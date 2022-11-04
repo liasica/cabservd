@@ -8,6 +8,7 @@ package hub
 import (
     "bufio"
     "bytes"
+    "cabservd/core/bean"
     "fmt"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
@@ -20,15 +21,28 @@ type hub struct {
     // address to listen
     addr string
 
+    // 电柜协议
+    bean bean.Bean
+
     // 在线的客户端
     // key = devId
-    // value = gnet.Conn
+    // value = Client
     clients sync.Map
 }
 
 func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
     log.Infof("TCP服务器已启动 %s", h.addr)
     return gnet.None
+}
+
+func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
+    log.Infof("新增客户端连接: %d, address: %s", c.Fd(), c.RemoteAddr())
+    return
+}
+
+func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
+    log.Infof("客户端断开连接 %d, error?: %v", c.Fd(), err)
+    return
 }
 
 func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
@@ -62,14 +76,4 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     buffer.Reset()
 
     return gnet.None
-}
-
-func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
-    log.Infof("新增客户端连接: %d, address: %s", c.Fd(), c.RemoteAddr())
-    return
-}
-
-func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
-    log.Infof("客户端断开连接 %d, error?: %v", c.Fd(), err)
-    return
 }

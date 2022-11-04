@@ -1,12 +1,16 @@
 // Copyright (C) liasica. 2022-present.
 //
-// Created at 2022-11-01
+// Created at 2022-11-04
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package hub
+package kaixin
 
 import "cabservd/core/bean"
 
-type Client struct {
+type Hander struct {
     bean.Bean
+}
+
+func New() *Hander {
+    return &Hander{}
 }

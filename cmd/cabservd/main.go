@@ -5,15 +5,5 @@
 
 package main
 
-import (
-    "cabservd/core/hub"
-    "cabservd/internal"
-)
-
 func main() {
-    // core boot
-    internal.Boot()
-
-    // 启动socket hub
-    hub.Run("0.0.0.0:18530")
 }

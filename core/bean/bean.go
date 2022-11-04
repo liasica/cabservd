@@ -6,7 +6,7 @@
 package bean
 
 type (
-    Event interface {
+    Bean interface {
         // OnConnect 连接接口
         OnConnect() (err error)
 

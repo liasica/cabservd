@@ -6,13 +6,15 @@
 package hub
 
 import (
+    "cabservd/core/bean"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
 )
 
-func Run(addr string) {
+func Run(addr string, bean bean.Bean) {
     h := &hub{
         addr: addr,
+        bean: bean,
     }
     log.Fatal(gnet.Run(
         h,
