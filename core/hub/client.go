@@ -4,3 +4,6 @@
 // Based on cabservd by liasica, magicrolan@qq.com.
 
 package hub
+
+type Client struct {
+}

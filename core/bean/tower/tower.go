@@ -3,7 +3,7 @@
 // Created at 2022-11-03
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package bean
+package tower
 
 import "cabservd/pkg/silk"
 
