@@ -1,0 +1,1 @@
+# GO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -tags=poll_opt -gcflags "all=-N -l" -trimpath -o build/release/kxservd cmd/kxservd/main.go

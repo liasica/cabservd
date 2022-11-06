@@ -6,8 +6,8 @@
 package main
 
 import (
-    "cabservd/core/bean/kaixin"
-    "cabservd/core/hub"
+    "cabservd/core"
+    "cabservd/core/kaixin"
     "cabservd/internal"
 )
 
@@ -16,5 +16,5 @@ func main() {
     internal.Boot()
 
     // 启动socket hub
-    hub.Run("0.0.0.0:18531", kaixin.New())
+    core.Run("0.0.0.0:18531", kaixin.New())
 }

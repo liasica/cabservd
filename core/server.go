@@ -3,16 +3,15 @@
 // Created at 2022-11-02
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package hub
+package core
 
 import (
-    "cabservd/core/bean"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
 )
 
-func Run(addr string, bean bean.Bean) {
-    h := &hub{
+func Run(addr string, bean Bean) {
+    h := &Hub{
         addr: addr,
         bean: bean,
     }

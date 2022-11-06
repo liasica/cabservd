@@ -3,10 +3,8 @@
 // Created at 2022-11-01
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package hub
-
-import "cabservd/core/bean"
+package core
 
 type Client struct {
-    bean.Bean
+    Bean
 }
