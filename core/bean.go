@@ -11,7 +11,7 @@ type (
         OnConnect() (err error)
 
         // OnMessage 收到消息
-        OnMessage(b []byte) (err error)
+        OnMessage(b []byte, client *Client) (err error)
     }
 
     Bean struct{}
@@ -21,6 +21,6 @@ func (h *Bean) OnConnect() (err error) {
     return
 }
 
-func (h *Bean) OnMessage(_ []byte) (err error) {
+func (h *Bean) OnMessage(_ []byte, _ *Client) (err error) {
     return
 }

@@ -18,14 +18,28 @@ func New() *Hander {
     return &Hander{}
 }
 
-func (h *Hander) OnMessage(b []byte) (err error) {
-    var message Message
-    err = jsoniter.Unmarshal(b, &message)
+// OnMessage 解析消息
+func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
+    req := new(Request)
+    // err = req.UnmarshalBinary(b)
+    err = jsoniter.Unmarshal(b, req)
     if err != nil {
         return
     }
-    switch message.MessageType {
+    switch req.MessageType {
     case MessageTypeLoginRequest:
+        return h.login(req, client)
     }
     return
+}
+
+// 登录请求
+func (h *Hander) login(req *Request, client *core.Client) (err error) {
+    // TODO: 保存其他信息
+
+    // 保存设备识别码
+    client.SetDeviceID(req.DevID)
+
+    // 发送登录响应
+    return client.SendMessage(req.Success())
 }

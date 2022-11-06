@@ -5,7 +5,9 @@
 
 package kaixin
 
-import "cabservd/pkg/silk"
+import (
+    "cabservd/pkg/silk"
+)
 
 // MessageType 消息类型
 type MessageType int
@@ -21,33 +23,33 @@ const (
     MessageTypeControlRequest  MessageType = 501 // 电柜控制响应
 )
 
-// RequestMessage 全局消息请求体
-type RequestMessage struct {
-    Message
-    LoginRequest
-    ReportRequest
-    NoticeRequest
-    ControlRequest
+func (t MessageType) String() string {
+    switch t {
+    case MessageTypeLoginRequest:
+        return "登录请求"
+    case MessageTypeLoginResponse:
+        return "登录响应"
+    case MessageTypeReportRequest:
+        return "属性上报请求"
+    case MessageTypeReportResponse:
+        return "属性上报响应"
+    case MessageTypeNoticeRequest:
+        return "告警上报请求"
+    case MessageTypeNoticeResponse:
+        return "告警上报响应"
+    case MessageTypeControlResponse:
+        return "电柜控制请求"
+    case MessageTypeControlRequest:
+        return "电柜控制响应"
+
+    }
+    return "未知"
 }
 
 type Message struct {
     MessageType MessageType `json:"messageType"` // 消息类型
     TxnNo       int64       `json:"txnNo"`       // 流水号: 13位时间戳
     DevID       string      `json:"devId"`       // 设备ID
-}
-
-// Result 响应结果
-type Result int
-
-const (
-    LoginResultFail Result = iota
-    LoginResultSuccess
-)
-
-// Response 响应
-type Response struct {
-    Message
-    Result Result `json:"result"` // 结果
 }
 
 // LoginRequest 上报登录请求

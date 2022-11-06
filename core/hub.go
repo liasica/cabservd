@@ -20,12 +20,22 @@ type Hub struct {
     // address to listen
     addr string
 
+    // 电柜类型
+    cate string
+
     // 电柜协议
     bean Hook
 
     // 在线的客户端
-    // deviceID => *Client
+    // *Client => deviceID
+    // deviceID 在初次连接的时候为空, 当登录成功后是设备的唯一编码
     clients sync.Map
+
+    // 客户端发起连接
+    connect chan *Client
+
+    // 断开客户端连接
+    disconnect chan *Client
 }
 
 func (h *Hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
@@ -35,6 +45,17 @@ func (h *Hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
 
 func (h *Hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
     log.Infof("[FD=%d] 新增客户端连接, address: %s", c.Fd(), c.RemoteAddr())
+
+    // 设置连接上下文信息
+    ctx := &Client{
+        Conn: c,
+        Hub:  h,
+    }
+    c.SetContext(ctx)
+
+    // 注册连接
+    h.connect <- ctx
+
     return
 }
 
@@ -44,6 +65,14 @@ func (h *Hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
 }
 
 func (h *Hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
+    // 获取客户端
+    client, ok := c.Context().(*Client)
+    if !ok {
+        // TODO 关闭连接
+        return gnet.Shutdown
+    }
+
+    // 读取消息
     reader := bufio.NewReader(c)
     var buffer bytes.Buffer
 
@@ -75,7 +104,8 @@ func (h *Hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     log.Infof("[FD=%d] 接收到消息, address: %s, message: %s", c.Fd(), c.RemoteAddr(), b)
 
     // 解析
-    err := h.bean.OnMessage(b)
+    // TODO 未知的 Client
+    err := h.bean.OnMessage(b, client)
     if err != nil {
         log.Errorf("[FD=%d] 消息解析失败, address: %s, err: %v", c.Fd(), c.RemoteAddr(), err)
     }
