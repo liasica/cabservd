@@ -6,49 +6,21 @@
 package core
 
 type (
-    Bean interface {
+    Hook interface {
         // OnConnect 连接接口
         OnConnect() (err error)
 
         // OnMessage 收到消息
         OnMessage(b []byte) (err error)
-        //
-        // // OnRegister 注册
-        // OnRegister() (err error)
-        //
-        // // OnReport 属性上报
-        // OnReport(body []byte) (err error)
-        //
-        // // OnNotice 告警上报
-        // OnNotice(body []byte) (err error)
-        //
-        // // OnControl 控制回报
-        // OnControl(body []byte) (err error)
     }
 
-    Hooks struct{}
+    Bean struct{}
 )
 
-func (h *Hooks) OnConnect() (err error) {
+func (h *Bean) OnConnect() (err error) {
     return
 }
 
-func (h *Hooks) OnMessage(_ []byte) (err error) {
-    return
-}
-
-func (h *Hooks) OnRegister() (err error) {
-    return
-}
-
-func (h *Hooks) OnReport(_ []byte) (err error) {
-    return
-}
-
-func (h *Hooks) OnNotice(_ []byte) (err error) {
-    return
-}
-
-func (h *Hooks) OnControl(_ []byte) (err error) {
+func (h *Bean) OnMessage(_ []byte) (err error) {
     return
 }

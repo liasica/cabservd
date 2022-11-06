@@ -21,13 +21,11 @@ type Hub struct {
     addr string
 
     // 电柜协议
-    bean Bean
+    bean Hook
 
     // 在线的客户端
     // deviceID => *Client
     clients sync.Map
-
-    register chan *Client
 }
 
 func (h *Hub) OnBoot(_ gnet.Engine) (action gnet.Action) {

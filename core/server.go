@@ -10,7 +10,7 @@ import (
     log "github.com/sirupsen/logrus"
 )
 
-func Run(addr string, bean Bean) {
+func Run(addr string, bean Hook) {
     h := &Hub{
         addr: addr,
         bean: bean,
