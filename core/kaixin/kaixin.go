@@ -47,9 +47,9 @@ func (t MessageType) String() string {
 }
 
 type Message struct {
-    MessageType MessageType `json:"messageType"` // 消息类型
-    TxnNo       int64       `json:"txnNo"`       // 流水号: 13位时间戳
-    DevID       string      `json:"devId"`       // 设备ID
+    MsgType MessageType `json:"msgType"` // 消息类型
+    TxnNo   int64       `json:"txnNo"`   // 流水号: 13位时间戳
+    DevID   string      `json:"devId"`   // 设备ID
 }
 
 // LoginRequest 上报登录请求

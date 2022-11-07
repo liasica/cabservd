@@ -37,9 +37,9 @@ func (m *Request) String() string {
 func (m *Request) Success() *Response {
     return &Response{
         Message: Message{
-            MessageType: m.MessageType + 1,
-            TxnNo:       m.TxnNo,
-            DevID:       m.DevID,
+            MsgType: m.MsgType + 1,
+            TxnNo:   m.TxnNo,
+            DevID:   m.DevID,
         },
         Result: LoginResultSuccess,
     }
@@ -49,9 +49,9 @@ func (m *Request) Success() *Response {
 func (m *Request) Fail() *Response {
     return &Response{
         Message: Message{
-            MessageType: m.MessageType + 1,
-            TxnNo:       m.TxnNo,
-            DevID:       m.DevID,
+            MsgType: m.MsgType + 1,
+            TxnNo:   m.TxnNo,
+            DevID:   m.DevID,
         },
         Result: LoginResultFail,
     }

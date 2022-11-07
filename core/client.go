@@ -10,6 +10,10 @@ import (
     "github.com/panjf2000/gnet/v2"
 )
 
+var (
+    newline = []byte("\n")
+)
+
 type Client struct {
     // gnet 连接
     gnet.Conn
@@ -30,5 +34,6 @@ func (c *Client) SendMessage(data any) (err error) {
         return
     }
     _, err = c.Write(b)
+    _, err = c.Write(newline)
     return
 }

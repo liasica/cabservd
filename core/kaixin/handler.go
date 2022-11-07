@@ -26,11 +26,23 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     if err != nil {
         return
     }
-    switch req.MessageType {
+    switch req.MsgType {
     case MessageTypeLoginRequest:
-        return h.login(req, client)
+        err = h.login(req, client)
+    case MessageTypeReportRequest:
+        err = h.report(req)
+    case MessageTypeNoticeRequest:
+        err = h.notice(req)
+    case MessageTypeControlResponse:
+        // TODO 控制成功逻辑
     }
-    return
+
+    // 发送登录响应
+    if err != nil {
+        return client.SendMessage(req.Fail())
+    }
+
+    return client.SendMessage(req.Success())
 }
 
 // 登录请求
@@ -40,6 +52,17 @@ func (h *Hander) login(req *Request, client *core.Client) (err error) {
     // 保存设备识别码
     client.SetDeviceID(req.DevID)
 
-    // 发送登录响应
-    return client.SendMessage(req.Success())
+    return
+}
+
+// 状态上报请求
+func (h *Hander) report(req *Request) (err error) {
+    // TODO 解读所有信号量
+    return
+}
+
+// 告警上报请求
+func (h *Hander) notice(req *Request) (err error) {
+    // TODO 解读所有告警信息
+    return
 }

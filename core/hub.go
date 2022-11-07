@@ -107,7 +107,7 @@ func (h *Hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     // TODO 未知的 Client
     err := h.bean.OnMessage(b, client)
     if err != nil {
-        log.Errorf("[FD=%d] 消息解析失败, address: %s, err: %v", c.Fd(), c.RemoteAddr(), err)
+        log.Errorf("[FD=%d] (%s)解析失败, address: %s, err: %v", c.Fd(), b, c.RemoteAddr(), err)
     }
 
     return gnet.None
