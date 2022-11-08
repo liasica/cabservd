@@ -2,6 +2,8 @@
 
 ### 第三方库
 - [DTM是一款开源的分布式事务管理器](https://www.dtm.pub/guide/start.html)
+- [kratos](https://go-kratos.dev/docs)
+- [wire](https://zhuanlan.zhihu.com/p/399101012)
 
 ### 日志内容
 - 时间
