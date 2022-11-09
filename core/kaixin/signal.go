@@ -10,7 +10,7 @@ type Signal string
 // SignalData 信号量结构体
 type SignalData struct {
     ID    Signal `json:"id,omitempty"`    // 信号量ID
-    Value string `json:"value,omitempty"` // 参数值
+    Value any    `json:"value,omitempty"` // 参数值
 }
 
 const (
