@@ -6,11 +6,9 @@
 package core
 
 import (
-    "bufio"
-    "bytes"
-    "fmt"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
+    "net"
     "sync"
 )
 
@@ -25,6 +23,9 @@ type Hub struct {
 
     // 电柜协议
     bean Hook
+
+    // 编码协议
+    codec Codec
 
     // 在线的客户端
     // *Client => deviceID
@@ -44,7 +45,7 @@ func (h *Hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
 }
 
 func (h *Hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
-    log.Infof("[FD=%d] 新增客户端连接, address: %s", c.Fd(), c.RemoteAddr())
+    log.Infof("[FD=%d / %s] 新增客户端连接", c.Fd(), c.RemoteAddr())
 
     // 设置连接上下文信息
     ctx := &Client{
@@ -60,7 +61,7 @@ func (h *Hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 }
 
 func (h *Hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
-    log.Infof("[FD=%d] 客户端断开连接, address: %s, error?: %v", c.Fd(), c.RemoteAddr(), err)
+    log.Infof("[FD=%d / %s] 客户端断开连接, error?: %v", c.Fd(), c.RemoteAddr(), err)
     return
 }
 
@@ -72,43 +73,37 @@ func (h *Hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
         return gnet.Shutdown
     }
 
-    // 读取消息
-    reader := bufio.NewReader(c)
-    var buffer bytes.Buffer
+    var (
+        b   []byte
+        err error
+    )
 
     for {
-        b, prefix, err := reader.ReadLine()
+        b, err = h.codec.Decode(c)
 
-        if err != nil {
-            log.Errorf("[Hub] 客户端消息读取失败: %v", err)
-        }
-
-        buffer.Write(b)
-
-        // 是否有后续消息
-        if prefix {
-            fmt.Println("接收后续消息")
-            continue
-        }
-
-        // 读取成功
-        if buffer.Len() > 0 {
+        if err == ErrIncompletePacket {
             break
         }
+
+        if err != nil {
+            log.Errorf("[FD=%d / %s] 消息读取失败, err: %v", c.Fd(), c.RemoteAddr(), err)
+            return
+        }
+
+        go h.decoded(b, c.Fd(), c.RemoteAddr(), client)
     }
 
-    b := buffer.Bytes()
-    buffer.Reset()
+    return gnet.None
+}
 
+func (h *Hub) decoded(b []byte, fd int, addr net.Addr, client *Client) {
     // 记录日志
-    log.Infof("[FD=%d] 接收到消息, address: %s, message: %s", c.Fd(), c.RemoteAddr(), b)
+    log.Infof("[FD=%d / %s] 接收到消息, message: %s", fd, addr, b)
 
     // 解析
     // TODO 未知的 Client
     err := h.bean.OnMessage(b, client)
     if err != nil {
-        log.Errorf("[FD=%d] 解析失败, address: %s, err: %v, 原始消息: %s", c.Fd(), c.RemoteAddr(), err, b)
+        log.Errorf("[FD=%d / %s] 解析失败, err: %v, 原始消息: %s", fd, addr, err, b)
     }
-
-    return gnet.None
 }

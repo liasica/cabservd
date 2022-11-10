@@ -12,10 +12,14 @@ import (
 
 type Hander struct {
     core.Bean
+    core.Codec
 }
 
 func New() *Hander {
-    return &Hander{}
+    return &Hander{
+        // 使用 \n 编码
+        Codec: new(core.Newline),
+    }
 }
 
 // OnMessage 解析消息

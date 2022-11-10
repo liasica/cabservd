@@ -10,11 +10,12 @@ import (
     log "github.com/sirupsen/logrus"
 )
 
-func Start(addr, cate string, bean Hook) {
+func Start(addr, cate string, bean Hook, codec Codec) {
     h := &Hub{
         addr:       addr,
         bean:       bean,
         cate:       cate,
+        codec:      codec,
         connect:    make(chan *Client, 256),
         disconnect: make(chan *Client, 256),
     }

@@ -10,10 +10,6 @@ import (
     "github.com/panjf2000/gnet/v2"
 )
 
-var (
-    newline = []byte("\n")
-)
-
 type Client struct {
     // gnet 连接
     gnet.Conn
@@ -28,12 +24,5 @@ func (c *Client) SetDeviceID(id string) {
 
 // SendMessage 向客户端发送消息
 func (c *Client) SendMessage(data any) (err error) {
-    var b []byte
-    b, err = jsoniter.Marshal(data)
-    if err != nil {
-        return
-    }
-    _, err = c.Write(b)
-    _, err = c.Write(newline)
-    return
+    return jsoniter.NewEncoder(c).Encode(data)
 }

@@ -16,5 +16,10 @@ func main() {
     internal.Boot()
 
     // 启动socket hub
-    core.Start("0.0.0.0:18531", "凯信", kaixin.New())
+    core.Start(
+        "0.0.0.0:18531",
+        "凯信",
+        kaixin.New(),
+        new(core.HeaderLength),
+    )
 }
