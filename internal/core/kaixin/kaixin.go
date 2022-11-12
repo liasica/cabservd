@@ -6,7 +6,7 @@
 package kaixin
 
 import (
-    "cabservd/pkg/silk"
+    "github.com/auroraride/cabservd/pkg/silk"
 )
 
 // MessageType 消息类型
@@ -19,8 +19,8 @@ const (
     MessageTypeReportResponse  MessageType = 301 // 属性上报响应
     MessageTypeNoticeRequest   MessageType = 400 // 告警上报
     MessageTypeNoticeResponse  MessageType = 401 // 告警上报响应
-    MessageTypeControlResponse MessageType = 500 // 电柜控制请求
-    MessageTypeControlRequest  MessageType = 501 // 电柜控制响应
+    MessageTypeControlRequest  MessageType = 500 // 电柜控制请求
+    MessageTypeControlResponse MessageType = 501 // 电柜控制响应
 )
 
 func (t MessageType) String() string {
@@ -62,8 +62,8 @@ type LoginRequest struct {
 
 // ReportRequest 上报电柜属性
 type ReportRequest struct {
-    AttrList []Attr `json:"attrList" json:"attrList,omitempty"` // 属性列表
-    IsFull   int    `json:"isFull" json:"isFull,omitempty"`     // 是否全量上报: 0:增量 1:全量
+    AttrList []Attr `json:"attrList,omitempty"` // 属性列表
+    IsFull   *int   `json:"isFull,omitempty"`   // 是否全量上报: 0:增量 1:全量
 }
 
 // Attr 属性信息
@@ -82,7 +82,7 @@ type Alarm struct {
     ID         string `json:"id,omitempty"`         // 信号量ID
     AlarmTime  int64  `json:"alarmTime,omitempty"`  // 告警时间: 13位时间戳
     AlarmmDesc string `json:"alarmmDesc,omitempty"` // 描述 (可为空)
-    AlarmFlag  int    `json:"alarmFlag,omitempty"`  // 告警标识: 0:结束 1:开始
+    AlarmFlag  *int   `json:"alarmFlag,omitempty"`  // 告警标识: 0:结束 1:开始
     DoorID     string `json:"doorId,omitempty"`     // 柜门ID (可为空, 对应信号量类别属于电池、柜门，字段必填)
     BatteryID  string `json:"batteryId,omitempty"`  // 电池ID (可为空, 对应信号量类别属于电池，字段必填)
     UserID     string `json:"userId,omitempty"`     // App用户ID (可为空, 首放、换电、退电的解绑、绑定事件必填)

@@ -6,13 +6,18 @@
 package core
 
 import (
+    "github.com/auroraride/cabservd/internal/errs"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
     "net"
     "sync"
 )
 
-type Hub struct {
+var (
+    Hub *hub
+)
+
+type hub struct {
     gnet.BuiltinEventEngine
 
     // address to listen
@@ -39,12 +44,12 @@ type Hub struct {
     disconnect chan *Client
 }
 
-func (h *Hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
+func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
     log.Infof("TCP服务器已启动 %s", h.addr)
     return gnet.None
 }
 
-func (h *Hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
+func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
     log.Infof("[FD=%d / %s] 新增客户端连接", c.Fd(), c.RemoteAddr())
 
     // 设置连接上下文信息
@@ -60,12 +65,18 @@ func (h *Hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
     return
 }
 
-func (h *Hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
+func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
     log.Infof("[FD=%d / %s] 客户端断开连接, error?: %v", c.Fd(), c.RemoteAddr(), err)
+    // 获取客户端
+    client, ok := c.Context().(*Client)
+    // 删除客户端
+    if ok {
+        h.clients.Delete(client)
+    }
     return
 }
 
-func (h *Hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
+func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     // 获取客户端
     client, ok := c.Context().(*Client)
     if !ok {
@@ -81,7 +92,7 @@ func (h *Hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     for {
         b, err = h.codec.Decode(c)
 
-        if err == ErrIncompletePacket {
+        if err == errs.IncompletePacket {
             break
         }
 
@@ -96,7 +107,7 @@ func (h *Hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     return gnet.None
 }
 
-func (h *Hub) decoded(b []byte, fd int, addr net.Addr, client *Client) {
+func (h *hub) decoded(b []byte, fd int, addr net.Addr, client *Client) {
     // 记录日志
     log.Infof("[FD=%d / %s] 接收到消息, message: %s", fd, addr, b)
 

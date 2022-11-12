@@ -2,7 +2,7 @@
   <configuration default="false" name="kxservd" type="GoApplicationRunConfiguration" factoryName="Go Application">
     <module name="cabservd" />
     <working_directory value="$PROJECT_DIR$" />
-    <go_parameters value="-trimpath" />
+    <go_parameters value="-trimpath -tags=jsoniter -tags=poll_opt" />
     <kind value="DIRECTORY" />
     <package value="cabservd/cmd/kxservd" />
     <directory value="$PROJECT_DIR$/cmd/kxservd" />

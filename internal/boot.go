@@ -6,8 +6,8 @@
 package internal
 
 import (
-    "cabservd/internal/g"
-    "cabservd/pkg/logger"
+    "github.com/auroraride/cabservd/internal/g"
+    "github.com/auroraride/cabservd/pkg/logger"
     "os"
     "time"
 )

@@ -11,7 +11,7 @@ import (
 )
 
 func Start(addr, cate string, bean Hook, codec Codec) {
-    h := &Hub{
+    Hub = &hub{
         addr:       addr,
         bean:       bean,
         cate:       cate,
@@ -20,18 +20,18 @@ func Start(addr, cate string, bean Hook, codec Codec) {
         disconnect: make(chan *Client, 256),
     }
 
-    go h.run()
+    go Hub.run()
 
     log.Fatal(gnet.Run(
-        h,
-        h.addr,
+        Hub,
+        Hub.addr,
         gnet.WithMulticore(true),
         gnet.WithReuseAddr(true),
         gnet.WithLogger(log.New()),
     ))
 }
 
-func (h *Hub) run() {
+func (h *hub) run() {
     for {
         select {
         case client := <-h.connect:

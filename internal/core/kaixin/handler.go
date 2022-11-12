@@ -6,7 +6,7 @@
 package kaixin
 
 import (
-    "cabservd/core"
+    "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
 )
 
@@ -39,6 +39,8 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
         err = h.notice(req)
     case MessageTypeControlResponse:
         // TODO 控制成功逻辑
+        // 收到成功逻辑处理完成后, 不发送反馈消息
+        return
     }
 
     // 发送登录响应

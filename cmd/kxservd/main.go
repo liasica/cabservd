@@ -6,14 +6,18 @@
 package main
 
 import (
-    "cabservd/core"
-    "cabservd/core/kaixin"
-    "cabservd/internal"
+    "github.com/auroraride/cabservd/internal"
+    "github.com/auroraride/cabservd/internal/core"
+    "github.com/auroraride/cabservd/internal/core/kaixin"
+    "github.com/auroraride/cabservd/router"
 )
 
 func main() {
     // core boot
     internal.Boot()
+
+    // 启动 http server
+    go router.Start()
 
     // 启动socket hub
     core.Start(
