@@ -5,6 +5,7 @@
 - [kratos](https://go-kratos.dev/docs)
 - [wire](https://zhuanlan.zhihu.com/p/399101012)
 - [dig](https://darjun.github.io/2020/02/22/godailylib/dig/)
+- [Loki](https://github.com/grafana/loki)
 
 ### 日志内容
 - 时间
