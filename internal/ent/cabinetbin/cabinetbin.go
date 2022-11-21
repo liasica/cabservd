@@ -35,6 +35,10 @@ const (
 	FieldVoltage = "voltage"
 	// FieldCurrent holds the string denoting the current field in the database.
 	FieldCurrent = "current"
+	// FieldSoc holds the string denoting the soc field in the database.
+	FieldSoc = "soc"
+	// FieldSoh holds the string denoting the soh field in the database.
+	FieldSoh = "soh"
 	// Table holds the table name of the cabinetbin in the database.
 	Table = "cabinet_bin"
 )
@@ -54,6 +58,8 @@ var Columns = []string{
 	FieldBatterySn,
 	FieldVoltage,
 	FieldCurrent,
+	FieldSoc,
+	FieldSoh,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -79,8 +85,14 @@ var (
 	DefaultOpen bool
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
+	// DefaultBatterySn holds the default value on creation for the "battery_sn" field.
+	DefaultBatterySn string
 	// DefaultVoltage holds the default value on creation for the "voltage" field.
 	DefaultVoltage float64
 	// DefaultCurrent holds the default value on creation for the "current" field.
 	DefaultCurrent float64
+	// DefaultSoc holds the default value on creation for the "soc" field.
+	DefaultSoc float64
+	// DefaultSoh holds the default value on creation for the "soh" field.
+	DefaultSoh float64
 )

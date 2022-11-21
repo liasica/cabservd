@@ -20,9 +20,14 @@ func Start() {
     router := gin.Default()
     _ = router.SetTrustedProxies([]string{"192.168.1.2"})
 
-    router.POST("/demo", api.Demo.Control)
+    // 引入HTML模板
+    router.LoadHTMLGlob("templates/**/*")
 
-    // log.Fatal(router.Run("0.0.0.0:18521"))
+    // demo路由
+    router.POST("/demo/control", api.Demo.Control)
+    router.GET("/demo/exchange", api.Demo.Exchange)
+    router.POST("/demo/start", api.Demo.Start)
+
     srv := &http.Server{
         Addr:    ":18521",
         Handler: router,

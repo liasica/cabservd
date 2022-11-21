@@ -21,9 +21,11 @@ var (
 		{Name: "index", Type: field.TypeInt},
 		{Name: "open", Type: field.TypeBool, Default: false},
 		{Name: "enable", Type: field.TypeBool, Default: true},
-		{Name: "battery_sn", Type: field.TypeString, Nullable: true},
+		{Name: "battery_sn", Type: field.TypeString, Default: ""},
 		{Name: "voltage", Type: field.TypeFloat64, Default: 0},
 		{Name: "current", Type: field.TypeFloat64, Default: 0},
+		{Name: "soc", Type: field.TypeFloat64, Default: 0},
+		{Name: "soh", Type: field.TypeFloat64, Default: 0},
 	}
 	// CabinetBinTable holds the schema information for the "cabinet_bin" table.
 	CabinetBinTable = &schema.Table{
@@ -50,6 +52,11 @@ var (
 				Name:    "cabinetbin_battery_sn",
 				Unique:  false,
 				Columns: []*schema.Column{CabinetBinColumns[10]},
+			},
+			{
+				Name:    "cabinetbin_soc",
+				Unique:  false,
+				Columns: []*schema.Column{CabinetBinColumns[13]},
 			},
 		},
 	}

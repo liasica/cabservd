@@ -70,3 +70,19 @@ func (a *Attr) GetCurrent() (v float64, exists bool) {
     }
     return
 }
+
+func (a *Attr) GetSoC() (v float64, exists bool) {
+    exists = a.ID == SignalSOC
+    if exists {
+        v = a.Value.(float64)
+    }
+    return
+}
+
+func (a *Attr) GetSoH() (v float64, exists bool) {
+    exists = a.ID == SignalSOH
+    if exists {
+        v = a.Value.(float64)
+    }
+    return
+}

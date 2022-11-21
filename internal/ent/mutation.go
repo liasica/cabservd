@@ -48,6 +48,10 @@ type CabinetBinMutation struct {
 	addvoltage    *float64
 	current       *float64
 	addcurrent    *float64
+	soc           *float64
+	addsoc        *float64
+	soh           *float64
+	addsoh        *float64
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*CabinetBin, error)
@@ -513,7 +517,7 @@ func (m *CabinetBinMutation) BatterySn() (r string, exists bool) {
 // OldBatterySn returns the old "battery_sn" field's value of the CabinetBin entity.
 // If the CabinetBin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CabinetBinMutation) OldBatterySn(ctx context.Context) (v *string, err error) {
+func (m *CabinetBinMutation) OldBatterySn(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBatterySn is only allowed on UpdateOne operations")
 	}
@@ -527,22 +531,9 @@ func (m *CabinetBinMutation) OldBatterySn(ctx context.Context) (v *string, err e
 	return oldValue.BatterySn, nil
 }
 
-// ClearBatterySn clears the value of the "battery_sn" field.
-func (m *CabinetBinMutation) ClearBatterySn() {
-	m.battery_sn = nil
-	m.clearedFields[cabinetbin.FieldBatterySn] = struct{}{}
-}
-
-// BatterySnCleared returns if the "battery_sn" field was cleared in this mutation.
-func (m *CabinetBinMutation) BatterySnCleared() bool {
-	_, ok := m.clearedFields[cabinetbin.FieldBatterySn]
-	return ok
-}
-
 // ResetBatterySn resets all changes to the "battery_sn" field.
 func (m *CabinetBinMutation) ResetBatterySn() {
 	m.battery_sn = nil
-	delete(m.clearedFields, cabinetbin.FieldBatterySn)
 }
 
 // SetVoltage sets the "voltage" field.
@@ -657,6 +648,118 @@ func (m *CabinetBinMutation) ResetCurrent() {
 	m.addcurrent = nil
 }
 
+// SetSoc sets the "soc" field.
+func (m *CabinetBinMutation) SetSoc(f float64) {
+	m.soc = &f
+	m.addsoc = nil
+}
+
+// Soc returns the value of the "soc" field in the mutation.
+func (m *CabinetBinMutation) Soc() (r float64, exists bool) {
+	v := m.soc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSoc returns the old "soc" field's value of the CabinetBin entity.
+// If the CabinetBin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetBinMutation) OldSoc(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSoc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSoc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSoc: %w", err)
+	}
+	return oldValue.Soc, nil
+}
+
+// AddSoc adds f to the "soc" field.
+func (m *CabinetBinMutation) AddSoc(f float64) {
+	if m.addsoc != nil {
+		*m.addsoc += f
+	} else {
+		m.addsoc = &f
+	}
+}
+
+// AddedSoc returns the value that was added to the "soc" field in this mutation.
+func (m *CabinetBinMutation) AddedSoc() (r float64, exists bool) {
+	v := m.addsoc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSoc resets all changes to the "soc" field.
+func (m *CabinetBinMutation) ResetSoc() {
+	m.soc = nil
+	m.addsoc = nil
+}
+
+// SetSoh sets the "soh" field.
+func (m *CabinetBinMutation) SetSoh(f float64) {
+	m.soh = &f
+	m.addsoh = nil
+}
+
+// Soh returns the value of the "soh" field in the mutation.
+func (m *CabinetBinMutation) Soh() (r float64, exists bool) {
+	v := m.soh
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSoh returns the old "soh" field's value of the CabinetBin entity.
+// If the CabinetBin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetBinMutation) OldSoh(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSoh is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSoh requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSoh: %w", err)
+	}
+	return oldValue.Soh, nil
+}
+
+// AddSoh adds f to the "soh" field.
+func (m *CabinetBinMutation) AddSoh(f float64) {
+	if m.addsoh != nil {
+		*m.addsoh += f
+	} else {
+		m.addsoh = &f
+	}
+}
+
+// AddedSoh returns the value that was added to the "soh" field in this mutation.
+func (m *CabinetBinMutation) AddedSoh() (r float64, exists bool) {
+	v := m.addsoh
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSoh resets all changes to the "soh" field.
+func (m *CabinetBinMutation) ResetSoh() {
+	m.soh = nil
+	m.addsoh = nil
+}
+
 // Where appends a list predicates to the CabinetBinMutation builder.
 func (m *CabinetBinMutation) Where(ps ...predicate.CabinetBin) {
 	m.predicates = append(m.predicates, ps...)
@@ -676,7 +779,7 @@ func (m *CabinetBinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CabinetBinMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, cabinetbin.FieldCreatedAt)
 	}
@@ -713,6 +816,12 @@ func (m *CabinetBinMutation) Fields() []string {
 	if m.current != nil {
 		fields = append(fields, cabinetbin.FieldCurrent)
 	}
+	if m.soc != nil {
+		fields = append(fields, cabinetbin.FieldSoc)
+	}
+	if m.soh != nil {
+		fields = append(fields, cabinetbin.FieldSoh)
+	}
 	return fields
 }
 
@@ -745,6 +854,10 @@ func (m *CabinetBinMutation) Field(name string) (ent.Value, bool) {
 		return m.Voltage()
 	case cabinetbin.FieldCurrent:
 		return m.Current()
+	case cabinetbin.FieldSoc:
+		return m.Soc()
+	case cabinetbin.FieldSoh:
+		return m.Soh()
 	}
 	return nil, false
 }
@@ -778,6 +891,10 @@ func (m *CabinetBinMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldVoltage(ctx)
 	case cabinetbin.FieldCurrent:
 		return m.OldCurrent(ctx)
+	case cabinetbin.FieldSoc:
+		return m.OldSoc(ctx)
+	case cabinetbin.FieldSoh:
+		return m.OldSoh(ctx)
 	}
 	return nil, fmt.Errorf("unknown CabinetBin field %s", name)
 }
@@ -871,6 +988,20 @@ func (m *CabinetBinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCurrent(v)
 		return nil
+	case cabinetbin.FieldSoc:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSoc(v)
+		return nil
+	case cabinetbin.FieldSoh:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSoh(v)
+		return nil
 	}
 	return fmt.Errorf("unknown CabinetBin field %s", name)
 }
@@ -888,6 +1019,12 @@ func (m *CabinetBinMutation) AddedFields() []string {
 	if m.addcurrent != nil {
 		fields = append(fields, cabinetbin.FieldCurrent)
 	}
+	if m.addsoc != nil {
+		fields = append(fields, cabinetbin.FieldSoc)
+	}
+	if m.addsoh != nil {
+		fields = append(fields, cabinetbin.FieldSoh)
+	}
 	return fields
 }
 
@@ -902,6 +1039,10 @@ func (m *CabinetBinMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedVoltage()
 	case cabinetbin.FieldCurrent:
 		return m.AddedCurrent()
+	case cabinetbin.FieldSoc:
+		return m.AddedSoc()
+	case cabinetbin.FieldSoh:
+		return m.AddedSoh()
 	}
 	return nil, false
 }
@@ -932,6 +1073,20 @@ func (m *CabinetBinMutation) AddField(name string, value ent.Value) error {
 		}
 		m.AddCurrent(v)
 		return nil
+	case cabinetbin.FieldSoc:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSoc(v)
+		return nil
+	case cabinetbin.FieldSoh:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSoh(v)
+		return nil
 	}
 	return fmt.Errorf("unknown CabinetBin numeric field %s", name)
 }
@@ -939,11 +1094,7 @@ func (m *CabinetBinMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CabinetBinMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(cabinetbin.FieldBatterySn) {
-		fields = append(fields, cabinetbin.FieldBatterySn)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -956,11 +1107,6 @@ func (m *CabinetBinMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CabinetBinMutation) ClearField(name string) error {
-	switch name {
-	case cabinetbin.FieldBatterySn:
-		m.ClearBatterySn()
-		return nil
-	}
 	return fmt.Errorf("unknown CabinetBin nullable field %s", name)
 }
 
@@ -1003,6 +1149,12 @@ func (m *CabinetBinMutation) ResetField(name string) error {
 		return nil
 	case cabinetbin.FieldCurrent:
 		m.ResetCurrent()
+		return nil
+	case cabinetbin.FieldSoc:
+		m.ResetSoc()
+		return nil
+	case cabinetbin.FieldSoh:
+		m.ResetSoh()
 		return nil
 	}
 	return fmt.Errorf("unknown CabinetBin field %s", name)

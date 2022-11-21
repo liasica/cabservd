@@ -37,6 +37,8 @@ var schemaGraph = func() *sqlgraph.Schema {
 			cabinetbin.FieldBatterySn: {Type: field.TypeString, Column: cabinetbin.FieldBatterySn},
 			cabinetbin.FieldVoltage:   {Type: field.TypeFloat64, Column: cabinetbin.FieldVoltage},
 			cabinetbin.FieldCurrent:   {Type: field.TypeFloat64, Column: cabinetbin.FieldCurrent},
+			cabinetbin.FieldSoc:       {Type: field.TypeFloat64, Column: cabinetbin.FieldSoc},
+			cabinetbin.FieldSoh:       {Type: field.TypeFloat64, Column: cabinetbin.FieldSoh},
 		},
 	}
 	return graph
@@ -146,4 +148,14 @@ func (f *CabinetBinFilter) WhereVoltage(p entql.Float64P) {
 // WhereCurrent applies the entql float64 predicate on the current field.
 func (f *CabinetBinFilter) WhereCurrent(p entql.Float64P) {
 	f.Where(p.Field(cabinetbin.FieldCurrent))
+}
+
+// WhereSoc applies the entql float64 predicate on the soc field.
+func (f *CabinetBinFilter) WhereSoc(p entql.Float64P) {
+	f.Where(p.Field(cabinetbin.FieldSoc))
+}
+
+// WhereSoh applies the entql float64 predicate on the soh field.
+func (f *CabinetBinFilter) WhereSoh(p entql.Float64P) {
+	f.Where(p.Field(cabinetbin.FieldSoh))
 }

@@ -35,11 +35,15 @@ type CabinetBin struct {
 	// 仓位是否启用
 	Enable bool `json:"enable,omitempty"`
 	// 电池序列号
-	BatterySn *string `json:"battery_sn,omitempty"`
+	BatterySn string `json:"battery_sn,omitempty"`
 	// 当前电压
 	Voltage float64 `json:"voltage,omitempty"`
 	// 当前电流
 	Current float64 `json:"current,omitempty"`
+	// 电池电量
+	Soc float64 `json:"soc,omitempty"`
+	// 电池健康程度
+	Soh float64 `json:"soh,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -49,7 +53,7 @@ func (*CabinetBin) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case cabinetbin.FieldOpen, cabinetbin.FieldEnable:
 			values[i] = new(sql.NullBool)
-		case cabinetbin.FieldVoltage, cabinetbin.FieldCurrent:
+		case cabinetbin.FieldVoltage, cabinetbin.FieldCurrent, cabinetbin.FieldSoc, cabinetbin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
 		case cabinetbin.FieldID, cabinetbin.FieldIndex:
 			values[i] = new(sql.NullInt64)
@@ -136,8 +140,7 @@ func (cb *CabinetBin) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field battery_sn", values[i])
 			} else if value.Valid {
-				cb.BatterySn = new(string)
-				*cb.BatterySn = value.String
+				cb.BatterySn = value.String
 			}
 		case cabinetbin.FieldVoltage:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -150,6 +153,18 @@ func (cb *CabinetBin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field current", values[i])
 			} else if value.Valid {
 				cb.Current = value.Float64
+			}
+		case cabinetbin.FieldSoc:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field soc", values[i])
+			} else if value.Valid {
+				cb.Soc = value.Float64
+			}
+		case cabinetbin.FieldSoh:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field soh", values[i])
+			} else if value.Valid {
+				cb.Soh = value.Float64
 			}
 		}
 	}
@@ -206,16 +221,20 @@ func (cb *CabinetBin) String() string {
 	builder.WriteString("enable=")
 	builder.WriteString(fmt.Sprintf("%v", cb.Enable))
 	builder.WriteString(", ")
-	if v := cb.BatterySn; v != nil {
-		builder.WriteString("battery_sn=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("battery_sn=")
+	builder.WriteString(cb.BatterySn)
 	builder.WriteString(", ")
 	builder.WriteString("voltage=")
 	builder.WriteString(fmt.Sprintf("%v", cb.Voltage))
 	builder.WriteString(", ")
 	builder.WriteString("current=")
 	builder.WriteString(fmt.Sprintf("%v", cb.Current))
+	builder.WriteString(", ")
+	builder.WriteString("soc=")
+	builder.WriteString(fmt.Sprintf("%v", cb.Soc))
+	builder.WriteString(", ")
+	builder.WriteString("soh=")
+	builder.WriteString(fmt.Sprintf("%v", cb.Soh))
 	builder.WriteByte(')')
 	return builder.String()
 }

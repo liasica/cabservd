@@ -40,6 +40,10 @@ func init() {
 	cabinetbinDescEnable := cabinetbinFields[6].Descriptor()
 	// cabinetbin.DefaultEnable holds the default value on creation for the enable field.
 	cabinetbin.DefaultEnable = cabinetbinDescEnable.Default.(bool)
+	// cabinetbinDescBatterySn is the schema descriptor for battery_sn field.
+	cabinetbinDescBatterySn := cabinetbinFields[7].Descriptor()
+	// cabinetbin.DefaultBatterySn holds the default value on creation for the battery_sn field.
+	cabinetbin.DefaultBatterySn = cabinetbinDescBatterySn.Default.(string)
 	// cabinetbinDescVoltage is the schema descriptor for voltage field.
 	cabinetbinDescVoltage := cabinetbinFields[8].Descriptor()
 	// cabinetbin.DefaultVoltage holds the default value on creation for the voltage field.
@@ -48,4 +52,12 @@ func init() {
 	cabinetbinDescCurrent := cabinetbinFields[9].Descriptor()
 	// cabinetbin.DefaultCurrent holds the default value on creation for the current field.
 	cabinetbin.DefaultCurrent = cabinetbinDescCurrent.Default.(float64)
+	// cabinetbinDescSoc is the schema descriptor for soc field.
+	cabinetbinDescSoc := cabinetbinFields[10].Descriptor()
+	// cabinetbin.DefaultSoc holds the default value on creation for the soc field.
+	cabinetbin.DefaultSoc = cabinetbinDescSoc.Default.(float64)
+	// cabinetbinDescSoh is the schema descriptor for soh field.
+	cabinetbinDescSoh := cabinetbinFields[11].Descriptor()
+	// cabinetbin.DefaultSoh holds the default value on creation for the soh field.
+	cabinetbin.DefaultSoh = cabinetbinDescSoh.Default.(float64)
 }

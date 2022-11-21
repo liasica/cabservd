@@ -114,12 +114,6 @@ func (cbu *CabinetBinUpdate) SetNillableBatterySn(s *string) *CabinetBinUpdate {
 	return cbu
 }
 
-// ClearBatterySn clears the value of the "battery_sn" field.
-func (cbu *CabinetBinUpdate) ClearBatterySn() *CabinetBinUpdate {
-	cbu.mutation.ClearBatterySn()
-	return cbu
-}
-
 // SetVoltage sets the "voltage" field.
 func (cbu *CabinetBinUpdate) SetVoltage(f float64) *CabinetBinUpdate {
 	cbu.mutation.ResetVoltage()
@@ -159,6 +153,48 @@ func (cbu *CabinetBinUpdate) SetNillableCurrent(f *float64) *CabinetBinUpdate {
 // AddCurrent adds f to the "current" field.
 func (cbu *CabinetBinUpdate) AddCurrent(f float64) *CabinetBinUpdate {
 	cbu.mutation.AddCurrent(f)
+	return cbu
+}
+
+// SetSoc sets the "soc" field.
+func (cbu *CabinetBinUpdate) SetSoc(f float64) *CabinetBinUpdate {
+	cbu.mutation.ResetSoc()
+	cbu.mutation.SetSoc(f)
+	return cbu
+}
+
+// SetNillableSoc sets the "soc" field if the given value is not nil.
+func (cbu *CabinetBinUpdate) SetNillableSoc(f *float64) *CabinetBinUpdate {
+	if f != nil {
+		cbu.SetSoc(*f)
+	}
+	return cbu
+}
+
+// AddSoc adds f to the "soc" field.
+func (cbu *CabinetBinUpdate) AddSoc(f float64) *CabinetBinUpdate {
+	cbu.mutation.AddSoc(f)
+	return cbu
+}
+
+// SetSoh sets the "soh" field.
+func (cbu *CabinetBinUpdate) SetSoh(f float64) *CabinetBinUpdate {
+	cbu.mutation.ResetSoh()
+	cbu.mutation.SetSoh(f)
+	return cbu
+}
+
+// SetNillableSoh sets the "soh" field if the given value is not nil.
+func (cbu *CabinetBinUpdate) SetNillableSoh(f *float64) *CabinetBinUpdate {
+	if f != nil {
+		cbu.SetSoh(*f)
+	}
+	return cbu
+}
+
+// AddSoh adds f to the "soh" field.
+func (cbu *CabinetBinUpdate) AddSoh(f float64) *CabinetBinUpdate {
+	cbu.mutation.AddSoh(f)
 	return cbu
 }
 
@@ -300,9 +336,6 @@ func (cbu *CabinetBinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cbu.mutation.BatterySn(); ok {
 		_spec.SetField(cabinetbin.FieldBatterySn, field.TypeString, value)
 	}
-	if cbu.mutation.BatterySnCleared() {
-		_spec.ClearField(cabinetbin.FieldBatterySn, field.TypeString)
-	}
 	if value, ok := cbu.mutation.Voltage(); ok {
 		_spec.SetField(cabinetbin.FieldVoltage, field.TypeFloat64, value)
 	}
@@ -314,6 +347,18 @@ func (cbu *CabinetBinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cbu.mutation.AddedCurrent(); ok {
 		_spec.AddField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
+	}
+	if value, ok := cbu.mutation.Soc(); ok {
+		_spec.SetField(cabinetbin.FieldSoc, field.TypeFloat64, value)
+	}
+	if value, ok := cbu.mutation.AddedSoc(); ok {
+		_spec.AddField(cabinetbin.FieldSoc, field.TypeFloat64, value)
+	}
+	if value, ok := cbu.mutation.Soh(); ok {
+		_spec.SetField(cabinetbin.FieldSoh, field.TypeFloat64, value)
+	}
+	if value, ok := cbu.mutation.AddedSoh(); ok {
+		_spec.AddField(cabinetbin.FieldSoh, field.TypeFloat64, value)
 	}
 	_spec.AddModifiers(cbu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cbu.driver, _spec); err != nil {
@@ -421,12 +466,6 @@ func (cbuo *CabinetBinUpdateOne) SetNillableBatterySn(s *string) *CabinetBinUpda
 	return cbuo
 }
 
-// ClearBatterySn clears the value of the "battery_sn" field.
-func (cbuo *CabinetBinUpdateOne) ClearBatterySn() *CabinetBinUpdateOne {
-	cbuo.mutation.ClearBatterySn()
-	return cbuo
-}
-
 // SetVoltage sets the "voltage" field.
 func (cbuo *CabinetBinUpdateOne) SetVoltage(f float64) *CabinetBinUpdateOne {
 	cbuo.mutation.ResetVoltage()
@@ -466,6 +505,48 @@ func (cbuo *CabinetBinUpdateOne) SetNillableCurrent(f *float64) *CabinetBinUpdat
 // AddCurrent adds f to the "current" field.
 func (cbuo *CabinetBinUpdateOne) AddCurrent(f float64) *CabinetBinUpdateOne {
 	cbuo.mutation.AddCurrent(f)
+	return cbuo
+}
+
+// SetSoc sets the "soc" field.
+func (cbuo *CabinetBinUpdateOne) SetSoc(f float64) *CabinetBinUpdateOne {
+	cbuo.mutation.ResetSoc()
+	cbuo.mutation.SetSoc(f)
+	return cbuo
+}
+
+// SetNillableSoc sets the "soc" field if the given value is not nil.
+func (cbuo *CabinetBinUpdateOne) SetNillableSoc(f *float64) *CabinetBinUpdateOne {
+	if f != nil {
+		cbuo.SetSoc(*f)
+	}
+	return cbuo
+}
+
+// AddSoc adds f to the "soc" field.
+func (cbuo *CabinetBinUpdateOne) AddSoc(f float64) *CabinetBinUpdateOne {
+	cbuo.mutation.AddSoc(f)
+	return cbuo
+}
+
+// SetSoh sets the "soh" field.
+func (cbuo *CabinetBinUpdateOne) SetSoh(f float64) *CabinetBinUpdateOne {
+	cbuo.mutation.ResetSoh()
+	cbuo.mutation.SetSoh(f)
+	return cbuo
+}
+
+// SetNillableSoh sets the "soh" field if the given value is not nil.
+func (cbuo *CabinetBinUpdateOne) SetNillableSoh(f *float64) *CabinetBinUpdateOne {
+	if f != nil {
+		cbuo.SetSoh(*f)
+	}
+	return cbuo
+}
+
+// AddSoh adds f to the "soh" field.
+func (cbuo *CabinetBinUpdateOne) AddSoh(f float64) *CabinetBinUpdateOne {
+	cbuo.mutation.AddSoh(f)
 	return cbuo
 }
 
@@ -637,9 +718,6 @@ func (cbuo *CabinetBinUpdateOne) sqlSave(ctx context.Context) (_node *CabinetBin
 	if value, ok := cbuo.mutation.BatterySn(); ok {
 		_spec.SetField(cabinetbin.FieldBatterySn, field.TypeString, value)
 	}
-	if cbuo.mutation.BatterySnCleared() {
-		_spec.ClearField(cabinetbin.FieldBatterySn, field.TypeString)
-	}
 	if value, ok := cbuo.mutation.Voltage(); ok {
 		_spec.SetField(cabinetbin.FieldVoltage, field.TypeFloat64, value)
 	}
@@ -651,6 +729,18 @@ func (cbuo *CabinetBinUpdateOne) sqlSave(ctx context.Context) (_node *CabinetBin
 	}
 	if value, ok := cbuo.mutation.AddedCurrent(); ok {
 		_spec.AddField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
+	}
+	if value, ok := cbuo.mutation.Soc(); ok {
+		_spec.SetField(cabinetbin.FieldSoc, field.TypeFloat64, value)
+	}
+	if value, ok := cbuo.mutation.AddedSoc(); ok {
+		_spec.AddField(cabinetbin.FieldSoc, field.TypeFloat64, value)
+	}
+	if value, ok := cbuo.mutation.Soh(); ok {
+		_spec.SetField(cabinetbin.FieldSoh, field.TypeFloat64, value)
+	}
+	if value, ok := cbuo.mutation.AddedSoh(); ok {
+		_spec.AddField(cabinetbin.FieldSoh, field.TypeFloat64, value)
 	}
 	_spec.AddModifiers(cbuo.modifiers...)
 	_node = &CabinetBin{config: cbuo.config}

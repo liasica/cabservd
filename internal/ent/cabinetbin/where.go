@@ -164,6 +164,20 @@ func Current(v float64) predicate.CabinetBin {
 	})
 }
 
+// Soc applies equality check predicate on the "soc" field. It's identical to SocEQ.
+func Soc(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSoc), v))
+	})
+}
+
+// Soh applies equality check predicate on the "soh" field. It's identical to SohEQ.
+func Soh(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSoh), v))
+	})
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
@@ -865,20 +879,6 @@ func BatterySnHasSuffix(v string) predicate.CabinetBin {
 	})
 }
 
-// BatterySnIsNil applies the IsNil predicate on the "battery_sn" field.
-func BatterySnIsNil() predicate.CabinetBin {
-	return predicate.CabinetBin(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldBatterySn)))
-	})
-}
-
-// BatterySnNotNil applies the NotNil predicate on the "battery_sn" field.
-func BatterySnNotNil() predicate.CabinetBin {
-	return predicate.CabinetBin(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldBatterySn)))
-	})
-}
-
 // BatterySnEqualFold applies the EqualFold predicate on the "battery_sn" field.
 func BatterySnEqualFold(v string) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
@@ -1018,6 +1018,134 @@ func CurrentLT(v float64) predicate.CabinetBin {
 func CurrentLTE(v float64) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldCurrent), v))
+	})
+}
+
+// SocEQ applies the EQ predicate on the "soc" field.
+func SocEQ(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSoc), v))
+	})
+}
+
+// SocNEQ applies the NEQ predicate on the "soc" field.
+func SocNEQ(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSoc), v))
+	})
+}
+
+// SocIn applies the In predicate on the "soc" field.
+func SocIn(vs ...float64) predicate.CabinetBin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldSoc), v...))
+	})
+}
+
+// SocNotIn applies the NotIn predicate on the "soc" field.
+func SocNotIn(vs ...float64) predicate.CabinetBin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldSoc), v...))
+	})
+}
+
+// SocGT applies the GT predicate on the "soc" field.
+func SocGT(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSoc), v))
+	})
+}
+
+// SocGTE applies the GTE predicate on the "soc" field.
+func SocGTE(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSoc), v))
+	})
+}
+
+// SocLT applies the LT predicate on the "soc" field.
+func SocLT(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSoc), v))
+	})
+}
+
+// SocLTE applies the LTE predicate on the "soc" field.
+func SocLTE(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSoc), v))
+	})
+}
+
+// SohEQ applies the EQ predicate on the "soh" field.
+func SohEQ(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldSoh), v))
+	})
+}
+
+// SohNEQ applies the NEQ predicate on the "soh" field.
+func SohNEQ(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldSoh), v))
+	})
+}
+
+// SohIn applies the In predicate on the "soh" field.
+func SohIn(vs ...float64) predicate.CabinetBin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldSoh), v...))
+	})
+}
+
+// SohNotIn applies the NotIn predicate on the "soh" field.
+func SohNotIn(vs ...float64) predicate.CabinetBin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldSoh), v...))
+	})
+}
+
+// SohGT applies the GT predicate on the "soh" field.
+func SohGT(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldSoh), v))
+	})
+}
+
+// SohGTE applies the GTE predicate on the "soh" field.
+func SohGTE(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldSoh), v))
+	})
+}
+
+// SohLT applies the LT predicate on the "soh" field.
+func SohLT(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldSoh), v))
+	})
+}
+
+// SohLTE applies the LTE predicate on the "soh" field.
+func SohLTE(v float64) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldSoh), v))
 	})
 }
 

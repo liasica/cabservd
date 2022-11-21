@@ -70,9 +70,11 @@ func (CabinetBin) Fields() []ent.Field {
         field.Bool("enable").Default(true).Comment("仓位是否启用"),
 
         // 电池信息
-        field.String("battery_sn").Optional().Nillable().Comment("电池序列号"),
+        field.String("battery_sn").Default("").Comment("电池序列号"),
         field.Float("voltage").Default(0).Comment("当前电压"),
         field.Float("current").Default(0).Comment("当前电流"),
+        field.Float("soc").Default(0).Comment("电池电量"),
+        field.Float("soh").Default(0).Comment("电池健康程度"),
     }
 }
 
@@ -92,5 +94,6 @@ func (CabinetBin) Indexes() []ent.Index {
         index.Fields("sn", "brand"),
         index.Fields("index"),
         index.Fields("battery_sn"),
+        index.Fields("soc"),
     }
 }

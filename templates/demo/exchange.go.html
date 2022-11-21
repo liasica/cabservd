@@ -1,0 +1,204 @@
+{{ define "demo/exchange.go.html" }}
+    <!doctype html>
+    <html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>换电测试</title>
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.font.im/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+        <style>
+          table {
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+          }
+
+          table thead tr {
+            background-color: #009879;
+            color: #ffffff;
+            text-align: left;
+          }
+
+          table th,
+          table td {
+            padding: 12px 15px;
+          }
+
+          table tbody tr {
+            border-bottom: 1px solid #dddddd;
+          }
+
+          table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+          }
+
+          table tbody tr:last-of-type {
+            border-bottom: 2px solid #009879;
+          }
+
+          table tbody tr.active-row {
+            font-weight: bold;
+            color: #009879;
+          }
+
+          .btn {
+            backface-visibility: hidden;
+            background-color: #405cf5;
+            border-radius: 6px;
+            border-width: 0;
+            box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .1) 0 2px 5px 0, rgba(0, 0, 0, .07) 0 1px 1px 0;
+            box-sizing: border-box;
+            color: #fff;
+            cursor: pointer;
+            font-family: -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif;
+            font-size: 100%;
+            height: 44px;
+            line-height: 1.15;
+            outline: none;
+            overflow: hidden;
+            padding: 0 20px;
+            position: relative;
+            text-align: center;
+            text-transform: none;
+            transform: translateZ(0);
+            transition: all .2s, box-shadow .08s ease-in;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+            width: 100%;
+            margin: 20px 0;
+          }
+
+          .btn:disabled {
+            cursor: default;
+          }
+
+          .btn:focus {
+            box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
+          }
+
+          * {
+            box-sizing: border-box;
+          }
+
+          body {
+            font-family: 'JetBrains Mono', monospace;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            column-gap: 20px;
+          }
+
+          .console {
+            flex: 1;
+            width: 80%;
+            overflow: auto;
+            position: relative;
+            margin-bottom: 40px;
+          }
+
+          .console #content {
+            padding: 20px;
+            background: #2E3842;
+            width: 100%;
+            min-height: 100%;
+            color: white;
+          }
+
+          p {
+            margin: 0;
+          }
+
+          p + p {
+            margin-top: 10px;
+          }
+        </style>
+    </head>
+    <body>
+    <table>
+        <thead>
+        <tr>
+            <th>名称</th>
+            <th>开门</th>
+            <th>启用</th>
+            <th>电池编码</th>
+            <th>电压</th>
+            <th>电流</th>
+            <th>电量</th>
+            <th>最大电量</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{ range .items }}
+            {{- /*gotype: github.com/auroraride/cabservd/internal/ent.CabinetBin*/ -}}
+            <tr>
+                <td>{{ .Name }}</td>
+                <td>{{ .Open }}</td>
+                <td>{{ .Enable }}</td>
+                <td>{{ .BatterySn }}</td>
+                <td>{{ .Voltage }}</td>
+                <td>{{ .Current }}</td>
+                <td>{{ .Soc }}</td>
+                <td>{{ .Soh }}</td>
+            </tr>
+        {{ end }}
+        </tbody>
+    </table>
+
+    <button class="btn" role="button" style="width: 140px;" onclick="onStart()">开始换电</button>
+
+    <div class="console">
+        <div id="content"></div>
+    </div>
+
+    <script>
+        Date.prototype.Format = function (fmt) {
+            const o = {
+                'M+': this.getMonth() + 1, //月份 
+                'd+': this.getDate(), //日 
+                'H+': this.getHours(), //小时 
+                'm+': this.getMinutes(), //分 
+                's+': this.getSeconds(), //秒 
+                'q+': Math.floor((this.getMonth() + 3) / 3), //季度 
+                'S': this.getMilliseconds() //毫秒 
+            };
+            if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + '').substr(4 - RegExp.$1.length));
+            for (const k in o)
+                if (new RegExp('(' + k + ')').test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (('00' + o[k]).substr(('' + o[k]).length)));
+            return fmt;
+        }
+
+        function log(str) {
+            const p = document.createElement('p')
+            p.innerText = `${new Date().Format("yyyy-MM-dd HH:mm:ss")}: ${str}`
+            document.querySelector('.console #content').appendChild(p)
+            const c = document.querySelector('.console')
+            c.scrollTop = c.scrollHeight
+        }
+
+        async function onStart() {
+            const req = await fetch('/demo/start', {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sn: '{{ .sn }}'
+                })
+            })
+            log(await req.text())
+        }
+    </script>
+    </body>
+    </html>
+{{ end }}

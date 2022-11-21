@@ -76,7 +76,7 @@ func (h *Hander) report(req *Request) (err error) {
     for _, attr := range req.AttrList {
         // 如果是仓位信息
         if attr.DoorID != "" {
-            _, err = core.SaveBin(Brand, req.DevID, attr)
+            err = core.SaveBin(Brand, req.DevID, attr)
             if err != nil {
                 log.Errorf("仓位保存失败: %v", err)
             }

@@ -86,14 +86,14 @@ func GenerateCmd(postRun ...func(*gen.Config)) *cobra.Command {
                 Clean()
 
                 if features == nil {
-                    features = []string{"sql/modifier", "sql/upsert", "privacy", "entql", "sql/execquery"}
+                    features = []string{"sql/modifier", "sql/upsert", "privacy", "entql", "sql/execquery", "schema/snapshot"}
                 }
                 opts := []entc.Option{
                     entc.Storage(storage),
                     entc.FeatureNames(features...),
                 }
                 templates = append(templates,
-                    "./cmd/ent/template/upsert.tmpl",
+                    // "./cmd/ent/template/upsert.tmpl",
                 )
                 for _, tmpl := range templates {
                     typ := "dir"

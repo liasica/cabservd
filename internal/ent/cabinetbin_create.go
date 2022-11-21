@@ -150,6 +150,34 @@ func (cbc *CabinetBinCreate) SetNillableCurrent(f *float64) *CabinetBinCreate {
 	return cbc
 }
 
+// SetSoc sets the "soc" field.
+func (cbc *CabinetBinCreate) SetSoc(f float64) *CabinetBinCreate {
+	cbc.mutation.SetSoc(f)
+	return cbc
+}
+
+// SetNillableSoc sets the "soc" field if the given value is not nil.
+func (cbc *CabinetBinCreate) SetNillableSoc(f *float64) *CabinetBinCreate {
+	if f != nil {
+		cbc.SetSoc(*f)
+	}
+	return cbc
+}
+
+// SetSoh sets the "soh" field.
+func (cbc *CabinetBinCreate) SetSoh(f float64) *CabinetBinCreate {
+	cbc.mutation.SetSoh(f)
+	return cbc
+}
+
+// SetNillableSoh sets the "soh" field if the given value is not nil.
+func (cbc *CabinetBinCreate) SetNillableSoh(f *float64) *CabinetBinCreate {
+	if f != nil {
+		cbc.SetSoh(*f)
+	}
+	return cbc
+}
+
 // Mutation returns the CabinetBinMutation object of the builder.
 func (cbc *CabinetBinCreate) Mutation() *CabinetBinMutation {
 	return cbc.mutation
@@ -243,6 +271,10 @@ func (cbc *CabinetBinCreate) defaults() {
 		v := cabinetbin.DefaultEnable
 		cbc.mutation.SetEnable(v)
 	}
+	if _, ok := cbc.mutation.BatterySn(); !ok {
+		v := cabinetbin.DefaultBatterySn
+		cbc.mutation.SetBatterySn(v)
+	}
 	if _, ok := cbc.mutation.Voltage(); !ok {
 		v := cabinetbin.DefaultVoltage
 		cbc.mutation.SetVoltage(v)
@@ -250,6 +282,14 @@ func (cbc *CabinetBinCreate) defaults() {
 	if _, ok := cbc.mutation.Current(); !ok {
 		v := cabinetbin.DefaultCurrent
 		cbc.mutation.SetCurrent(v)
+	}
+	if _, ok := cbc.mutation.Soc(); !ok {
+		v := cabinetbin.DefaultSoc
+		cbc.mutation.SetSoc(v)
+	}
+	if _, ok := cbc.mutation.Soh(); !ok {
+		v := cabinetbin.DefaultSoh
+		cbc.mutation.SetSoh(v)
 	}
 }
 
@@ -287,11 +327,20 @@ func (cbc *CabinetBinCreate) check() error {
 	if _, ok := cbc.mutation.Enable(); !ok {
 		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "CabinetBin.enable"`)}
 	}
+	if _, ok := cbc.mutation.BatterySn(); !ok {
+		return &ValidationError{Name: "battery_sn", err: errors.New(`ent: missing required field "CabinetBin.battery_sn"`)}
+	}
 	if _, ok := cbc.mutation.Voltage(); !ok {
 		return &ValidationError{Name: "voltage", err: errors.New(`ent: missing required field "CabinetBin.voltage"`)}
 	}
 	if _, ok := cbc.mutation.Current(); !ok {
 		return &ValidationError{Name: "current", err: errors.New(`ent: missing required field "CabinetBin.current"`)}
+	}
+	if _, ok := cbc.mutation.Soc(); !ok {
+		return &ValidationError{Name: "soc", err: errors.New(`ent: missing required field "CabinetBin.soc"`)}
+	}
+	if _, ok := cbc.mutation.Soh(); !ok {
+		return &ValidationError{Name: "soh", err: errors.New(`ent: missing required field "CabinetBin.soh"`)}
 	}
 	return nil
 }
@@ -359,7 +408,7 @@ func (cbc *CabinetBinCreate) createSpec() (*CabinetBin, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cbc.mutation.BatterySn(); ok {
 		_spec.SetField(cabinetbin.FieldBatterySn, field.TypeString, value)
-		_node.BatterySn = &value
+		_node.BatterySn = value
 	}
 	if value, ok := cbc.mutation.Voltage(); ok {
 		_spec.SetField(cabinetbin.FieldVoltage, field.TypeFloat64, value)
@@ -368,6 +417,14 @@ func (cbc *CabinetBinCreate) createSpec() (*CabinetBin, *sqlgraph.CreateSpec) {
 	if value, ok := cbc.mutation.Current(); ok {
 		_spec.SetField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
 		_node.Current = value
+	}
+	if value, ok := cbc.mutation.Soc(); ok {
+		_spec.SetField(cabinetbin.FieldSoc, field.TypeFloat64, value)
+		_node.Soc = value
+	}
+	if value, ok := cbc.mutation.Soh(); ok {
+		_spec.SetField(cabinetbin.FieldSoh, field.TypeFloat64, value)
+		_node.Soh = value
 	}
 	return _node, _spec
 }
@@ -535,12 +592,6 @@ func (u *CabinetBinUpsert) UpdateBatterySn() *CabinetBinUpsert {
 	return u
 }
 
-// ClearBatterySn clears the value of the "battery_sn" field.
-func (u *CabinetBinUpsert) ClearBatterySn() *CabinetBinUpsert {
-	u.SetNull(cabinetbin.FieldBatterySn)
-	return u
-}
-
 // SetVoltage sets the "voltage" field.
 func (u *CabinetBinUpsert) SetVoltage(v float64) *CabinetBinUpsert {
 	u.Set(cabinetbin.FieldVoltage, v)
@@ -574,6 +625,42 @@ func (u *CabinetBinUpsert) UpdateCurrent() *CabinetBinUpsert {
 // AddCurrent adds v to the "current" field.
 func (u *CabinetBinUpsert) AddCurrent(v float64) *CabinetBinUpsert {
 	u.Add(cabinetbin.FieldCurrent, v)
+	return u
+}
+
+// SetSoc sets the "soc" field.
+func (u *CabinetBinUpsert) SetSoc(v float64) *CabinetBinUpsert {
+	u.Set(cabinetbin.FieldSoc, v)
+	return u
+}
+
+// UpdateSoc sets the "soc" field to the value that was provided on create.
+func (u *CabinetBinUpsert) UpdateSoc() *CabinetBinUpsert {
+	u.SetExcluded(cabinetbin.FieldSoc)
+	return u
+}
+
+// AddSoc adds v to the "soc" field.
+func (u *CabinetBinUpsert) AddSoc(v float64) *CabinetBinUpsert {
+	u.Add(cabinetbin.FieldSoc, v)
+	return u
+}
+
+// SetSoh sets the "soh" field.
+func (u *CabinetBinUpsert) SetSoh(v float64) *CabinetBinUpsert {
+	u.Set(cabinetbin.FieldSoh, v)
+	return u
+}
+
+// UpdateSoh sets the "soh" field to the value that was provided on create.
+func (u *CabinetBinUpsert) UpdateSoh() *CabinetBinUpsert {
+	u.SetExcluded(cabinetbin.FieldSoh)
+	return u
+}
+
+// AddSoh adds v to the "soh" field.
+func (u *CabinetBinUpsert) AddSoh(v float64) *CabinetBinUpsert {
+	u.Add(cabinetbin.FieldSoh, v)
 	return u
 }
 
@@ -755,13 +842,6 @@ func (u *CabinetBinUpsertOne) UpdateBatterySn() *CabinetBinUpsertOne {
 	})
 }
 
-// ClearBatterySn clears the value of the "battery_sn" field.
-func (u *CabinetBinUpsertOne) ClearBatterySn() *CabinetBinUpsertOne {
-	return u.Update(func(s *CabinetBinUpsert) {
-		s.ClearBatterySn()
-	})
-}
-
 // SetVoltage sets the "voltage" field.
 func (u *CabinetBinUpsertOne) SetVoltage(v float64) *CabinetBinUpsertOne {
 	return u.Update(func(s *CabinetBinUpsert) {
@@ -804,6 +884,48 @@ func (u *CabinetBinUpsertOne) UpdateCurrent() *CabinetBinUpsertOne {
 	})
 }
 
+// SetSoc sets the "soc" field.
+func (u *CabinetBinUpsertOne) SetSoc(v float64) *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetSoc(v)
+	})
+}
+
+// AddSoc adds v to the "soc" field.
+func (u *CabinetBinUpsertOne) AddSoc(v float64) *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.AddSoc(v)
+	})
+}
+
+// UpdateSoc sets the "soc" field to the value that was provided on create.
+func (u *CabinetBinUpsertOne) UpdateSoc() *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateSoc()
+	})
+}
+
+// SetSoh sets the "soh" field.
+func (u *CabinetBinUpsertOne) SetSoh(v float64) *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetSoh(v)
+	})
+}
+
+// AddSoh adds v to the "soh" field.
+func (u *CabinetBinUpsertOne) AddSoh(v float64) *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.AddSoh(v)
+	})
+}
+
+// UpdateSoh sets the "soh" field to the value that was provided on create.
+func (u *CabinetBinUpsertOne) UpdateSoh() *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateSoh()
+	})
+}
+
 // Exec executes the query.
 func (u *CabinetBinUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -835,14 +957,6 @@ func (u *CabinetBinUpsertOne) IDX(ctx context.Context) uint64 {
 		panic(err)
 	}
 	return id
-}
-
-// Save creates the CabinetBin in the database.
-func (u *CabinetBinUpsertOne) Save(ctx context.Context) (*CabinetBin, error) {
-	if len(u.create.conflict) == 0 {
-		return nil, errors.New("ent: missing options for CabinetBinCreate.OnConflict")
-	}
-	return u.create.Save(ctx)
 }
 
 // CabinetBinCreateBulk is the builder for creating many CabinetBin entities in bulk.
@@ -1152,13 +1266,6 @@ func (u *CabinetBinUpsertBulk) UpdateBatterySn() *CabinetBinUpsertBulk {
 	})
 }
 
-// ClearBatterySn clears the value of the "battery_sn" field.
-func (u *CabinetBinUpsertBulk) ClearBatterySn() *CabinetBinUpsertBulk {
-	return u.Update(func(s *CabinetBinUpsert) {
-		s.ClearBatterySn()
-	})
-}
-
 // SetVoltage sets the "voltage" field.
 func (u *CabinetBinUpsertBulk) SetVoltage(v float64) *CabinetBinUpsertBulk {
 	return u.Update(func(s *CabinetBinUpsert) {
@@ -1198,6 +1305,48 @@ func (u *CabinetBinUpsertBulk) AddCurrent(v float64) *CabinetBinUpsertBulk {
 func (u *CabinetBinUpsertBulk) UpdateCurrent() *CabinetBinUpsertBulk {
 	return u.Update(func(s *CabinetBinUpsert) {
 		s.UpdateCurrent()
+	})
+}
+
+// SetSoc sets the "soc" field.
+func (u *CabinetBinUpsertBulk) SetSoc(v float64) *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetSoc(v)
+	})
+}
+
+// AddSoc adds v to the "soc" field.
+func (u *CabinetBinUpsertBulk) AddSoc(v float64) *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.AddSoc(v)
+	})
+}
+
+// UpdateSoc sets the "soc" field to the value that was provided on create.
+func (u *CabinetBinUpsertBulk) UpdateSoc() *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateSoc()
+	})
+}
+
+// SetSoh sets the "soh" field.
+func (u *CabinetBinUpsertBulk) SetSoh(v float64) *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetSoh(v)
+	})
+}
+
+// AddSoh adds v to the "soh" field.
+func (u *CabinetBinUpsertBulk) AddSoh(v float64) *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.AddSoh(v)
+	})
+}
+
+// UpdateSoh sets the "soh" field to the value that was provided on create.
+func (u *CabinetBinUpsertBulk) UpdateSoh() *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateSoh()
 	})
 }
 
