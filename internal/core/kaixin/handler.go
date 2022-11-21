@@ -7,7 +7,9 @@ package kaixin
 
 import (
     "github.com/auroraride/cabservd/internal/core"
+    "github.com/auroraride/cabservd/internal/errs"
     jsoniter "github.com/json-iterator/go"
+    log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -67,7 +69,19 @@ func (h *Hander) login(req *Request, client *core.Client) (err error) {
 
 // 状态上报请求
 func (h *Hander) report(req *Request) (err error) {
+    if req.DevID == "" {
+        return errs.CabinetDeviceIDRequired
+    }
     // TODO 解读所有信号量
+    for _, attr := range req.AttrList {
+        // 如果是仓位信息
+        if attr.DoorID != "" {
+            _, err = core.SaveBin(Brand, req.DevID, attr)
+            if err != nil {
+                log.Errorf("仓位保存失败: %v", err)
+            }
+        }
+    }
     return
 }
 

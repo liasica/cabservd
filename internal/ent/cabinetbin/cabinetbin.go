@@ -15,6 +15,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldUUID holds the string denoting the uuid field in the database.
+	FieldUUID = "uuid"
 	// FieldBrand holds the string denoting the brand field in the database.
 	FieldBrand = "brand"
 	// FieldSn holds the string denoting the sn field in the database.
@@ -25,6 +27,8 @@ const (
 	FieldIndex = "index"
 	// FieldOpen holds the string denoting the open field in the database.
 	FieldOpen = "open"
+	// FieldEnable holds the string denoting the enable field in the database.
+	FieldEnable = "enable"
 	// FieldBatterySn holds the string denoting the battery_sn field in the database.
 	FieldBatterySn = "battery_sn"
 	// FieldVoltage holds the string denoting the voltage field in the database.
@@ -40,11 +44,13 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldUUID,
 	FieldBrand,
 	FieldSn,
 	FieldName,
 	FieldIndex,
 	FieldOpen,
+	FieldEnable,
 	FieldBatterySn,
 	FieldVoltage,
 	FieldCurrent,
@@ -67,4 +73,14 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// UUIDValidator is a validator for the "uuid" field. It is called by the builders before save.
+	UUIDValidator func(string) error
+	// DefaultOpen holds the default value on creation for the "open" field.
+	DefaultOpen bool
+	// DefaultEnable holds the default value on creation for the "enable" field.
+	DefaultEnable bool
+	// DefaultVoltage holds the default value on creation for the "voltage" field.
+	DefaultVoltage float64
+	// DefaultCurrent holds the default value on creation for the "current" field.
+	DefaultCurrent float64
 )

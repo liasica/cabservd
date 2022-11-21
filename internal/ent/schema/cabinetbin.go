@@ -57,15 +57,22 @@ func (CabinetBin) Annotations() []schema.Annotation {
 // Fields of the CabinetBin.
 func (CabinetBin) Fields() []ent.Field {
     return []ent.Field{
+        field.String("uuid").Unique().MaxLen(32).Comment("唯一标识"),
+
+        // 电柜信息
         field.String("brand").Comment("品牌"),
         field.String("sn").Comment("电柜设备序列号"),
+
+        // 仓位信息
         field.String("name").Comment("仓位名称(N号仓)"),
         field.Int("index").Comment("仓位序号(从0开始)"),
-        field.Bool("open").Comment("仓门是否开启"),
+        field.Bool("open").Default(false).Comment("仓门是否开启"),
+        field.Bool("enable").Default(true).Comment("仓位是否启用"),
 
+        // 电池信息
         field.String("battery_sn").Optional().Nillable().Comment("电池序列号"),
-        field.Float("voltage").Optional().Nillable().Comment("当前电压"),
-        field.Float("current").Optional().Nillable().Comment("当前电流"),
+        field.Float("voltage").Default(0).Comment("当前电压"),
+        field.Float("current").Default(0).Comment("当前电流"),
     }
 }
 

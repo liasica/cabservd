@@ -27,11 +27,13 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			cabinetbin.FieldCreatedAt: {Type: field.TypeTime, Column: cabinetbin.FieldCreatedAt},
 			cabinetbin.FieldUpdatedAt: {Type: field.TypeTime, Column: cabinetbin.FieldUpdatedAt},
+			cabinetbin.FieldUUID:      {Type: field.TypeString, Column: cabinetbin.FieldUUID},
 			cabinetbin.FieldBrand:     {Type: field.TypeString, Column: cabinetbin.FieldBrand},
 			cabinetbin.FieldSn:        {Type: field.TypeString, Column: cabinetbin.FieldSn},
 			cabinetbin.FieldName:      {Type: field.TypeString, Column: cabinetbin.FieldName},
 			cabinetbin.FieldIndex:     {Type: field.TypeInt, Column: cabinetbin.FieldIndex},
 			cabinetbin.FieldOpen:      {Type: field.TypeBool, Column: cabinetbin.FieldOpen},
+			cabinetbin.FieldEnable:    {Type: field.TypeBool, Column: cabinetbin.FieldEnable},
 			cabinetbin.FieldBatterySn: {Type: field.TypeString, Column: cabinetbin.FieldBatterySn},
 			cabinetbin.FieldVoltage:   {Type: field.TypeFloat64, Column: cabinetbin.FieldVoltage},
 			cabinetbin.FieldCurrent:   {Type: field.TypeFloat64, Column: cabinetbin.FieldCurrent},
@@ -96,6 +98,11 @@ func (f *CabinetBinFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(cabinetbin.FieldUpdatedAt))
 }
 
+// WhereUUID applies the entql string predicate on the uuid field.
+func (f *CabinetBinFilter) WhereUUID(p entql.StringP) {
+	f.Where(p.Field(cabinetbin.FieldUUID))
+}
+
 // WhereBrand applies the entql string predicate on the brand field.
 func (f *CabinetBinFilter) WhereBrand(p entql.StringP) {
 	f.Where(p.Field(cabinetbin.FieldBrand))
@@ -119,6 +126,11 @@ func (f *CabinetBinFilter) WhereIndex(p entql.IntP) {
 // WhereOpen applies the entql bool predicate on the open field.
 func (f *CabinetBinFilter) WhereOpen(p entql.BoolP) {
 	f.Where(p.Field(cabinetbin.FieldOpen))
+}
+
+// WhereEnable applies the entql bool predicate on the enable field.
+func (f *CabinetBinFilter) WhereEnable(p entql.BoolP) {
+	f.Where(p.Field(cabinetbin.FieldEnable))
 }
 
 // WhereBatterySn applies the entql string predicate on the battery_sn field.

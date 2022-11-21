@@ -50,6 +50,12 @@ func (cbc *CabinetBinCreate) SetNillableUpdatedAt(t *time.Time) *CabinetBinCreat
 	return cbc
 }
 
+// SetUUID sets the "uuid" field.
+func (cbc *CabinetBinCreate) SetUUID(s string) *CabinetBinCreate {
+	cbc.mutation.SetUUID(s)
+	return cbc
+}
+
 // SetBrand sets the "brand" field.
 func (cbc *CabinetBinCreate) SetBrand(s string) *CabinetBinCreate {
 	cbc.mutation.SetBrand(s)
@@ -77,6 +83,28 @@ func (cbc *CabinetBinCreate) SetIndex(i int) *CabinetBinCreate {
 // SetOpen sets the "open" field.
 func (cbc *CabinetBinCreate) SetOpen(b bool) *CabinetBinCreate {
 	cbc.mutation.SetOpen(b)
+	return cbc
+}
+
+// SetNillableOpen sets the "open" field if the given value is not nil.
+func (cbc *CabinetBinCreate) SetNillableOpen(b *bool) *CabinetBinCreate {
+	if b != nil {
+		cbc.SetOpen(*b)
+	}
+	return cbc
+}
+
+// SetEnable sets the "enable" field.
+func (cbc *CabinetBinCreate) SetEnable(b bool) *CabinetBinCreate {
+	cbc.mutation.SetEnable(b)
+	return cbc
+}
+
+// SetNillableEnable sets the "enable" field if the given value is not nil.
+func (cbc *CabinetBinCreate) SetNillableEnable(b *bool) *CabinetBinCreate {
+	if b != nil {
+		cbc.SetEnable(*b)
+	}
 	return cbc
 }
 
@@ -207,6 +235,22 @@ func (cbc *CabinetBinCreate) defaults() {
 		v := cabinetbin.DefaultUpdatedAt()
 		cbc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := cbc.mutation.Open(); !ok {
+		v := cabinetbin.DefaultOpen
+		cbc.mutation.SetOpen(v)
+	}
+	if _, ok := cbc.mutation.Enable(); !ok {
+		v := cabinetbin.DefaultEnable
+		cbc.mutation.SetEnable(v)
+	}
+	if _, ok := cbc.mutation.Voltage(); !ok {
+		v := cabinetbin.DefaultVoltage
+		cbc.mutation.SetVoltage(v)
+	}
+	if _, ok := cbc.mutation.Current(); !ok {
+		v := cabinetbin.DefaultCurrent
+		cbc.mutation.SetCurrent(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -216,6 +260,14 @@ func (cbc *CabinetBinCreate) check() error {
 	}
 	if _, ok := cbc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "CabinetBin.updated_at"`)}
+	}
+	if _, ok := cbc.mutation.UUID(); !ok {
+		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "CabinetBin.uuid"`)}
+	}
+	if v, ok := cbc.mutation.UUID(); ok {
+		if err := cabinetbin.UUIDValidator(v); err != nil {
+			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "CabinetBin.uuid": %w`, err)}
+		}
 	}
 	if _, ok := cbc.mutation.Brand(); !ok {
 		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "CabinetBin.brand"`)}
@@ -231,6 +283,15 @@ func (cbc *CabinetBinCreate) check() error {
 	}
 	if _, ok := cbc.mutation.Open(); !ok {
 		return &ValidationError{Name: "open", err: errors.New(`ent: missing required field "CabinetBin.open"`)}
+	}
+	if _, ok := cbc.mutation.Enable(); !ok {
+		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "CabinetBin.enable"`)}
+	}
+	if _, ok := cbc.mutation.Voltage(); !ok {
+		return &ValidationError{Name: "voltage", err: errors.New(`ent: missing required field "CabinetBin.voltage"`)}
+	}
+	if _, ok := cbc.mutation.Current(); !ok {
+		return &ValidationError{Name: "current", err: errors.New(`ent: missing required field "CabinetBin.current"`)}
 	}
 	return nil
 }
@@ -268,6 +329,10 @@ func (cbc *CabinetBinCreate) createSpec() (*CabinetBin, *sqlgraph.CreateSpec) {
 		_spec.SetField(cabinetbin.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := cbc.mutation.UUID(); ok {
+		_spec.SetField(cabinetbin.FieldUUID, field.TypeString, value)
+		_node.UUID = value
+	}
 	if value, ok := cbc.mutation.Brand(); ok {
 		_spec.SetField(cabinetbin.FieldBrand, field.TypeString, value)
 		_node.Brand = value
@@ -288,17 +353,21 @@ func (cbc *CabinetBinCreate) createSpec() (*CabinetBin, *sqlgraph.CreateSpec) {
 		_spec.SetField(cabinetbin.FieldOpen, field.TypeBool, value)
 		_node.Open = value
 	}
+	if value, ok := cbc.mutation.Enable(); ok {
+		_spec.SetField(cabinetbin.FieldEnable, field.TypeBool, value)
+		_node.Enable = value
+	}
 	if value, ok := cbc.mutation.BatterySn(); ok {
 		_spec.SetField(cabinetbin.FieldBatterySn, field.TypeString, value)
 		_node.BatterySn = &value
 	}
 	if value, ok := cbc.mutation.Voltage(); ok {
 		_spec.SetField(cabinetbin.FieldVoltage, field.TypeFloat64, value)
-		_node.Voltage = &value
+		_node.Voltage = value
 	}
 	if value, ok := cbc.mutation.Current(); ok {
 		_spec.SetField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
-		_node.Current = &value
+		_node.Current = value
 	}
 	return _node, _spec
 }
@@ -361,6 +430,18 @@ func (u *CabinetBinUpsert) SetUpdatedAt(v time.Time) *CabinetBinUpsert {
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
 func (u *CabinetBinUpsert) UpdateUpdatedAt() *CabinetBinUpsert {
 	u.SetExcluded(cabinetbin.FieldUpdatedAt)
+	return u
+}
+
+// SetUUID sets the "uuid" field.
+func (u *CabinetBinUpsert) SetUUID(v string) *CabinetBinUpsert {
+	u.Set(cabinetbin.FieldUUID, v)
+	return u
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *CabinetBinUpsert) UpdateUUID() *CabinetBinUpsert {
+	u.SetExcluded(cabinetbin.FieldUUID)
 	return u
 }
 
@@ -430,6 +511,18 @@ func (u *CabinetBinUpsert) UpdateOpen() *CabinetBinUpsert {
 	return u
 }
 
+// SetEnable sets the "enable" field.
+func (u *CabinetBinUpsert) SetEnable(v bool) *CabinetBinUpsert {
+	u.Set(cabinetbin.FieldEnable, v)
+	return u
+}
+
+// UpdateEnable sets the "enable" field to the value that was provided on create.
+func (u *CabinetBinUpsert) UpdateEnable() *CabinetBinUpsert {
+	u.SetExcluded(cabinetbin.FieldEnable)
+	return u
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (u *CabinetBinUpsert) SetBatterySn(v string) *CabinetBinUpsert {
 	u.Set(cabinetbin.FieldBatterySn, v)
@@ -466,12 +559,6 @@ func (u *CabinetBinUpsert) AddVoltage(v float64) *CabinetBinUpsert {
 	return u
 }
 
-// ClearVoltage clears the value of the "voltage" field.
-func (u *CabinetBinUpsert) ClearVoltage() *CabinetBinUpsert {
-	u.SetNull(cabinetbin.FieldVoltage)
-	return u
-}
-
 // SetCurrent sets the "current" field.
 func (u *CabinetBinUpsert) SetCurrent(v float64) *CabinetBinUpsert {
 	u.Set(cabinetbin.FieldCurrent, v)
@@ -487,12 +574,6 @@ func (u *CabinetBinUpsert) UpdateCurrent() *CabinetBinUpsert {
 // AddCurrent adds v to the "current" field.
 func (u *CabinetBinUpsert) AddCurrent(v float64) *CabinetBinUpsert {
 	u.Add(cabinetbin.FieldCurrent, v)
-	return u
-}
-
-// ClearCurrent clears the value of the "current" field.
-func (u *CabinetBinUpsert) ClearCurrent() *CabinetBinUpsert {
-	u.SetNull(cabinetbin.FieldCurrent)
 	return u
 }
 
@@ -552,6 +633,20 @@ func (u *CabinetBinUpsertOne) SetUpdatedAt(v time.Time) *CabinetBinUpsertOne {
 func (u *CabinetBinUpsertOne) UpdateUpdatedAt() *CabinetBinUpsertOne {
 	return u.Update(func(s *CabinetBinUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetUUID sets the "uuid" field.
+func (u *CabinetBinUpsertOne) SetUUID(v string) *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetUUID(v)
+	})
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *CabinetBinUpsertOne) UpdateUUID() *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateUUID()
 	})
 }
 
@@ -632,6 +727,20 @@ func (u *CabinetBinUpsertOne) UpdateOpen() *CabinetBinUpsertOne {
 	})
 }
 
+// SetEnable sets the "enable" field.
+func (u *CabinetBinUpsertOne) SetEnable(v bool) *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetEnable(v)
+	})
+}
+
+// UpdateEnable sets the "enable" field to the value that was provided on create.
+func (u *CabinetBinUpsertOne) UpdateEnable() *CabinetBinUpsertOne {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateEnable()
+	})
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (u *CabinetBinUpsertOne) SetBatterySn(v string) *CabinetBinUpsertOne {
 	return u.Update(func(s *CabinetBinUpsert) {
@@ -674,13 +783,6 @@ func (u *CabinetBinUpsertOne) UpdateVoltage() *CabinetBinUpsertOne {
 	})
 }
 
-// ClearVoltage clears the value of the "voltage" field.
-func (u *CabinetBinUpsertOne) ClearVoltage() *CabinetBinUpsertOne {
-	return u.Update(func(s *CabinetBinUpsert) {
-		s.ClearVoltage()
-	})
-}
-
 // SetCurrent sets the "current" field.
 func (u *CabinetBinUpsertOne) SetCurrent(v float64) *CabinetBinUpsertOne {
 	return u.Update(func(s *CabinetBinUpsert) {
@@ -699,13 +801,6 @@ func (u *CabinetBinUpsertOne) AddCurrent(v float64) *CabinetBinUpsertOne {
 func (u *CabinetBinUpsertOne) UpdateCurrent() *CabinetBinUpsertOne {
 	return u.Update(func(s *CabinetBinUpsert) {
 		s.UpdateCurrent()
-	})
-}
-
-// ClearCurrent clears the value of the "current" field.
-func (u *CabinetBinUpsertOne) ClearCurrent() *CabinetBinUpsertOne {
-	return u.Update(func(s *CabinetBinUpsert) {
-		s.ClearCurrent()
 	})
 }
 
@@ -938,6 +1033,20 @@ func (u *CabinetBinUpsertBulk) UpdateUpdatedAt() *CabinetBinUpsertBulk {
 	})
 }
 
+// SetUUID sets the "uuid" field.
+func (u *CabinetBinUpsertBulk) SetUUID(v string) *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetUUID(v)
+	})
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *CabinetBinUpsertBulk) UpdateUUID() *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateUUID()
+	})
+}
+
 // SetBrand sets the "brand" field.
 func (u *CabinetBinUpsertBulk) SetBrand(v string) *CabinetBinUpsertBulk {
 	return u.Update(func(s *CabinetBinUpsert) {
@@ -1015,6 +1124,20 @@ func (u *CabinetBinUpsertBulk) UpdateOpen() *CabinetBinUpsertBulk {
 	})
 }
 
+// SetEnable sets the "enable" field.
+func (u *CabinetBinUpsertBulk) SetEnable(v bool) *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.SetEnable(v)
+	})
+}
+
+// UpdateEnable sets the "enable" field to the value that was provided on create.
+func (u *CabinetBinUpsertBulk) UpdateEnable() *CabinetBinUpsertBulk {
+	return u.Update(func(s *CabinetBinUpsert) {
+		s.UpdateEnable()
+	})
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (u *CabinetBinUpsertBulk) SetBatterySn(v string) *CabinetBinUpsertBulk {
 	return u.Update(func(s *CabinetBinUpsert) {
@@ -1057,13 +1180,6 @@ func (u *CabinetBinUpsertBulk) UpdateVoltage() *CabinetBinUpsertBulk {
 	})
 }
 
-// ClearVoltage clears the value of the "voltage" field.
-func (u *CabinetBinUpsertBulk) ClearVoltage() *CabinetBinUpsertBulk {
-	return u.Update(func(s *CabinetBinUpsert) {
-		s.ClearVoltage()
-	})
-}
-
 // SetCurrent sets the "current" field.
 func (u *CabinetBinUpsertBulk) SetCurrent(v float64) *CabinetBinUpsertBulk {
 	return u.Update(func(s *CabinetBinUpsert) {
@@ -1082,13 +1198,6 @@ func (u *CabinetBinUpsertBulk) AddCurrent(v float64) *CabinetBinUpsertBulk {
 func (u *CabinetBinUpsertBulk) UpdateCurrent() *CabinetBinUpsertBulk {
 	return u.Update(func(s *CabinetBinUpsert) {
 		s.UpdateCurrent()
-	})
-}
-
-// ClearCurrent clears the value of the "current" field.
-func (u *CabinetBinUpsertBulk) ClearCurrent() *CabinetBinUpsertBulk {
-	return u.Update(func(s *CabinetBinUpsert) {
-		s.ClearCurrent()
 	})
 }
 

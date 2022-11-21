@@ -20,6 +20,8 @@ type CabinetBin struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 唯一标识
+	UUID string `json:"uuid,omitempty"`
 	// 品牌
 	Brand string `json:"brand,omitempty"`
 	// 电柜设备序列号
@@ -30,12 +32,14 @@ type CabinetBin struct {
 	Index int `json:"index,omitempty"`
 	// 仓门是否开启
 	Open bool `json:"open,omitempty"`
+	// 仓位是否启用
+	Enable bool `json:"enable,omitempty"`
 	// 电池序列号
 	BatterySn *string `json:"battery_sn,omitempty"`
 	// 当前电压
-	Voltage *float64 `json:"voltage,omitempty"`
+	Voltage float64 `json:"voltage,omitempty"`
 	// 当前电流
-	Current *float64 `json:"current,omitempty"`
+	Current float64 `json:"current,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -43,13 +47,13 @@ func (*CabinetBin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case cabinetbin.FieldOpen:
+		case cabinetbin.FieldOpen, cabinetbin.FieldEnable:
 			values[i] = new(sql.NullBool)
 		case cabinetbin.FieldVoltage, cabinetbin.FieldCurrent:
 			values[i] = new(sql.NullFloat64)
 		case cabinetbin.FieldID, cabinetbin.FieldIndex:
 			values[i] = new(sql.NullInt64)
-		case cabinetbin.FieldBrand, cabinetbin.FieldSn, cabinetbin.FieldName, cabinetbin.FieldBatterySn:
+		case cabinetbin.FieldUUID, cabinetbin.FieldBrand, cabinetbin.FieldSn, cabinetbin.FieldName, cabinetbin.FieldBatterySn:
 			values[i] = new(sql.NullString)
 		case cabinetbin.FieldCreatedAt, cabinetbin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -86,6 +90,12 @@ func (cb *CabinetBin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				cb.UpdatedAt = value.Time
 			}
+		case cabinetbin.FieldUUID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value.Valid {
+				cb.UUID = value.String
+			}
 		case cabinetbin.FieldBrand:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field brand", values[i])
@@ -116,6 +126,12 @@ func (cb *CabinetBin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				cb.Open = value.Bool
 			}
+		case cabinetbin.FieldEnable:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field enable", values[i])
+			} else if value.Valid {
+				cb.Enable = value.Bool
+			}
 		case cabinetbin.FieldBatterySn:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field battery_sn", values[i])
@@ -127,15 +143,13 @@ func (cb *CabinetBin) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field voltage", values[i])
 			} else if value.Valid {
-				cb.Voltage = new(float64)
-				*cb.Voltage = value.Float64
+				cb.Voltage = value.Float64
 			}
 		case cabinetbin.FieldCurrent:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field current", values[i])
 			} else if value.Valid {
-				cb.Current = new(float64)
-				*cb.Current = value.Float64
+				cb.Current = value.Float64
 			}
 		}
 	}
@@ -171,6 +185,9 @@ func (cb *CabinetBin) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(cb.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
+	builder.WriteString("uuid=")
+	builder.WriteString(cb.UUID)
+	builder.WriteString(", ")
 	builder.WriteString("brand=")
 	builder.WriteString(cb.Brand)
 	builder.WriteString(", ")
@@ -186,20 +203,19 @@ func (cb *CabinetBin) String() string {
 	builder.WriteString("open=")
 	builder.WriteString(fmt.Sprintf("%v", cb.Open))
 	builder.WriteString(", ")
+	builder.WriteString("enable=")
+	builder.WriteString(fmt.Sprintf("%v", cb.Enable))
+	builder.WriteString(", ")
 	if v := cb.BatterySn; v != nil {
 		builder.WriteString("battery_sn=")
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	if v := cb.Voltage; v != nil {
-		builder.WriteString("voltage=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("voltage=")
+	builder.WriteString(fmt.Sprintf("%v", cb.Voltage))
 	builder.WriteString(", ")
-	if v := cb.Current; v != nil {
-		builder.WriteString("current=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("current=")
+	builder.WriteString(fmt.Sprintf("%v", cb.Current))
 	builder.WriteByte(')')
 	return builder.String()
 }

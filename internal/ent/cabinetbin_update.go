@@ -35,6 +35,12 @@ func (cbu *CabinetBinUpdate) SetUpdatedAt(t time.Time) *CabinetBinUpdate {
 	return cbu
 }
 
+// SetUUID sets the "uuid" field.
+func (cbu *CabinetBinUpdate) SetUUID(s string) *CabinetBinUpdate {
+	cbu.mutation.SetUUID(s)
+	return cbu
+}
+
 // SetBrand sets the "brand" field.
 func (cbu *CabinetBinUpdate) SetBrand(s string) *CabinetBinUpdate {
 	cbu.mutation.SetBrand(s)
@@ -69,6 +75,28 @@ func (cbu *CabinetBinUpdate) AddIndex(i int) *CabinetBinUpdate {
 // SetOpen sets the "open" field.
 func (cbu *CabinetBinUpdate) SetOpen(b bool) *CabinetBinUpdate {
 	cbu.mutation.SetOpen(b)
+	return cbu
+}
+
+// SetNillableOpen sets the "open" field if the given value is not nil.
+func (cbu *CabinetBinUpdate) SetNillableOpen(b *bool) *CabinetBinUpdate {
+	if b != nil {
+		cbu.SetOpen(*b)
+	}
+	return cbu
+}
+
+// SetEnable sets the "enable" field.
+func (cbu *CabinetBinUpdate) SetEnable(b bool) *CabinetBinUpdate {
+	cbu.mutation.SetEnable(b)
+	return cbu
+}
+
+// SetNillableEnable sets the "enable" field if the given value is not nil.
+func (cbu *CabinetBinUpdate) SetNillableEnable(b *bool) *CabinetBinUpdate {
+	if b != nil {
+		cbu.SetEnable(*b)
+	}
 	return cbu
 }
 
@@ -113,12 +141,6 @@ func (cbu *CabinetBinUpdate) AddVoltage(f float64) *CabinetBinUpdate {
 	return cbu
 }
 
-// ClearVoltage clears the value of the "voltage" field.
-func (cbu *CabinetBinUpdate) ClearVoltage() *CabinetBinUpdate {
-	cbu.mutation.ClearVoltage()
-	return cbu
-}
-
 // SetCurrent sets the "current" field.
 func (cbu *CabinetBinUpdate) SetCurrent(f float64) *CabinetBinUpdate {
 	cbu.mutation.ResetCurrent()
@@ -140,12 +162,6 @@ func (cbu *CabinetBinUpdate) AddCurrent(f float64) *CabinetBinUpdate {
 	return cbu
 }
 
-// ClearCurrent clears the value of the "current" field.
-func (cbu *CabinetBinUpdate) ClearCurrent() *CabinetBinUpdate {
-	cbu.mutation.ClearCurrent()
-	return cbu
-}
-
 // Mutation returns the CabinetBinMutation object of the builder.
 func (cbu *CabinetBinUpdate) Mutation() *CabinetBinMutation {
 	return cbu.mutation
@@ -159,12 +175,18 @@ func (cbu *CabinetBinUpdate) Save(ctx context.Context) (int, error) {
 	)
 	cbu.defaults()
 	if len(cbu.hooks) == 0 {
+		if err = cbu.check(); err != nil {
+			return 0, err
+		}
 		affected, err = cbu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CabinetBinMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = cbu.check(); err != nil {
+				return 0, err
 			}
 			cbu.mutation = mutation
 			affected, err = cbu.sqlSave(ctx)
@@ -214,6 +236,16 @@ func (cbu *CabinetBinUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cbu *CabinetBinUpdate) check() error {
+	if v, ok := cbu.mutation.UUID(); ok {
+		if err := cabinetbin.UUIDValidator(v); err != nil {
+			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "CabinetBin.uuid": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cbu *CabinetBinUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CabinetBinUpdate {
 	cbu.modifiers = append(cbu.modifiers, modifiers...)
@@ -241,6 +273,9 @@ func (cbu *CabinetBinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cbu.mutation.UpdatedAt(); ok {
 		_spec.SetField(cabinetbin.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := cbu.mutation.UUID(); ok {
+		_spec.SetField(cabinetbin.FieldUUID, field.TypeString, value)
+	}
 	if value, ok := cbu.mutation.Brand(); ok {
 		_spec.SetField(cabinetbin.FieldBrand, field.TypeString, value)
 	}
@@ -259,6 +294,9 @@ func (cbu *CabinetBinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cbu.mutation.Open(); ok {
 		_spec.SetField(cabinetbin.FieldOpen, field.TypeBool, value)
 	}
+	if value, ok := cbu.mutation.Enable(); ok {
+		_spec.SetField(cabinetbin.FieldEnable, field.TypeBool, value)
+	}
 	if value, ok := cbu.mutation.BatterySn(); ok {
 		_spec.SetField(cabinetbin.FieldBatterySn, field.TypeString, value)
 	}
@@ -271,17 +309,11 @@ func (cbu *CabinetBinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cbu.mutation.AddedVoltage(); ok {
 		_spec.AddField(cabinetbin.FieldVoltage, field.TypeFloat64, value)
 	}
-	if cbu.mutation.VoltageCleared() {
-		_spec.ClearField(cabinetbin.FieldVoltage, field.TypeFloat64)
-	}
 	if value, ok := cbu.mutation.Current(); ok {
 		_spec.SetField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
 	}
 	if value, ok := cbu.mutation.AddedCurrent(); ok {
 		_spec.AddField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
-	}
-	if cbu.mutation.CurrentCleared() {
-		_spec.ClearField(cabinetbin.FieldCurrent, field.TypeFloat64)
 	}
 	_spec.AddModifiers(cbu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cbu.driver, _spec); err != nil {
@@ -307,6 +339,12 @@ type CabinetBinUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (cbuo *CabinetBinUpdateOne) SetUpdatedAt(t time.Time) *CabinetBinUpdateOne {
 	cbuo.mutation.SetUpdatedAt(t)
+	return cbuo
+}
+
+// SetUUID sets the "uuid" field.
+func (cbuo *CabinetBinUpdateOne) SetUUID(s string) *CabinetBinUpdateOne {
+	cbuo.mutation.SetUUID(s)
 	return cbuo
 }
 
@@ -344,6 +382,28 @@ func (cbuo *CabinetBinUpdateOne) AddIndex(i int) *CabinetBinUpdateOne {
 // SetOpen sets the "open" field.
 func (cbuo *CabinetBinUpdateOne) SetOpen(b bool) *CabinetBinUpdateOne {
 	cbuo.mutation.SetOpen(b)
+	return cbuo
+}
+
+// SetNillableOpen sets the "open" field if the given value is not nil.
+func (cbuo *CabinetBinUpdateOne) SetNillableOpen(b *bool) *CabinetBinUpdateOne {
+	if b != nil {
+		cbuo.SetOpen(*b)
+	}
+	return cbuo
+}
+
+// SetEnable sets the "enable" field.
+func (cbuo *CabinetBinUpdateOne) SetEnable(b bool) *CabinetBinUpdateOne {
+	cbuo.mutation.SetEnable(b)
+	return cbuo
+}
+
+// SetNillableEnable sets the "enable" field if the given value is not nil.
+func (cbuo *CabinetBinUpdateOne) SetNillableEnable(b *bool) *CabinetBinUpdateOne {
+	if b != nil {
+		cbuo.SetEnable(*b)
+	}
 	return cbuo
 }
 
@@ -388,12 +448,6 @@ func (cbuo *CabinetBinUpdateOne) AddVoltage(f float64) *CabinetBinUpdateOne {
 	return cbuo
 }
 
-// ClearVoltage clears the value of the "voltage" field.
-func (cbuo *CabinetBinUpdateOne) ClearVoltage() *CabinetBinUpdateOne {
-	cbuo.mutation.ClearVoltage()
-	return cbuo
-}
-
 // SetCurrent sets the "current" field.
 func (cbuo *CabinetBinUpdateOne) SetCurrent(f float64) *CabinetBinUpdateOne {
 	cbuo.mutation.ResetCurrent()
@@ -412,12 +466,6 @@ func (cbuo *CabinetBinUpdateOne) SetNillableCurrent(f *float64) *CabinetBinUpdat
 // AddCurrent adds f to the "current" field.
 func (cbuo *CabinetBinUpdateOne) AddCurrent(f float64) *CabinetBinUpdateOne {
 	cbuo.mutation.AddCurrent(f)
-	return cbuo
-}
-
-// ClearCurrent clears the value of the "current" field.
-func (cbuo *CabinetBinUpdateOne) ClearCurrent() *CabinetBinUpdateOne {
-	cbuo.mutation.ClearCurrent()
 	return cbuo
 }
 
@@ -441,12 +489,18 @@ func (cbuo *CabinetBinUpdateOne) Save(ctx context.Context) (*CabinetBin, error) 
 	)
 	cbuo.defaults()
 	if len(cbuo.hooks) == 0 {
+		if err = cbuo.check(); err != nil {
+			return nil, err
+		}
 		node, err = cbuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*CabinetBinMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
+			}
+			if err = cbuo.check(); err != nil {
+				return nil, err
 			}
 			cbuo.mutation = mutation
 			node, err = cbuo.sqlSave(ctx)
@@ -502,6 +556,16 @@ func (cbuo *CabinetBinUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cbuo *CabinetBinUpdateOne) check() error {
+	if v, ok := cbuo.mutation.UUID(); ok {
+		if err := cabinetbin.UUIDValidator(v); err != nil {
+			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "CabinetBin.uuid": %w`, err)}
+		}
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (cbuo *CabinetBinUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *CabinetBinUpdateOne {
 	cbuo.modifiers = append(cbuo.modifiers, modifiers...)
@@ -546,6 +610,9 @@ func (cbuo *CabinetBinUpdateOne) sqlSave(ctx context.Context) (_node *CabinetBin
 	if value, ok := cbuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(cabinetbin.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := cbuo.mutation.UUID(); ok {
+		_spec.SetField(cabinetbin.FieldUUID, field.TypeString, value)
+	}
 	if value, ok := cbuo.mutation.Brand(); ok {
 		_spec.SetField(cabinetbin.FieldBrand, field.TypeString, value)
 	}
@@ -564,6 +631,9 @@ func (cbuo *CabinetBinUpdateOne) sqlSave(ctx context.Context) (_node *CabinetBin
 	if value, ok := cbuo.mutation.Open(); ok {
 		_spec.SetField(cabinetbin.FieldOpen, field.TypeBool, value)
 	}
+	if value, ok := cbuo.mutation.Enable(); ok {
+		_spec.SetField(cabinetbin.FieldEnable, field.TypeBool, value)
+	}
 	if value, ok := cbuo.mutation.BatterySn(); ok {
 		_spec.SetField(cabinetbin.FieldBatterySn, field.TypeString, value)
 	}
@@ -576,17 +646,11 @@ func (cbuo *CabinetBinUpdateOne) sqlSave(ctx context.Context) (_node *CabinetBin
 	if value, ok := cbuo.mutation.AddedVoltage(); ok {
 		_spec.AddField(cabinetbin.FieldVoltage, field.TypeFloat64, value)
 	}
-	if cbuo.mutation.VoltageCleared() {
-		_spec.ClearField(cabinetbin.FieldVoltage, field.TypeFloat64)
-	}
 	if value, ok := cbuo.mutation.Current(); ok {
 		_spec.SetField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
 	}
 	if value, ok := cbuo.mutation.AddedCurrent(); ok {
 		_spec.AddField(cabinetbin.FieldCurrent, field.TypeFloat64, value)
-	}
-	if cbuo.mutation.CurrentCleared() {
-		_spec.ClearField(cabinetbin.FieldCurrent, field.TypeFloat64)
 	}
 	_spec.AddModifiers(cbuo.modifiers...)
 	_node = &CabinetBin{config: cbuo.config}

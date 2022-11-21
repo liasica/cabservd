@@ -35,12 +35,14 @@ type CabinetBinMutation struct {
 	id            *uint64
 	created_at    *time.Time
 	updated_at    *time.Time
+	uuid          *string
 	brand         *string
 	sn            *string
 	name          *string
 	index         *int
 	addindex      *int
 	open          *bool
+	enable        *bool
 	battery_sn    *string
 	voltage       *float64
 	addvoltage    *float64
@@ -220,6 +222,42 @@ func (m *CabinetBinMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *CabinetBinMutation) ResetUpdatedAt() {
 	m.updated_at = nil
+}
+
+// SetUUID sets the "uuid" field.
+func (m *CabinetBinMutation) SetUUID(s string) {
+	m.uuid = &s
+}
+
+// UUID returns the value of the "uuid" field in the mutation.
+func (m *CabinetBinMutation) UUID() (r string, exists bool) {
+	v := m.uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUUID returns the old "uuid" field's value of the CabinetBin entity.
+// If the CabinetBin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetBinMutation) OldUUID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
+	}
+	return oldValue.UUID, nil
+}
+
+// ResetUUID resets all changes to the "uuid" field.
+func (m *CabinetBinMutation) ResetUUID() {
+	m.uuid = nil
 }
 
 // SetBrand sets the "brand" field.
@@ -422,6 +460,42 @@ func (m *CabinetBinMutation) ResetOpen() {
 	m.open = nil
 }
 
+// SetEnable sets the "enable" field.
+func (m *CabinetBinMutation) SetEnable(b bool) {
+	m.enable = &b
+}
+
+// Enable returns the value of the "enable" field in the mutation.
+func (m *CabinetBinMutation) Enable() (r bool, exists bool) {
+	v := m.enable
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnable returns the old "enable" field's value of the CabinetBin entity.
+// If the CabinetBin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetBinMutation) OldEnable(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnable is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnable requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnable: %w", err)
+	}
+	return oldValue.Enable, nil
+}
+
+// ResetEnable resets all changes to the "enable" field.
+func (m *CabinetBinMutation) ResetEnable() {
+	m.enable = nil
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (m *CabinetBinMutation) SetBatterySn(s string) {
 	m.battery_sn = &s
@@ -489,7 +563,7 @@ func (m *CabinetBinMutation) Voltage() (r float64, exists bool) {
 // OldVoltage returns the old "voltage" field's value of the CabinetBin entity.
 // If the CabinetBin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CabinetBinMutation) OldVoltage(ctx context.Context) (v *float64, err error) {
+func (m *CabinetBinMutation) OldVoltage(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldVoltage is only allowed on UpdateOne operations")
 	}
@@ -521,24 +595,10 @@ func (m *CabinetBinMutation) AddedVoltage() (r float64, exists bool) {
 	return *v, true
 }
 
-// ClearVoltage clears the value of the "voltage" field.
-func (m *CabinetBinMutation) ClearVoltage() {
-	m.voltage = nil
-	m.addvoltage = nil
-	m.clearedFields[cabinetbin.FieldVoltage] = struct{}{}
-}
-
-// VoltageCleared returns if the "voltage" field was cleared in this mutation.
-func (m *CabinetBinMutation) VoltageCleared() bool {
-	_, ok := m.clearedFields[cabinetbin.FieldVoltage]
-	return ok
-}
-
 // ResetVoltage resets all changes to the "voltage" field.
 func (m *CabinetBinMutation) ResetVoltage() {
 	m.voltage = nil
 	m.addvoltage = nil
-	delete(m.clearedFields, cabinetbin.FieldVoltage)
 }
 
 // SetCurrent sets the "current" field.
@@ -559,7 +619,7 @@ func (m *CabinetBinMutation) Current() (r float64, exists bool) {
 // OldCurrent returns the old "current" field's value of the CabinetBin entity.
 // If the CabinetBin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CabinetBinMutation) OldCurrent(ctx context.Context) (v *float64, err error) {
+func (m *CabinetBinMutation) OldCurrent(ctx context.Context) (v float64, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCurrent is only allowed on UpdateOne operations")
 	}
@@ -591,24 +651,10 @@ func (m *CabinetBinMutation) AddedCurrent() (r float64, exists bool) {
 	return *v, true
 }
 
-// ClearCurrent clears the value of the "current" field.
-func (m *CabinetBinMutation) ClearCurrent() {
-	m.current = nil
-	m.addcurrent = nil
-	m.clearedFields[cabinetbin.FieldCurrent] = struct{}{}
-}
-
-// CurrentCleared returns if the "current" field was cleared in this mutation.
-func (m *CabinetBinMutation) CurrentCleared() bool {
-	_, ok := m.clearedFields[cabinetbin.FieldCurrent]
-	return ok
-}
-
 // ResetCurrent resets all changes to the "current" field.
 func (m *CabinetBinMutation) ResetCurrent() {
 	m.current = nil
 	m.addcurrent = nil
-	delete(m.clearedFields, cabinetbin.FieldCurrent)
 }
 
 // Where appends a list predicates to the CabinetBinMutation builder.
@@ -630,12 +676,15 @@ func (m *CabinetBinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CabinetBinMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 12)
 	if m.created_at != nil {
 		fields = append(fields, cabinetbin.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, cabinetbin.FieldUpdatedAt)
+	}
+	if m.uuid != nil {
+		fields = append(fields, cabinetbin.FieldUUID)
 	}
 	if m.brand != nil {
 		fields = append(fields, cabinetbin.FieldBrand)
@@ -651,6 +700,9 @@ func (m *CabinetBinMutation) Fields() []string {
 	}
 	if m.open != nil {
 		fields = append(fields, cabinetbin.FieldOpen)
+	}
+	if m.enable != nil {
+		fields = append(fields, cabinetbin.FieldEnable)
 	}
 	if m.battery_sn != nil {
 		fields = append(fields, cabinetbin.FieldBatterySn)
@@ -673,6 +725,8 @@ func (m *CabinetBinMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case cabinetbin.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case cabinetbin.FieldUUID:
+		return m.UUID()
 	case cabinetbin.FieldBrand:
 		return m.Brand()
 	case cabinetbin.FieldSn:
@@ -683,6 +737,8 @@ func (m *CabinetBinMutation) Field(name string) (ent.Value, bool) {
 		return m.Index()
 	case cabinetbin.FieldOpen:
 		return m.Open()
+	case cabinetbin.FieldEnable:
+		return m.Enable()
 	case cabinetbin.FieldBatterySn:
 		return m.BatterySn()
 	case cabinetbin.FieldVoltage:
@@ -702,6 +758,8 @@ func (m *CabinetBinMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldCreatedAt(ctx)
 	case cabinetbin.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case cabinetbin.FieldUUID:
+		return m.OldUUID(ctx)
 	case cabinetbin.FieldBrand:
 		return m.OldBrand(ctx)
 	case cabinetbin.FieldSn:
@@ -712,6 +770,8 @@ func (m *CabinetBinMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldIndex(ctx)
 	case cabinetbin.FieldOpen:
 		return m.OldOpen(ctx)
+	case cabinetbin.FieldEnable:
+		return m.OldEnable(ctx)
 	case cabinetbin.FieldBatterySn:
 		return m.OldBatterySn(ctx)
 	case cabinetbin.FieldVoltage:
@@ -740,6 +800,13 @@ func (m *CabinetBinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case cabinetbin.FieldUUID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUUID(v)
 		return nil
 	case cabinetbin.FieldBrand:
 		v, ok := value.(string)
@@ -775,6 +842,13 @@ func (m *CabinetBinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOpen(v)
+		return nil
+	case cabinetbin.FieldEnable:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnable(v)
 		return nil
 	case cabinetbin.FieldBatterySn:
 		v, ok := value.(string)
@@ -869,12 +943,6 @@ func (m *CabinetBinMutation) ClearedFields() []string {
 	if m.FieldCleared(cabinetbin.FieldBatterySn) {
 		fields = append(fields, cabinetbin.FieldBatterySn)
 	}
-	if m.FieldCleared(cabinetbin.FieldVoltage) {
-		fields = append(fields, cabinetbin.FieldVoltage)
-	}
-	if m.FieldCleared(cabinetbin.FieldCurrent) {
-		fields = append(fields, cabinetbin.FieldCurrent)
-	}
 	return fields
 }
 
@@ -892,12 +960,6 @@ func (m *CabinetBinMutation) ClearField(name string) error {
 	case cabinetbin.FieldBatterySn:
 		m.ClearBatterySn()
 		return nil
-	case cabinetbin.FieldVoltage:
-		m.ClearVoltage()
-		return nil
-	case cabinetbin.FieldCurrent:
-		m.ClearCurrent()
-		return nil
 	}
 	return fmt.Errorf("unknown CabinetBin nullable field %s", name)
 }
@@ -911,6 +973,9 @@ func (m *CabinetBinMutation) ResetField(name string) error {
 		return nil
 	case cabinetbin.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case cabinetbin.FieldUUID:
+		m.ResetUUID()
 		return nil
 	case cabinetbin.FieldBrand:
 		m.ResetBrand()
@@ -926,6 +991,9 @@ func (m *CabinetBinMutation) ResetField(name string) error {
 		return nil
 	case cabinetbin.FieldOpen:
 		m.ResetOpen()
+		return nil
+	case cabinetbin.FieldEnable:
+		m.ResetEnable()
 		return nil
 	case cabinetbin.FieldBatterySn:
 		m.ResetBatterySn()

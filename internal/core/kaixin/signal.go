@@ -14,6 +14,14 @@ type SignalData struct {
 }
 
 const (
+    DoorStatusClose = "0" // 仓门 - 关
+    DoorStatusOpen  = "1" // 仓门 - 开
+
+    BinEnable  = "1" // 仓位 - 启用
+    BinDisable = "0" // 仓位 - 禁用
+)
+
+const (
     SignalLng                Signal = "02111001" // 柜子经度
     SignalLat                Signal = "02112001" // 柜子纬度
     SignalStatus             Signal = "02102001" // 换电柜状态 0:上电初始化 1:无换电、放电、取电动作 2:换电中 3:在归还电池中 4:在取出电池中 5:换电柜异常

@@ -29,29 +29,29 @@ type Request struct {
 }
 
 // String TODO 转为String
-func (m *Request) String() string {
+func (r *Request) String() string {
     return "TODO"
 }
 
 // Success 成功响应
-func (m *Request) Success() *Response {
+func (r *Request) Success() *Response {
     return &Response{
         Message: Message{
-            MsgType: m.MsgType + 1,
-            TxnNo:   m.TxnNo,
-            DevID:   m.DevID,
+            MsgType: r.MsgType + 1,
+            TxnNo:   r.TxnNo,
+            DevID:   r.DevID,
         },
         Result: LoginResultSuccess,
     }
 }
 
 // Fail 响应失败
-func (m *Request) Fail() *Response {
+func (r *Request) Fail() *Response {
     return &Response{
         Message: Message{
-            MsgType: m.MsgType + 1,
-            TxnNo:   m.TxnNo,
-            DevID:   m.DevID,
+            MsgType: r.MsgType + 1,
+            TxnNo:   r.TxnNo,
+            DevID:   r.DevID,
         },
         Result: LoginResultFail,
     }

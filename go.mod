@@ -6,14 +6,14 @@ require (
 	entgo.io/ent v0.11.4
 	github.com/gin-gonic/gin v1.8.1
 	github.com/google/uuid v1.3.0
+	github.com/jackc/pgx/v4 v4.17.2
 	github.com/json-iterator/go v1.1.12
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/liasica/go-helpers v0.0.0-20221121032422-00ebd1997697
+	github.com/liasica/go-helpers v0.0.0-20221121071102-4bdcdde476e3
 	github.com/mattn/go-colorable v0.1.13
 	github.com/panjf2000/gnet/v2 v2.1.2
 	github.com/sirupsen/logrus v1.9.0
 	github.com/spf13/cobra v1.6.1
-	golang.org/x/exp v0.0.0-20221114191408-850992195362
 	golang.org/x/tools v0.2.0
 )
 
@@ -37,7 +37,6 @@ require (
 	github.com/jackc/pgproto3/v2 v2.3.1 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20200714003250-2b9c44734f2b // indirect
 	github.com/jackc/pgtype v1.12.0 // indirect
-	github.com/jackc/pgx/v4 v4.17.2 // indirect
 	github.com/jonboulle/clockwork v0.3.0 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
 	github.com/lestrrat-go/strftime v1.0.6 // indirect

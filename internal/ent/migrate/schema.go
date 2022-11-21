@@ -14,14 +14,16 @@ var (
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "uuid", Type: field.TypeString, Unique: true, Size: 32},
 		{Name: "brand", Type: field.TypeString},
 		{Name: "sn", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "index", Type: field.TypeInt},
-		{Name: "open", Type: field.TypeBool},
+		{Name: "open", Type: field.TypeBool, Default: false},
+		{Name: "enable", Type: field.TypeBool, Default: true},
 		{Name: "battery_sn", Type: field.TypeString, Nullable: true},
-		{Name: "voltage", Type: field.TypeFloat64, Nullable: true},
-		{Name: "current", Type: field.TypeFloat64, Nullable: true},
+		{Name: "voltage", Type: field.TypeFloat64, Default: 0},
+		{Name: "current", Type: field.TypeFloat64, Default: 0},
 	}
 	// CabinetBinTable holds the schema information for the "cabinet_bin" table.
 	CabinetBinTable = &schema.Table{
@@ -37,17 +39,17 @@ var (
 			{
 				Name:    "cabinetbin_sn_brand",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[4], CabinetBinColumns[3]},
+				Columns: []*schema.Column{CabinetBinColumns[5], CabinetBinColumns[4]},
 			},
 			{
 				Name:    "cabinetbin_index",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[6]},
+				Columns: []*schema.Column{CabinetBinColumns[7]},
 			},
 			{
 				Name:    "cabinetbin_battery_sn",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[8]},
+				Columns: []*schema.Column{CabinetBinColumns[10]},
 			},
 		},
 	}

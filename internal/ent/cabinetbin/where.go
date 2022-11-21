@@ -94,6 +94,13 @@ func UpdatedAt(v time.Time) predicate.CabinetBin {
 	})
 }
 
+// UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
+func UUID(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUUID), v))
+	})
+}
+
 // Brand applies equality check predicate on the "brand" field. It's identical to BrandEQ.
 func Brand(v string) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
@@ -126,6 +133,13 @@ func Index(v int) predicate.CabinetBin {
 func Open(v bool) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldOpen), v))
+	})
+}
+
+// Enable applies equality check predicate on the "enable" field. It's identical to EnableEQ.
+func Enable(v bool) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEnable), v))
 	})
 }
 
@@ -275,6 +289,105 @@ func UpdatedAtLT(v time.Time) predicate.CabinetBin {
 func UpdatedAtLTE(v time.Time) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
+	})
+}
+
+// UUIDEQ applies the EQ predicate on the "uuid" field.
+func UUIDEQ(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDNEQ applies the NEQ predicate on the "uuid" field.
+func UUIDNEQ(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDIn applies the In predicate on the "uuid" field.
+func UUIDIn(vs ...string) predicate.CabinetBin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldUUID), v...))
+	})
+}
+
+// UUIDNotIn applies the NotIn predicate on the "uuid" field.
+func UUIDNotIn(vs ...string) predicate.CabinetBin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldUUID), v...))
+	})
+}
+
+// UUIDGT applies the GT predicate on the "uuid" field.
+func UUIDGT(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDGTE applies the GTE predicate on the "uuid" field.
+func UUIDGTE(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDLT applies the LT predicate on the "uuid" field.
+func UUIDLT(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDLTE applies the LTE predicate on the "uuid" field.
+func UUIDLTE(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDContains applies the Contains predicate on the "uuid" field.
+func UUIDContains(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDHasPrefix applies the HasPrefix predicate on the "uuid" field.
+func UUIDHasPrefix(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDHasSuffix applies the HasSuffix predicate on the "uuid" field.
+func UUIDHasSuffix(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDEqualFold applies the EqualFold predicate on the "uuid" field.
+func UUIDEqualFold(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDContainsFold applies the ContainsFold predicate on the "uuid" field.
+func UUIDContainsFold(v string) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldUUID), v))
 	})
 }
 
@@ -653,6 +766,20 @@ func OpenNEQ(v bool) predicate.CabinetBin {
 	})
 }
 
+// EnableEQ applies the EQ predicate on the "enable" field.
+func EnableEQ(v bool) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldEnable), v))
+	})
+}
+
+// EnableNEQ applies the NEQ predicate on the "enable" field.
+func EnableNEQ(v bool) predicate.CabinetBin {
+	return predicate.CabinetBin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldEnable), v))
+	})
+}
+
 // BatterySnEQ applies the EQ predicate on the "battery_sn" field.
 func BatterySnEQ(v string) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
@@ -830,20 +957,6 @@ func VoltageLTE(v float64) predicate.CabinetBin {
 	})
 }
 
-// VoltageIsNil applies the IsNil predicate on the "voltage" field.
-func VoltageIsNil() predicate.CabinetBin {
-	return predicate.CabinetBin(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldVoltage)))
-	})
-}
-
-// VoltageNotNil applies the NotNil predicate on the "voltage" field.
-func VoltageNotNil() predicate.CabinetBin {
-	return predicate.CabinetBin(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldVoltage)))
-	})
-}
-
 // CurrentEQ applies the EQ predicate on the "current" field.
 func CurrentEQ(v float64) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
@@ -905,20 +1018,6 @@ func CurrentLT(v float64) predicate.CabinetBin {
 func CurrentLTE(v float64) predicate.CabinetBin {
 	return predicate.CabinetBin(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldCurrent), v))
-	})
-}
-
-// CurrentIsNil applies the IsNil predicate on the "current" field.
-func CurrentIsNil() predicate.CabinetBin {
-	return predicate.CabinetBin(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldCurrent)))
-	})
-}
-
-// CurrentNotNil applies the NotNil predicate on the "current" field.
-func CurrentNotNil() predicate.CabinetBin {
-	return predicate.CabinetBin(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldCurrent)))
 	})
 }
 

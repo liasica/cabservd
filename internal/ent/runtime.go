@@ -28,4 +28,24 @@ func init() {
 	cabinetbin.DefaultUpdatedAt = cabinetbinDescUpdatedAt.Default.(func() time.Time)
 	// cabinetbin.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	cabinetbin.UpdateDefaultUpdatedAt = cabinetbinDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// cabinetbinDescUUID is the schema descriptor for uuid field.
+	cabinetbinDescUUID := cabinetbinFields[0].Descriptor()
+	// cabinetbin.UUIDValidator is a validator for the "uuid" field. It is called by the builders before save.
+	cabinetbin.UUIDValidator = cabinetbinDescUUID.Validators[0].(func(string) error)
+	// cabinetbinDescOpen is the schema descriptor for open field.
+	cabinetbinDescOpen := cabinetbinFields[5].Descriptor()
+	// cabinetbin.DefaultOpen holds the default value on creation for the open field.
+	cabinetbin.DefaultOpen = cabinetbinDescOpen.Default.(bool)
+	// cabinetbinDescEnable is the schema descriptor for enable field.
+	cabinetbinDescEnable := cabinetbinFields[6].Descriptor()
+	// cabinetbin.DefaultEnable holds the default value on creation for the enable field.
+	cabinetbin.DefaultEnable = cabinetbinDescEnable.Default.(bool)
+	// cabinetbinDescVoltage is the schema descriptor for voltage field.
+	cabinetbinDescVoltage := cabinetbinFields[8].Descriptor()
+	// cabinetbin.DefaultVoltage holds the default value on creation for the voltage field.
+	cabinetbin.DefaultVoltage = cabinetbinDescVoltage.Default.(float64)
+	// cabinetbinDescCurrent is the schema descriptor for current field.
+	cabinetbinDescCurrent := cabinetbinFields[9].Descriptor()
+	// cabinetbin.DefaultCurrent holds the default value on creation for the current field.
+	cabinetbin.DefaultCurrent = cabinetbinDescCurrent.Default.(float64)
 }
