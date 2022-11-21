@@ -26,3 +26,9 @@ go install github.com/go-kratos/kratos/cmd/protoc-gen-go-http/v2@latest
 go install github.com/go-kratos/kratos/cmd/kratos/v2@latest
 go install github.com/google/gnostic/cmd/protoc-gen-openapi@latest
 ```
+
+### ent
+```shell
+go run -mod=mod entgo.io/ent/cmd/ent init --target ./internal/ent/schema CabinetBin
+
+```

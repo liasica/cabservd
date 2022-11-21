@@ -6,6 +6,12 @@
 package g
 
 type config struct {
+    Database struct {
+        Postgres struct {
+            Dsn   string
+            Debug bool
+        }
+    }
 }
 
 func LoadConfig() {

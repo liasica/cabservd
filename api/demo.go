@@ -31,3 +31,17 @@ func (*demo) Control(c *gin.Context) {
         "err": fmt.Sprintf("%v", err),
     })
 }
+
+func (*demo) Exchange(c *gin.Context) {
+    var req struct {
+        DeviceId string `json:"deviceId"`
+    }
+    err := c.Bind(&req)
+    if err != nil {
+        c.JSON(http.StatusBadRequest, gin.H{
+            "err": err,
+        })
+        return
+    }
+    // 获取空仓位
+}

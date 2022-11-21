@@ -6,6 +6,7 @@
 package internal
 
 import (
+    "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/pkg/logger"
     "os"
@@ -29,4 +30,8 @@ func Boot() {
 
     // 加载配置
     g.LoadConfig()
+
+    // 加载数据库
+    // ent.Database = ent.OpenDatabase(g.Config.Database.Postgres.Dsn, g.Config.Database.Postgres.Debug)
+    ent.Database = ent.OpenDatabase("host=localhost user=liasica dbname=cabinet port=5432 sslmode=disable TimeZone=Asia/Shanghai", false)
 }

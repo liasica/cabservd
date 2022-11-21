@@ -80,14 +80,8 @@ func (c ReportCate) String() string {
 
 // ReportRequest 上报电柜属性
 type ReportRequest struct {
-    AttrList []Attr     `json:"attrList,omitempty"` // 属性列表
+    AttrList []*Attr    `json:"attrList,omitempty"` // 属性列表
     IsFull   ReportCate `json:"isFull,omitempty"`   // 是否全量上报: 0:增量 1:全量
-}
-
-// Attr 属性信息
-type Attr struct {
-    SignalData
-    DoorID string `json:"doorId,omitempty"` // 柜门ID (可为空)
 }
 
 // NoticeRequest 上报告警信息

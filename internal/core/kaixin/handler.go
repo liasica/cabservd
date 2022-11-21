@@ -10,6 +10,10 @@ import (
     jsoniter "github.com/json-iterator/go"
 )
 
+const (
+    Brand = "KAIXIN"
+)
+
 type Hander struct {
     core.Bean
     core.Codec
