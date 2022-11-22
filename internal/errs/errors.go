@@ -18,6 +18,11 @@ var (
     CabinetNotFound         = errors.New("电柜未找到")
     CabinetNoFully          = errors.New("无可换电池")
     CabinetNoEmpty          = errors.New("无空仓位")
+    CabinetBusy             = errors.New("电柜忙")
 
-    ExchangeFailed = errors.New("换电失败")
+    ExchangeTaskNotExist = errors.New("换电任务不存在")
+    ExchangeFailed       = errors.New("换电失败")
+    ExchangeTimeOut      = errors.New("换电超时")
+    ExchangeBatteryLost  = errors.New("电池未放入")
+    ExchangeBatteryExist = errors.New("电池未取走")
 )

@@ -27,6 +27,7 @@ func Start() {
     router.POST("/demo/control", api.Demo.Control)
     router.GET("/demo/exchange", api.Demo.Exchange)
     router.POST("/demo/start", api.Demo.Start)
+    router.POST("/demo/status", api.Demo.Status)
 
     srv := &http.Server{
         Addr:    ":18521",

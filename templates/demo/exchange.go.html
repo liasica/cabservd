@@ -197,6 +197,45 @@
                 })
             })
             log(await req.text())
+            await loopStatus(0)
+        }
+
+        async function loopStatus(step) {
+            const req = await fetch('/demo/status', {
+                method: 'POST',
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    sn: '{{ .sn }}',
+                    step,
+                })
+            })
+            const r = await req.json()
+
+            const status = r['status']
+            console.info(r, status)
+
+            if (status == 1) {
+                step += 1
+            }
+
+            // 记录日志
+            let message = r['message']
+            if (status == 1) {
+                message += ', 成功'
+            }
+            if (status != 0) {
+                log(message)
+            }
+
+            // 第四步直接退出
+            if (r['step'] == 3 || status == 2) {
+                return
+            }
+
+            await loopStatus(step)
         }
     </script>
     </body>
