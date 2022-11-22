@@ -21,7 +21,7 @@ func main() {
 
     // 启动socket hub
     core.Start(
-        "0.0.0.0:18531",
+        "0.0.0.0:18511",
         "凯信",
         kaixin.New(),
         new(core.HeaderLength),
