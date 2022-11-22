@@ -8,6 +8,7 @@
         <title>换电测试</title>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.font.im/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.staticfile.org/bulma/0.9.4/css/bulma.css">
         <style>
           table {
             border-collapse: collapse;
@@ -18,7 +19,7 @@
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
           }
 
-          table thead tr {
+          table thead th {
             background-color: #009879;
             color: #ffffff;
             text-align: left;
@@ -44,42 +45,6 @@
           table tbody tr.active-row {
             font-weight: bold;
             color: #009879;
-          }
-
-          .btn {
-            backface-visibility: hidden;
-            background-color: #405cf5;
-            border-radius: 6px;
-            border-width: 0;
-            box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .1) 0 2px 5px 0, rgba(0, 0, 0, .07) 0 1px 1px 0;
-            box-sizing: border-box;
-            color: #fff;
-            cursor: pointer;
-            font-family: -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Ubuntu, sans-serif;
-            font-size: 100%;
-            height: 44px;
-            line-height: 1.15;
-            outline: none;
-            overflow: hidden;
-            padding: 0 20px;
-            position: relative;
-            text-align: center;
-            text-transform: none;
-            transform: translateZ(0);
-            transition: all .2s, box-shadow .08s ease-in;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
-            width: 100%;
-            margin: 20px 0;
-          }
-
-          .btn:disabled {
-            cursor: default;
-          }
-
-          .btn:focus {
-            box-shadow: rgba(50, 50, 93, .1) 0 0 0 1px inset, rgba(50, 50, 93, .2) 0 6px 15px 0, rgba(0, 0, 0, .1) 0 2px 2px 0, rgba(50, 151, 211, .3) 0 0 0 4px;
           }
 
           * {
@@ -142,19 +107,35 @@
             {{- /*gotype: github.com/auroraride/cabservd/internal/ent.CabinetBin*/ -}}
             <tr>
                 <td>{{ .Name }}</td>
-                <td>{{ .Open }}</td>
-                <td>{{ .Enable }}</td>
+                <td>
+                    <span class="tag is-{{ if .Open }}warning{{ else }}primary{{ end }}">
+                        {{ if .Open }} 开 {{ else }} 关 {{ end }}
+                    </span>
+                </td>
+                <td>
+                    <span class="tag is-{{ if .Enable }}primary{{ else }}danger{{ end }}">
+                        {{ if .Enable }} 启用 {{ else }} 禁用 {{ end }}
+                    </span>
+                </td>
                 <td>{{ .BatterySn }}</td>
-                <td>{{ .Voltage }}</td>
-                <td>{{ .Current }}</td>
-                <td>{{ .Soc }}</td>
-                <td>{{ .Soh }}</td>
+                <td>
+                    {{ if (gt .Voltage 0.0) }} {{ .Voltage }}V {{ end }}
+                </td>
+                <td>
+                    {{ if (gt .Current 0.0) }} {{ .Current }}A {{ end }}
+                </td>
+                <td>
+                    {{ if (gt .Soc 0.0) }} {{ .Soc }}% {{ end }}
+                </td>
+                <td>
+                    {{ if (gt .Soh 0.0) }} {{ .Soh }}% {{ end }}
+                </td>
             </tr>
         {{ end }}
         </tbody>
     </table>
 
-    <button class="btn" role="button" style="width: 140px;" onclick="onStart()">开始换电</button>
+    <button class="button is-primary" style="width: 140px; margin-bottom: 20px;" onclick="onStart()">开始换电</button>
 
     <div class="console">
         <div id="content"></div>
@@ -196,7 +177,11 @@
                     sn: '{{ .sn }}'
                 })
             })
-            log(await req.text())
+            const r = await req.json()
+            log(JSON.stringify(r))
+            if (r['error']) {
+                return
+            }
             await loopStatus(0)
         }
 
