@@ -49,7 +49,7 @@ func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err err
         Update(func(u *ent.CabinetBinUpsert) {
             // 仓门状态
             if open, ok := bin.GetOpen(); ok {
-                fmt.Printf("%d->%v\n", index, open)
+                fmt.Printf("%d open:->%v\n", index, open)
                 u.SetOpen(open)
             }
 
@@ -60,6 +60,7 @@ func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err err
 
             // 电池编号
             if bs, ok := bin.GetBatterySN(); ok {
+                fmt.Printf("%d battery:->%v\n", index, bs)
                 u.SetBatterySn(bs)
                 if bs == "" {
                     // 无电池的时候清除电池信息
