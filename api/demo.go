@@ -153,6 +153,7 @@ func (d *demo) Start(c *gin.Context) {
 
     // 开始执行换电任务
     t := &task{
+        sn:    req.SN,
         empty: empty,
         fully: fully,
         step:  0,
