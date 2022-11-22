@@ -294,7 +294,7 @@ func (t *task) doorOpen(index int) (err error) {
         return
     }
 
-    return t.doorOpenStatus(t.empty.Index, true, 0)
+    return t.doorOpenStatus(index, true, 0)
 }
 
 // 死循环查询仓门状态

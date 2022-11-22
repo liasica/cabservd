@@ -49,6 +49,7 @@ func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err err
         Update(func(u *ent.CabinetBinUpsert) {
             // 仓门状态
             if open, ok := bin.GetOpen(); ok {
+                fmt.Printf("%d->%v\n", index, open)
                 u.SetOpen(open)
             }
 
