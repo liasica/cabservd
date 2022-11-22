@@ -118,7 +118,7 @@ func (d *demo) Start(c *gin.Context) {
     // 获取仓位状态
     var items ent.CabinetBins
     items, err = ent.Database.CabinetBin.Query().
-        Where(cabinetbin.Sn(req.SN), cabinetbin.Enable(true), cabinetbin.Open(false)).
+        Where(cabinetbin.Sn(req.SN), cabinetbin.Enable(true), cabinetbin.Open(false), cabinetbin.IndexIn(2, 3)).
         Order(ent.Desc(cabinetbin.FieldSoc)).
         All(context.Background())
 
@@ -304,6 +304,7 @@ func (t *task) doorOpen(index int) (err error) {
 func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) {
     var item *ent.CabinetBin
     start := time.Now()
+    var maxtime float64 = 120
 
     // time.Sleep(3 * time.Second)
     // return
@@ -321,22 +322,29 @@ func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) 
             case 1:
                 // 检查电池是否放入
                 if item.BatterySn == "" {
-                    err = errs.ExchangeBatteryLost
+                    maxtime = 30
+                    start = time.Now()
+
+                    // TODO: 重复弹开
+                    if time.Now().Sub(start).Seconds() > maxtime {
+                        err = errs.ExchangeBatteryLost
+                    }
                 }
-            case 2:
-                // 检查电池是否取出
-                if item.BatterySn != "" {
-                    err = errs.ExchangeBatteryLost
-                }
+                // case 2:
+                //     // 检查电池是否取出
+                //     // TODO: 是否取走
+                //     if item.BatterySn != "" {
+                //         err = errs.ExchangeBatteryLost
+                //     }
             }
             return
         }
         // 超时
-        if time.Now().Sub(start).Seconds() > 120 {
+        if time.Now().Sub(start).Seconds() > maxtime {
             err = errs.ExchangeTimeOut
             return
         }
-        // 100ms查询一次
-        time.Sleep(100 * time.Millisecond)
+        // 10ms查询一次
+        time.Sleep(10 * time.Millisecond)
     }
 }
