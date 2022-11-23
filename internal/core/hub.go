@@ -101,6 +101,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
             return
         }
 
+        // TODO 使用channel处理消息体
         go h.decoded(b, c.Fd(), c.RemoteAddr(), client)
     }
 

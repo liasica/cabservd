@@ -92,3 +92,17 @@ func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err err
         UpdateUUID().
         Exec(ctx)
 }
+
+// ResetBins 重置电柜仓位信息
+func ResetBins(sn string) error {
+    return ent.Database.CabinetBin.Update().
+        Where(cabinetbin.Sn(sn)).
+        SetBatterySn("").
+        SetSoc(0).
+        SetSoh(0).
+        SetVoltage(0).
+        SetCurrent(0).
+        // SetEnable(true). // TODO 是否单独设置LOCK
+        SetOpen(false).
+        Exec(context.Background())
+}
