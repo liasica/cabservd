@@ -9,7 +9,6 @@ import (
     "github.com/auroraride/cabservd/internal/errs"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
-    "net"
     "sync"
 )
 
@@ -42,6 +41,14 @@ type hub struct {
 
     // 断开客户端连接
     disconnect chan *Client
+
+    // 消息代理
+    receiver chan *MessageProxy
+}
+
+type MessageProxy struct {
+    Data   []byte
+    Client *Client
 }
 
 func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
@@ -101,21 +108,24 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
             return
         }
 
-        // TODO 使用channel处理消息体
-        go h.decoded(b, c.Fd(), c.RemoteAddr(), client)
+        // 使用channel处理消息体
+        h.receiver <- &MessageProxy{
+            Data:   b,
+            Client: client,
+        }
     }
 
     return gnet.None
 }
 
-func (h *hub) decoded(b []byte, fd int, addr net.Addr, client *Client) {
+func (h *hub) handleMessage(b []byte, client *Client) {
     // 记录日志
-    log.Infof("[FD=%d / %s] 接收到消息, message: %s", fd, addr, b)
+    log.Infof("[FD=%d / %s] 接收到消息, message: %s", client.Fd(), client.RemoteAddr(), b)
 
     // 解析
     // TODO 未知的 Client
     err := h.bean.OnMessage(b, client)
     if err != nil {
-        log.Errorf("[FD=%d / %s] 解析失败, err: %v, 原始消息: %s", fd, addr, err, b)
+        log.Errorf("[FD=%d / %s] 解析失败, err: %v, 原始消息: %s", client.Fd(), client.RemoteAddr(), err, b)
     }
 }

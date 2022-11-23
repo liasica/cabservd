@@ -18,6 +18,7 @@ func Start(addr, cate string, bean Hook, codec Codec) {
         codec:      codec,
         connect:    make(chan *Client, 256),
         disconnect: make(chan *Client, 256),
+        receiver:   make(chan *MessageProxy),
     }
 
     go Hub.run()
@@ -40,6 +41,8 @@ func (h *hub) run() {
             if _, ok := h.clients.Load(client); ok {
                 h.clients.Delete(client)
             }
+        case message := <-h.receiver:
+            h.handleMessage(message.Data, message.Client)
         }
     }
 }
