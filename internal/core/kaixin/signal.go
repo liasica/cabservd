@@ -24,9 +24,9 @@ const (
 const (
     SignalLng                Signal = "02111001" // 柜子经度
     SignalLat                Signal = "02112001" // 柜子纬度
-    SignalStatus             Signal = "02102001" // 换电柜状态 0:上电初始化 1:无换电、放电、取电动作 2:换电中 3:在归还电池中 4:在取出电池中 5:换电柜异常
+    SignalBinStatus          Signal = "02102001" // 仓位状态 0:上电初始化 1:无换电、放电、取电动作 2:换电中 3:在归还电池中 4:在取出电池中 5:换电柜异常
+    SignalBinChargeStatus    Signal = "02104001" // 仓位充电状态 0:无电池 1:电池正在充电 2:电池充满 5:异常
     SignalDoorStatus         Signal = "02103001" // 柜门状态 0:关 1:开
-    SignalBinStatus          Signal = "02104001" // 柜体状态 (仓位状态) 0:无电池 1:电池正在充电 2:电池充满 5:异常
     SignalBinID              Signal = "01309001" // 柜门ID 1~16:对应柜门ID
     SignalBatteryID          Signal = "01310001" // 换电柜设备ID
     SignalGSM                Signal = "02105001" // GSM 信号强度
