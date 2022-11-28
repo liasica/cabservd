@@ -9,7 +9,7 @@ import (
     "context"
     "fmt"
     "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/cabinetbin"
+    "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/errs"
     "github.com/liasica/go-helpers/tools"
 )
@@ -30,8 +30,8 @@ func SaveBin(brand, sn string, bin Bin) error {
     return SaveBinWithContext(brand, sn, bin, ctx)
 }
 
-func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err error) {
-    index, exists := bin.GetDoorIndex()
+func SaveBinWithContext(brand, sn string, item Bin, ctx context.Context) (err error) {
+    index, exists := item.GetDoorIndex()
     if !exists {
         err = errs.CabinetBinIndexRequired
         return
@@ -39,27 +39,27 @@ func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err err
 
     uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, sn, index))
 
-    return ent.Database.CabinetBin.Create().
+    return ent.Database.Bin.Create().
         SetUUID(uuid).
         SetBrand(brand).
         SetSn(sn).
         SetName(fmt.Sprintf("%d号仓", index+1)).
         SetIndex(index).
-        OnConflictColumns(cabinetbin.FieldUUID).
-        Update(func(u *ent.CabinetBinUpsert) {
+        OnConflictColumns(bin.FieldUUID).
+        Update(func(u *ent.BinUpsert) {
             // 仓门状态
-            if open, ok := bin.GetOpen(); ok {
+            if open, ok := item.GetOpen(); ok {
                 fmt.Printf("%d open:->%v\n", index, open)
                 u.SetOpen(open)
             }
 
             // 仓位启用状态
-            if enable, ok := bin.GetEnable(); ok {
+            if enable, ok := item.GetEnable(); ok {
                 u.SetEnable(enable)
             }
 
             // 电池编号
-            if bs, ok := bin.GetBatterySN(); ok {
+            if bs, ok := item.GetBatterySN(); ok {
                 fmt.Printf("%d battery:->%v\n", index, bs)
                 u.SetBatterySn(bs)
                 if bs == "" {
@@ -70,22 +70,22 @@ func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err err
             }
 
             // 电压
-            if v, ok := bin.GetVoltage(); ok {
+            if v, ok := item.GetVoltage(); ok {
                 u.SetVoltage(v)
             }
 
             // 电流
-            if v, ok := bin.GetCurrent(); ok {
+            if v, ok := item.GetCurrent(); ok {
                 u.SetCurrent(v)
             }
 
             // 电量
-            if v, ok := bin.GetSoC(); ok {
+            if v, ok := item.GetSoC(); ok {
                 u.SetSoc(v)
             }
 
             // 健康
-            if v, ok := bin.GetSoH(); ok {
+            if v, ok := item.GetSoH(); ok {
                 u.SetSoh(v)
             }
         }).
@@ -95,8 +95,8 @@ func SaveBinWithContext(brand, sn string, bin Bin, ctx context.Context) (err err
 
 // ResetBins 重置电柜仓位信息
 func ResetBins(sn string) error {
-    return ent.Database.CabinetBin.Update().
-        Where(cabinetbin.Sn(sn)).
+    return ent.Database.Bin.Update().
+        Where(bin.Sn(sn)).
         SetBatterySn("").
         SetSoc(0).
         SetSoh(0).

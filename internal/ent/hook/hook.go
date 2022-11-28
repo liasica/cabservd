@@ -9,15 +9,15 @@ import (
 	"github.com/auroraride/cabservd/internal/ent"
 )
 
-// The CabinetBinFunc type is an adapter to allow the use of ordinary
-// function as CabinetBin mutator.
-type CabinetBinFunc func(context.Context, *ent.CabinetBinMutation) (ent.Value, error)
+// The BinFunc type is an adapter to allow the use of ordinary
+// function as Bin mutator.
+type BinFunc func(context.Context, *ent.BinMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CabinetBinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.CabinetBinMutation)
+func (f BinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.BinMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CabinetBinMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BinMutation", m)
 	}
 	return f(ctx, mv)
 }

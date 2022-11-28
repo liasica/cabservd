@@ -150,28 +150,28 @@ func DenyMutationOperationRule(op ent.Op) MutationRule {
 	return OnMutationOperation(rule, op)
 }
 
-// The CabinetBinQueryRuleFunc type is an adapter to allow the use of ordinary
+// The BinQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
-type CabinetBinQueryRuleFunc func(context.Context, *ent.CabinetBinQuery) error
+type BinQueryRuleFunc func(context.Context, *ent.BinQuery) error
 
 // EvalQuery return f(ctx, q).
-func (f CabinetBinQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
-	if q, ok := q.(*ent.CabinetBinQuery); ok {
+func (f BinQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.BinQuery); ok {
 		return f(ctx, q)
 	}
-	return Denyf("ent/privacy: unexpected query type %T, expect *ent.CabinetBinQuery", q)
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.BinQuery", q)
 }
 
-// The CabinetBinMutationRuleFunc type is an adapter to allow the use of ordinary
+// The BinMutationRuleFunc type is an adapter to allow the use of ordinary
 // functions as a mutation rule.
-type CabinetBinMutationRuleFunc func(context.Context, *ent.CabinetBinMutation) error
+type BinMutationRuleFunc func(context.Context, *ent.BinMutation) error
 
 // EvalMutation calls f(ctx, m).
-func (f CabinetBinMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
-	if m, ok := m.(*ent.CabinetBinMutation); ok {
+func (f BinMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.BinMutation); ok {
 		return f(ctx, m)
 	}
-	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.CabinetBinMutation", m)
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.BinMutation", m)
 }
 
 type (
@@ -209,7 +209,7 @@ var _ QueryMutationRule = FilterFunc(nil)
 
 func queryFilter(q ent.Query) (Filter, error) {
 	switch q := q.(type) {
-	case *ent.CabinetBinQuery:
+	case *ent.BinQuery:
 		return q.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected query type %T for query filter", q)
@@ -218,7 +218,7 @@ func queryFilter(q ent.Query) (Filter, error) {
 
 func mutationFilter(m ent.Mutation) (Filter, error) {
 	switch m := m.(type) {
-	case *ent.CabinetBinMutation:
+	case *ent.BinMutation:
 		return m.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected mutation type %T for mutation filter", m)

@@ -10,7 +10,7 @@ import (
     "fmt"
     "github.com/auroraride/cabservd/internal/core/kaixin"
     "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/cabinetbin"
+    "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/errs"
     "github.com/gin-gonic/gin"
     log "github.com/sirupsen/logrus"
@@ -24,22 +24,22 @@ type demo struct {
 
 var tasks sync.Map
 
-type bin struct {
+type cabinetBin struct {
     Index int     `json:"-"`
     Name  string  `json:"name"`
     Soc   float64 `json:"soc"`
 }
 
 type taskStep struct {
-    *bin
+    *cabinetBin
     status  uint8 // 0:进行中 1:成功 2:失败
     message string
 }
 
 type task struct {
     sn      string
-    empty   *bin
-    fully   *bin
+    empty   *cabinetBin
+    fully   *cabinetBin
     step    int
     steps   []*taskStep
     running bool
@@ -76,10 +76,10 @@ func (*demo) Exchange(c *gin.Context) {
     }
 
     // 获取仓位状态
-    var items ent.CabinetBins
-    items, err = ent.Database.CabinetBin.Query().
-        Where(cabinetbin.Sn(req.SN)).
-        Order(ent.Asc(cabinetbin.FieldIndex)).
+    var items ent.Bins
+    items, err = ent.Database.Bin.Query().
+        Where(bin.Sn(req.SN)).
+        Order(ent.Asc(bin.FieldIndex)).
         All(context.Background())
 
     c.HTML(http.StatusOK, "demo/exchange.go.html", gin.H{
@@ -116,10 +116,10 @@ func (d *demo) Start(c *gin.Context) {
     }
 
     // 获取仓位状态
-    var items ent.CabinetBins
-    items, err = ent.Database.CabinetBin.Query().
-        Where(cabinetbin.Sn(req.SN), cabinetbin.Enable(true), cabinetbin.Open(false), cabinetbin.IndexIn(2, 3)).
-        Order(ent.Desc(cabinetbin.FieldSoc)).
+    var items ent.Bins
+    items, err = ent.Database.Bin.Query().
+        Where(bin.Sn(req.SN), bin.Enable(true), bin.Open(false), bin.IndexIn(2, 3)).
+        Order(ent.Desc(bin.FieldSoc)).
         All(context.Background())
 
     if len(items) == 0 {
@@ -133,7 +133,7 @@ func (d *demo) Start(c *gin.Context) {
         c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoFully.Error()})
         return
     }
-    fully := &bin{
+    fully := &cabinetBin{
         Name:  max.Name,
         Soc:   max.Soc,
         Index: max.Index,
@@ -145,7 +145,7 @@ func (d *demo) Start(c *gin.Context) {
         c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoEmpty.Error()})
         return
     }
-    empty := &bin{
+    empty := &cabinetBin{
         Name:  min.Name,
         Soc:   min.Soc,
         Index: min.Index,
@@ -158,10 +158,10 @@ func (d *demo) Start(c *gin.Context) {
         fully: fully,
         step:  0,
         steps: []*taskStep{
-            {bin: empty},
-            {bin: empty},
-            {bin: fully},
-            {bin: fully},
+            {cabinetBin: empty},
+            {cabinetBin: empty},
+            {cabinetBin: fully},
+            {cabinetBin: fully},
         },
         running: true,
     }
@@ -302,7 +302,7 @@ func (t *task) doorOpen(index int) (err error) {
 // status: 待检查的状态
 // battery: 是否检查电池放入状态 0不检查 1放入检查 2取出检查
 func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) {
-    var item *ent.CabinetBin
+    var item *ent.Bin
     start := time.Now()
     var maxtime float64 = 120
 
@@ -311,7 +311,7 @@ func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) 
 
     for {
         // TODO: 缓存
-        item, err = ent.Database.CabinetBin.Query().Where(cabinetbin.Sn(t.sn), cabinetbin.Index(index), cabinetbin.Enable(true)).First(context.Background())
+        item, err = ent.Database.Bin.Query().Where(bin.Sn(t.sn), bin.Index(index), bin.Enable(true)).First(context.Background())
         if err != nil {
             return
         }

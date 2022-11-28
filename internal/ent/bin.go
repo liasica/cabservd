@@ -8,11 +8,11 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/auroraride/cabservd/internal/ent/cabinetbin"
+	"github.com/auroraride/cabservd/internal/ent/bin"
 )
 
-// CabinetBin is the model entity for the CabinetBin schema.
-type CabinetBin struct {
+// Bin is the model entity for the Bin schema.
+type Bin struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID uint64 `json:"id,omitempty"`
@@ -47,203 +47,203 @@ type CabinetBin struct {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*CabinetBin) scanValues(columns []string) ([]any, error) {
+func (*Bin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case cabinetbin.FieldOpen, cabinetbin.FieldEnable:
+		case bin.FieldOpen, bin.FieldEnable:
 			values[i] = new(sql.NullBool)
-		case cabinetbin.FieldVoltage, cabinetbin.FieldCurrent, cabinetbin.FieldSoc, cabinetbin.FieldSoh:
+		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
-		case cabinetbin.FieldID, cabinetbin.FieldIndex:
+		case bin.FieldID, bin.FieldIndex:
 			values[i] = new(sql.NullInt64)
-		case cabinetbin.FieldUUID, cabinetbin.FieldBrand, cabinetbin.FieldSn, cabinetbin.FieldName, cabinetbin.FieldBatterySn:
+		case bin.FieldUUID, bin.FieldBrand, bin.FieldSn, bin.FieldName, bin.FieldBatterySn:
 			values[i] = new(sql.NullString)
-		case cabinetbin.FieldCreatedAt, cabinetbin.FieldUpdatedAt:
+		case bin.FieldCreatedAt, bin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type CabinetBin", columns[i])
+			return nil, fmt.Errorf("unexpected column %q for type Bin", columns[i])
 		}
 	}
 	return values, nil
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the CabinetBin fields.
-func (cb *CabinetBin) assignValues(columns []string, values []any) error {
+// to the Bin fields.
+func (b *Bin) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case cabinetbin.FieldID:
+		case bin.FieldID:
 			value, ok := values[i].(*sql.NullInt64)
 			if !ok {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
-			cb.ID = uint64(value.Int64)
-		case cabinetbin.FieldCreatedAt:
+			b.ID = uint64(value.Int64)
+		case bin.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
 			} else if value.Valid {
-				cb.CreatedAt = value.Time
+				b.CreatedAt = value.Time
 			}
-		case cabinetbin.FieldUpdatedAt:
+		case bin.FieldUpdatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
-				cb.UpdatedAt = value.Time
+				b.UpdatedAt = value.Time
 			}
-		case cabinetbin.FieldUUID:
+		case bin.FieldUUID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
 			} else if value.Valid {
-				cb.UUID = value.String
+				b.UUID = value.String
 			}
-		case cabinetbin.FieldBrand:
+		case bin.FieldBrand:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field brand", values[i])
 			} else if value.Valid {
-				cb.Brand = value.String
+				b.Brand = value.String
 			}
-		case cabinetbin.FieldSn:
+		case bin.FieldSn:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field sn", values[i])
 			} else if value.Valid {
-				cb.Sn = value.String
+				b.Sn = value.String
 			}
-		case cabinetbin.FieldName:
+		case bin.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				cb.Name = value.String
+				b.Name = value.String
 			}
-		case cabinetbin.FieldIndex:
+		case bin.FieldIndex:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field index", values[i])
 			} else if value.Valid {
-				cb.Index = int(value.Int64)
+				b.Index = int(value.Int64)
 			}
-		case cabinetbin.FieldOpen:
+		case bin.FieldOpen:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field open", values[i])
 			} else if value.Valid {
-				cb.Open = value.Bool
+				b.Open = value.Bool
 			}
-		case cabinetbin.FieldEnable:
+		case bin.FieldEnable:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field enable", values[i])
 			} else if value.Valid {
-				cb.Enable = value.Bool
+				b.Enable = value.Bool
 			}
-		case cabinetbin.FieldBatterySn:
+		case bin.FieldBatterySn:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field battery_sn", values[i])
 			} else if value.Valid {
-				cb.BatterySn = value.String
+				b.BatterySn = value.String
 			}
-		case cabinetbin.FieldVoltage:
+		case bin.FieldVoltage:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field voltage", values[i])
 			} else if value.Valid {
-				cb.Voltage = value.Float64
+				b.Voltage = value.Float64
 			}
-		case cabinetbin.FieldCurrent:
+		case bin.FieldCurrent:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field current", values[i])
 			} else if value.Valid {
-				cb.Current = value.Float64
+				b.Current = value.Float64
 			}
-		case cabinetbin.FieldSoc:
+		case bin.FieldSoc:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field soc", values[i])
 			} else if value.Valid {
-				cb.Soc = value.Float64
+				b.Soc = value.Float64
 			}
-		case cabinetbin.FieldSoh:
+		case bin.FieldSoh:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
 				return fmt.Errorf("unexpected type %T for field soh", values[i])
 			} else if value.Valid {
-				cb.Soh = value.Float64
+				b.Soh = value.Float64
 			}
 		}
 	}
 	return nil
 }
 
-// Update returns a builder for updating this CabinetBin.
-// Note that you need to call CabinetBin.Unwrap() before calling this method if this CabinetBin
+// Update returns a builder for updating this Bin.
+// Note that you need to call Bin.Unwrap() before calling this method if this Bin
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (cb *CabinetBin) Update() *CabinetBinUpdateOne {
-	return (&CabinetBinClient{config: cb.config}).UpdateOne(cb)
+func (b *Bin) Update() *BinUpdateOne {
+	return (&BinClient{config: b.config}).UpdateOne(b)
 }
 
-// Unwrap unwraps the CabinetBin entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the Bin entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (cb *CabinetBin) Unwrap() *CabinetBin {
-	_tx, ok := cb.config.driver.(*txDriver)
+func (b *Bin) Unwrap() *Bin {
+	_tx, ok := b.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: CabinetBin is not a transactional entity")
+		panic("ent: Bin is not a transactional entity")
 	}
-	cb.config.driver = _tx.drv
-	return cb
+	b.config.driver = _tx.drv
+	return b
 }
 
 // String implements the fmt.Stringer.
-func (cb *CabinetBin) String() string {
+func (b *Bin) String() string {
 	var builder strings.Builder
-	builder.WriteString("CabinetBin(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", cb.ID))
+	builder.WriteString("Bin(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", b.ID))
 	builder.WriteString("created_at=")
-	builder.WriteString(cb.CreatedAt.Format(time.ANSIC))
+	builder.WriteString(b.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
-	builder.WriteString(cb.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(b.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("uuid=")
-	builder.WriteString(cb.UUID)
+	builder.WriteString(b.UUID)
 	builder.WriteString(", ")
 	builder.WriteString("brand=")
-	builder.WriteString(cb.Brand)
+	builder.WriteString(b.Brand)
 	builder.WriteString(", ")
 	builder.WriteString("sn=")
-	builder.WriteString(cb.Sn)
+	builder.WriteString(b.Sn)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
-	builder.WriteString(cb.Name)
+	builder.WriteString(b.Name)
 	builder.WriteString(", ")
 	builder.WriteString("index=")
-	builder.WriteString(fmt.Sprintf("%v", cb.Index))
+	builder.WriteString(fmt.Sprintf("%v", b.Index))
 	builder.WriteString(", ")
 	builder.WriteString("open=")
-	builder.WriteString(fmt.Sprintf("%v", cb.Open))
+	builder.WriteString(fmt.Sprintf("%v", b.Open))
 	builder.WriteString(", ")
 	builder.WriteString("enable=")
-	builder.WriteString(fmt.Sprintf("%v", cb.Enable))
+	builder.WriteString(fmt.Sprintf("%v", b.Enable))
 	builder.WriteString(", ")
 	builder.WriteString("battery_sn=")
-	builder.WriteString(cb.BatterySn)
+	builder.WriteString(b.BatterySn)
 	builder.WriteString(", ")
 	builder.WriteString("voltage=")
-	builder.WriteString(fmt.Sprintf("%v", cb.Voltage))
+	builder.WriteString(fmt.Sprintf("%v", b.Voltage))
 	builder.WriteString(", ")
 	builder.WriteString("current=")
-	builder.WriteString(fmt.Sprintf("%v", cb.Current))
+	builder.WriteString(fmt.Sprintf("%v", b.Current))
 	builder.WriteString(", ")
 	builder.WriteString("soc=")
-	builder.WriteString(fmt.Sprintf("%v", cb.Soc))
+	builder.WriteString(fmt.Sprintf("%v", b.Soc))
 	builder.WriteString(", ")
 	builder.WriteString("soh=")
-	builder.WriteString(fmt.Sprintf("%v", cb.Soh))
+	builder.WriteString(fmt.Sprintf("%v", b.Soh))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// CabinetBins is a parsable slice of CabinetBin.
-type CabinetBins []*CabinetBin
+// Bins is a parsable slice of Bin.
+type Bins []*Bin
 
-func (cb CabinetBins) config(cfg config) {
-	for _i := range cb {
-		cb[_i].config = cfg
+func (b Bins) config(cfg config) {
+	for _i := range b {
+		b[_i].config = cfg
 	}
 }

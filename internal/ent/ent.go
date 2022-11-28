@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/auroraride/cabservd/internal/ent/cabinetbin"
+	"github.com/auroraride/cabservd/internal/ent/bin"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -31,7 +31,7 @@ type OrderFunc func(*sql.Selector)
 // columnChecker returns a function indicates if the column exists in the given column.
 func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
-		cabinetbin.Table: cabinetbin.ValidColumn,
+		bin.Table: bin.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

@@ -6,5 +6,5 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// CabinetBin is the predicate function for cabinetbin builders.
-type CabinetBin func(*sql.Selector)
+// Bin is the predicate function for bin builders.
+type Bin func(*sql.Selector)

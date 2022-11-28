@@ -3,7 +3,7 @@
 package ent
 
 import (
-	"github.com/auroraride/cabservd/internal/ent/cabinetbin"
+	"github.com/auroraride/cabservd/internal/ent/bin"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -16,29 +16,29 @@ var schemaGraph = func() *sqlgraph.Schema {
 	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 1)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
-			Table:   cabinetbin.Table,
-			Columns: cabinetbin.Columns,
+			Table:   bin.Table,
+			Columns: bin.Columns,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeUint64,
-				Column: cabinetbin.FieldID,
+				Column: bin.FieldID,
 			},
 		},
-		Type: "CabinetBin",
+		Type: "Bin",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			cabinetbin.FieldCreatedAt: {Type: field.TypeTime, Column: cabinetbin.FieldCreatedAt},
-			cabinetbin.FieldUpdatedAt: {Type: field.TypeTime, Column: cabinetbin.FieldUpdatedAt},
-			cabinetbin.FieldUUID:      {Type: field.TypeString, Column: cabinetbin.FieldUUID},
-			cabinetbin.FieldBrand:     {Type: field.TypeString, Column: cabinetbin.FieldBrand},
-			cabinetbin.FieldSn:        {Type: field.TypeString, Column: cabinetbin.FieldSn},
-			cabinetbin.FieldName:      {Type: field.TypeString, Column: cabinetbin.FieldName},
-			cabinetbin.FieldIndex:     {Type: field.TypeInt, Column: cabinetbin.FieldIndex},
-			cabinetbin.FieldOpen:      {Type: field.TypeBool, Column: cabinetbin.FieldOpen},
-			cabinetbin.FieldEnable:    {Type: field.TypeBool, Column: cabinetbin.FieldEnable},
-			cabinetbin.FieldBatterySn: {Type: field.TypeString, Column: cabinetbin.FieldBatterySn},
-			cabinetbin.FieldVoltage:   {Type: field.TypeFloat64, Column: cabinetbin.FieldVoltage},
-			cabinetbin.FieldCurrent:   {Type: field.TypeFloat64, Column: cabinetbin.FieldCurrent},
-			cabinetbin.FieldSoc:       {Type: field.TypeFloat64, Column: cabinetbin.FieldSoc},
-			cabinetbin.FieldSoh:       {Type: field.TypeFloat64, Column: cabinetbin.FieldSoh},
+			bin.FieldCreatedAt: {Type: field.TypeTime, Column: bin.FieldCreatedAt},
+			bin.FieldUpdatedAt: {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
+			bin.FieldUUID:      {Type: field.TypeString, Column: bin.FieldUUID},
+			bin.FieldBrand:     {Type: field.TypeString, Column: bin.FieldBrand},
+			bin.FieldSn:        {Type: field.TypeString, Column: bin.FieldSn},
+			bin.FieldName:      {Type: field.TypeString, Column: bin.FieldName},
+			bin.FieldIndex:     {Type: field.TypeInt, Column: bin.FieldIndex},
+			bin.FieldOpen:      {Type: field.TypeBool, Column: bin.FieldOpen},
+			bin.FieldEnable:    {Type: field.TypeBool, Column: bin.FieldEnable},
+			bin.FieldBatterySn: {Type: field.TypeString, Column: bin.FieldBatterySn},
+			bin.FieldVoltage:   {Type: field.TypeFloat64, Column: bin.FieldVoltage},
+			bin.FieldCurrent:   {Type: field.TypeFloat64, Column: bin.FieldCurrent},
+			bin.FieldSoc:       {Type: field.TypeFloat64, Column: bin.FieldSoc},
+			bin.FieldSoh:       {Type: field.TypeFloat64, Column: bin.FieldSoh},
 		},
 	}
 	return graph
@@ -51,33 +51,33 @@ type predicateAdder interface {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (cbq *CabinetBinQuery) addPredicate(pred func(s *sql.Selector)) {
-	cbq.predicates = append(cbq.predicates, pred)
+func (bq *BinQuery) addPredicate(pred func(s *sql.Selector)) {
+	bq.predicates = append(bq.predicates, pred)
 }
 
-// Filter returns a Filter implementation to apply filters on the CabinetBinQuery builder.
-func (cbq *CabinetBinQuery) Filter() *CabinetBinFilter {
-	return &CabinetBinFilter{config: cbq.config, predicateAdder: cbq}
+// Filter returns a Filter implementation to apply filters on the BinQuery builder.
+func (bq *BinQuery) Filter() *BinFilter {
+	return &BinFilter{config: bq.config, predicateAdder: bq}
 }
 
 // addPredicate implements the predicateAdder interface.
-func (m *CabinetBinMutation) addPredicate(pred func(s *sql.Selector)) {
+func (m *BinMutation) addPredicate(pred func(s *sql.Selector)) {
 	m.predicates = append(m.predicates, pred)
 }
 
-// Filter returns an entql.Where implementation to apply filters on the CabinetBinMutation builder.
-func (m *CabinetBinMutation) Filter() *CabinetBinFilter {
-	return &CabinetBinFilter{config: m.config, predicateAdder: m}
+// Filter returns an entql.Where implementation to apply filters on the BinMutation builder.
+func (m *BinMutation) Filter() *BinFilter {
+	return &BinFilter{config: m.config, predicateAdder: m}
 }
 
-// CabinetBinFilter provides a generic filtering capability at runtime for CabinetBinQuery.
-type CabinetBinFilter struct {
+// BinFilter provides a generic filtering capability at runtime for BinQuery.
+type BinFilter struct {
 	predicateAdder
 	config
 }
 
 // Where applies the entql predicate on the query filter.
-func (f *CabinetBinFilter) Where(p entql.P) {
+func (f *BinFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
 		if err := schemaGraph.EvalP(schemaGraph.Nodes[0].Type, p, s); err != nil {
 			s.AddError(err)
@@ -86,76 +86,76 @@ func (f *CabinetBinFilter) Where(p entql.P) {
 }
 
 // WhereID applies the entql uint64 predicate on the id field.
-func (f *CabinetBinFilter) WhereID(p entql.Uint64P) {
-	f.Where(p.Field(cabinetbin.FieldID))
+func (f *BinFilter) WhereID(p entql.Uint64P) {
+	f.Where(p.Field(bin.FieldID))
 }
 
 // WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *CabinetBinFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(cabinetbin.FieldCreatedAt))
+func (f *BinFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(bin.FieldCreatedAt))
 }
 
 // WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *CabinetBinFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(cabinetbin.FieldUpdatedAt))
+func (f *BinFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(bin.FieldUpdatedAt))
 }
 
 // WhereUUID applies the entql string predicate on the uuid field.
-func (f *CabinetBinFilter) WhereUUID(p entql.StringP) {
-	f.Where(p.Field(cabinetbin.FieldUUID))
+func (f *BinFilter) WhereUUID(p entql.StringP) {
+	f.Where(p.Field(bin.FieldUUID))
 }
 
 // WhereBrand applies the entql string predicate on the brand field.
-func (f *CabinetBinFilter) WhereBrand(p entql.StringP) {
-	f.Where(p.Field(cabinetbin.FieldBrand))
+func (f *BinFilter) WhereBrand(p entql.StringP) {
+	f.Where(p.Field(bin.FieldBrand))
 }
 
 // WhereSn applies the entql string predicate on the sn field.
-func (f *CabinetBinFilter) WhereSn(p entql.StringP) {
-	f.Where(p.Field(cabinetbin.FieldSn))
+func (f *BinFilter) WhereSn(p entql.StringP) {
+	f.Where(p.Field(bin.FieldSn))
 }
 
 // WhereName applies the entql string predicate on the name field.
-func (f *CabinetBinFilter) WhereName(p entql.StringP) {
-	f.Where(p.Field(cabinetbin.FieldName))
+func (f *BinFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(bin.FieldName))
 }
 
 // WhereIndex applies the entql int predicate on the index field.
-func (f *CabinetBinFilter) WhereIndex(p entql.IntP) {
-	f.Where(p.Field(cabinetbin.FieldIndex))
+func (f *BinFilter) WhereIndex(p entql.IntP) {
+	f.Where(p.Field(bin.FieldIndex))
 }
 
 // WhereOpen applies the entql bool predicate on the open field.
-func (f *CabinetBinFilter) WhereOpen(p entql.BoolP) {
-	f.Where(p.Field(cabinetbin.FieldOpen))
+func (f *BinFilter) WhereOpen(p entql.BoolP) {
+	f.Where(p.Field(bin.FieldOpen))
 }
 
 // WhereEnable applies the entql bool predicate on the enable field.
-func (f *CabinetBinFilter) WhereEnable(p entql.BoolP) {
-	f.Where(p.Field(cabinetbin.FieldEnable))
+func (f *BinFilter) WhereEnable(p entql.BoolP) {
+	f.Where(p.Field(bin.FieldEnable))
 }
 
 // WhereBatterySn applies the entql string predicate on the battery_sn field.
-func (f *CabinetBinFilter) WhereBatterySn(p entql.StringP) {
-	f.Where(p.Field(cabinetbin.FieldBatterySn))
+func (f *BinFilter) WhereBatterySn(p entql.StringP) {
+	f.Where(p.Field(bin.FieldBatterySn))
 }
 
 // WhereVoltage applies the entql float64 predicate on the voltage field.
-func (f *CabinetBinFilter) WhereVoltage(p entql.Float64P) {
-	f.Where(p.Field(cabinetbin.FieldVoltage))
+func (f *BinFilter) WhereVoltage(p entql.Float64P) {
+	f.Where(p.Field(bin.FieldVoltage))
 }
 
 // WhereCurrent applies the entql float64 predicate on the current field.
-func (f *CabinetBinFilter) WhereCurrent(p entql.Float64P) {
-	f.Where(p.Field(cabinetbin.FieldCurrent))
+func (f *BinFilter) WhereCurrent(p entql.Float64P) {
+	f.Where(p.Field(bin.FieldCurrent))
 }
 
 // WhereSoc applies the entql float64 predicate on the soc field.
-func (f *CabinetBinFilter) WhereSoc(p entql.Float64P) {
-	f.Where(p.Field(cabinetbin.FieldSoc))
+func (f *BinFilter) WhereSoc(p entql.Float64P) {
+	f.Where(p.Field(bin.FieldSoc))
 }
 
 // WhereSoh applies the entql float64 predicate on the soh field.
-func (f *CabinetBinFilter) WhereSoh(p entql.Float64P) {
-	f.Where(p.Field(cabinetbin.FieldSoh))
+func (f *BinFilter) WhereSoh(p entql.Float64P) {
+	f.Where(p.Field(bin.FieldSoh))
 }

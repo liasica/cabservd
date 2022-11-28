@@ -9,8 +9,8 @@ import (
 )
 
 var (
-	// CabinetBinColumns holds the columns for the "cabinet_bin" table.
-	CabinetBinColumns = []*schema.Column{
+	// BinColumns holds the columns for the "bin" table.
+	BinColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
@@ -27,47 +27,47 @@ var (
 		{Name: "soc", Type: field.TypeFloat64, Default: 0},
 		{Name: "soh", Type: field.TypeFloat64, Default: 0},
 	}
-	// CabinetBinTable holds the schema information for the "cabinet_bin" table.
-	CabinetBinTable = &schema.Table{
-		Name:       "cabinet_bin",
-		Columns:    CabinetBinColumns,
-		PrimaryKey: []*schema.Column{CabinetBinColumns[0]},
+	// BinTable holds the schema information for the "bin" table.
+	BinTable = &schema.Table{
+		Name:       "bin",
+		Columns:    BinColumns,
+		PrimaryKey: []*schema.Column{BinColumns[0]},
 		Indexes: []*schema.Index{
 			{
-				Name:    "cabinetbin_created_at",
+				Name:    "bin_created_at",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[1]},
+				Columns: []*schema.Column{BinColumns[1]},
 			},
 			{
-				Name:    "cabinetbin_sn_brand",
+				Name:    "bin_sn_brand",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[5], CabinetBinColumns[4]},
+				Columns: []*schema.Column{BinColumns[5], BinColumns[4]},
 			},
 			{
-				Name:    "cabinetbin_index",
+				Name:    "bin_index",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[7]},
+				Columns: []*schema.Column{BinColumns[7]},
 			},
 			{
-				Name:    "cabinetbin_battery_sn",
+				Name:    "bin_battery_sn",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[10]},
+				Columns: []*schema.Column{BinColumns[10]},
 			},
 			{
-				Name:    "cabinetbin_soc",
+				Name:    "bin_soc",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetBinColumns[13]},
+				Columns: []*schema.Column{BinColumns[13]},
 			},
 		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
-		CabinetBinTable,
+		BinTable,
 	}
 )
 
 func init() {
-	CabinetBinTable.Annotation = &entsql.Annotation{
-		Table: "cabinet_bin",
+	BinTable.Annotation = &entsql.Annotation{
+		Table: "bin",
 	}
 }

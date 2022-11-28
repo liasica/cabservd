@@ -10,7 +10,7 @@ import (
 
 	"github.com/auroraride/cabservd/internal/ent/migrate"
 
-	"github.com/auroraride/cabservd/internal/ent/cabinetbin"
+	"github.com/auroraride/cabservd/internal/ent/bin"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -21,8 +21,8 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
-	// CabinetBin is the client for interacting with the CabinetBin builders.
-	CabinetBin *CabinetBinClient
+	// Bin is the client for interacting with the Bin builders.
+	Bin *BinClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -36,7 +36,7 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
-	c.CabinetBin = NewCabinetBinClient(c.config)
+	c.Bin = NewBinClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -68,9 +68,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		CabinetBin: NewCabinetBinClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		Bin:    NewBinClient(cfg),
 	}, nil
 }
 
@@ -88,16 +88,16 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:        ctx,
-		config:     cfg,
-		CabinetBin: NewCabinetBinClient(cfg),
+		ctx:    ctx,
+		config: cfg,
+		Bin:    NewBinClient(cfg),
 	}, nil
 }
 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		CabinetBin.
+//		Bin.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -119,87 +119,87 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.CabinetBin.Use(hooks...)
+	c.Bin.Use(hooks...)
 }
 
-// CabinetBinClient is a client for the CabinetBin schema.
-type CabinetBinClient struct {
+// BinClient is a client for the Bin schema.
+type BinClient struct {
 	config
 }
 
-// NewCabinetBinClient returns a client for the CabinetBin from the given config.
-func NewCabinetBinClient(c config) *CabinetBinClient {
-	return &CabinetBinClient{config: c}
+// NewBinClient returns a client for the Bin from the given config.
+func NewBinClient(c config) *BinClient {
+	return &BinClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `cabinetbin.Hooks(f(g(h())))`.
-func (c *CabinetBinClient) Use(hooks ...Hook) {
-	c.hooks.CabinetBin = append(c.hooks.CabinetBin, hooks...)
+// A call to `Use(f, g, h)` equals to `bin.Hooks(f(g(h())))`.
+func (c *BinClient) Use(hooks ...Hook) {
+	c.hooks.Bin = append(c.hooks.Bin, hooks...)
 }
 
-// Create returns a builder for creating a CabinetBin entity.
-func (c *CabinetBinClient) Create() *CabinetBinCreate {
-	mutation := newCabinetBinMutation(c.config, OpCreate)
-	return &CabinetBinCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Bin entity.
+func (c *BinClient) Create() *BinCreate {
+	mutation := newBinMutation(c.config, OpCreate)
+	return &BinCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of CabinetBin entities.
-func (c *CabinetBinClient) CreateBulk(builders ...*CabinetBinCreate) *CabinetBinCreateBulk {
-	return &CabinetBinCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Bin entities.
+func (c *BinClient) CreateBulk(builders ...*BinCreate) *BinCreateBulk {
+	return &BinCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for CabinetBin.
-func (c *CabinetBinClient) Update() *CabinetBinUpdate {
-	mutation := newCabinetBinMutation(c.config, OpUpdate)
-	return &CabinetBinUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Bin.
+func (c *BinClient) Update() *BinUpdate {
+	mutation := newBinMutation(c.config, OpUpdate)
+	return &BinUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CabinetBinClient) UpdateOne(cb *CabinetBin) *CabinetBinUpdateOne {
-	mutation := newCabinetBinMutation(c.config, OpUpdateOne, withCabinetBin(cb))
-	return &CabinetBinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *BinClient) UpdateOne(b *Bin) *BinUpdateOne {
+	mutation := newBinMutation(c.config, OpUpdateOne, withBin(b))
+	return &BinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CabinetBinClient) UpdateOneID(id uint64) *CabinetBinUpdateOne {
-	mutation := newCabinetBinMutation(c.config, OpUpdateOne, withCabinetBinID(id))
-	return &CabinetBinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *BinClient) UpdateOneID(id uint64) *BinUpdateOne {
+	mutation := newBinMutation(c.config, OpUpdateOne, withBinID(id))
+	return &BinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for CabinetBin.
-func (c *CabinetBinClient) Delete() *CabinetBinDelete {
-	mutation := newCabinetBinMutation(c.config, OpDelete)
-	return &CabinetBinDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Bin.
+func (c *BinClient) Delete() *BinDelete {
+	mutation := newBinMutation(c.config, OpDelete)
+	return &BinDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CabinetBinClient) DeleteOne(cb *CabinetBin) *CabinetBinDeleteOne {
-	return c.DeleteOneID(cb.ID)
+func (c *BinClient) DeleteOne(b *Bin) *BinDeleteOne {
+	return c.DeleteOneID(b.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CabinetBinClient) DeleteOneID(id uint64) *CabinetBinDeleteOne {
-	builder := c.Delete().Where(cabinetbin.ID(id))
+func (c *BinClient) DeleteOneID(id uint64) *BinDeleteOne {
+	builder := c.Delete().Where(bin.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CabinetBinDeleteOne{builder}
+	return &BinDeleteOne{builder}
 }
 
-// Query returns a query builder for CabinetBin.
-func (c *CabinetBinClient) Query() *CabinetBinQuery {
-	return &CabinetBinQuery{
+// Query returns a query builder for Bin.
+func (c *BinClient) Query() *BinQuery {
+	return &BinQuery{
 		config: c.config,
 	}
 }
 
-// Get returns a CabinetBin entity by its id.
-func (c *CabinetBinClient) Get(ctx context.Context, id uint64) (*CabinetBin, error) {
-	return c.Query().Where(cabinetbin.ID(id)).Only(ctx)
+// Get returns a Bin entity by its id.
+func (c *BinClient) Get(ctx context.Context, id uint64) (*Bin, error) {
+	return c.Query().Where(bin.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CabinetBinClient) GetX(ctx context.Context, id uint64) *CabinetBin {
+func (c *BinClient) GetX(ctx context.Context, id uint64) *Bin {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -208,6 +208,6 @@ func (c *CabinetBinClient) GetX(ctx context.Context, id uint64) *CabinetBin {
 }
 
 // Hooks returns the client hooks.
-func (c *CabinetBinClient) Hooks() []Hook {
-	return c.hooks.CabinetBin
+func (c *BinClient) Hooks() []Hook {
+	return c.hooks.Bin
 }

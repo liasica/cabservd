@@ -11,13 +11,13 @@ import (
     "github.com/auroraride/cabservd/internal/ent/internal"
 )
 
-type CabinetBinMixin struct {
+type BinMixin struct {
     mixin.Schema
     Optional     bool
     DisableIndex bool
 }
 
-func (m CabinetBinMixin) Fields() []ent.Field {
+func (m BinMixin) Fields() []ent.Field {
     relate := field.Uint64("bin_id")
     if m.Optional {
         relate.Optional().Nillable()
@@ -27,35 +27,35 @@ func (m CabinetBinMixin) Fields() []ent.Field {
     }
 }
 
-func (m CabinetBinMixin) Edges() []ent.Edge {
-    e := edge.To("bin", CabinetBin.Type).Unique().Field("bin_id")
+func (m BinMixin) Edges() []ent.Edge {
+    e := edge.To("bin", Bin.Type).Unique().Field("bin_id")
     if !m.Optional {
         e.Required()
     }
     return []ent.Edge{e}
 }
 
-func (m CabinetBinMixin) Indexes() (arr []ent.Index) {
+func (m BinMixin) Indexes() (arr []ent.Index) {
     if !m.DisableIndex {
         arr = append(arr, index.Fields("bin_id"))
     }
     return
 }
 
-// CabinetBin holds the schema definition for the CabinetBin entity.
-type CabinetBin struct {
+// Bin holds the schema definition for the Bin entity.
+type Bin struct {
     ent.Schema
 }
 
-// Annotations of the CabinetBin.
-func (CabinetBin) Annotations() []schema.Annotation {
+// Annotations of the Bin.
+func (Bin) Annotations() []schema.Annotation {
     return []schema.Annotation{
-        entsql.Annotation{Table: "cabinet_bin"},
+        entsql.Annotation{Table: "bin"},
     }
 }
 
-// Fields of the CabinetBin.
-func (CabinetBin) Fields() []ent.Field {
+// Fields of the Bin.
+func (Bin) Fields() []ent.Field {
     return []ent.Field{
         field.String("uuid").Unique().MaxLen(32).Comment("唯一标识"),
 
@@ -78,18 +78,18 @@ func (CabinetBin) Fields() []ent.Field {
     }
 }
 
-// Edges of the CabinetBin.
-func (CabinetBin) Edges() []ent.Edge {
+// Edges of the Bin.
+func (Bin) Edges() []ent.Edge {
     return []ent.Edge{}
 }
 
-func (CabinetBin) Mixin() []ent.Mixin {
+func (Bin) Mixin() []ent.Mixin {
     return []ent.Mixin{
         internal.TimeMixin{},
     }
 }
 
-func (CabinetBin) Indexes() []ent.Index {
+func (Bin) Indexes() []ent.Index {
     return []ent.Index{
         index.Fields("sn", "brand"),
         index.Fields("index"),
