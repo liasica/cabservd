@@ -17,6 +17,35 @@ type Client struct {
     gnet.Conn
 
     Hub *hub
+
+    // 消息代理
+    receiver chan *MessageProxy
+}
+
+type MessageProxy struct {
+    Data   []byte
+    Client *Client
+}
+
+func NewClient(conn gnet.Conn, h *hub) *Client {
+    c := &Client{
+        Conn:     conn,
+        Hub:      h,
+        receiver: make(chan *MessageProxy),
+    }
+    go c.run()
+    return c
+}
+
+// 启动客户端任务
+func (c *Client) run() {
+    for {
+        select {
+        case message := <-c.receiver:
+            // 消息代理
+            c.Hub.handleMessage(message.Data, message.Client)
+        }
+    }
 }
 
 // SetDeviceID 设置deviceID

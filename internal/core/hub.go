@@ -41,14 +41,6 @@ type hub struct {
 
     // 断开客户端连接
     disconnect chan *Client
-
-    // 消息代理
-    receiver chan *MessageProxy
-}
-
-type MessageProxy struct {
-    Data   []byte
-    Client *Client
 }
 
 func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
@@ -60,10 +52,7 @@ func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
     log.Infof("[FD=%d / %s] 新增客户端连接", c.Fd(), c.RemoteAddr())
 
     // 设置连接上下文信息
-    ctx := &Client{
-        Conn: c,
-        Hub:  h,
-    }
+    ctx := NewClient(c, h)
     c.SetContext(ctx)
 
     // 注册连接
@@ -109,7 +98,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
         }
 
         // 使用channel处理消息体
-        h.receiver <- &MessageProxy{
+        client.receiver <- &MessageProxy{
             Data:   b,
             Client: client,
         }
