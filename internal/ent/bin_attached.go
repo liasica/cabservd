@@ -5,9 +5,9 @@
 
 package ent
 
-// ResetBatteryInfo 无电池的时候清除电池信息
+// ResetBattery 无电池的时候清除电池信息
 // TODO: 是否有必要?
-func (u *BinUpsert) ResetBatteryInfo() *BinUpsert {
+func (u *BinUpsert) ResetBattery() *BinUpsert {
     u.SetCurrent(0).SetVoltage(0).SetSoc(0).SetSoh(0)
     return u
 }
