@@ -30,10 +30,12 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldUUID:      {Type: field.TypeString, Column: bin.FieldUUID},
 			bin.FieldBrand:     {Type: field.TypeString, Column: bin.FieldBrand},
 			bin.FieldSn:        {Type: field.TypeString, Column: bin.FieldSn},
+			bin.FieldLock:      {Type: field.TypeBool, Column: bin.FieldLock},
 			bin.FieldName:      {Type: field.TypeString, Column: bin.FieldName},
 			bin.FieldIndex:     {Type: field.TypeInt, Column: bin.FieldIndex},
 			bin.FieldOpen:      {Type: field.TypeBool, Column: bin.FieldOpen},
 			bin.FieldEnable:    {Type: field.TypeBool, Column: bin.FieldEnable},
+			bin.FieldHealth:    {Type: field.TypeBool, Column: bin.FieldHealth},
 			bin.FieldBatterySn: {Type: field.TypeString, Column: bin.FieldBatterySn},
 			bin.FieldVoltage:   {Type: field.TypeFloat64, Column: bin.FieldVoltage},
 			bin.FieldCurrent:   {Type: field.TypeFloat64, Column: bin.FieldCurrent},
@@ -115,6 +117,11 @@ func (f *BinFilter) WhereSn(p entql.StringP) {
 	f.Where(p.Field(bin.FieldSn))
 }
 
+// WhereLock applies the entql bool predicate on the lock field.
+func (f *BinFilter) WhereLock(p entql.BoolP) {
+	f.Where(p.Field(bin.FieldLock))
+}
+
 // WhereName applies the entql string predicate on the name field.
 func (f *BinFilter) WhereName(p entql.StringP) {
 	f.Where(p.Field(bin.FieldName))
@@ -133,6 +140,11 @@ func (f *BinFilter) WhereOpen(p entql.BoolP) {
 // WhereEnable applies the entql bool predicate on the enable field.
 func (f *BinFilter) WhereEnable(p entql.BoolP) {
 	f.Where(p.Field(bin.FieldEnable))
+}
+
+// WhereHealth applies the entql bool predicate on the health field.
+func (f *BinFilter) WhereHealth(p entql.BoolP) {
+	f.Where(p.Field(bin.FieldHealth))
 }
 
 // WhereBatterySn applies the entql string predicate on the battery_sn field.

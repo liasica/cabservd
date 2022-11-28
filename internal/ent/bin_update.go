@@ -53,6 +53,20 @@ func (bu *BinUpdate) SetSn(s string) *BinUpdate {
 	return bu
 }
 
+// SetLock sets the "lock" field.
+func (bu *BinUpdate) SetLock(b bool) *BinUpdate {
+	bu.mutation.SetLock(b)
+	return bu
+}
+
+// SetNillableLock sets the "lock" field if the given value is not nil.
+func (bu *BinUpdate) SetNillableLock(b *bool) *BinUpdate {
+	if b != nil {
+		bu.SetLock(*b)
+	}
+	return bu
+}
+
 // SetName sets the "name" field.
 func (bu *BinUpdate) SetName(s string) *BinUpdate {
 	bu.mutation.SetName(s)
@@ -96,6 +110,20 @@ func (bu *BinUpdate) SetEnable(b bool) *BinUpdate {
 func (bu *BinUpdate) SetNillableEnable(b *bool) *BinUpdate {
 	if b != nil {
 		bu.SetEnable(*b)
+	}
+	return bu
+}
+
+// SetHealth sets the "health" field.
+func (bu *BinUpdate) SetHealth(b bool) *BinUpdate {
+	bu.mutation.SetHealth(b)
+	return bu
+}
+
+// SetNillableHealth sets the "health" field if the given value is not nil.
+func (bu *BinUpdate) SetNillableHealth(b *bool) *BinUpdate {
+	if b != nil {
+		bu.SetHealth(*b)
 	}
 	return bu
 }
@@ -318,6 +346,9 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.Sn(); ok {
 		_spec.SetField(bin.FieldSn, field.TypeString, value)
 	}
+	if value, ok := bu.mutation.Lock(); ok {
+		_spec.SetField(bin.FieldLock, field.TypeBool, value)
+	}
 	if value, ok := bu.mutation.Name(); ok {
 		_spec.SetField(bin.FieldName, field.TypeString, value)
 	}
@@ -332,6 +363,9 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.Enable(); ok {
 		_spec.SetField(bin.FieldEnable, field.TypeBool, value)
+	}
+	if value, ok := bu.mutation.Health(); ok {
+		_spec.SetField(bin.FieldHealth, field.TypeBool, value)
 	}
 	if value, ok := bu.mutation.BatterySn(); ok {
 		_spec.SetField(bin.FieldBatterySn, field.TypeString, value)
@@ -405,6 +439,20 @@ func (buo *BinUpdateOne) SetSn(s string) *BinUpdateOne {
 	return buo
 }
 
+// SetLock sets the "lock" field.
+func (buo *BinUpdateOne) SetLock(b bool) *BinUpdateOne {
+	buo.mutation.SetLock(b)
+	return buo
+}
+
+// SetNillableLock sets the "lock" field if the given value is not nil.
+func (buo *BinUpdateOne) SetNillableLock(b *bool) *BinUpdateOne {
+	if b != nil {
+		buo.SetLock(*b)
+	}
+	return buo
+}
+
 // SetName sets the "name" field.
 func (buo *BinUpdateOne) SetName(s string) *BinUpdateOne {
 	buo.mutation.SetName(s)
@@ -448,6 +496,20 @@ func (buo *BinUpdateOne) SetEnable(b bool) *BinUpdateOne {
 func (buo *BinUpdateOne) SetNillableEnable(b *bool) *BinUpdateOne {
 	if b != nil {
 		buo.SetEnable(*b)
+	}
+	return buo
+}
+
+// SetHealth sets the "health" field.
+func (buo *BinUpdateOne) SetHealth(b bool) *BinUpdateOne {
+	buo.mutation.SetHealth(b)
+	return buo
+}
+
+// SetNillableHealth sets the "health" field if the given value is not nil.
+func (buo *BinUpdateOne) SetNillableHealth(b *bool) *BinUpdateOne {
+	if b != nil {
+		buo.SetHealth(*b)
 	}
 	return buo
 }
@@ -700,6 +762,9 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	if value, ok := buo.mutation.Sn(); ok {
 		_spec.SetField(bin.FieldSn, field.TypeString, value)
 	}
+	if value, ok := buo.mutation.Lock(); ok {
+		_spec.SetField(bin.FieldLock, field.TypeBool, value)
+	}
 	if value, ok := buo.mutation.Name(); ok {
 		_spec.SetField(bin.FieldName, field.TypeString, value)
 	}
@@ -714,6 +779,9 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if value, ok := buo.mutation.Enable(); ok {
 		_spec.SetField(bin.FieldEnable, field.TypeBool, value)
+	}
+	if value, ok := buo.mutation.Health(); ok {
+		_spec.SetField(bin.FieldHealth, field.TypeBool, value)
 	}
 	if value, ok := buo.mutation.BatterySn(); ok {
 		_spec.SetField(bin.FieldBatterySn, field.TypeString, value)

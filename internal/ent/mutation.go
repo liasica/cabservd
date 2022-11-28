@@ -38,11 +38,13 @@ type BinMutation struct {
 	uuid          *string
 	brand         *string
 	sn            *string
+	lock          *bool
 	name          *string
 	index         *int
 	addindex      *int
 	open          *bool
 	enable        *bool
+	health        *bool
 	battery_sn    *string
 	voltage       *float64
 	addvoltage    *float64
@@ -336,6 +338,42 @@ func (m *BinMutation) ResetSn() {
 	m.sn = nil
 }
 
+// SetLock sets the "lock" field.
+func (m *BinMutation) SetLock(b bool) {
+	m.lock = &b
+}
+
+// Lock returns the value of the "lock" field in the mutation.
+func (m *BinMutation) Lock() (r bool, exists bool) {
+	v := m.lock
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLock returns the old "lock" field's value of the Bin entity.
+// If the Bin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BinMutation) OldLock(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLock is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLock requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLock: %w", err)
+	}
+	return oldValue.Lock, nil
+}
+
+// ResetLock resets all changes to the "lock" field.
+func (m *BinMutation) ResetLock() {
+	m.lock = nil
+}
+
 // SetName sets the "name" field.
 func (m *BinMutation) SetName(s string) {
 	m.name = &s
@@ -498,6 +536,42 @@ func (m *BinMutation) OldEnable(ctx context.Context) (v bool, err error) {
 // ResetEnable resets all changes to the "enable" field.
 func (m *BinMutation) ResetEnable() {
 	m.enable = nil
+}
+
+// SetHealth sets the "health" field.
+func (m *BinMutation) SetHealth(b bool) {
+	m.health = &b
+}
+
+// Health returns the value of the "health" field in the mutation.
+func (m *BinMutation) Health() (r bool, exists bool) {
+	v := m.health
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHealth returns the old "health" field's value of the Bin entity.
+// If the Bin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BinMutation) OldHealth(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHealth is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHealth requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHealth: %w", err)
+	}
+	return oldValue.Health, nil
+}
+
+// ResetHealth resets all changes to the "health" field.
+func (m *BinMutation) ResetHealth() {
+	m.health = nil
 }
 
 // SetBatterySn sets the "battery_sn" field.
@@ -779,7 +853,7 @@ func (m *BinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BinMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 16)
 	if m.created_at != nil {
 		fields = append(fields, bin.FieldCreatedAt)
 	}
@@ -795,6 +869,9 @@ func (m *BinMutation) Fields() []string {
 	if m.sn != nil {
 		fields = append(fields, bin.FieldSn)
 	}
+	if m.lock != nil {
+		fields = append(fields, bin.FieldLock)
+	}
 	if m.name != nil {
 		fields = append(fields, bin.FieldName)
 	}
@@ -806,6 +883,9 @@ func (m *BinMutation) Fields() []string {
 	}
 	if m.enable != nil {
 		fields = append(fields, bin.FieldEnable)
+	}
+	if m.health != nil {
+		fields = append(fields, bin.FieldHealth)
 	}
 	if m.battery_sn != nil {
 		fields = append(fields, bin.FieldBatterySn)
@@ -840,6 +920,8 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.Brand()
 	case bin.FieldSn:
 		return m.Sn()
+	case bin.FieldLock:
+		return m.Lock()
 	case bin.FieldName:
 		return m.Name()
 	case bin.FieldIndex:
@@ -848,6 +930,8 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.Open()
 	case bin.FieldEnable:
 		return m.Enable()
+	case bin.FieldHealth:
+		return m.Health()
 	case bin.FieldBatterySn:
 		return m.BatterySn()
 	case bin.FieldVoltage:
@@ -877,6 +961,8 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldBrand(ctx)
 	case bin.FieldSn:
 		return m.OldSn(ctx)
+	case bin.FieldLock:
+		return m.OldLock(ctx)
 	case bin.FieldName:
 		return m.OldName(ctx)
 	case bin.FieldIndex:
@@ -885,6 +971,8 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldOpen(ctx)
 	case bin.FieldEnable:
 		return m.OldEnable(ctx)
+	case bin.FieldHealth:
+		return m.OldHealth(ctx)
 	case bin.FieldBatterySn:
 		return m.OldBatterySn(ctx)
 	case bin.FieldVoltage:
@@ -939,6 +1027,13 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSn(v)
 		return nil
+	case bin.FieldLock:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLock(v)
+		return nil
 	case bin.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -966,6 +1061,13 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetEnable(v)
+		return nil
+	case bin.FieldHealth:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHealth(v)
 		return nil
 	case bin.FieldBatterySn:
 		v, ok := value.(string)
@@ -1129,6 +1231,9 @@ func (m *BinMutation) ResetField(name string) error {
 	case bin.FieldSn:
 		m.ResetSn()
 		return nil
+	case bin.FieldLock:
+		m.ResetLock()
+		return nil
 	case bin.FieldName:
 		m.ResetName()
 		return nil
@@ -1140,6 +1245,9 @@ func (m *BinMutation) ResetField(name string) error {
 		return nil
 	case bin.FieldEnable:
 		m.ResetEnable()
+		return nil
+	case bin.FieldHealth:
+		m.ResetHealth()
 		return nil
 	case bin.FieldBatterySn:
 		m.ResetBatterySn()

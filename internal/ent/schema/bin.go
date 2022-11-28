@@ -63,11 +63,15 @@ func (Bin) Fields() []ent.Field {
         field.String("brand").Comment("品牌"),
         field.String("sn").Comment("电柜设备序列号"),
 
+        // 操作记录
+        field.Bool("lock").Default(false).Comment("锁仓"),
+
         // 仓位信息
         field.String("name").Comment("仓位名称(N号仓)"),
         field.Int("index").Comment("仓位序号(从0开始)"),
         field.Bool("open").Default(false).Comment("仓门是否开启"),
         field.Bool("enable").Default(true).Comment("仓位是否启用"),
+        field.Bool("health").Default(true).Comment("仓位是否健康"),
 
         // 电池信息
         field.String("battery_sn").Default("").Comment("电池序列号"),

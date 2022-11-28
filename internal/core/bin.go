@@ -8,6 +8,7 @@ package core
 import (
     "context"
     "fmt"
+    "github.com/auroraride/cabservd/internal/core/types"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/errs"
@@ -18,9 +19,11 @@ type Bin interface {
     GetOpen() (v bool, exists bool)
     GetEnable() (v bool, exists bool)
     GetDoorIndex() (v int, exists bool)
-    GetBatterySN() (v string, exists bool)
+    // GetBattery 获取电池序列号, 若序列号为空, 则无电池
+    GetBattery() (v string, exists bool)
     GetVoltage() (v float64, exists bool)
     GetCurrent() (v float64, exists bool)
+    GetChargeStatus() (v types.ChargeStatus, exists bool)
     GetSoC() (v float64, exists bool)
     GetSoH() (v float64, exists bool)
 }
@@ -59,13 +62,20 @@ func SaveBinWithContext(brand, sn string, item Bin, ctx context.Context) (err er
             }
 
             // 电池编号
-            if bs, ok := item.GetBatterySN(); ok {
+            if bs, ok := item.GetBattery(); ok {
                 fmt.Printf("%d battery:->%v\n", index, bs)
                 u.SetBatterySn(bs)
                 if bs == "" {
-                    // 无电池的时候清除电池信息
-                    // TODO: 是否有必要?
-                    u.SetCurrent(0).SetVoltage(0).SetSoc(0).SetSoh(0)
+                    u.ResetBatteryInfo()
+                }
+            }
+
+            if v, ok := item.GetChargeStatus(); ok {
+                switch v {
+                case types.ChargeStatusNoBattery:
+                    u.ResetBatteryInfo()
+                case types.ChargeStatusException:
+                    // TODO: 是否标记为故障
                 }
             }
 

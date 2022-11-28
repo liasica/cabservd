@@ -17,10 +17,12 @@ var (
 		{Name: "uuid", Type: field.TypeString, Unique: true, Size: 32},
 		{Name: "brand", Type: field.TypeString},
 		{Name: "sn", Type: field.TypeString},
+		{Name: "lock", Type: field.TypeBool, Default: false},
 		{Name: "name", Type: field.TypeString},
 		{Name: "index", Type: field.TypeInt},
 		{Name: "open", Type: field.TypeBool, Default: false},
 		{Name: "enable", Type: field.TypeBool, Default: true},
+		{Name: "health", Type: field.TypeBool, Default: true},
 		{Name: "battery_sn", Type: field.TypeString, Default: ""},
 		{Name: "voltage", Type: field.TypeFloat64, Default: 0},
 		{Name: "current", Type: field.TypeFloat64, Default: 0},
@@ -46,17 +48,17 @@ var (
 			{
 				Name:    "bin_index",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[7]},
+				Columns: []*schema.Column{BinColumns[8]},
 			},
 			{
 				Name:    "bin_battery_sn",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[10]},
+				Columns: []*schema.Column{BinColumns[12]},
 			},
 			{
 				Name:    "bin_soc",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[13]},
+				Columns: []*schema.Column{BinColumns[15]},
 			},
 		},
 	}

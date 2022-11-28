@@ -26,6 +26,8 @@ type Bin struct {
 	Brand string `json:"brand,omitempty"`
 	// 电柜设备序列号
 	Sn string `json:"sn,omitempty"`
+	// 锁仓
+	Lock bool `json:"lock,omitempty"`
 	// 仓位名称(N号仓)
 	Name string `json:"name,omitempty"`
 	// 仓位序号(从0开始)
@@ -34,6 +36,8 @@ type Bin struct {
 	Open bool `json:"open,omitempty"`
 	// 仓位是否启用
 	Enable bool `json:"enable,omitempty"`
+	// 仓位是否健康
+	Health bool `json:"health,omitempty"`
 	// 电池序列号
 	BatterySn string `json:"battery_sn,omitempty"`
 	// 当前电压
@@ -51,7 +55,7 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case bin.FieldOpen, bin.FieldEnable:
+		case bin.FieldLock, bin.FieldOpen, bin.FieldEnable, bin.FieldHealth:
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
@@ -112,6 +116,12 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.Sn = value.String
 			}
+		case bin.FieldLock:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field lock", values[i])
+			} else if value.Valid {
+				b.Lock = value.Bool
+			}
 		case bin.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -135,6 +145,12 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field enable", values[i])
 			} else if value.Valid {
 				b.Enable = value.Bool
+			}
+		case bin.FieldHealth:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field health", values[i])
+			} else if value.Valid {
+				b.Health = value.Bool
 			}
 		case bin.FieldBatterySn:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -209,6 +225,9 @@ func (b *Bin) String() string {
 	builder.WriteString("sn=")
 	builder.WriteString(b.Sn)
 	builder.WriteString(", ")
+	builder.WriteString("lock=")
+	builder.WriteString(fmt.Sprintf("%v", b.Lock))
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(b.Name)
 	builder.WriteString(", ")
@@ -220,6 +239,9 @@ func (b *Bin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("enable=")
 	builder.WriteString(fmt.Sprintf("%v", b.Enable))
+	builder.WriteString(", ")
+	builder.WriteString("health=")
+	builder.WriteString(fmt.Sprintf("%v", b.Health))
 	builder.WriteString(", ")
 	builder.WriteString("battery_sn=")
 	builder.WriteString(b.BatterySn)

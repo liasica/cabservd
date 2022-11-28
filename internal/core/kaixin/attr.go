@@ -6,7 +6,7 @@
 package kaixin
 
 import (
-    "fmt"
+    "github.com/auroraride/cabservd/internal/core/types"
     log "github.com/sirupsen/logrus"
     "strconv"
 )
@@ -34,7 +34,7 @@ func (a *Attr) GetDoorIndex() (index int, exists bool) {
 func (a *Attr) GetOpen() (open bool, exists bool) {
     exists = a.ID == SignalDoorStatus
     if exists {
-        open = fmt.Sprintf("%v", a.Value) == DoorStatusOpen
+        open = a.StringValue() == DoorStatusOpen
     }
     return
 }
@@ -42,15 +42,23 @@ func (a *Attr) GetOpen() (open bool, exists bool) {
 func (a *Attr) GetEnable() (enable bool, exists bool) {
     exists = a.ID == SignalBinEnable
     if exists {
-        enable = fmt.Sprintf("%v", a.Value) == BinEnable
+        enable = a.StringValue() == BinEnable
     }
     return
 }
 
-func (a *Attr) GetBatterySN() (sn string, exists bool) {
+func (a *Attr) GetBattery() (v string, exists bool) {
     exists = a.ID == SignalBatterySN
     if exists {
-        sn = fmt.Sprintf("%v", a.Value)
+        v = a.StringValue()
+    }
+    return
+}
+
+func (a *Attr) GetChargeStatus() (v types.ChargeStatus, exists bool) {
+    exists = a.ID == SignalBinChargeStatus
+    if exists {
+        v = types.ChargeStatus(a.StringValue())
     }
     return
 }

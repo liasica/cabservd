@@ -118,7 +118,7 @@ func (d *demo) Start(c *gin.Context) {
     // 获取仓位状态
     var items ent.Bins
     items, err = ent.Database.Bin.Query().
-        Where(bin.Sn(req.SN), bin.Enable(true), bin.Open(false), bin.IndexIn(2, 3)).
+        Where(bin.Sn(req.SN), bin.Enable(true), bin.Open(false), bin.Lock(false)).
         Order(ent.Desc(bin.FieldSoc)).
         All(context.Background())
 

@@ -115,6 +115,13 @@ func Sn(v string) predicate.Bin {
 	})
 }
 
+// Lock applies equality check predicate on the "lock" field. It's identical to LockEQ.
+func Lock(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLock), v))
+	})
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
@@ -140,6 +147,13 @@ func Open(v bool) predicate.Bin {
 func Enable(v bool) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldEnable), v))
+	})
+}
+
+// Health applies equality check predicate on the "health" field. It's identical to HealthEQ.
+func Health(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldHealth), v))
 	})
 }
 
@@ -603,6 +617,20 @@ func SnContainsFold(v string) predicate.Bin {
 	})
 }
 
+// LockEQ applies the EQ predicate on the "lock" field.
+func LockEQ(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldLock), v))
+	})
+}
+
+// LockNEQ applies the NEQ predicate on the "lock" field.
+func LockNEQ(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldLock), v))
+	})
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
@@ -791,6 +819,20 @@ func EnableEQ(v bool) predicate.Bin {
 func EnableNEQ(v bool) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldEnable), v))
+	})
+}
+
+// HealthEQ applies the EQ predicate on the "health" field.
+func HealthEQ(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldHealth), v))
+	})
+}
+
+// HealthNEQ applies the NEQ predicate on the "health" field.
+func HealthNEQ(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldHealth), v))
 	})
 }
 

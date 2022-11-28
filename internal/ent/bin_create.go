@@ -68,6 +68,20 @@ func (bc *BinCreate) SetSn(s string) *BinCreate {
 	return bc
 }
 
+// SetLock sets the "lock" field.
+func (bc *BinCreate) SetLock(b bool) *BinCreate {
+	bc.mutation.SetLock(b)
+	return bc
+}
+
+// SetNillableLock sets the "lock" field if the given value is not nil.
+func (bc *BinCreate) SetNillableLock(b *bool) *BinCreate {
+	if b != nil {
+		bc.SetLock(*b)
+	}
+	return bc
+}
+
 // SetName sets the "name" field.
 func (bc *BinCreate) SetName(s string) *BinCreate {
 	bc.mutation.SetName(s)
@@ -104,6 +118,20 @@ func (bc *BinCreate) SetEnable(b bool) *BinCreate {
 func (bc *BinCreate) SetNillableEnable(b *bool) *BinCreate {
 	if b != nil {
 		bc.SetEnable(*b)
+	}
+	return bc
+}
+
+// SetHealth sets the "health" field.
+func (bc *BinCreate) SetHealth(b bool) *BinCreate {
+	bc.mutation.SetHealth(b)
+	return bc
+}
+
+// SetNillableHealth sets the "health" field if the given value is not nil.
+func (bc *BinCreate) SetNillableHealth(b *bool) *BinCreate {
+	if b != nil {
+		bc.SetHealth(*b)
 	}
 	return bc
 }
@@ -263,6 +291,10 @@ func (bc *BinCreate) defaults() {
 		v := bin.DefaultUpdatedAt()
 		bc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := bc.mutation.Lock(); !ok {
+		v := bin.DefaultLock
+		bc.mutation.SetLock(v)
+	}
 	if _, ok := bc.mutation.Open(); !ok {
 		v := bin.DefaultOpen
 		bc.mutation.SetOpen(v)
@@ -270,6 +302,10 @@ func (bc *BinCreate) defaults() {
 	if _, ok := bc.mutation.Enable(); !ok {
 		v := bin.DefaultEnable
 		bc.mutation.SetEnable(v)
+	}
+	if _, ok := bc.mutation.Health(); !ok {
+		v := bin.DefaultHealth
+		bc.mutation.SetHealth(v)
 	}
 	if _, ok := bc.mutation.BatterySn(); !ok {
 		v := bin.DefaultBatterySn
@@ -315,6 +351,9 @@ func (bc *BinCreate) check() error {
 	if _, ok := bc.mutation.Sn(); !ok {
 		return &ValidationError{Name: "sn", err: errors.New(`ent: missing required field "Bin.sn"`)}
 	}
+	if _, ok := bc.mutation.Lock(); !ok {
+		return &ValidationError{Name: "lock", err: errors.New(`ent: missing required field "Bin.lock"`)}
+	}
 	if _, ok := bc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Bin.name"`)}
 	}
@@ -326,6 +365,9 @@ func (bc *BinCreate) check() error {
 	}
 	if _, ok := bc.mutation.Enable(); !ok {
 		return &ValidationError{Name: "enable", err: errors.New(`ent: missing required field "Bin.enable"`)}
+	}
+	if _, ok := bc.mutation.Health(); !ok {
+		return &ValidationError{Name: "health", err: errors.New(`ent: missing required field "Bin.health"`)}
 	}
 	if _, ok := bc.mutation.BatterySn(); !ok {
 		return &ValidationError{Name: "battery_sn", err: errors.New(`ent: missing required field "Bin.battery_sn"`)}
@@ -390,6 +432,10 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 		_spec.SetField(bin.FieldSn, field.TypeString, value)
 		_node.Sn = value
 	}
+	if value, ok := bc.mutation.Lock(); ok {
+		_spec.SetField(bin.FieldLock, field.TypeBool, value)
+		_node.Lock = value
+	}
 	if value, ok := bc.mutation.Name(); ok {
 		_spec.SetField(bin.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -405,6 +451,10 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Enable(); ok {
 		_spec.SetField(bin.FieldEnable, field.TypeBool, value)
 		_node.Enable = value
+	}
+	if value, ok := bc.mutation.Health(); ok {
+		_spec.SetField(bin.FieldHealth, field.TypeBool, value)
+		_node.Health = value
 	}
 	if value, ok := bc.mutation.BatterySn(); ok {
 		_spec.SetField(bin.FieldBatterySn, field.TypeString, value)
@@ -526,6 +576,18 @@ func (u *BinUpsert) UpdateSn() *BinUpsert {
 	return u
 }
 
+// SetLock sets the "lock" field.
+func (u *BinUpsert) SetLock(v bool) *BinUpsert {
+	u.Set(bin.FieldLock, v)
+	return u
+}
+
+// UpdateLock sets the "lock" field to the value that was provided on create.
+func (u *BinUpsert) UpdateLock() *BinUpsert {
+	u.SetExcluded(bin.FieldLock)
+	return u
+}
+
 // SetName sets the "name" field.
 func (u *BinUpsert) SetName(v string) *BinUpsert {
 	u.Set(bin.FieldName, v)
@@ -577,6 +639,18 @@ func (u *BinUpsert) SetEnable(v bool) *BinUpsert {
 // UpdateEnable sets the "enable" field to the value that was provided on create.
 func (u *BinUpsert) UpdateEnable() *BinUpsert {
 	u.SetExcluded(bin.FieldEnable)
+	return u
+}
+
+// SetHealth sets the "health" field.
+func (u *BinUpsert) SetHealth(v bool) *BinUpsert {
+	u.Set(bin.FieldHealth, v)
+	return u
+}
+
+// UpdateHealth sets the "health" field to the value that was provided on create.
+func (u *BinUpsert) UpdateHealth() *BinUpsert {
+	u.SetExcluded(bin.FieldHealth)
 	return u
 }
 
@@ -765,6 +839,20 @@ func (u *BinUpsertOne) UpdateSn() *BinUpsertOne {
 	})
 }
 
+// SetLock sets the "lock" field.
+func (u *BinUpsertOne) SetLock(v bool) *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.SetLock(v)
+	})
+}
+
+// UpdateLock sets the "lock" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateLock() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateLock()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *BinUpsertOne) SetName(v string) *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
@@ -825,6 +913,20 @@ func (u *BinUpsertOne) SetEnable(v bool) *BinUpsertOne {
 func (u *BinUpsertOne) UpdateEnable() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateEnable()
+	})
+}
+
+// SetHealth sets the "health" field.
+func (u *BinUpsertOne) SetHealth(v bool) *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.SetHealth(v)
+	})
+}
+
+// UpdateHealth sets the "health" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateHealth() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateHealth()
 	})
 }
 
@@ -1189,6 +1291,20 @@ func (u *BinUpsertBulk) UpdateSn() *BinUpsertBulk {
 	})
 }
 
+// SetLock sets the "lock" field.
+func (u *BinUpsertBulk) SetLock(v bool) *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.SetLock(v)
+	})
+}
+
+// UpdateLock sets the "lock" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateLock() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateLock()
+	})
+}
+
 // SetName sets the "name" field.
 func (u *BinUpsertBulk) SetName(v string) *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
@@ -1249,6 +1365,20 @@ func (u *BinUpsertBulk) SetEnable(v bool) *BinUpsertBulk {
 func (u *BinUpsertBulk) UpdateEnable() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateEnable()
+	})
+}
+
+// SetHealth sets the "health" field.
+func (u *BinUpsertBulk) SetHealth(v bool) *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.SetHealth(v)
+	})
+}
+
+// UpdateHealth sets the "health" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateHealth() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateHealth()
 	})
 }
 

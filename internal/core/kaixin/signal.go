@@ -5,12 +5,18 @@
 
 package kaixin
 
+import "fmt"
+
 type Signal string
 
 // SignalData 信号量结构体
 type SignalData struct {
     ID    Signal `json:"id,omitempty"`    // 信号量ID
     Value any    `json:"value,omitempty"` // 参数值
+}
+
+func (s *SignalData) StringValue() string {
+    return fmt.Sprintf("%v", s.Value)
 }
 
 const (

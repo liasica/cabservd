@@ -21,6 +21,8 @@ const (
 	FieldBrand = "brand"
 	// FieldSn holds the string denoting the sn field in the database.
 	FieldSn = "sn"
+	// FieldLock holds the string denoting the lock field in the database.
+	FieldLock = "lock"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldIndex holds the string denoting the index field in the database.
@@ -29,6 +31,8 @@ const (
 	FieldOpen = "open"
 	// FieldEnable holds the string denoting the enable field in the database.
 	FieldEnable = "enable"
+	// FieldHealth holds the string denoting the health field in the database.
+	FieldHealth = "health"
 	// FieldBatterySn holds the string denoting the battery_sn field in the database.
 	FieldBatterySn = "battery_sn"
 	// FieldVoltage holds the string denoting the voltage field in the database.
@@ -51,10 +55,12 @@ var Columns = []string{
 	FieldUUID,
 	FieldBrand,
 	FieldSn,
+	FieldLock,
 	FieldName,
 	FieldIndex,
 	FieldOpen,
 	FieldEnable,
+	FieldHealth,
 	FieldBatterySn,
 	FieldVoltage,
 	FieldCurrent,
@@ -81,10 +87,14 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// UUIDValidator is a validator for the "uuid" field. It is called by the builders before save.
 	UUIDValidator func(string) error
+	// DefaultLock holds the default value on creation for the "lock" field.
+	DefaultLock bool
 	// DefaultOpen holds the default value on creation for the "open" field.
 	DefaultOpen bool
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
+	// DefaultHealth holds the default value on creation for the "health" field.
+	DefaultHealth bool
 	// DefaultBatterySn holds the default value on creation for the "battery_sn" field.
 	DefaultBatterySn string
 	// DefaultVoltage holds the default value on creation for the "voltage" field.
