@@ -41,8 +41,8 @@ const (
     SignalBatteryCurrent     Signal = "01112001" // 电池总电流 (A)
     SignalCabinetVoltage     Signal = "02107001" // 换电柜总电压 (V)
     SignalCabinetCurrent     Signal = "02108001" // 换电柜总电流 (A)
-    SignalSOC                Signal = "02109001"
-    SignalSOH                Signal = "02110001"
+    SignalSOC                Signal = "02109001" // 电池电量
+    SignalSOH                Signal = "02110001" // 电池健康
     SignalBatteryCellID      Signal = "01116001" // XX单芯电压串数 (表示电池内电芯总数量值)
     SignalBatteryCellVoltage Signal = "01117001" // XX单芯电压值 (XX如果为01，对应的信号量ID结尾为01)
     SignalCabinetTemp        Signal = "02113001" // 柜体温度值 (换电柜温度)
