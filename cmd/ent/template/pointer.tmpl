@@ -1,0 +1,21 @@
+{{/* The line below tells Intellij/GoLand to enable the autocompletion based on the *gen.Graph type. */}}
+{{/* gotype: entgo.io/ent/entc/gen.Graph */}}
+
+{{ define "pointer" }}
+
+    {{/* Add the base header for the generated file */}}
+    {{ $pkg := base $.Config.Package }}
+    {{ template "header" $ }}
+
+    {{/* Loop over all nodes and implement the "GoStringer" interface */}}
+    {{ range $n := $.Nodes }}
+        type {{ $n.Name }}Pointers []*{{ $n.Name }}Pointer
+        type {{ $n.Name }}Pointer struct {
+        {{- range $f := $n.Fields }}{{ if and (ne $f.StructField "CreatedAt")  (ne $f.StructField "UpdatedAt") }}
+            {{- $tag := $f.StructTag }}{{ with $tags := $.Annotations.Fields.StructTag }}{{ with index $tags $f.Name }}{{ $tag = . }}{{ end }}{{ end }}
+            {{ $f.StructField }} *{{ $f.Type }} {{ if not $f.Sensitive }}`{{ $tag }}`{{ else }}{{ template "model/omittags" $ }}{{ end }}
+        {{- end }}{{ end }}
+        }
+    {{ end }}
+
+{{ end }}

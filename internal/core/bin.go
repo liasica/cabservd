@@ -8,100 +8,83 @@ package core
 import (
     "context"
     "fmt"
-    "github.com/auroraride/cabservd/internal/core/types"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
-    "github.com/auroraride/cabservd/internal/errs"
+    jsoniter "github.com/json-iterator/go"
     "github.com/liasica/go-helpers/tools"
+    log "github.com/sirupsen/logrus"
 )
 
-type Bin interface {
-    GetOpen() (v bool, exists bool)
-    GetEnable() (v bool, exists bool)
-    GetDoorIndex() (v int, exists bool)
-    // GetBattery 获取电池序列号, 若序列号为空, 则无电池
-    GetBattery() (v string, exists bool)
-    GetVoltage() (v float64, exists bool)
-    GetCurrent() (v float64, exists bool)
-    GetChargeStatus() (v types.ChargeStatus, exists bool)
-    GetSoC() (v float64, exists bool)
-    GetSoH() (v float64, exists bool)
-}
-
-func SaveBin(brand, sn string, bin Bin) error {
+func SaveBins(brand, sn string, bp BinParser) {
     ctx := context.Background()
-    return SaveBinWithContext(brand, sn, bin, ctx)
+    SaveBinsContext(brand, sn, bp, ctx)
 }
 
-func SaveBinWithContext(brand, sn string, item Bin, ctx context.Context) (err error) {
-    index, exists := item.GetDoorIndex()
-    if !exists {
-        err = errs.CabinetBinIndexRequired
-        return
+func SaveBinsContext(brand, sn string, bp BinParser, ctx context.Context) {
+    items := bp.Bins()
+    for _, item := range items {
+        uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, sn, *item.Index))
+        name := fmt.Sprintf("%d号仓", *item.Index+1)
+        err := ent.Database.Bin.Create().
+            SetUUID(uuid).
+            SetBrand(brand).
+            SetSn(sn).
+            SetName(name).
+            SetIndex(*item.Index).
+            OnConflictColumns(bin.FieldUUID).
+            Update(func(u *ent.BinUpsert) {
+                // 健康状态
+                if item.Health != nil {
+                    u.SetHealth(*item.Health)
+                }
+
+                // 仓门状态
+                if item.Open != nil {
+                    fmt.Printf("%s open:->%v\n", name, *item.Open)
+                    u.SetOpen(*item.Open)
+                }
+
+                // 仓位启用状态
+                if item.Enable != nil {
+                    u.SetEnable(*item.Enable)
+                }
+
+                // 电池编号
+                if item.BatterySn != nil {
+                    fmt.Printf("%s battery:->%v\n", name, *item.BatterySn)
+                    u.SetBatterySn(*item.BatterySn)
+                    if *item.BatterySn == "" {
+                        u.ResetBattery()
+                    }
+                }
+
+                // 电压
+                if item.Voltage != nil {
+                    u.SetVoltage(*item.Voltage)
+                }
+
+                // 电流
+                if item.Current != nil {
+                    u.SetCurrent(*item.Current)
+                }
+
+                // 电量
+                if item.Soc != nil {
+                    u.SetSoc(*item.Soc)
+                }
+
+                // 健康
+                if item.Soh != nil {
+                    u.SetSoh(*item.Soh)
+                }
+            }).
+            UpdateUUID().
+            Exec(ctx)
+        if err != nil {
+            b, _ := jsoniter.Marshal(item)
+            log.Errorf("仓位保存失败, %s: %v", string(b), err)
+        }
     }
-
-    uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, sn, index))
-
-    return ent.Database.Bin.Create().
-        SetUUID(uuid).
-        SetBrand(brand).
-        SetSn(sn).
-        SetName(fmt.Sprintf("%d号仓", index+1)).
-        SetIndex(index).
-        OnConflictColumns(bin.FieldUUID).
-        Update(func(u *ent.BinUpsert) {
-            // 仓门状态
-            if open, ok := item.GetOpen(); ok {
-                fmt.Printf("%d open:->%v\n", index, open)
-                u.SetOpen(open)
-            }
-
-            // 仓位启用状态
-            if enable, ok := item.GetEnable(); ok {
-                u.SetEnable(enable)
-            }
-
-            // 电池编号
-            if bs, ok := item.GetBattery(); ok {
-                fmt.Printf("%d battery:->%v\n", index, bs)
-                u.SetBatterySn(bs)
-                if bs == "" {
-                    u.ResetBattery()
-                }
-            }
-
-            // 充电状态
-            if v, ok := item.GetChargeStatus(); ok {
-                switch v {
-                case types.ChargeStatusNoBattery:
-                    u.ResetBattery()
-                case types.ChargeStatusException:
-                    // TODO: 是否标记为故障
-                }
-            }
-
-            // 电压
-            if v, ok := item.GetVoltage(); ok {
-                u.SetVoltage(v)
-            }
-
-            // 电流
-            if v, ok := item.GetCurrent(); ok {
-                u.SetCurrent(v)
-            }
-
-            // 电量
-            if v, ok := item.GetSoC(); ok {
-                u.SetSoc(v)
-            }
-
-            // 健康
-            if v, ok := item.GetSoH(); ok {
-                u.SetSoh(v)
-            }
-        }).
-        UpdateUUID().
-        Exec(ctx)
 }
 
 // ResetBins 重置电柜仓位信息

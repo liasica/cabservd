@@ -6,7 +6,7 @@
 package kaixin
 
 import (
-    "github.com/auroraride/cabservd/pkg/silk"
+    "github.com/liasica/go-helpers/silk"
 )
 
 // MessageType 消息类型
@@ -80,7 +80,7 @@ func (c ReportCate) String() string {
 
 // ReportRequest 上报电柜属性
 type ReportRequest struct {
-    AttrList []*Attr    `json:"attrList,omitempty"` // 属性列表
+    AttrList Attributes `json:"attrList,omitempty"` // 属性列表
     IsFull   ReportCate `json:"isFull,omitempty"`   // 是否全量上报: 0:增量 1:全量
 }
 

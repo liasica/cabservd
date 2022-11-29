@@ -94,6 +94,7 @@ func GenerateCmd(postRun ...func(*gen.Config)) *cobra.Command {
                 }
                 templates = append(templates,
                     // "./cmd/ent/template/upsert.tmpl",
+                    "./cmd/ent/template/pointer.tmpl",
                 )
                 for _, tmpl := range templates {
                     typ := "dir"
