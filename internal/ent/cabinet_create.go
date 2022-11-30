@@ -68,6 +68,14 @@ func (cc *CabinetCreate) SetStatus(c cabinet.Status) *CabinetCreate {
 	return cc
 }
 
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cc *CabinetCreate) SetNillableStatus(c *cabinet.Status) *CabinetCreate {
+	if c != nil {
+		cc.SetStatus(*c)
+	}
+	return cc
+}
+
 // SetEnable sets the "enable" field.
 func (cc *CabinetCreate) SetEnable(b bool) *CabinetCreate {
 	cc.mutation.SetEnable(b)
@@ -264,6 +272,10 @@ func (cc *CabinetCreate) defaults() {
 	if _, ok := cc.mutation.UpdatedAt(); !ok {
 		v := cabinet.DefaultUpdatedAt()
 		cc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := cc.mutation.Status(); !ok {
+		v := cabinet.DefaultStatus
+		cc.mutation.SetStatus(v)
 	}
 	if _, ok := cc.mutation.Enable(); !ok {
 		v := cabinet.DefaultEnable

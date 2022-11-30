@@ -84,6 +84,9 @@ var (
 // Status defines the type for the "status" enum field.
 type Status string
 
+// StatusPoweron is the default value of the Status enum.
+const DefaultStatus = StatusPoweron
+
 // Status values.
 const (
 	StatusPoweron  Status = "poweron"

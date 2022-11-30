@@ -22,79 +22,71 @@ type Parser interface {
 }
 
 func UpdateCabinet(brand, serial string, p Parser) {
-    SaveCabinet(brand, serial, p)
-    SaveBins(brand, serial, p)
-}
-
-func SaveCabinet(brand, serial string, p Parser) {
-    SaveCabinetContext(brand, serial, p, context.Background())
-}
-
-func SaveCabinetContext(brand, serial string, p Parser, ctx context.Context) {
     cab := p.Cabinet()
+    bins := p.Bins()
+    ctx := context.Background()
+    SaveCabinetContext(ctx, brand, serial, cab)
+    SaveBinsContext(ctx, brand, serial, bins)
+}
+
+func SaveCabinetContext(ctx context.Context, brand, serial string, item ent.CabinetPointer) {
     err := ent.Database.Cabinet.Create().
         SetBrand(brand).
         SetSerial(serial).
         OnConflictColumns(cabinet.FieldSerial).
         Update(func(u *ent.CabinetUpsert) {
             // 状态
-            if cab.Status != nil {
-                u.SetStatus(*cab.Status)
+            if item.Status != nil {
+                u.SetStatus(*item.Status)
             }
 
             // 经度
-            if cab.Lng != nil {
-                u.SetLng(*cab.Lng)
+            if item.Lng != nil {
+                u.SetLng(*item.Lng)
             }
 
             // 纬度
-            if cab.Lat != nil {
-                u.SetLat(*cab.Lat)
+            if item.Lat != nil {
+                u.SetLat(*item.Lat)
             }
 
             // GSM
-            if cab.Gsm != nil {
-                u.SetGsm(*cab.Gsm)
+            if item.Gsm != nil {
+                u.SetGsm(*item.Gsm)
             }
 
             // 电压
-            if cab.Voltage != nil {
-                u.SetVoltage(*cab.Voltage)
+            if item.Voltage != nil {
+                u.SetVoltage(*item.Voltage)
             }
 
             // 电流
-            if cab.Current != nil {
-                u.SetCurrent(*cab.Current)
+            if item.Current != nil {
+                u.SetCurrent(*item.Current)
             }
 
             // 温度
-            if cab.Temperature != nil {
-                u.SetTemperature(*cab.Temperature)
+            if item.Temperature != nil {
+                u.SetTemperature(*item.Temperature)
             }
 
             // 启用
-            if cab.Enable != nil {
-                u.SetEnable(*cab.Enable)
+            if item.Enable != nil {
+                u.SetEnable(*item.Enable)
             }
 
             // 总用电
-            if cab.Electricity != nil {
-                u.SetElectricity(*cab.Electricity)
+            if item.Electricity != nil {
+                u.SetElectricity(*item.Electricity)
             }
         }).Exec(ctx)
     if err != nil {
-        b, _ := jsoniter.Marshal(cab)
+        b, _ := jsoniter.Marshal(item)
         log.Errorf("电柜保存失败, %s: %v", string(b), err)
     }
 }
 
-func SaveBins(brand, serial string, p Parser) {
-    ctx := context.Background()
-    SaveBinsContext(brand, serial, p, ctx)
-}
-
-func SaveBinsContext(brand, serial string, p Parser, ctx context.Context) {
-    items := p.Bins()
+func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPointers) {
     if len(items) == 0 {
         return
     }

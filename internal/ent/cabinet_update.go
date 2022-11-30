@@ -53,6 +53,14 @@ func (cu *CabinetUpdate) SetStatus(c cabinet.Status) *CabinetUpdate {
 	return cu
 }
 
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cu *CabinetUpdate) SetNillableStatus(c *cabinet.Status) *CabinetUpdate {
+	if c != nil {
+		cu.SetStatus(*c)
+	}
+	return cu
+}
+
 // SetEnable sets the "enable" field.
 func (cu *CabinetUpdate) SetEnable(b bool) *CabinetUpdate {
 	cu.mutation.SetEnable(b)
@@ -484,6 +492,14 @@ func (cuo *CabinetUpdateOne) SetSerial(s string) *CabinetUpdateOne {
 // SetStatus sets the "status" field.
 func (cuo *CabinetUpdateOne) SetStatus(c cabinet.Status) *CabinetUpdateOne {
 	cuo.mutation.SetStatus(c)
+	return cuo
+}
+
+// SetNillableStatus sets the "status" field if the given value is not nil.
+func (cuo *CabinetUpdateOne) SetNillableStatus(c *cabinet.Status) *CabinetUpdateOne {
+	if c != nil {
+		cuo.SetStatus(*c)
+	}
 	return cuo
 }
 

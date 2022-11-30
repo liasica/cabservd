@@ -75,6 +75,7 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
         bin, ok := m[attr.DoorID]
         if !ok {
             bin = &ent.BinPointer{Index: silk.Int(index)}
+            m[attr.DoorID] = bin
         }
 
         switch attr.ID {

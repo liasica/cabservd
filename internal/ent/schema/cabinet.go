@@ -59,8 +59,8 @@ func (Cabinet) Fields() []ent.Field {
     return []ent.Field{
         field.String("brand").Comment("品牌"),
         field.String("serial").Unique().Comment("电柜编号"),
-        field.Enum("status").Values("poweron", "idle", "busy", "abnormal").Comment("状态"), // poweron:上电中 idle:空闲 busy:忙 abnormal:异常
-        field.Bool("enable").Default(true).Comment("电柜是否启用"),
+        field.Enum("status").Default("poweron").Values("poweron", "idle", "busy", "abnormal").Comment("状态"), // poweron:上电中 idle:空闲 busy:忙 abnormal:异常
+        field.Bool("enable").Default(false).Comment("电柜是否启用"),
         field.Float("lng").Optional().Nillable().Comment("经度"),
         field.Float("lat").Optional().Nillable().Comment("纬度"),
         field.Float("gsm").Optional().Nillable().Comment("GSM信号强度"),
