@@ -8,3 +8,6 @@ import (
 
 // Bin is the predicate function for bin builders.
 type Bin func(*sql.Selector)
+
+// Cabinet is the predicate function for cabinet builders.
+type Cabinet func(*sql.Selector)

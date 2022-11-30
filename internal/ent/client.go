@@ -11,6 +11,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/migrate"
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -23,6 +24,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// Bin is the client for interacting with the Bin builders.
 	Bin *BinClient
+	// Cabinet is the client for interacting with the Cabinet builders.
+	Cabinet *CabinetClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -37,6 +40,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Bin = NewBinClient(c.config)
+	c.Cabinet = NewCabinetClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -68,9 +72,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Bin:    NewBinClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		Bin:     NewBinClient(cfg),
+		Cabinet: NewCabinetClient(cfg),
 	}, nil
 }
 
@@ -88,9 +93,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:    ctx,
-		config: cfg,
-		Bin:    NewBinClient(cfg),
+		ctx:     ctx,
+		config:  cfg,
+		Bin:     NewBinClient(cfg),
+		Cabinet: NewCabinetClient(cfg),
 	}, nil
 }
 
@@ -120,6 +126,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.Bin.Use(hooks...)
+	c.Cabinet.Use(hooks...)
 }
 
 // BinClient is a client for the Bin schema.
@@ -210,4 +217,94 @@ func (c *BinClient) GetX(ctx context.Context, id uint64) *Bin {
 // Hooks returns the client hooks.
 func (c *BinClient) Hooks() []Hook {
 	return c.hooks.Bin
+}
+
+// CabinetClient is a client for the Cabinet schema.
+type CabinetClient struct {
+	config
+}
+
+// NewCabinetClient returns a client for the Cabinet from the given config.
+func NewCabinetClient(c config) *CabinetClient {
+	return &CabinetClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `cabinet.Hooks(f(g(h())))`.
+func (c *CabinetClient) Use(hooks ...Hook) {
+	c.hooks.Cabinet = append(c.hooks.Cabinet, hooks...)
+}
+
+// Create returns a builder for creating a Cabinet entity.
+func (c *CabinetClient) Create() *CabinetCreate {
+	mutation := newCabinetMutation(c.config, OpCreate)
+	return &CabinetCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Cabinet entities.
+func (c *CabinetClient) CreateBulk(builders ...*CabinetCreate) *CabinetCreateBulk {
+	return &CabinetCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Cabinet.
+func (c *CabinetClient) Update() *CabinetUpdate {
+	mutation := newCabinetMutation(c.config, OpUpdate)
+	return &CabinetUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CabinetClient) UpdateOne(ca *Cabinet) *CabinetUpdateOne {
+	mutation := newCabinetMutation(c.config, OpUpdateOne, withCabinet(ca))
+	return &CabinetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CabinetClient) UpdateOneID(id uint64) *CabinetUpdateOne {
+	mutation := newCabinetMutation(c.config, OpUpdateOne, withCabinetID(id))
+	return &CabinetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Cabinet.
+func (c *CabinetClient) Delete() *CabinetDelete {
+	mutation := newCabinetMutation(c.config, OpDelete)
+	return &CabinetDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CabinetClient) DeleteOne(ca *Cabinet) *CabinetDeleteOne {
+	return c.DeleteOneID(ca.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CabinetClient) DeleteOneID(id uint64) *CabinetDeleteOne {
+	builder := c.Delete().Where(cabinet.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CabinetDeleteOne{builder}
+}
+
+// Query returns a query builder for Cabinet.
+func (c *CabinetClient) Query() *CabinetQuery {
+	return &CabinetQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Cabinet entity by its id.
+func (c *CabinetClient) Get(ctx context.Context, id uint64) (*Cabinet, error) {
+	return c.Query().Where(cabinet.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CabinetClient) GetX(ctx context.Context, id uint64) *Cabinet {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CabinetClient) Hooks() []Hook {
+	return c.hooks.Cabinet
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/schema"
 )
 
@@ -68,4 +69,23 @@ func init() {
 	binDescSoh := binFields[13].Descriptor()
 	// bin.DefaultSoh holds the default value on creation for the soh field.
 	bin.DefaultSoh = binDescSoh.Default.(float64)
+	cabinetMixin := schema.Cabinet{}.Mixin()
+	cabinetMixinFields0 := cabinetMixin[0].Fields()
+	_ = cabinetMixinFields0
+	cabinetFields := schema.Cabinet{}.Fields()
+	_ = cabinetFields
+	// cabinetDescCreatedAt is the schema descriptor for created_at field.
+	cabinetDescCreatedAt := cabinetMixinFields0[0].Descriptor()
+	// cabinet.DefaultCreatedAt holds the default value on creation for the created_at field.
+	cabinet.DefaultCreatedAt = cabinetDescCreatedAt.Default.(func() time.Time)
+	// cabinetDescUpdatedAt is the schema descriptor for updated_at field.
+	cabinetDescUpdatedAt := cabinetMixinFields0[1].Descriptor()
+	// cabinet.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	cabinet.DefaultUpdatedAt = cabinetDescUpdatedAt.Default.(func() time.Time)
+	// cabinet.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	cabinet.UpdateDefaultUpdatedAt = cabinetDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// cabinetDescEnable is the schema descriptor for enable field.
+	cabinetDescEnable := cabinetFields[3].Descriptor()
+	// cabinet.DefaultEnable holds the default value on creation for the enable field.
+	cabinet.DefaultEnable = cabinetDescEnable.Default.(bool)
 }

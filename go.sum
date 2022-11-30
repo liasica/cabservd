@@ -137,6 +137,8 @@ github.com/liasica/go-helpers v0.0.0-20221121032422-00ebd1997697 h1:/at5zOeQC2Zy
 github.com/liasica/go-helpers v0.0.0-20221121032422-00ebd1997697/go.mod h1:eeUNBPH7ZdxxCFZjjZ5JCtzyJbApBB4bZav7UrXUPbQ=
 github.com/liasica/go-helpers v0.0.0-20221121071102-4bdcdde476e3 h1:CASlWZPjKKPE87+QYq6oo0SInjDEl8Ab79Pr15GMhbs=
 github.com/liasica/go-helpers v0.0.0-20221121071102-4bdcdde476e3/go.mod h1:eeUNBPH7ZdxxCFZjjZ5JCtzyJbApBB4bZav7UrXUPbQ=
+github.com/liasica/go-helpers v0.0.0-20221130010501-6c8b04fa0f35 h1:ajllBaswaCCUVLCDvGdkcJXmXuyMhbJwTS4ZxZglrco=
+github.com/liasica/go-helpers v0.0.0-20221130010501-6c8b04fa0f35/go.mod h1:OMCLvfb+tTt9y0/ttpGUwgsDMwv4TCY/ikDGCIRTagc=
 github.com/lib/pq v1.0.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
 github.com/lib/pq v1.1.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=
 github.com/lib/pq v1.2.0/go.mod h1:5WUZQaWbwv1U+lTReE5YruASi9Al49XbQIvNi/34Woo=

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -13,7 +14,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 1)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 2)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   bin.Table,
@@ -29,7 +30,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldUpdatedAt: {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
 			bin.FieldUUID:      {Type: field.TypeString, Column: bin.FieldUUID},
 			bin.FieldBrand:     {Type: field.TypeString, Column: bin.FieldBrand},
-			bin.FieldSn:        {Type: field.TypeString, Column: bin.FieldSn},
+			bin.FieldSerial:    {Type: field.TypeString, Column: bin.FieldSerial},
 			bin.FieldLock:      {Type: field.TypeBool, Column: bin.FieldLock},
 			bin.FieldName:      {Type: field.TypeString, Column: bin.FieldName},
 			bin.FieldIndex:     {Type: field.TypeInt, Column: bin.FieldIndex},
@@ -41,6 +42,32 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldCurrent:   {Type: field.TypeFloat64, Column: bin.FieldCurrent},
 			bin.FieldSoc:       {Type: field.TypeFloat64, Column: bin.FieldSoc},
 			bin.FieldSoh:       {Type: field.TypeFloat64, Column: bin.FieldSoh},
+		},
+	}
+	graph.Nodes[1] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   cabinet.Table,
+			Columns: cabinet.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint64,
+				Column: cabinet.FieldID,
+			},
+		},
+		Type: "Cabinet",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			cabinet.FieldCreatedAt:   {Type: field.TypeTime, Column: cabinet.FieldCreatedAt},
+			cabinet.FieldUpdatedAt:   {Type: field.TypeTime, Column: cabinet.FieldUpdatedAt},
+			cabinet.FieldBrand:       {Type: field.TypeString, Column: cabinet.FieldBrand},
+			cabinet.FieldSerial:      {Type: field.TypeString, Column: cabinet.FieldSerial},
+			cabinet.FieldStatus:      {Type: field.TypeEnum, Column: cabinet.FieldStatus},
+			cabinet.FieldEnable:      {Type: field.TypeBool, Column: cabinet.FieldEnable},
+			cabinet.FieldLng:         {Type: field.TypeFloat64, Column: cabinet.FieldLng},
+			cabinet.FieldLat:         {Type: field.TypeFloat64, Column: cabinet.FieldLat},
+			cabinet.FieldGsm:         {Type: field.TypeFloat64, Column: cabinet.FieldGsm},
+			cabinet.FieldVoltage:     {Type: field.TypeFloat64, Column: cabinet.FieldVoltage},
+			cabinet.FieldCurrent:     {Type: field.TypeFloat64, Column: cabinet.FieldCurrent},
+			cabinet.FieldTemperature: {Type: field.TypeFloat64, Column: cabinet.FieldTemperature},
+			cabinet.FieldElectricity: {Type: field.TypeFloat64, Column: cabinet.FieldElectricity},
 		},
 	}
 	return graph
@@ -112,9 +139,9 @@ func (f *BinFilter) WhereBrand(p entql.StringP) {
 	f.Where(p.Field(bin.FieldBrand))
 }
 
-// WhereSn applies the entql string predicate on the sn field.
-func (f *BinFilter) WhereSn(p entql.StringP) {
-	f.Where(p.Field(bin.FieldSn))
+// WhereSerial applies the entql string predicate on the serial field.
+func (f *BinFilter) WhereSerial(p entql.StringP) {
+	f.Where(p.Field(bin.FieldSerial))
 }
 
 // WhereLock applies the entql bool predicate on the lock field.
@@ -170,4 +197,109 @@ func (f *BinFilter) WhereSoc(p entql.Float64P) {
 // WhereSoh applies the entql float64 predicate on the soh field.
 func (f *BinFilter) WhereSoh(p entql.Float64P) {
 	f.Where(p.Field(bin.FieldSoh))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (cq *CabinetQuery) addPredicate(pred func(s *sql.Selector)) {
+	cq.predicates = append(cq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the CabinetQuery builder.
+func (cq *CabinetQuery) Filter() *CabinetFilter {
+	return &CabinetFilter{config: cq.config, predicateAdder: cq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *CabinetMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the CabinetMutation builder.
+func (m *CabinetMutation) Filter() *CabinetFilter {
+	return &CabinetFilter{config: m.config, predicateAdder: m}
+}
+
+// CabinetFilter provides a generic filtering capability at runtime for CabinetQuery.
+type CabinetFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *CabinetFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint64 predicate on the id field.
+func (f *CabinetFilter) WhereID(p entql.Uint64P) {
+	f.Where(p.Field(cabinet.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *CabinetFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(cabinet.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *CabinetFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(cabinet.FieldUpdatedAt))
+}
+
+// WhereBrand applies the entql string predicate on the brand field.
+func (f *CabinetFilter) WhereBrand(p entql.StringP) {
+	f.Where(p.Field(cabinet.FieldBrand))
+}
+
+// WhereSerial applies the entql string predicate on the serial field.
+func (f *CabinetFilter) WhereSerial(p entql.StringP) {
+	f.Where(p.Field(cabinet.FieldSerial))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *CabinetFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(cabinet.FieldStatus))
+}
+
+// WhereEnable applies the entql bool predicate on the enable field.
+func (f *CabinetFilter) WhereEnable(p entql.BoolP) {
+	f.Where(p.Field(cabinet.FieldEnable))
+}
+
+// WhereLng applies the entql float64 predicate on the lng field.
+func (f *CabinetFilter) WhereLng(p entql.Float64P) {
+	f.Where(p.Field(cabinet.FieldLng))
+}
+
+// WhereLat applies the entql float64 predicate on the lat field.
+func (f *CabinetFilter) WhereLat(p entql.Float64P) {
+	f.Where(p.Field(cabinet.FieldLat))
+}
+
+// WhereGsm applies the entql float64 predicate on the gsm field.
+func (f *CabinetFilter) WhereGsm(p entql.Float64P) {
+	f.Where(p.Field(cabinet.FieldGsm))
+}
+
+// WhereVoltage applies the entql float64 predicate on the voltage field.
+func (f *CabinetFilter) WhereVoltage(p entql.Float64P) {
+	f.Where(p.Field(cabinet.FieldVoltage))
+}
+
+// WhereCurrent applies the entql float64 predicate on the current field.
+func (f *CabinetFilter) WhereCurrent(p entql.Float64P) {
+	f.Where(p.Field(cabinet.FieldCurrent))
+}
+
+// WhereTemperature applies the entql float64 predicate on the temperature field.
+func (f *CabinetFilter) WhereTemperature(p entql.Float64P) {
+	f.Where(p.Field(cabinet.FieldTemperature))
+}
+
+// WhereElectricity applies the entql float64 predicate on the electricity field.
+func (f *CabinetFilter) WhereElectricity(p entql.Float64P) {
+	f.Where(p.Field(cabinet.FieldElectricity))
 }

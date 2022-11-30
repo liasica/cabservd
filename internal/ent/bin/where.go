@@ -108,10 +108,10 @@ func Brand(v string) predicate.Bin {
 	})
 }
 
-// Sn applies equality check predicate on the "sn" field. It's identical to SnEQ.
-func Sn(v string) predicate.Bin {
+// Serial applies equality check predicate on the "serial" field. It's identical to SerialEQ.
+func Serial(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSn), v))
+		s.Where(sql.EQ(s.C(FieldSerial), v))
 	})
 }
 
@@ -518,102 +518,102 @@ func BrandContainsFold(v string) predicate.Bin {
 	})
 }
 
-// SnEQ applies the EQ predicate on the "sn" field.
-func SnEQ(v string) predicate.Bin {
+// SerialEQ applies the EQ predicate on the "serial" field.
+func SerialEQ(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSn), v))
+		s.Where(sql.EQ(s.C(FieldSerial), v))
 	})
 }
 
-// SnNEQ applies the NEQ predicate on the "sn" field.
-func SnNEQ(v string) predicate.Bin {
+// SerialNEQ applies the NEQ predicate on the "serial" field.
+func SerialNEQ(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSn), v))
+		s.Where(sql.NEQ(s.C(FieldSerial), v))
 	})
 }
 
-// SnIn applies the In predicate on the "sn" field.
-func SnIn(vs ...string) predicate.Bin {
+// SerialIn applies the In predicate on the "serial" field.
+func SerialIn(vs ...string) predicate.Bin {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSn), v...))
+		s.Where(sql.In(s.C(FieldSerial), v...))
 	})
 }
 
-// SnNotIn applies the NotIn predicate on the "sn" field.
-func SnNotIn(vs ...string) predicate.Bin {
+// SerialNotIn applies the NotIn predicate on the "serial" field.
+func SerialNotIn(vs ...string) predicate.Bin {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSn), v...))
+		s.Where(sql.NotIn(s.C(FieldSerial), v...))
 	})
 }
 
-// SnGT applies the GT predicate on the "sn" field.
-func SnGT(v string) predicate.Bin {
+// SerialGT applies the GT predicate on the "serial" field.
+func SerialGT(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSn), v))
+		s.Where(sql.GT(s.C(FieldSerial), v))
 	})
 }
 
-// SnGTE applies the GTE predicate on the "sn" field.
-func SnGTE(v string) predicate.Bin {
+// SerialGTE applies the GTE predicate on the "serial" field.
+func SerialGTE(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSn), v))
+		s.Where(sql.GTE(s.C(FieldSerial), v))
 	})
 }
 
-// SnLT applies the LT predicate on the "sn" field.
-func SnLT(v string) predicate.Bin {
+// SerialLT applies the LT predicate on the "serial" field.
+func SerialLT(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSn), v))
+		s.Where(sql.LT(s.C(FieldSerial), v))
 	})
 }
 
-// SnLTE applies the LTE predicate on the "sn" field.
-func SnLTE(v string) predicate.Bin {
+// SerialLTE applies the LTE predicate on the "serial" field.
+func SerialLTE(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSn), v))
+		s.Where(sql.LTE(s.C(FieldSerial), v))
 	})
 }
 
-// SnContains applies the Contains predicate on the "sn" field.
-func SnContains(v string) predicate.Bin {
+// SerialContains applies the Contains predicate on the "serial" field.
+func SerialContains(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldSn), v))
+		s.Where(sql.Contains(s.C(FieldSerial), v))
 	})
 }
 
-// SnHasPrefix applies the HasPrefix predicate on the "sn" field.
-func SnHasPrefix(v string) predicate.Bin {
+// SerialHasPrefix applies the HasPrefix predicate on the "serial" field.
+func SerialHasPrefix(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldSn), v))
+		s.Where(sql.HasPrefix(s.C(FieldSerial), v))
 	})
 }
 
-// SnHasSuffix applies the HasSuffix predicate on the "sn" field.
-func SnHasSuffix(v string) predicate.Bin {
+// SerialHasSuffix applies the HasSuffix predicate on the "serial" field.
+func SerialHasSuffix(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldSn), v))
+		s.Where(sql.HasSuffix(s.C(FieldSerial), v))
 	})
 }
 
-// SnEqualFold applies the EqualFold predicate on the "sn" field.
-func SnEqualFold(v string) predicate.Bin {
+// SerialEqualFold applies the EqualFold predicate on the "serial" field.
+func SerialEqualFold(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldSn), v))
+		s.Where(sql.EqualFold(s.C(FieldSerial), v))
 	})
 }
 
-// SnContainsFold applies the ContainsFold predicate on the "sn" field.
-func SnContainsFold(v string) predicate.Bin {
+// SerialContainsFold applies the ContainsFold predicate on the "serial" field.
+func SerialContainsFold(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldSn), v))
+		s.Where(sql.ContainsFold(s.C(FieldSerial), v))
 	})
 }
 

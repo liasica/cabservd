@@ -22,6 +22,19 @@ func (f BinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) 
 	return f(ctx, mv)
 }
 
+// The CabinetFunc type is an adapter to allow the use of ordinary
+// function as Cabinet mutator.
+type CabinetFunc func(context.Context, *ent.CabinetMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CabinetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CabinetMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CabinetMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

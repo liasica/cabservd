@@ -61,7 +61,7 @@ func (Bin) Fields() []ent.Field {
 
         // 电柜信息
         field.String("brand").Comment("品牌"),
-        field.String("sn").Comment("电柜设备序列号"),
+        field.String("serial").Comment("电柜设备序列号"),
 
         // 操作记录
         field.Bool("lock").Default(false).Comment("锁仓"),
@@ -95,7 +95,7 @@ func (Bin) Mixin() []ent.Mixin {
 
 func (Bin) Indexes() []ent.Index {
     return []ent.Index{
-        index.Fields("sn", "brand"),
+        index.Fields("serial", "brand"),
         index.Fields("index"),
         index.Fields("battery_sn"),
         index.Fields("soc"),

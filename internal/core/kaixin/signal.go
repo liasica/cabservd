@@ -5,42 +5,13 @@
 
 package kaixin
 
-import (
-    "strconv"
-)
-
 type Signal string
 
 // SignalData 信号量结构体
 type SignalData struct {
     ID    Signal `json:"id,omitempty"`    // 信号量ID
     Value any    `json:"value,omitempty"` // 参数值
-
-    RawValue string `json:"-"` // 字符串值
 }
-
-func (s SignalData) ValueFloat64() (v float64) {
-    v, _ = strconv.ParseFloat(s.RawValue, 64)
-    return
-}
-
-func (s SignalData) ValueInt64() (v int64) {
-    v, _ = strconv.ParseInt(s.RawValue, 10, 64)
-    return
-}
-
-const (
-    DoorStatusClose = "0" // 仓门 - 关
-    DoorStatusOpen  = "1" // 仓门 - 开
-
-    BinUsingEnable  = "1" // 仓位 - 启用
-    BinUsingDisable = "0" // 仓位 - 禁用
-
-    BinStatusNoBattery = "0" // 无电池
-    BinStatusCharging  = "1" // 充电中
-    BinStatusFull      = "2" // 已充满
-    BinStatusException = "5" // 异常
-)
 
 const (
     SignalBinID          Signal = "01309001" // 柜门ID 1~16:对应柜门ID
@@ -67,13 +38,13 @@ const (
     SignalCabinetStatus  Signal = "02102001" // 电柜状态 0:上电初始化 1:无换电、放电、取电动作 2:换电中 3:在归还电池中 4:在取出电池中 5:换电柜异常
     SignalLng            Signal = "02111001" // 柜子经度
     SignalLat            Signal = "02112001" // 柜子纬度
-    SignalBatteryID      Signal = "01310001" // 换电柜设备ID
+    SignalDeviceID       Signal = "01310001" // 换电柜设备ID
     SignalGSM            Signal = "02105001" // GSM 信号强度
     SignalCabinetVoltage Signal = "02107001" // 换电柜总电压 (V)
     SignalCabinetCurrent Signal = "02108001" // 换电柜总电流 (A)
     SignalCabinetTemp    Signal = "02113001" // 柜体温度值 (换电柜温度)
     SignalEnable         Signal = "02119001" // 柜体是否禁用 (0:禁用 1:启用)
-    SignalEnergy         Signal = "02120001" // 柜子总用电量 (kwh)
+    SignalElectricity    Signal = "02120001" // 柜子总用电量 (kwh)
     SignalCabinetControl Signal = "02301001" // 控制换电柜命令
 )
 

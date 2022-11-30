@@ -8,7 +8,9 @@ package kaixin
 import (
     "fmt"
     "github.com/auroraride/cabservd/internal/ent"
+    "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/liasica/go-helpers/silk"
+    "github.com/liasica/go-helpers/tools"
     log "github.com/sirupsen/logrus"
     "strconv"
 )
@@ -19,6 +21,14 @@ type Attributes []*Attribute
 type Attribute struct {
     SignalData
     DoorID string `json:"doorId,omitempty"` // 柜门ID (可为空)
+}
+
+func (d SignalData) ValueString() (str string) {
+    v := fmt.Sprintf("%v", d.Value)
+    if v == "null" {
+        str = ""
+    }
+    return
 }
 
 func (a *Attribute) GetDoorIndex() (index int, exists bool) {
@@ -37,11 +47,11 @@ func (a *Attribute) GetDoorIndex() (index int, exists bool) {
 
 // BinStatus 获取仓位状态
 // hasBattery 是否有电池
-func (a *Attribute) BinStatus(bin *ent.BinPointer) {
+func (a *Attribute) BinStatus(bin *ent.BinPointer, v string) {
     // 是否异常
-    bin.Health = silk.Bool(a.RawValue != BinStatusException)
+    bin.Health = silk.Bool(v != "5")
     // 如果无电池
-    if a.RawValue == BinStatusNoBattery {
+    if v == "0" {
         bin.BatterySn = silk.String("")
     }
     return
@@ -52,7 +62,7 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
 
     for _, attr := range attrs {
         // 原始字符串值
-        attr.RawValue = fmt.Sprintf("%v", attr.Value)
+        v := attr.ValueString()
 
         // 获取仓位Index
         index, exists := attr.GetDoorIndex()
@@ -69,26 +79,60 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
 
         switch attr.ID {
         case SignalBinStatus:
-            attr.BinStatus(bin)
+            attr.BinStatus(bin, v)
         case SignalDoorStatus:
-            bin.Open = silk.Bool(attr.RawValue == DoorStatusOpen)
+            bin.Open = silk.Bool(v == "1")
         case SignalBinUsingStatus:
-            bin.Enable = silk.Bool(attr.RawValue == BinUsingEnable)
+            bin.Enable = silk.Bool(v == "1")
         case SignalBatterySN:
-            bin.BatterySn = silk.String(attr.RawValue)
+            bin.BatterySn = silk.String(v)
         case SignalBatteryVoltage:
-            bin.Voltage = silk.Float64(attr.ValueFloat64())
+            bin.Voltage = silk.Float64(tools.StrToFloat64(v))
         case SignalBatteryCurrent:
-            bin.Current = silk.Float64(attr.ValueFloat64())
+            bin.Current = silk.Float64(tools.StrToFloat64(v))
         case SignalSOC:
-            bin.Soc = silk.Float64(attr.ValueFloat64())
+            bin.Soc = silk.Float64(tools.StrToFloat64(v))
         case SignalSOH:
-            bin.Soh = silk.Float64(attr.ValueFloat64())
+            bin.Soh = silk.Float64(tools.StrToFloat64(v))
         }
     }
 
     for _, p := range m {
         items = append(items, p)
+    }
+    return
+}
+
+func (attrs Attributes) Cabinet() (cab ent.CabinetPointer) {
+    for _, attr := range attrs {
+        v := attr.ValueString()
+
+        switch attr.ID {
+        case SignalCabinetStatus:
+            m := map[string]cabinet.Status{
+                "0": cabinet.StatusPoweron,
+                "1": cabinet.StatusIdle,
+                "2": cabinet.StatusBusy,
+                "3": cabinet.StatusAbnormal,
+            }
+            cab.Status = silk.Pointer(m[v])
+        case SignalLng:
+            cab.Lng = silk.Float64(tools.StrToFloat64(v))
+        case SignalLat:
+            cab.Lat = silk.Float64(tools.StrToFloat64(v))
+        case SignalGSM:
+            cab.Gsm = silk.Float64(tools.StrToFloat64(v))
+        case SignalCabinetVoltage:
+            cab.Voltage = silk.Float64(tools.StrToFloat64(v))
+        case SignalCabinetCurrent:
+            cab.Current = silk.Float64(tools.StrToFloat64(v))
+        case SignalCabinetTemp:
+            cab.Temperature = silk.Float64(tools.StrToFloat64(v))
+        case SignalEnable:
+            cab.Enable = silk.Bool(v == "1")
+        case SignalElectricity:
+            cab.Electricity = silk.Float64(tools.StrToFloat64(v))
+        }
     }
     return
 }

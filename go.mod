@@ -9,7 +9,7 @@ require (
 	github.com/jackc/pgx/v4 v4.17.2
 	github.com/json-iterator/go v1.1.12
 	github.com/lestrrat-go/file-rotatelogs v2.4.0+incompatible
-	github.com/liasica/go-helpers v0.0.0-20221121071102-4bdcdde476e3
+	github.com/liasica/go-helpers v0.0.0-20221130010501-6c8b04fa0f35
 	github.com/mattn/go-colorable v0.1.13
 	github.com/panjf2000/gnet/v2 v2.1.2
 	github.com/sirupsen/logrus v1.9.0

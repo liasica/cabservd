@@ -47,9 +47,9 @@ func (bu *BinUpdate) SetBrand(s string) *BinUpdate {
 	return bu
 }
 
-// SetSn sets the "sn" field.
-func (bu *BinUpdate) SetSn(s string) *BinUpdate {
-	bu.mutation.SetSn(s)
+// SetSerial sets the "serial" field.
+func (bu *BinUpdate) SetSerial(s string) *BinUpdate {
+	bu.mutation.SetSerial(s)
 	return bu
 }
 
@@ -343,8 +343,8 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.Brand(); ok {
 		_spec.SetField(bin.FieldBrand, field.TypeString, value)
 	}
-	if value, ok := bu.mutation.Sn(); ok {
-		_spec.SetField(bin.FieldSn, field.TypeString, value)
+	if value, ok := bu.mutation.Serial(); ok {
+		_spec.SetField(bin.FieldSerial, field.TypeString, value)
 	}
 	if value, ok := bu.mutation.Lock(); ok {
 		_spec.SetField(bin.FieldLock, field.TypeBool, value)
@@ -433,9 +433,9 @@ func (buo *BinUpdateOne) SetBrand(s string) *BinUpdateOne {
 	return buo
 }
 
-// SetSn sets the "sn" field.
-func (buo *BinUpdateOne) SetSn(s string) *BinUpdateOne {
-	buo.mutation.SetSn(s)
+// SetSerial sets the "serial" field.
+func (buo *BinUpdateOne) SetSerial(s string) *BinUpdateOne {
+	buo.mutation.SetSerial(s)
 	return buo
 }
 
@@ -759,8 +759,8 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	if value, ok := buo.mutation.Brand(); ok {
 		_spec.SetField(bin.FieldBrand, field.TypeString, value)
 	}
-	if value, ok := buo.mutation.Sn(); ok {
-		_spec.SetField(bin.FieldSn, field.TypeString, value)
+	if value, ok := buo.mutation.Serial(); ok {
+		_spec.SetField(bin.FieldSerial, field.TypeString, value)
 	}
 	if value, ok := buo.mutation.Lock(); ok {
 		_spec.SetField(bin.FieldLock, field.TypeBool, value)

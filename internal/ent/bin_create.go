@@ -62,9 +62,9 @@ func (bc *BinCreate) SetBrand(s string) *BinCreate {
 	return bc
 }
 
-// SetSn sets the "sn" field.
-func (bc *BinCreate) SetSn(s string) *BinCreate {
-	bc.mutation.SetSn(s)
+// SetSerial sets the "serial" field.
+func (bc *BinCreate) SetSerial(s string) *BinCreate {
+	bc.mutation.SetSerial(s)
 	return bc
 }
 
@@ -348,8 +348,8 @@ func (bc *BinCreate) check() error {
 	if _, ok := bc.mutation.Brand(); !ok {
 		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "Bin.brand"`)}
 	}
-	if _, ok := bc.mutation.Sn(); !ok {
-		return &ValidationError{Name: "sn", err: errors.New(`ent: missing required field "Bin.sn"`)}
+	if _, ok := bc.mutation.Serial(); !ok {
+		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Bin.serial"`)}
 	}
 	if _, ok := bc.mutation.Lock(); !ok {
 		return &ValidationError{Name: "lock", err: errors.New(`ent: missing required field "Bin.lock"`)}
@@ -428,9 +428,9 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 		_spec.SetField(bin.FieldBrand, field.TypeString, value)
 		_node.Brand = value
 	}
-	if value, ok := bc.mutation.Sn(); ok {
-		_spec.SetField(bin.FieldSn, field.TypeString, value)
-		_node.Sn = value
+	if value, ok := bc.mutation.Serial(); ok {
+		_spec.SetField(bin.FieldSerial, field.TypeString, value)
+		_node.Serial = value
 	}
 	if value, ok := bc.mutation.Lock(); ok {
 		_spec.SetField(bin.FieldLock, field.TypeBool, value)
@@ -564,15 +564,15 @@ func (u *BinUpsert) UpdateBrand() *BinUpsert {
 	return u
 }
 
-// SetSn sets the "sn" field.
-func (u *BinUpsert) SetSn(v string) *BinUpsert {
-	u.Set(bin.FieldSn, v)
+// SetSerial sets the "serial" field.
+func (u *BinUpsert) SetSerial(v string) *BinUpsert {
+	u.Set(bin.FieldSerial, v)
 	return u
 }
 
-// UpdateSn sets the "sn" field to the value that was provided on create.
-func (u *BinUpsert) UpdateSn() *BinUpsert {
-	u.SetExcluded(bin.FieldSn)
+// UpdateSerial sets the "serial" field to the value that was provided on create.
+func (u *BinUpsert) UpdateSerial() *BinUpsert {
+	u.SetExcluded(bin.FieldSerial)
 	return u
 }
 
@@ -825,17 +825,17 @@ func (u *BinUpsertOne) UpdateBrand() *BinUpsertOne {
 	})
 }
 
-// SetSn sets the "sn" field.
-func (u *BinUpsertOne) SetSn(v string) *BinUpsertOne {
+// SetSerial sets the "serial" field.
+func (u *BinUpsertOne) SetSerial(v string) *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
-		s.SetSn(v)
+		s.SetSerial(v)
 	})
 }
 
-// UpdateSn sets the "sn" field to the value that was provided on create.
-func (u *BinUpsertOne) UpdateSn() *BinUpsertOne {
+// UpdateSerial sets the "serial" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateSerial() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
-		s.UpdateSn()
+		s.UpdateSerial()
 	})
 }
 
@@ -1277,17 +1277,17 @@ func (u *BinUpsertBulk) UpdateBrand() *BinUpsertBulk {
 	})
 }
 
-// SetSn sets the "sn" field.
-func (u *BinUpsertBulk) SetSn(v string) *BinUpsertBulk {
+// SetSerial sets the "serial" field.
+func (u *BinUpsertBulk) SetSerial(v string) *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
-		s.SetSn(v)
+		s.SetSerial(v)
 	})
 }
 
-// UpdateSn sets the "sn" field to the value that was provided on create.
-func (u *BinUpsertBulk) UpdateSn() *BinUpsertBulk {
+// UpdateSerial sets the "serial" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateSerial() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
-		s.UpdateSn()
+		s.UpdateSerial()
 	})
 }
 

@@ -81,7 +81,7 @@ func (h *Hander) report(req *Request) (err error) {
     if req.DevID == "" {
         return errs.CabinetDeviceIDRequired
     }
-    core.SaveBins(Brand, req.DevID, req.AttrList)
+    core.UpdateCabinet(Brand, req.DevID, req.AttrList)
     return
 }
 

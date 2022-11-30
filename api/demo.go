@@ -78,7 +78,7 @@ func (*demo) Exchange(c *gin.Context) {
     // 获取仓位状态
     var items ent.Bins
     items, err = ent.Database.Bin.Query().
-        Where(bin.Sn(req.SN)).
+        Where(bin.Serial(req.SN)).
         Order(ent.Asc(bin.FieldIndex)).
         All(context.Background())
 
@@ -118,7 +118,7 @@ func (d *demo) Start(c *gin.Context) {
     // 获取仓位状态
     var items ent.Bins
     items, err = ent.Database.Bin.Query().
-        Where(bin.Sn(req.SN), bin.Enable(true), bin.Open(false), bin.Lock(false)).
+        Where(bin.Serial(req.SN), bin.Enable(true), bin.Open(false), bin.Lock(false)).
         Order(ent.Desc(bin.FieldSoc)).
         All(context.Background())
 
@@ -311,7 +311,7 @@ func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) 
 
     for {
         // TODO: 缓存
-        item, err = ent.Database.Bin.Query().Where(bin.Sn(t.sn), bin.Index(index), bin.Enable(true)).First(context.Background())
+        item, err = ent.Database.Bin.Query().Where(bin.Serial(t.sn), bin.Index(index), bin.Enable(true)).First(context.Background())
         if err != nil {
             return
         }

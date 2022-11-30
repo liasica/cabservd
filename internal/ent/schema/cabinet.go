@@ -57,8 +57,17 @@ func (Cabinet) Annotations() []schema.Annotation {
 // Fields of the Cabinet.
 func (Cabinet) Fields() []ent.Field {
     return []ent.Field{
-        field.String("sn").Unique().Comment("电柜编号"),
-        field.Uint("status").Default(0).Comment("状态"),
+        field.String("brand").Comment("品牌"),
+        field.String("serial").Unique().Comment("电柜编号"),
+        field.Enum("status").Values("poweron", "idle", "busy", "abnormal").Comment("状态"), // poweron:上电中 idle:空闲 busy:忙 abnormal:异常
+        field.Bool("enable").Default(true).Comment("电柜是否启用"),
+        field.Float("lng").Optional().Nillable().Comment("经度"),
+        field.Float("lat").Optional().Nillable().Comment("纬度"),
+        field.Float("gsm").Optional().Nillable().Comment("GSM信号强度"),
+        field.Float("voltage").Optional().Nillable().Comment("换电柜总电压 (V)"),
+        field.Float("current").Optional().Nillable().Comment("换电柜总电流 (A)"),
+        field.Float("temperature").Optional().Nillable().Comment("柜体温度值 (换电柜温度)"),
+        field.Float("electricity").Optional().Nillable().Comment("总用电量"),
     }
 }
 
@@ -74,5 +83,11 @@ func (Cabinet) Mixin() []ent.Mixin {
 }
 
 func (Cabinet) Indexes() []ent.Index {
-    return []ent.Index{}
+    return []ent.Index{
+        index.Fields("brand"),
+        index.Fields("status"),
+        index.Fields("enable"),
+        index.Fields("lng"),
+        index.Fields("lat"),
+    }
 }

@@ -16,7 +16,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "uuid", Type: field.TypeString, Unique: true, Size: 32},
 		{Name: "brand", Type: field.TypeString},
-		{Name: "sn", Type: field.TypeString},
+		{Name: "serial", Type: field.TypeString},
 		{Name: "lock", Type: field.TypeBool, Default: false},
 		{Name: "name", Type: field.TypeString},
 		{Name: "index", Type: field.TypeInt},
@@ -41,7 +41,7 @@ var (
 				Columns: []*schema.Column{BinColumns[1]},
 			},
 			{
-				Name:    "bin_sn_brand",
+				Name:    "bin_serial_brand",
 				Unique:  false,
 				Columns: []*schema.Column{BinColumns[5], BinColumns[4]},
 			},
@@ -62,14 +62,73 @@ var (
 			},
 		},
 	}
+	// CabinetColumns holds the columns for the "cabinet" table.
+	CabinetColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "brand", Type: field.TypeString},
+		{Name: "serial", Type: field.TypeString, Unique: true},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"poweron", "idle", "busy", "abnormal"}},
+		{Name: "enable", Type: field.TypeBool, Default: true},
+		{Name: "lng", Type: field.TypeFloat64, Nullable: true},
+		{Name: "lat", Type: field.TypeFloat64, Nullable: true},
+		{Name: "gsm", Type: field.TypeFloat64, Nullable: true},
+		{Name: "voltage", Type: field.TypeFloat64, Nullable: true},
+		{Name: "current", Type: field.TypeFloat64, Nullable: true},
+		{Name: "temperature", Type: field.TypeFloat64, Nullable: true},
+		{Name: "electricity", Type: field.TypeFloat64, Nullable: true},
+	}
+	// CabinetTable holds the schema information for the "cabinet" table.
+	CabinetTable = &schema.Table{
+		Name:       "cabinet",
+		Columns:    CabinetColumns,
+		PrimaryKey: []*schema.Column{CabinetColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "cabinet_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{CabinetColumns[1]},
+			},
+			{
+				Name:    "cabinet_brand",
+				Unique:  false,
+				Columns: []*schema.Column{CabinetColumns[3]},
+			},
+			{
+				Name:    "cabinet_status",
+				Unique:  false,
+				Columns: []*schema.Column{CabinetColumns[5]},
+			},
+			{
+				Name:    "cabinet_enable",
+				Unique:  false,
+				Columns: []*schema.Column{CabinetColumns[6]},
+			},
+			{
+				Name:    "cabinet_lng",
+				Unique:  false,
+				Columns: []*schema.Column{CabinetColumns[7]},
+			},
+			{
+				Name:    "cabinet_lat",
+				Unique:  false,
+				Columns: []*schema.Column{CabinetColumns[8]},
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		BinTable,
+		CabinetTable,
 	}
 )
 
 func init() {
 	BinTable.Annotation = &entsql.Annotation{
 		Table: "bin",
+	}
+	CabinetTable.Annotation = &entsql.Annotation{
+		Table: "cabinet",
 	}
 }

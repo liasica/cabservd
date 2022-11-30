@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 
 	"entgo.io/ent"
@@ -24,7 +25,8 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeBin = "Bin"
+	TypeBin     = "Bin"
+	TypeCabinet = "Cabinet"
 )
 
 // BinMutation represents an operation that mutates the Bin nodes in the graph.
@@ -37,7 +39,7 @@ type BinMutation struct {
 	updated_at    *time.Time
 	uuid          *string
 	brand         *string
-	sn            *string
+	serial        *string
 	lock          *bool
 	name          *string
 	index         *int
@@ -302,40 +304,40 @@ func (m *BinMutation) ResetBrand() {
 	m.brand = nil
 }
 
-// SetSn sets the "sn" field.
-func (m *BinMutation) SetSn(s string) {
-	m.sn = &s
+// SetSerial sets the "serial" field.
+func (m *BinMutation) SetSerial(s string) {
+	m.serial = &s
 }
 
-// Sn returns the value of the "sn" field in the mutation.
-func (m *BinMutation) Sn() (r string, exists bool) {
-	v := m.sn
+// Serial returns the value of the "serial" field in the mutation.
+func (m *BinMutation) Serial() (r string, exists bool) {
+	v := m.serial
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldSn returns the old "sn" field's value of the Bin entity.
+// OldSerial returns the old "serial" field's value of the Bin entity.
 // If the Bin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BinMutation) OldSn(ctx context.Context) (v string, err error) {
+func (m *BinMutation) OldSerial(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldSn is only allowed on UpdateOne operations")
+		return v, errors.New("OldSerial is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldSn requires an ID field in the mutation")
+		return v, errors.New("OldSerial requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldSn: %w", err)
+		return v, fmt.Errorf("querying old value for OldSerial: %w", err)
 	}
-	return oldValue.Sn, nil
+	return oldValue.Serial, nil
 }
 
-// ResetSn resets all changes to the "sn" field.
-func (m *BinMutation) ResetSn() {
-	m.sn = nil
+// ResetSerial resets all changes to the "serial" field.
+func (m *BinMutation) ResetSerial() {
+	m.serial = nil
 }
 
 // SetLock sets the "lock" field.
@@ -866,8 +868,8 @@ func (m *BinMutation) Fields() []string {
 	if m.brand != nil {
 		fields = append(fields, bin.FieldBrand)
 	}
-	if m.sn != nil {
-		fields = append(fields, bin.FieldSn)
+	if m.serial != nil {
+		fields = append(fields, bin.FieldSerial)
 	}
 	if m.lock != nil {
 		fields = append(fields, bin.FieldLock)
@@ -918,8 +920,8 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.UUID()
 	case bin.FieldBrand:
 		return m.Brand()
-	case bin.FieldSn:
-		return m.Sn()
+	case bin.FieldSerial:
+		return m.Serial()
 	case bin.FieldLock:
 		return m.Lock()
 	case bin.FieldName:
@@ -959,8 +961,8 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldUUID(ctx)
 	case bin.FieldBrand:
 		return m.OldBrand(ctx)
-	case bin.FieldSn:
-		return m.OldSn(ctx)
+	case bin.FieldSerial:
+		return m.OldSerial(ctx)
 	case bin.FieldLock:
 		return m.OldLock(ctx)
 	case bin.FieldName:
@@ -1020,12 +1022,12 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetBrand(v)
 		return nil
-	case bin.FieldSn:
+	case bin.FieldSerial:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetSn(v)
+		m.SetSerial(v)
 		return nil
 	case bin.FieldLock:
 		v, ok := value.(bool)
@@ -1228,8 +1230,8 @@ func (m *BinMutation) ResetField(name string) error {
 	case bin.FieldBrand:
 		m.ResetBrand()
 		return nil
-	case bin.FieldSn:
-		m.ResetSn()
+	case bin.FieldSerial:
+		m.ResetSerial()
 		return nil
 	case bin.FieldLock:
 		m.ResetLock()
@@ -1314,4 +1316,1340 @@ func (m *BinMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *BinMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Bin edge %s", name)
+}
+
+// CabinetMutation represents an operation that mutates the Cabinet nodes in the graph.
+type CabinetMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *uint64
+	created_at     *time.Time
+	updated_at     *time.Time
+	brand          *string
+	serial         *string
+	status         *cabinet.Status
+	enable         *bool
+	lng            *float64
+	addlng         *float64
+	lat            *float64
+	addlat         *float64
+	gsm            *float64
+	addgsm         *float64
+	voltage        *float64
+	addvoltage     *float64
+	current        *float64
+	addcurrent     *float64
+	temperature    *float64
+	addtemperature *float64
+	electricity    *float64
+	addelectricity *float64
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*Cabinet, error)
+	predicates     []predicate.Cabinet
+}
+
+var _ ent.Mutation = (*CabinetMutation)(nil)
+
+// cabinetOption allows management of the mutation configuration using functional options.
+type cabinetOption func(*CabinetMutation)
+
+// newCabinetMutation creates new mutation for the Cabinet entity.
+func newCabinetMutation(c config, op Op, opts ...cabinetOption) *CabinetMutation {
+	m := &CabinetMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCabinet,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCabinetID sets the ID field of the mutation.
+func withCabinetID(id uint64) cabinetOption {
+	return func(m *CabinetMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Cabinet
+		)
+		m.oldValue = func(ctx context.Context) (*Cabinet, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Cabinet.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCabinet sets the old Cabinet of the mutation.
+func withCabinet(node *Cabinet) cabinetOption {
+	return func(m *CabinetMutation) {
+		m.oldValue = func(context.Context) (*Cabinet, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CabinetMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CabinetMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CabinetMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CabinetMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Cabinet.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *CabinetMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *CabinetMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *CabinetMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *CabinetMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *CabinetMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *CabinetMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetBrand sets the "brand" field.
+func (m *CabinetMutation) SetBrand(s string) {
+	m.brand = &s
+}
+
+// Brand returns the value of the "brand" field in the mutation.
+func (m *CabinetMutation) Brand() (r string, exists bool) {
+	v := m.brand
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBrand returns the old "brand" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldBrand(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBrand requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBrand: %w", err)
+	}
+	return oldValue.Brand, nil
+}
+
+// ResetBrand resets all changes to the "brand" field.
+func (m *CabinetMutation) ResetBrand() {
+	m.brand = nil
+}
+
+// SetSerial sets the "serial" field.
+func (m *CabinetMutation) SetSerial(s string) {
+	m.serial = &s
+}
+
+// Serial returns the value of the "serial" field in the mutation.
+func (m *CabinetMutation) Serial() (r string, exists bool) {
+	v := m.serial
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSerial returns the old "serial" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldSerial(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSerial is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSerial requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSerial: %w", err)
+	}
+	return oldValue.Serial, nil
+}
+
+// ResetSerial resets all changes to the "serial" field.
+func (m *CabinetMutation) ResetSerial() {
+	m.serial = nil
+}
+
+// SetStatus sets the "status" field.
+func (m *CabinetMutation) SetStatus(c cabinet.Status) {
+	m.status = &c
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *CabinetMutation) Status() (r cabinet.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldStatus(ctx context.Context) (v cabinet.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *CabinetMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetEnable sets the "enable" field.
+func (m *CabinetMutation) SetEnable(b bool) {
+	m.enable = &b
+}
+
+// Enable returns the value of the "enable" field in the mutation.
+func (m *CabinetMutation) Enable() (r bool, exists bool) {
+	v := m.enable
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEnable returns the old "enable" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldEnable(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEnable is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEnable requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEnable: %w", err)
+	}
+	return oldValue.Enable, nil
+}
+
+// ResetEnable resets all changes to the "enable" field.
+func (m *CabinetMutation) ResetEnable() {
+	m.enable = nil
+}
+
+// SetLng sets the "lng" field.
+func (m *CabinetMutation) SetLng(f float64) {
+	m.lng = &f
+	m.addlng = nil
+}
+
+// Lng returns the value of the "lng" field in the mutation.
+func (m *CabinetMutation) Lng() (r float64, exists bool) {
+	v := m.lng
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLng returns the old "lng" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldLng(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLng is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLng requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLng: %w", err)
+	}
+	return oldValue.Lng, nil
+}
+
+// AddLng adds f to the "lng" field.
+func (m *CabinetMutation) AddLng(f float64) {
+	if m.addlng != nil {
+		*m.addlng += f
+	} else {
+		m.addlng = &f
+	}
+}
+
+// AddedLng returns the value that was added to the "lng" field in this mutation.
+func (m *CabinetMutation) AddedLng() (r float64, exists bool) {
+	v := m.addlng
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearLng clears the value of the "lng" field.
+func (m *CabinetMutation) ClearLng() {
+	m.lng = nil
+	m.addlng = nil
+	m.clearedFields[cabinet.FieldLng] = struct{}{}
+}
+
+// LngCleared returns if the "lng" field was cleared in this mutation.
+func (m *CabinetMutation) LngCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldLng]
+	return ok
+}
+
+// ResetLng resets all changes to the "lng" field.
+func (m *CabinetMutation) ResetLng() {
+	m.lng = nil
+	m.addlng = nil
+	delete(m.clearedFields, cabinet.FieldLng)
+}
+
+// SetLat sets the "lat" field.
+func (m *CabinetMutation) SetLat(f float64) {
+	m.lat = &f
+	m.addlat = nil
+}
+
+// Lat returns the value of the "lat" field in the mutation.
+func (m *CabinetMutation) Lat() (r float64, exists bool) {
+	v := m.lat
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLat returns the old "lat" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldLat(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLat is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLat requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLat: %w", err)
+	}
+	return oldValue.Lat, nil
+}
+
+// AddLat adds f to the "lat" field.
+func (m *CabinetMutation) AddLat(f float64) {
+	if m.addlat != nil {
+		*m.addlat += f
+	} else {
+		m.addlat = &f
+	}
+}
+
+// AddedLat returns the value that was added to the "lat" field in this mutation.
+func (m *CabinetMutation) AddedLat() (r float64, exists bool) {
+	v := m.addlat
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearLat clears the value of the "lat" field.
+func (m *CabinetMutation) ClearLat() {
+	m.lat = nil
+	m.addlat = nil
+	m.clearedFields[cabinet.FieldLat] = struct{}{}
+}
+
+// LatCleared returns if the "lat" field was cleared in this mutation.
+func (m *CabinetMutation) LatCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldLat]
+	return ok
+}
+
+// ResetLat resets all changes to the "lat" field.
+func (m *CabinetMutation) ResetLat() {
+	m.lat = nil
+	m.addlat = nil
+	delete(m.clearedFields, cabinet.FieldLat)
+}
+
+// SetGsm sets the "gsm" field.
+func (m *CabinetMutation) SetGsm(f float64) {
+	m.gsm = &f
+	m.addgsm = nil
+}
+
+// Gsm returns the value of the "gsm" field in the mutation.
+func (m *CabinetMutation) Gsm() (r float64, exists bool) {
+	v := m.gsm
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGsm returns the old "gsm" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldGsm(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldGsm is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldGsm requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGsm: %w", err)
+	}
+	return oldValue.Gsm, nil
+}
+
+// AddGsm adds f to the "gsm" field.
+func (m *CabinetMutation) AddGsm(f float64) {
+	if m.addgsm != nil {
+		*m.addgsm += f
+	} else {
+		m.addgsm = &f
+	}
+}
+
+// AddedGsm returns the value that was added to the "gsm" field in this mutation.
+func (m *CabinetMutation) AddedGsm() (r float64, exists bool) {
+	v := m.addgsm
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearGsm clears the value of the "gsm" field.
+func (m *CabinetMutation) ClearGsm() {
+	m.gsm = nil
+	m.addgsm = nil
+	m.clearedFields[cabinet.FieldGsm] = struct{}{}
+}
+
+// GsmCleared returns if the "gsm" field was cleared in this mutation.
+func (m *CabinetMutation) GsmCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldGsm]
+	return ok
+}
+
+// ResetGsm resets all changes to the "gsm" field.
+func (m *CabinetMutation) ResetGsm() {
+	m.gsm = nil
+	m.addgsm = nil
+	delete(m.clearedFields, cabinet.FieldGsm)
+}
+
+// SetVoltage sets the "voltage" field.
+func (m *CabinetMutation) SetVoltage(f float64) {
+	m.voltage = &f
+	m.addvoltage = nil
+}
+
+// Voltage returns the value of the "voltage" field in the mutation.
+func (m *CabinetMutation) Voltage() (r float64, exists bool) {
+	v := m.voltage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVoltage returns the old "voltage" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldVoltage(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVoltage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVoltage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVoltage: %w", err)
+	}
+	return oldValue.Voltage, nil
+}
+
+// AddVoltage adds f to the "voltage" field.
+func (m *CabinetMutation) AddVoltage(f float64) {
+	if m.addvoltage != nil {
+		*m.addvoltage += f
+	} else {
+		m.addvoltage = &f
+	}
+}
+
+// AddedVoltage returns the value that was added to the "voltage" field in this mutation.
+func (m *CabinetMutation) AddedVoltage() (r float64, exists bool) {
+	v := m.addvoltage
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearVoltage clears the value of the "voltage" field.
+func (m *CabinetMutation) ClearVoltage() {
+	m.voltage = nil
+	m.addvoltage = nil
+	m.clearedFields[cabinet.FieldVoltage] = struct{}{}
+}
+
+// VoltageCleared returns if the "voltage" field was cleared in this mutation.
+func (m *CabinetMutation) VoltageCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldVoltage]
+	return ok
+}
+
+// ResetVoltage resets all changes to the "voltage" field.
+func (m *CabinetMutation) ResetVoltage() {
+	m.voltage = nil
+	m.addvoltage = nil
+	delete(m.clearedFields, cabinet.FieldVoltage)
+}
+
+// SetCurrent sets the "current" field.
+func (m *CabinetMutation) SetCurrent(f float64) {
+	m.current = &f
+	m.addcurrent = nil
+}
+
+// Current returns the value of the "current" field in the mutation.
+func (m *CabinetMutation) Current() (r float64, exists bool) {
+	v := m.current
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCurrent returns the old "current" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldCurrent(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCurrent is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCurrent requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCurrent: %w", err)
+	}
+	return oldValue.Current, nil
+}
+
+// AddCurrent adds f to the "current" field.
+func (m *CabinetMutation) AddCurrent(f float64) {
+	if m.addcurrent != nil {
+		*m.addcurrent += f
+	} else {
+		m.addcurrent = &f
+	}
+}
+
+// AddedCurrent returns the value that was added to the "current" field in this mutation.
+func (m *CabinetMutation) AddedCurrent() (r float64, exists bool) {
+	v := m.addcurrent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearCurrent clears the value of the "current" field.
+func (m *CabinetMutation) ClearCurrent() {
+	m.current = nil
+	m.addcurrent = nil
+	m.clearedFields[cabinet.FieldCurrent] = struct{}{}
+}
+
+// CurrentCleared returns if the "current" field was cleared in this mutation.
+func (m *CabinetMutation) CurrentCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldCurrent]
+	return ok
+}
+
+// ResetCurrent resets all changes to the "current" field.
+func (m *CabinetMutation) ResetCurrent() {
+	m.current = nil
+	m.addcurrent = nil
+	delete(m.clearedFields, cabinet.FieldCurrent)
+}
+
+// SetTemperature sets the "temperature" field.
+func (m *CabinetMutation) SetTemperature(f float64) {
+	m.temperature = &f
+	m.addtemperature = nil
+}
+
+// Temperature returns the value of the "temperature" field in the mutation.
+func (m *CabinetMutation) Temperature() (r float64, exists bool) {
+	v := m.temperature
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTemperature returns the old "temperature" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldTemperature(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTemperature is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTemperature requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTemperature: %w", err)
+	}
+	return oldValue.Temperature, nil
+}
+
+// AddTemperature adds f to the "temperature" field.
+func (m *CabinetMutation) AddTemperature(f float64) {
+	if m.addtemperature != nil {
+		*m.addtemperature += f
+	} else {
+		m.addtemperature = &f
+	}
+}
+
+// AddedTemperature returns the value that was added to the "temperature" field in this mutation.
+func (m *CabinetMutation) AddedTemperature() (r float64, exists bool) {
+	v := m.addtemperature
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearTemperature clears the value of the "temperature" field.
+func (m *CabinetMutation) ClearTemperature() {
+	m.temperature = nil
+	m.addtemperature = nil
+	m.clearedFields[cabinet.FieldTemperature] = struct{}{}
+}
+
+// TemperatureCleared returns if the "temperature" field was cleared in this mutation.
+func (m *CabinetMutation) TemperatureCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldTemperature]
+	return ok
+}
+
+// ResetTemperature resets all changes to the "temperature" field.
+func (m *CabinetMutation) ResetTemperature() {
+	m.temperature = nil
+	m.addtemperature = nil
+	delete(m.clearedFields, cabinet.FieldTemperature)
+}
+
+// SetElectricity sets the "electricity" field.
+func (m *CabinetMutation) SetElectricity(f float64) {
+	m.electricity = &f
+	m.addelectricity = nil
+}
+
+// Electricity returns the value of the "electricity" field in the mutation.
+func (m *CabinetMutation) Electricity() (r float64, exists bool) {
+	v := m.electricity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldElectricity returns the old "electricity" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldElectricity(ctx context.Context) (v *float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldElectricity is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldElectricity requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldElectricity: %w", err)
+	}
+	return oldValue.Electricity, nil
+}
+
+// AddElectricity adds f to the "electricity" field.
+func (m *CabinetMutation) AddElectricity(f float64) {
+	if m.addelectricity != nil {
+		*m.addelectricity += f
+	} else {
+		m.addelectricity = &f
+	}
+}
+
+// AddedElectricity returns the value that was added to the "electricity" field in this mutation.
+func (m *CabinetMutation) AddedElectricity() (r float64, exists bool) {
+	v := m.addelectricity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearElectricity clears the value of the "electricity" field.
+func (m *CabinetMutation) ClearElectricity() {
+	m.electricity = nil
+	m.addelectricity = nil
+	m.clearedFields[cabinet.FieldElectricity] = struct{}{}
+}
+
+// ElectricityCleared returns if the "electricity" field was cleared in this mutation.
+func (m *CabinetMutation) ElectricityCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldElectricity]
+	return ok
+}
+
+// ResetElectricity resets all changes to the "electricity" field.
+func (m *CabinetMutation) ResetElectricity() {
+	m.electricity = nil
+	m.addelectricity = nil
+	delete(m.clearedFields, cabinet.FieldElectricity)
+}
+
+// Where appends a list predicates to the CabinetMutation builder.
+func (m *CabinetMutation) Where(ps ...predicate.Cabinet) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *CabinetMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Cabinet).
+func (m *CabinetMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CabinetMutation) Fields() []string {
+	fields := make([]string, 0, 13)
+	if m.created_at != nil {
+		fields = append(fields, cabinet.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, cabinet.FieldUpdatedAt)
+	}
+	if m.brand != nil {
+		fields = append(fields, cabinet.FieldBrand)
+	}
+	if m.serial != nil {
+		fields = append(fields, cabinet.FieldSerial)
+	}
+	if m.status != nil {
+		fields = append(fields, cabinet.FieldStatus)
+	}
+	if m.enable != nil {
+		fields = append(fields, cabinet.FieldEnable)
+	}
+	if m.lng != nil {
+		fields = append(fields, cabinet.FieldLng)
+	}
+	if m.lat != nil {
+		fields = append(fields, cabinet.FieldLat)
+	}
+	if m.gsm != nil {
+		fields = append(fields, cabinet.FieldGsm)
+	}
+	if m.voltage != nil {
+		fields = append(fields, cabinet.FieldVoltage)
+	}
+	if m.current != nil {
+		fields = append(fields, cabinet.FieldCurrent)
+	}
+	if m.temperature != nil {
+		fields = append(fields, cabinet.FieldTemperature)
+	}
+	if m.electricity != nil {
+		fields = append(fields, cabinet.FieldElectricity)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CabinetMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case cabinet.FieldCreatedAt:
+		return m.CreatedAt()
+	case cabinet.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case cabinet.FieldBrand:
+		return m.Brand()
+	case cabinet.FieldSerial:
+		return m.Serial()
+	case cabinet.FieldStatus:
+		return m.Status()
+	case cabinet.FieldEnable:
+		return m.Enable()
+	case cabinet.FieldLng:
+		return m.Lng()
+	case cabinet.FieldLat:
+		return m.Lat()
+	case cabinet.FieldGsm:
+		return m.Gsm()
+	case cabinet.FieldVoltage:
+		return m.Voltage()
+	case cabinet.FieldCurrent:
+		return m.Current()
+	case cabinet.FieldTemperature:
+		return m.Temperature()
+	case cabinet.FieldElectricity:
+		return m.Electricity()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CabinetMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case cabinet.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case cabinet.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case cabinet.FieldBrand:
+		return m.OldBrand(ctx)
+	case cabinet.FieldSerial:
+		return m.OldSerial(ctx)
+	case cabinet.FieldStatus:
+		return m.OldStatus(ctx)
+	case cabinet.FieldEnable:
+		return m.OldEnable(ctx)
+	case cabinet.FieldLng:
+		return m.OldLng(ctx)
+	case cabinet.FieldLat:
+		return m.OldLat(ctx)
+	case cabinet.FieldGsm:
+		return m.OldGsm(ctx)
+	case cabinet.FieldVoltage:
+		return m.OldVoltage(ctx)
+	case cabinet.FieldCurrent:
+		return m.OldCurrent(ctx)
+	case cabinet.FieldTemperature:
+		return m.OldTemperature(ctx)
+	case cabinet.FieldElectricity:
+		return m.OldElectricity(ctx)
+	}
+	return nil, fmt.Errorf("unknown Cabinet field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CabinetMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case cabinet.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case cabinet.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case cabinet.FieldBrand:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBrand(v)
+		return nil
+	case cabinet.FieldSerial:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSerial(v)
+		return nil
+	case cabinet.FieldStatus:
+		v, ok := value.(cabinet.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case cabinet.FieldEnable:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEnable(v)
+		return nil
+	case cabinet.FieldLng:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLng(v)
+		return nil
+	case cabinet.FieldLat:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLat(v)
+		return nil
+	case cabinet.FieldGsm:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGsm(v)
+		return nil
+	case cabinet.FieldVoltage:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVoltage(v)
+		return nil
+	case cabinet.FieldCurrent:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCurrent(v)
+		return nil
+	case cabinet.FieldTemperature:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTemperature(v)
+		return nil
+	case cabinet.FieldElectricity:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetElectricity(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Cabinet field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CabinetMutation) AddedFields() []string {
+	var fields []string
+	if m.addlng != nil {
+		fields = append(fields, cabinet.FieldLng)
+	}
+	if m.addlat != nil {
+		fields = append(fields, cabinet.FieldLat)
+	}
+	if m.addgsm != nil {
+		fields = append(fields, cabinet.FieldGsm)
+	}
+	if m.addvoltage != nil {
+		fields = append(fields, cabinet.FieldVoltage)
+	}
+	if m.addcurrent != nil {
+		fields = append(fields, cabinet.FieldCurrent)
+	}
+	if m.addtemperature != nil {
+		fields = append(fields, cabinet.FieldTemperature)
+	}
+	if m.addelectricity != nil {
+		fields = append(fields, cabinet.FieldElectricity)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CabinetMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case cabinet.FieldLng:
+		return m.AddedLng()
+	case cabinet.FieldLat:
+		return m.AddedLat()
+	case cabinet.FieldGsm:
+		return m.AddedGsm()
+	case cabinet.FieldVoltage:
+		return m.AddedVoltage()
+	case cabinet.FieldCurrent:
+		return m.AddedCurrent()
+	case cabinet.FieldTemperature:
+		return m.AddedTemperature()
+	case cabinet.FieldElectricity:
+		return m.AddedElectricity()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CabinetMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case cabinet.FieldLng:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLng(v)
+		return nil
+	case cabinet.FieldLat:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLat(v)
+		return nil
+	case cabinet.FieldGsm:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddGsm(v)
+		return nil
+	case cabinet.FieldVoltage:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddVoltage(v)
+		return nil
+	case cabinet.FieldCurrent:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCurrent(v)
+		return nil
+	case cabinet.FieldTemperature:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddTemperature(v)
+		return nil
+	case cabinet.FieldElectricity:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddElectricity(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Cabinet numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CabinetMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(cabinet.FieldLng) {
+		fields = append(fields, cabinet.FieldLng)
+	}
+	if m.FieldCleared(cabinet.FieldLat) {
+		fields = append(fields, cabinet.FieldLat)
+	}
+	if m.FieldCleared(cabinet.FieldGsm) {
+		fields = append(fields, cabinet.FieldGsm)
+	}
+	if m.FieldCleared(cabinet.FieldVoltage) {
+		fields = append(fields, cabinet.FieldVoltage)
+	}
+	if m.FieldCleared(cabinet.FieldCurrent) {
+		fields = append(fields, cabinet.FieldCurrent)
+	}
+	if m.FieldCleared(cabinet.FieldTemperature) {
+		fields = append(fields, cabinet.FieldTemperature)
+	}
+	if m.FieldCleared(cabinet.FieldElectricity) {
+		fields = append(fields, cabinet.FieldElectricity)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CabinetMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CabinetMutation) ClearField(name string) error {
+	switch name {
+	case cabinet.FieldLng:
+		m.ClearLng()
+		return nil
+	case cabinet.FieldLat:
+		m.ClearLat()
+		return nil
+	case cabinet.FieldGsm:
+		m.ClearGsm()
+		return nil
+	case cabinet.FieldVoltage:
+		m.ClearVoltage()
+		return nil
+	case cabinet.FieldCurrent:
+		m.ClearCurrent()
+		return nil
+	case cabinet.FieldTemperature:
+		m.ClearTemperature()
+		return nil
+	case cabinet.FieldElectricity:
+		m.ClearElectricity()
+		return nil
+	}
+	return fmt.Errorf("unknown Cabinet nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CabinetMutation) ResetField(name string) error {
+	switch name {
+	case cabinet.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case cabinet.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case cabinet.FieldBrand:
+		m.ResetBrand()
+		return nil
+	case cabinet.FieldSerial:
+		m.ResetSerial()
+		return nil
+	case cabinet.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case cabinet.FieldEnable:
+		m.ResetEnable()
+		return nil
+	case cabinet.FieldLng:
+		m.ResetLng()
+		return nil
+	case cabinet.FieldLat:
+		m.ResetLat()
+		return nil
+	case cabinet.FieldGsm:
+		m.ResetGsm()
+		return nil
+	case cabinet.FieldVoltage:
+		m.ResetVoltage()
+		return nil
+	case cabinet.FieldCurrent:
+		m.ResetCurrent()
+		return nil
+	case cabinet.FieldTemperature:
+		m.ResetTemperature()
+		return nil
+	case cabinet.FieldElectricity:
+		m.ResetElectricity()
+		return nil
+	}
+	return fmt.Errorf("unknown Cabinet field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CabinetMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CabinetMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CabinetMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CabinetMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CabinetMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CabinetMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CabinetMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Cabinet unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CabinetMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Cabinet edge %s", name)
 }

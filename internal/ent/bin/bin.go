@@ -19,8 +19,8 @@ const (
 	FieldUUID = "uuid"
 	// FieldBrand holds the string denoting the brand field in the database.
 	FieldBrand = "brand"
-	// FieldSn holds the string denoting the sn field in the database.
-	FieldSn = "sn"
+	// FieldSerial holds the string denoting the serial field in the database.
+	FieldSerial = "serial"
 	// FieldLock holds the string denoting the lock field in the database.
 	FieldLock = "lock"
 	// FieldName holds the string denoting the name field in the database.
@@ -54,7 +54,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldUUID,
 	FieldBrand,
-	FieldSn,
+	FieldSerial,
 	FieldLock,
 	FieldName,
 	FieldIndex,
