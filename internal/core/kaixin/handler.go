@@ -8,23 +8,16 @@ package kaixin
 import (
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/errs"
+    "github.com/auroraride/cabservd/types"
     jsoniter "github.com/json-iterator/go"
-)
-
-const (
-    Brand = "KAIXIN"
 )
 
 type Hander struct {
     core.Bean
-    core.Codec
 }
 
 func New() *Hander {
-    return &Hander{
-        // 使用 \n 编码
-        Codec: new(core.Newline),
-    }
+    return &Hander{}
 }
 
 // OnMessage 解析消息
@@ -81,12 +74,12 @@ func (h *Hander) report(req *Request) (err error) {
     if req.DevID == "" {
         return errs.CabinetDeviceIDRequired
     }
-    core.UpdateCabinet(Brand, req.DevID, req.AttrList)
+    core.UpdateCabinet(types.BrandKaixin, req.DevID, req.AttrList)
     return
 }
 
 // 告警上报请求
 func (h *Hander) notice(req *Request) (err error) {
-    // TODO 解读所有告警信息
+    // TODO 解读并保存所有告警信息
     return
 }

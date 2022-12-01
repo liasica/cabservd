@@ -54,7 +54,7 @@ func (*demo) Control(c *gin.Context) {
     }
     err := c.Bind(&req)
     if err == nil {
-        err = kaixin.Control(req.SN, kaixin.ControlRequest{ParamList: req.Params})
+        err = kaixin.SendControl(req.SN, kaixin.ControlRequest{ParamList: req.Params})
     }
 
     c.JSON(http.StatusOK, gin.H{
@@ -289,7 +289,7 @@ func (t *task) doorOpen(index int) (err error) {
             Value: kaixin.ControlOpenDoor,
         }, DoorID: fmt.Sprintf("%d", index+1)},
     }
-    err = kaixin.Control(t.sn, kaixin.ControlRequest{ParamList: params})
+    err = kaixin.SendControl(t.sn, kaixin.ControlRequest{ParamList: params})
     if err != nil {
         return
     }

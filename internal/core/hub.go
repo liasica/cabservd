@@ -22,8 +22,8 @@ type hub struct {
     // address to listen
     addr string
 
-    // 电柜类型
-    cate string
+    // 电柜品牌
+    brand string
 
     // 电柜协议
     bean Hook

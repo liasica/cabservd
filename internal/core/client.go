@@ -86,7 +86,7 @@ func GetClient(devId string) (c *Client, err error) {
         return true
     })
     if c == nil {
-        err = errs.ClientNotFound
+        err = errs.CabinetClientNotFound
     }
     return
 }

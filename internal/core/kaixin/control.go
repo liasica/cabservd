@@ -6,7 +6,10 @@
 package kaixin
 
 import (
+    "fmt"
     "github.com/auroraride/cabservd/internal/core"
+    "github.com/auroraride/cabservd/internal/errs"
+    "github.com/auroraride/cabservd/types"
     "time"
 )
 
@@ -27,18 +30,44 @@ const (
     ControlBatteryTenancy ControlValue = "12" // 退还电池
 )
 
-func Control(deviceId string, req ControlRequest) (err error) {
+var (
+    controlValueMap = map[types.ControlType]ControlValue{
+        types.ControlTypeOpenDoor: ControlOpenDoor,
+        types.BinDisable:          ControlBinDisable,
+        types.BinEnable:           ControlBinEnable,
+    }
+)
+
+func Control(serial string, typ types.ControlType, index int) error {
+    v, ok := controlValueMap[typ]
+    if !ok {
+        return errs.CabinetControlParamError
+    }
+
+    req := ControlRequest{
+        ParamList: []ControlParam{{
+            SignalData: SignalData{
+                ID:    SignalCabinetControl,
+                Value: v,
+            },
+            DoorID: fmt.Sprintf("%d", index+1),
+        }},
+    }
+    return SendControl(serial, req)
+}
+
+func SendControl(serial string, req ControlRequest) (err error) {
     msg := &Request{
         Message: Message{
             MsgType: MessageTypeControlRequest,
             TxnNo:   time.Now().UnixMilli(),
-            DevID:   deviceId,
+            DevID:   serial,
         },
         ControlRequest: req,
     }
 
     var c *core.Client
-    c, err = core.GetClient(deviceId)
+    c, err = core.GetClient(serial)
     if err != nil {
         return
     }
