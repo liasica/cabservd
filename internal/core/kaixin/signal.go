@@ -49,5 +49,18 @@ const (
 )
 
 var (
-    SignalLabels = map[Signal]string{}
+    SignalLabels  = map[Signal]string{}
+    CabinetSignal = map[Signal]struct{}{
+        SignalCabinetStatus:  {},
+        SignalLng:            {},
+        SignalLat:            {},
+        SignalDeviceID:       {},
+        SignalGSM:            {},
+        SignalCabinetVoltage: {},
+        SignalCabinetCurrent: {},
+        SignalCabinetTemp:    {},
+        SignalEnable:         {},
+        SignalElectricity:    {},
+        SignalCabinetControl: {},
+    }
 )

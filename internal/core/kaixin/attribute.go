@@ -104,9 +104,13 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
     return
 }
 
-func (attrs Attributes) Cabinet() (cab ent.CabinetPointer) {
+func (attrs Attributes) Cabinet() (cab ent.CabinetPointer, exists bool) {
     for _, attr := range attrs {
         v := attr.ValueString()
+
+        if _, ok := CabinetSignal[attr.ID]; ok {
+            exists = true
+        }
 
         switch attr.ID {
         case SignalCabinetStatus:

@@ -18,14 +18,18 @@ import (
 
 type Parser interface {
     Bins() ent.BinPointers
-    Cabinet() ent.CabinetPointer
+    Cabinet() (ent.CabinetPointer, bool)
 }
 
 func UpdateCabinet(brand, serial string, p Parser) {
-    cab := p.Cabinet()
-    bins := p.Bins()
     ctx := context.Background()
-    SaveCabinetContext(ctx, brand, serial, cab)
+
+    cab, exists := p.Cabinet()
+    if exists {
+        SaveCabinetContext(ctx, brand, serial, cab)
+    }
+
+    bins := p.Bins()
     SaveBinsContext(ctx, brand, serial, bins)
 }
 

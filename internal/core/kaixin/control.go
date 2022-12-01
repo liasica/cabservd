@@ -38,7 +38,7 @@ var (
     }
 )
 
-func Control(serial string, typ types.ControlType, index int) error {
+func (h *Hander) OnControl(serial string, typ types.ControlType, index int) error {
     v, ok := controlValueMap[typ]
     if !ok {
         return errs.CabinetControlParamError

@@ -5,6 +5,8 @@
 
 package core
 
+import "github.com/auroraride/cabservd/types"
+
 type (
     Hook interface {
         // OnConnect 连接接口
@@ -12,6 +14,9 @@ type (
 
         // OnMessage 收到消息
         OnMessage(b []byte, client *Client) (err error)
+
+        // OnControl 发送控制
+        OnControl(serial string, typ types.ControlType, index int) error
     }
 
     Bean struct{}
@@ -22,5 +27,9 @@ func (h *Bean) OnConnect() (err error) {
 }
 
 func (h *Bean) OnMessage(_ []byte, _ *Client) (err error) {
+    return
+}
+
+func OnControl(serial string, typ types.ControlType, index int) (err error) {
     return
 }

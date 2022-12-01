@@ -6,7 +6,6 @@
 package core
 
 import (
-    "github.com/auroraride/cabservd/internal/core/kaixin"
     "github.com/auroraride/cabservd/internal/errs"
     "github.com/auroraride/cabservd/types"
 )
@@ -18,7 +17,7 @@ func (h *hub) Control(req *types.ControlRequest) (err error) {
 
     switch req.Brand {
     case types.BrandKaixin:
-        err = kaixin.Control(req.Serial, req.Type, *req.Index)
+        err = h.bean.OnControl(req.Serial, req.Type, *req.Index)
     }
 
     return
