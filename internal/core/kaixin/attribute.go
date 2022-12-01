@@ -88,14 +88,21 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
         case SignalBatterySN:
             bin.BatterySn = silk.String(v)
         case SignalBatteryVoltage:
-            bin.Voltage = silk.Float64(tools.StrToFloat64(v))
+            vf := tools.StrToFloat64(v)
+            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            bin.Voltage = silk.Float64(vf)
         case SignalBatteryCurrent:
-            c := tools.StrToFloat64(v)
-            bin.Current = silk.Float64(c)
+            vf := tools.StrToFloat64(v)
+            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            bin.Current = silk.Float64(vf)
         case SignalSOC:
-            bin.Soc = silk.Float64(tools.StrToFloat64(v))
+            vf := tools.StrToFloat64(v)
+            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            bin.Soc = silk.Float64(vf)
         case SignalSOH:
-            bin.Soh = silk.Float64(tools.StrToFloat64(v))
+            vf := tools.StrToFloat64(v)
+            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            bin.Soh = silk.Float64(vf)
         }
     }
 

@@ -30,11 +30,11 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     }
     switch req.MsgType {
     case MessageTypeLoginRequest:
-        err = h.login(req, client)
+        err = h.LoginHandle(req, client)
     case MessageTypeReportRequest:
-        err = h.report(req)
+        err = h.ReportHandle(req)
     case MessageTypeNoticeRequest:
-        err = h.notice(req)
+        err = h.NoticeHandle(req)
     case MessageTypeControlResponse:
         // TODO 控制成功逻辑
         // 收到成功逻辑处理完成后, 不发送反馈消息
@@ -49,8 +49,8 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     return client.SendMessage(req.Success())
 }
 
-// 登录请求
-func (h *Hander) login(req *Request, client *core.Client) (err error) {
+// LoginHandle 登录请求
+func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     if req.DevID == "" {
         return errs.CabinetDeviceIDRequired
     }
@@ -69,8 +69,8 @@ func (h *Hander) login(req *Request, client *core.Client) (err error) {
     return
 }
 
-// 状态上报请求
-func (h *Hander) report(req *Request) (err error) {
+// ReportHandle 状态上报请求
+func (h *Hander) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
         return errs.CabinetDeviceIDRequired
     }
@@ -78,8 +78,8 @@ func (h *Hander) report(req *Request) (err error) {
     return
 }
 
-// 告警上报请求
-func (h *Hander) notice(req *Request) (err error) {
+// NoticeHandle 告警上报请求
+func (h *Hander) NoticeHandle(req *Request) (err error) {
     // TODO 解读并保存所有告警信息
     return
 }
