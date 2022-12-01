@@ -64,7 +64,7 @@ func (c *Client) SendMessage(data any, params ...any) (err error) {
         logMessage = params[0].(bool)
     }
 
-    _, err = c.Write(append(b, newline...))
+    _, err = c.Write(c.Hub.codec.Encode(b))
     if err != nil {
         log.Errorf("[FD=%d / %s] 发送失败, message: %s", c.Fd(), c.RemoteAddr(), b)
     } else if logMessage {

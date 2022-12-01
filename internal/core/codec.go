@@ -24,6 +24,7 @@ const (
 
 type Codec interface {
     Decode(c gnet.Conn) (b []byte, err error)
+    Encode(data []byte) []byte
 }
 
 // Newline 以\n为分割处理
@@ -35,6 +36,10 @@ func (codec *Newline) Decode(c gnet.Conn) (b []byte, err error) {
         return
     }
     return
+}
+
+func (codec *Newline) Encode(message []byte) []byte {
+    return append(message, newline...)
 }
 
 // HeaderLength 以头部4字节定义
@@ -55,4 +60,15 @@ func (codec *HeaderLength) Decode(c gnet.Conn) ([]byte, error) {
     _, _ = c.Discard(msgLen)
 
     return bytes.TrimSpace(bytes.Replace(buf[bodySize:msgLen], newline, nil, -1)), nil
+}
+
+func (codec *HeaderLength) Encode(message []byte) []byte {
+    msgLen := bodySize + len(message)
+
+    data := make([]byte, msgLen)
+
+    binary.BigEndian.PutUint32(data[:bodySize], uint32(len(message)))
+    copy(data[bodySize:msgLen], message)
+
+    return data
 }

@@ -24,8 +24,8 @@ type Attribute struct {
 }
 
 func (d SignalData) ValueString() (str string) {
-    v := fmt.Sprintf("%v", d.Value)
-    if v == "null" {
+    str = fmt.Sprintf("%v", d.Value)
+    if str == "null" {
         str = ""
     }
     return
@@ -90,7 +90,8 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
         case SignalBatteryVoltage:
             bin.Voltage = silk.Float64(tools.StrToFloat64(v))
         case SignalBatteryCurrent:
-            bin.Current = silk.Float64(tools.StrToFloat64(v))
+            c := tools.StrToFloat64(v)
+            bin.Current = silk.Float64(c)
         case SignalSOC:
             bin.Soc = silk.Float64(tools.StrToFloat64(v))
         case SignalSOH:
