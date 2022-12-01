@@ -55,12 +55,12 @@ func (h *Hander) login(req *Request, client *core.Client) (err error) {
         return errs.CabinetDeviceIDRequired
     }
 
-    // 清除仓位电池信息
-    // TODO 清除的时候会不会后来的消息先到
-    err = core.ResetBins(req.DevID)
-    if err != nil {
-        return
-    }
+    // // 清除仓位电池信息
+    // // TODO 清除的时候会不会后来的消息先到
+    // err = core.ResetBins(req.DevID)
+    // if err != nil {
+    //     return
+    // }
 
     // 保存设备识别码
     client.SetDeviceID(req.DevID)
