@@ -5,7 +5,7 @@
 
 package core
 
-import "github.com/auroraride/cabservd/types"
+import "github.com/auroraride/cabservd/internal/types"
 
 type (
     Hook interface {

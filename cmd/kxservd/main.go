@@ -9,7 +9,7 @@ import (
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/core/kaixin"
-    "github.com/auroraride/cabservd/router"
+    "github.com/auroraride/cabservd/internal/router"
 )
 
 func main() {

@@ -7,7 +7,7 @@ package core
 
 import (
     "github.com/auroraride/cabservd/internal/errs"
-    "github.com/auroraride/cabservd/types"
+    "github.com/auroraride/cabservd/internal/types"
 )
 
 func (h *hub) Control(req *types.ControlRequest) (err error) {
