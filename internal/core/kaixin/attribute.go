@@ -78,6 +78,7 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
             m[attr.DoorID] = bin
         }
 
+        // TODO 电池在位检测信号量
         switch attr.ID {
         case SignalBinStatus:
             attr.BinStatus(bin, v)
@@ -89,19 +90,19 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
             bin.BatterySn = silk.String(v)
         case SignalBatteryVoltage:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            fmt.Println(">>>>>>>>>> [V]", vf, "<<<<<<<<<<")
             bin.Voltage = silk.Float64(vf)
         case SignalBatteryCurrent:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            fmt.Println(">>>>>>>>>> [A]", vf, "<<<<<<<<<<")
             bin.Current = silk.Float64(vf)
         case SignalSOC:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            fmt.Println(">>>>>>>>>> [SOC]", vf, "<<<<<<<<<<")
             bin.Soc = silk.Float64(vf)
         case SignalSOH:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>>", vf, "<<<<<<<<<<")
+            fmt.Println(">>>>>>>>>> [SOH]", vf, "<<<<<<<<<<")
             bin.Soh = silk.Float64(vf)
         }
     }

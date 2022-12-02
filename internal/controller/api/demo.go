@@ -129,7 +129,8 @@ func (d *demo) Start(c *gin.Context) {
 
     // 获取满电仓位
     max := items[0]
-    if max.BatterySn == "" || max.Soc == 0 || max.Soc < 50 {
+    var minsoc float64 = 1
+    if max.BatterySn == "" || max.Soc == 0 || max.Soc < minsoc {
         c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoFully.Error()})
         return
     }
@@ -225,6 +226,7 @@ func (*demo) Status(c *gin.Context) {
     }
 }
 
+// TODO 取走电池未关门超时逻辑
 func (t *task) run() {
     var (
         err error
@@ -273,7 +275,7 @@ func (t *task) run() {
     // 第四步, 识别电池取出并关闭仓门
     t.step += 1
     t.steps[t.step].message = fmt.Sprintf("第④步, 监控电池取走[%s]并关闭", t.fully.Name)
-    // 识别仓门是否关闭且电池是否放入
+    // 识别仓门是否关闭且电池是否取走
     err = t.doorOpenStatus(t.fully.Index, false, 2)
     if err != nil {
         return
@@ -299,46 +301,30 @@ func (t *task) doorOpen(index int) (err error) {
 
 // 死循环查询仓门状态
 // index: 检查的仓门index
-// status: 待检查的状态
+// status: 待检查的状态 true:开门 false:关门
 // battery: 是否检查电池放入状态 0不检查 1放入检查 2取出检查
 func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) {
-    var item *ent.Bin
-    start := time.Now()
-    var maxtime float64 = 120
+    var (
+        // 仓位信息
+        item *ent.Bin
+
+        // 步骤最长时间
+        maxtime float64 = 30 // TODO 测试使用30s超时
+
+        // 开始时间
+        start = time.Now()
+
+        // 检测电池是否放入或取出时间
+        batteryCheckMaxtime float64 = 15
+
+        // 仓门状态匹配时间
+        statusTime time.Time
+    )
 
     // time.Sleep(3 * time.Second)
     // return
 
     for {
-        // TODO: 缓存
-        item, err = ent.Database.Bin.Query().Where(bin.Serial(t.sn), bin.Index(index), bin.Enable(true)).First(context.Background())
-        if err != nil {
-            return
-        }
-        // 检查成功
-        if item.Open == status {
-            // 若仓门关闭并且检查电池
-            switch battery {
-            case 1:
-                // 检查电池是否放入
-                if item.BatterySn == "" {
-                    maxtime = 30
-                    start = time.Now()
-
-                    // TODO: 重复弹开
-                    if time.Now().Sub(start).Seconds() > maxtime {
-                        err = errs.ExchangeBatteryLost
-                    }
-                }
-                // case 2:
-                //     // 检查电池是否取出
-                //     // TODO: 是否取走
-                //     if item.BatterySn != "" {
-                //         err = errs.ExchangeBatteryLost
-                //     }
-            }
-            return
-        }
         // 超时
         if time.Now().Sub(start).Seconds() > maxtime {
             err = errs.ExchangeTimeOut
@@ -346,5 +332,42 @@ func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) 
         }
         // 10ms查询一次
         time.Sleep(10 * time.Millisecond)
+
+        // TODO: 缓存
+        item, err = ent.Database.Bin.Query().Where(bin.Serial(t.sn), bin.Index(index), bin.Enable(true)).First(context.Background())
+        if err != nil {
+            return
+        }
+        // 检查成功
+        if item.Open == status {
+            if statusTime.IsZero() {
+                statusTime = time.Now()
+            }
+
+            // 若仓门关闭并且检查电池
+            switch battery {
+            case 1:
+                // 检查电池是否放入
+                if item.BatterySn == "" {
+                    // TODO: 重复弹开
+                    if time.Now().Sub(statusTime).Seconds() > batteryCheckMaxtime {
+                        err = errs.ExchangeBatteryLost
+                        // 返回错误
+                        return
+                    }
+                    // 未检测到电池, 继续轮询
+                    continue
+                }
+                // 检测到电池, 返回成功
+                return
+            case 2:
+                // 检查电池是否取出
+                // TODO: 是否取走, 重复弹开
+                if item.BatterySn != "" {
+                    err = errs.ExchangeBatteryExist
+                }
+            }
+            return
+        }
     }
 }

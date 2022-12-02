@@ -54,17 +54,26 @@ func (c *Client) SetDeviceID(id string) {
 }
 
 // SendMessage 向客户端发送消息
-func (c *Client) SendMessage(data any, params ...any) (err error) {
+func (c *Client) SendMessage(message any, params ...any) (err error) {
     // return jsoniter.NewEncoder(c).Encode(c)
 
-    b, _ := jsoniter.Marshal(data)
+    b, _ := jsoniter.Marshal(message)
 
     var logMessage bool
     if len(params) > 0 {
         logMessage = params[0].(bool)
     }
 
-    _, err = c.Write(c.Hub.codec.Encode(b))
+    data := c.Hub.codec.Encode(b)
+
+    // // TODO DEMO
+    // if len(params) > 1 {
+    //     x := []byte(fmt.Sprintf(`{"msgType":500,"txnNo":%d,"devId":"CH6004KXHD220728222","paramList":[{"id":"02301001","value":"04","doorId":"7"}]}`, time.Now().UnixMilli()))
+    //     data = append(data, c.Hub.codec.Encode(x)...)
+    //     fmt.Printf("%x", data)
+    // }
+
+    _, err = c.Write(data)
     if err != nil {
         log.Errorf("[FD=%d / %s] 发送失败, message: %s", c.Fd(), c.RemoteAddr(), b)
     } else if logMessage {
