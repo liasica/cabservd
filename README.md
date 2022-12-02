@@ -6,6 +6,9 @@
 - [wire](https://zhuanlan.zhihu.com/p/399101012)
 - [dig](https://darjun.github.io/2020/02/22/godailylib/dig/)
 - [Loki](https://github.com/grafana/loki)
+- [grpc-go-middleware](https://www.cnblogs.com/FireworksEasyCool/p/12750339.html)
+- [GoKit CLI](https://github.com/GrantZheng/kit/blob/master/README_zh.md)
+- [Go 教程：使用 GO-KIT 来构建微服务（上）](https://learnku.com/go/t/36923)
 
 ### 日志内容
 - 时间
