@@ -11,3 +11,27 @@ func (u *BinUpsert) ResetBattery() *BinUpsert {
     u.SetCurrent(0).SetVoltage(0).SetSoc(0).SetSoh(0)
     return u
 }
+
+// IsLooseHasBattery 是否有电池
+// 宽松检测, 任意一项满足即判定为有电池, 常用在换电第一步判定仓位是否为空
+// fakevoltage 指定电压
+// fakecurrent 指定电流
+// 在位 或 编码不为空 或 电压大于指定值 或 电流大于指定值 或 容量大于0
+func (b *Bin) IsLooseHasBattery(fakevoltage, fakecurrent float64) bool {
+    return b.BatteryExists || // 在位
+        b.BatterySn != "" || // 编码不为空
+        b.Voltage > fakevoltage || // 电压大于指定值
+        b.Current > fakecurrent || // 电流大于指定值
+        b.Soc > 0 // 容量大于0
+}
+
+// IsStrictHasBattery 是否有电池
+// 严格检测, 所有选项都满足才判定为有电池, 常用在换电第三步检测电池是否放入
+// 在位 并且 电池编码不为空 并且 电压大于指定电压 并且 容量大于0
+func (b *Bin) IsStrictHasBattery(fakevoltage float64) (has bool) {
+    has = b.BatteryExists &&
+        b.BatterySn != "" &&
+        b.Voltage > fakevoltage &&
+        b.Soc > 0
+    return
+}

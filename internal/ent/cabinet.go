@@ -20,6 +20,8 @@ type Cabinet struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// 是否在线
+	Online bool `json:"online,omitempty"`
 	// 品牌
 	Brand string `json:"brand,omitempty"`
 	// 电柜编号
@@ -49,7 +51,7 @@ func (*Cabinet) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case cabinet.FieldEnable:
+		case cabinet.FieldOnline, cabinet.FieldEnable:
 			values[i] = new(sql.NullBool)
 		case cabinet.FieldLng, cabinet.FieldLat, cabinet.FieldGsm, cabinet.FieldVoltage, cabinet.FieldCurrent, cabinet.FieldTemperature, cabinet.FieldElectricity:
 			values[i] = new(sql.NullFloat64)
@@ -91,6 +93,12 @@ func (c *Cabinet) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				c.UpdatedAt = value.Time
+			}
+		case cabinet.FieldOnline:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field online", values[i])
+			} else if value.Valid {
+				c.Online = value.Bool
 			}
 		case cabinet.FieldBrand:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -198,6 +206,9 @@ func (c *Cabinet) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("online=")
+	builder.WriteString(fmt.Sprintf("%v", c.Online))
 	builder.WriteString(", ")
 	builder.WriteString("brand=")
 	builder.WriteString(c.Brand)

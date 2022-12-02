@@ -35,6 +35,20 @@ func (cu *CabinetUpdate) SetUpdatedAt(t time.Time) *CabinetUpdate {
 	return cu
 }
 
+// SetOnline sets the "online" field.
+func (cu *CabinetUpdate) SetOnline(b bool) *CabinetUpdate {
+	cu.mutation.SetOnline(b)
+	return cu
+}
+
+// SetNillableOnline sets the "online" field if the given value is not nil.
+func (cu *CabinetUpdate) SetNillableOnline(b *bool) *CabinetUpdate {
+	if b != nil {
+		cu.SetOnline(*b)
+	}
+	return cu
+}
+
 // SetBrand sets the "brand" field.
 func (cu *CabinetUpdate) SetBrand(s string) *CabinetUpdate {
 	cu.mutation.SetBrand(s)
@@ -375,6 +389,9 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.UpdatedAt(); ok {
 		_spec.SetField(cabinet.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := cu.mutation.Online(); ok {
+		_spec.SetField(cabinet.FieldOnline, field.TypeBool, value)
+	}
 	if value, ok := cu.mutation.Brand(); ok {
 		_spec.SetField(cabinet.FieldBrand, field.TypeString, value)
 	}
@@ -474,6 +491,20 @@ type CabinetUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (cuo *CabinetUpdateOne) SetUpdatedAt(t time.Time) *CabinetUpdateOne {
 	cuo.mutation.SetUpdatedAt(t)
+	return cuo
+}
+
+// SetOnline sets the "online" field.
+func (cuo *CabinetUpdateOne) SetOnline(b bool) *CabinetUpdateOne {
+	cuo.mutation.SetOnline(b)
+	return cuo
+}
+
+// SetNillableOnline sets the "online" field if the given value is not nil.
+func (cuo *CabinetUpdateOne) SetNillableOnline(b *bool) *CabinetUpdateOne {
+	if b != nil {
+		cuo.SetOnline(*b)
+	}
 	return cuo
 }
 
@@ -846,6 +877,9 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 	}
 	if value, ok := cuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(cabinet.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := cuo.mutation.Online(); ok {
+		_spec.SetField(cabinet.FieldOnline, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.Brand(); ok {
 		_spec.SetField(cabinet.FieldBrand, field.TypeString, value)

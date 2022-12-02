@@ -136,6 +136,20 @@ func (bc *BinCreate) SetNillableHealth(b *bool) *BinCreate {
 	return bc
 }
 
+// SetBatteryExists sets the "battery_exists" field.
+func (bc *BinCreate) SetBatteryExists(b bool) *BinCreate {
+	bc.mutation.SetBatteryExists(b)
+	return bc
+}
+
+// SetNillableBatteryExists sets the "battery_exists" field if the given value is not nil.
+func (bc *BinCreate) SetNillableBatteryExists(b *bool) *BinCreate {
+	if b != nil {
+		bc.SetBatteryExists(*b)
+	}
+	return bc
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (bc *BinCreate) SetBatterySn(s string) *BinCreate {
 	bc.mutation.SetBatterySn(s)
@@ -307,6 +321,10 @@ func (bc *BinCreate) defaults() {
 		v := bin.DefaultHealth
 		bc.mutation.SetHealth(v)
 	}
+	if _, ok := bc.mutation.BatteryExists(); !ok {
+		v := bin.DefaultBatteryExists
+		bc.mutation.SetBatteryExists(v)
+	}
 	if _, ok := bc.mutation.BatterySn(); !ok {
 		v := bin.DefaultBatterySn
 		bc.mutation.SetBatterySn(v)
@@ -368,6 +386,9 @@ func (bc *BinCreate) check() error {
 	}
 	if _, ok := bc.mutation.Health(); !ok {
 		return &ValidationError{Name: "health", err: errors.New(`ent: missing required field "Bin.health"`)}
+	}
+	if _, ok := bc.mutation.BatteryExists(); !ok {
+		return &ValidationError{Name: "battery_exists", err: errors.New(`ent: missing required field "Bin.battery_exists"`)}
 	}
 	if _, ok := bc.mutation.BatterySn(); !ok {
 		return &ValidationError{Name: "battery_sn", err: errors.New(`ent: missing required field "Bin.battery_sn"`)}
@@ -455,6 +476,10 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Health(); ok {
 		_spec.SetField(bin.FieldHealth, field.TypeBool, value)
 		_node.Health = value
+	}
+	if value, ok := bc.mutation.BatteryExists(); ok {
+		_spec.SetField(bin.FieldBatteryExists, field.TypeBool, value)
+		_node.BatteryExists = value
 	}
 	if value, ok := bc.mutation.BatterySn(); ok {
 		_spec.SetField(bin.FieldBatterySn, field.TypeString, value)
@@ -651,6 +676,18 @@ func (u *BinUpsert) SetHealth(v bool) *BinUpsert {
 // UpdateHealth sets the "health" field to the value that was provided on create.
 func (u *BinUpsert) UpdateHealth() *BinUpsert {
 	u.SetExcluded(bin.FieldHealth)
+	return u
+}
+
+// SetBatteryExists sets the "battery_exists" field.
+func (u *BinUpsert) SetBatteryExists(v bool) *BinUpsert {
+	u.Set(bin.FieldBatteryExists, v)
+	return u
+}
+
+// UpdateBatteryExists sets the "battery_exists" field to the value that was provided on create.
+func (u *BinUpsert) UpdateBatteryExists() *BinUpsert {
+	u.SetExcluded(bin.FieldBatteryExists)
 	return u
 }
 
@@ -930,6 +967,20 @@ func (u *BinUpsertOne) UpdateHealth() *BinUpsertOne {
 	})
 }
 
+// SetBatteryExists sets the "battery_exists" field.
+func (u *BinUpsertOne) SetBatteryExists(v bool) *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.SetBatteryExists(v)
+	})
+}
+
+// UpdateBatteryExists sets the "battery_exists" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateBatteryExists() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateBatteryExists()
+	})
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (u *BinUpsertOne) SetBatterySn(v string) *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
@@ -1059,6 +1110,14 @@ func (u *BinUpsertOne) IDX(ctx context.Context) uint64 {
 		panic(err)
 	}
 	return id
+}
+
+// Save creates the Bin in the database.
+func (u *BinUpsertOne) Save(ctx context.Context) (*Bin, error) {
+	if len(u.create.conflict) == 0 {
+		return nil, errors.New("ent: missing options for BinCreate.OnConflict")
+	}
+	return u.create.Save(ctx)
 }
 
 // BinCreateBulk is the builder for creating many Bin entities in bulk.
@@ -1379,6 +1438,20 @@ func (u *BinUpsertBulk) SetHealth(v bool) *BinUpsertBulk {
 func (u *BinUpsertBulk) UpdateHealth() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateHealth()
+	})
+}
+
+// SetBatteryExists sets the "battery_exists" field.
+func (u *BinUpsertBulk) SetBatteryExists(v bool) *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.SetBatteryExists(v)
+	})
+}
+
+// UpdateBatteryExists sets the "battery_exists" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateBatteryExists() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateBatteryExists()
 	})
 }
 

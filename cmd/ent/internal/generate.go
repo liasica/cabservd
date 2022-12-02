@@ -93,7 +93,7 @@ func GenerateCmd(postRun ...func(*gen.Config)) *cobra.Command {
                     entc.FeatureNames(features...),
                 }
                 templates = append(templates,
-                    // "./cmd/ent/template/upsert.tmpl",
+                    "./cmd/ent/template/upsert.tmpl",
                     "./cmd/ent/template/pointer.tmpl",
                 )
                 for _, tmpl := range templates {

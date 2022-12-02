@@ -94,6 +94,13 @@ func UpdatedAt(v time.Time) predicate.Cabinet {
 	})
 }
 
+// Online applies equality check predicate on the "online" field. It's identical to OnlineEQ.
+func Online(v bool) predicate.Cabinet {
+	return predicate.Cabinet(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldOnline), v))
+	})
+}
+
 // Brand applies equality check predicate on the "brand" field. It's identical to BrandEQ.
 func Brand(v string) predicate.Cabinet {
 	return predicate.Cabinet(func(s *sql.Selector) {
@@ -289,6 +296,20 @@ func UpdatedAtLT(v time.Time) predicate.Cabinet {
 func UpdatedAtLTE(v time.Time) predicate.Cabinet {
 	return predicate.Cabinet(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
+	})
+}
+
+// OnlineEQ applies the EQ predicate on the "online" field.
+func OnlineEQ(v bool) predicate.Cabinet {
+	return predicate.Cabinet(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldOnline), v))
+	})
+}
+
+// OnlineNEQ applies the NEQ predicate on the "online" field.
+func OnlineNEQ(v bool) predicate.Cabinet {
+	return predicate.Cabinet(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldOnline), v))
 	})
 }
 

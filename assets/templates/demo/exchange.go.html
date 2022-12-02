@@ -7,7 +7,7 @@
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>换电测试</title>
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.font.im/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+{{/*        <link href="https://fonts.font.im/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">*/}}
         <link rel="stylesheet" href="https://cdn.staticfile.org/bulma/0.9.4/css/bulma.css">
         <style>
           table {
@@ -221,8 +221,13 @@
                 log(message)
             }
 
-            // 第四步直接退出
-            if (r['step'] == 3 || status == 2) {
+            // 换电失败直接退出
+            if (status == 2) {
+                return
+            }
+
+            // 第四步成功后跳出
+            if (r['step'] == 3 && status == 1) {
                 return
             }
 

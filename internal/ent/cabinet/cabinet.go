@@ -16,6 +16,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldOnline holds the string denoting the online field in the database.
+	FieldOnline = "online"
 	// FieldBrand holds the string denoting the brand field in the database.
 	FieldBrand = "brand"
 	// FieldSerial holds the string denoting the serial field in the database.
@@ -47,6 +49,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldOnline,
 	FieldBrand,
 	FieldSerial,
 	FieldStatus,
@@ -77,6 +80,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultOnline holds the default value on creation for the "online" field.
+	DefaultOnline bool
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
 )
@@ -84,15 +89,15 @@ var (
 // Status defines the type for the "status" enum field.
 type Status string
 
-// StatusPoweron is the default value of the Status enum.
-const DefaultStatus = StatusPoweron
+// StatusInitializing is the default value of the Status enum.
+const DefaultStatus = StatusInitializing
 
 // Status values.
 const (
-	StatusPoweron  Status = "poweron"
-	StatusIdle     Status = "idle"
-	StatusBusy     Status = "busy"
-	StatusAbnormal Status = "abnormal"
+	StatusInitializing Status = "initializing"
+	StatusIdle         Status = "idle"
+	StatusBusy         Status = "busy"
+	StatusAbnormal     Status = "abnormal"
 )
 
 func (s Status) String() string {
@@ -102,7 +107,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusPoweron, StatusIdle, StatusBusy, StatusAbnormal:
+	case StatusInitializing, StatusIdle, StatusBusy, StatusAbnormal:
 		return nil
 	default:
 		return fmt.Errorf("cabinet: invalid enum value for status field: %q", s)

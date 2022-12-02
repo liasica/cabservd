@@ -50,17 +50,17 @@ func (a *Attribute) GetDoorIndex() (index int, exists bool) {
 func (a *Attribute) BinStatus(bin *ent.BinPointer, v string) {
     // 是否异常
     bin.Health = silk.Bool(v != "5")
-    // 如果无电池
-    if v == "0" {
-        bin.BatterySn = silk.String("")
-    }
+    // // TODO 如果无电池
+    // if v == "0" {
+    //     bin.BatterySn = silk.String("")
+    // }
     return
 }
 
-func (attrs Attributes) Bins() (items ent.BinPointers) {
+func (req ReportRequest) Bins() (items ent.BinPointers) {
     m := make(map[string]*ent.BinPointer)
 
-    for _, attr := range attrs {
+    for _, attr := range req.AttrList {
         // 原始字符串值
         v := attr.ValueString()
 
@@ -86,6 +86,8 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
             bin.Open = silk.Bool(v == "1")
         case SignalBinUsingStatus:
             bin.Enable = silk.Bool(v == "1")
+        case SignalBatteryExists:
+            bin.BatteryExists = silk.Bool(v == "1")
         case SignalBatterySN:
             bin.BatterySn = silk.String(v)
         case SignalBatteryVoltage:
@@ -113,8 +115,14 @@ func (attrs Attributes) Bins() (items ent.BinPointers) {
     return
 }
 
-func (attrs Attributes) Cabinet() (cab ent.CabinetPointer, exists bool) {
-    for _, attr := range attrs {
+func (req ReportRequest) Cabinet() (cab ent.CabinetPointer, exists bool) {
+    // 如果是全量上报, 标记电柜在线
+    if req.IsFull == ReportCateFull {
+        cab.Online = silk.Bool(true)
+    }
+
+    // 解析详细属性
+    for _, attr := range req.AttrList {
         v := attr.ValueString()
 
         if _, ok := CabinetSignal[attr.ID]; ok {
@@ -124,10 +132,12 @@ func (attrs Attributes) Cabinet() (cab ent.CabinetPointer, exists bool) {
         switch attr.ID {
         case SignalCabinetStatus:
             m := map[string]cabinet.Status{
-                "0": cabinet.StatusPoweron,
+                "0": cabinet.StatusIdle,
                 "1": cabinet.StatusIdle,
                 "2": cabinet.StatusBusy,
-                "3": cabinet.StatusAbnormal,
+                "3": cabinet.StatusBusy,
+                "4": cabinet.StatusBusy,
+                "5": cabinet.StatusAbnormal,
             }
             cab.Status = silk.Pointer(m[v])
         case SignalLng:

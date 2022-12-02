@@ -128,6 +128,20 @@ func (bu *BinUpdate) SetNillableHealth(b *bool) *BinUpdate {
 	return bu
 }
 
+// SetBatteryExists sets the "battery_exists" field.
+func (bu *BinUpdate) SetBatteryExists(b bool) *BinUpdate {
+	bu.mutation.SetBatteryExists(b)
+	return bu
+}
+
+// SetNillableBatteryExists sets the "battery_exists" field if the given value is not nil.
+func (bu *BinUpdate) SetNillableBatteryExists(b *bool) *BinUpdate {
+	if b != nil {
+		bu.SetBatteryExists(*b)
+	}
+	return bu
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (bu *BinUpdate) SetBatterySn(s string) *BinUpdate {
 	bu.mutation.SetBatterySn(s)
@@ -367,6 +381,9 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.Health(); ok {
 		_spec.SetField(bin.FieldHealth, field.TypeBool, value)
 	}
+	if value, ok := bu.mutation.BatteryExists(); ok {
+		_spec.SetField(bin.FieldBatteryExists, field.TypeBool, value)
+	}
 	if value, ok := bu.mutation.BatterySn(); ok {
 		_spec.SetField(bin.FieldBatterySn, field.TypeString, value)
 	}
@@ -510,6 +527,20 @@ func (buo *BinUpdateOne) SetHealth(b bool) *BinUpdateOne {
 func (buo *BinUpdateOne) SetNillableHealth(b *bool) *BinUpdateOne {
 	if b != nil {
 		buo.SetHealth(*b)
+	}
+	return buo
+}
+
+// SetBatteryExists sets the "battery_exists" field.
+func (buo *BinUpdateOne) SetBatteryExists(b bool) *BinUpdateOne {
+	buo.mutation.SetBatteryExists(b)
+	return buo
+}
+
+// SetNillableBatteryExists sets the "battery_exists" field if the given value is not nil.
+func (buo *BinUpdateOne) SetNillableBatteryExists(b *bool) *BinUpdateOne {
+	if b != nil {
+		buo.SetBatteryExists(*b)
 	}
 	return buo
 }
@@ -782,6 +813,9 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if value, ok := buo.mutation.Health(); ok {
 		_spec.SetField(bin.FieldHealth, field.TypeBool, value)
+	}
+	if value, ok := buo.mutation.BatteryExists(); ok {
+		_spec.SetField(bin.FieldBatteryExists, field.TypeBool, value)
 	}
 	if value, ok := buo.mutation.BatterySn(); ok {
 		_spec.SetField(bin.FieldBatterySn, field.TypeString, value)

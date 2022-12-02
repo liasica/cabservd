@@ -8,9 +8,11 @@ package api
 import (
     "context"
     "fmt"
+    "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/core/kaixin"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
+    "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/errs"
     "github.com/gin-gonic/gin"
     log "github.com/sirupsen/logrus"
@@ -24,22 +26,16 @@ type demo struct {
 
 var tasks sync.Map
 
-type cabinetBin struct {
-    Index int     `json:"-"`
-    Name  string  `json:"name"`
-    Soc   float64 `json:"soc"`
-}
-
 type taskStep struct {
-    *cabinetBin
+    *ent.Bin
     status  uint8 // 0:进行中 1:成功 2:失败
     message string
 }
 
 type task struct {
-    sn      string
-    empty   *cabinetBin
-    fully   *cabinetBin
+    serial  string
+    empty   *ent.Bin
+    fully   *ent.Bin
     step    int
     steps   []*taskStep
     running bool
@@ -109,6 +105,26 @@ func (d *demo) Start(c *gin.Context) {
         return
     }
 
+    // TODO 判断电柜状态
+    // 查询电柜信息
+    cab, _ := ent.Database.Cabinet.Query().Where(cabinet.Serial(req.SN)).First(context.Background())
+    if cab == nil {
+        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNotFound.Error()})
+        return
+    }
+    if cab.Status == cabinet.StatusInitializing {
+        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetInitializing.Error()})
+        return
+    }
+    if cab.Status == cabinet.StatusAbnormal {
+        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetAbnormal.Error()})
+        return
+    }
+    if !cab.Online {
+        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetOffline.Error()})
+        return
+    }
+
     // 是否有正在执行的任务
     if d.isBusy(req.SN) {
         c.JSON(http.StatusOK, gin.H{"error": errs.CabinetBusy.Error()})
@@ -122,47 +138,59 @@ func (d *demo) Start(c *gin.Context) {
         Order(ent.Desc(bin.FieldSoc)).
         All(context.Background())
 
-    if len(items) == 0 {
+    var (
+        fully  *ent.Bin
+        empty  *ent.Bin
+        minsoc float64 = 1
+    )
+
+    // 获取仓位
+    fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyFake()
+    for _, item := range items {
+        // 获取满电仓位
+        if fully == nil {
+            // 若该仓位无电池, 继续循环
+            if !item.IsStrictHasBattery(fakevoltage) {
+                // TODO 该仓位是否出错
+                continue
+            }
+            // 该仓位电量小于最小电量
+            if item.Soc < minsoc {
+                continue
+            }
+            fully = item
+        }
+        if empty == nil {
+            // 若该仓位无电池, 标记为空仓
+            if !item.IsLooseHasBattery(fakevoltage, fakecurrent) {
+                empty = item
+            }
+        }
+    }
+
+    // 如果无满电
+    if fully == nil {
         c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoFully.Error()})
         return
     }
 
-    // 获取满电仓位
-    max := items[0]
-    var minsoc float64 = 1
-    if max.BatterySn == "" || max.Soc == 0 || max.Soc < minsoc {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoFully.Error()})
-        return
-    }
-    fully := &cabinetBin{
-        Name:  max.Name,
-        Soc:   max.Soc,
-        Index: max.Index,
-    }
-
-    // 获取空电仓位
-    min := items[len(items)-1]
-    if min.BatterySn != "" {
+    // 如果无空仓
+    if empty == nil {
         c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoEmpty.Error()})
         return
-    }
-    empty := &cabinetBin{
-        Name:  min.Name,
-        Soc:   min.Soc,
-        Index: min.Index,
     }
 
     // 开始执行换电任务
     t := &task{
-        sn:    req.SN,
-        empty: empty,
-        fully: fully,
-        step:  0,
+        serial: req.SN,
+        empty:  empty,
+        fully:  fully,
+        step:   0,
         steps: []*taskStep{
-            {cabinetBin: empty},
-            {cabinetBin: empty},
-            {cabinetBin: fully},
-            {cabinetBin: fully},
+            {Bin: empty},
+            {Bin: empty},
+            {Bin: fully},
+            {Bin: fully},
         },
         running: true,
     }
@@ -213,9 +241,10 @@ func (*demo) Status(c *gin.Context) {
     }
     s := t.(*task).steps[req.Step]
 
-    start := time.Now()
+    startAt := time.Now()
+
     for {
-        if time.Now().Sub(start).Seconds() > 30 {
+        if time.Now().Sub(startAt).Seconds() > 30 {
             return
         }
         res.Status = s.status
@@ -244,7 +273,7 @@ func (t *task) run() {
 
     // 第一步, 开启空电仓门并检查仓门是否开启
     t.steps[t.step].message = fmt.Sprintf("第①步, 开启空电仓门[%s]", t.empty.Name)
-    err = t.doorOpen(t.empty.Index)
+    err = t.doorOpen(t.empty)
     if err != nil {
         return
     }
@@ -255,7 +284,7 @@ func (t *task) run() {
     t.step += 1
     t.steps[t.step].message = fmt.Sprintf("第②步, 监控电池放入空电仓[%s]并关闭", t.empty.Name)
     // 识别仓门是否关闭且电池是否放入
-    err = t.doorOpenStatus(t.empty.Index, false, 1)
+    err = t.doorOpenStatus(t.empty, false, 1)
     if err != nil {
         return
     }
@@ -265,7 +294,7 @@ func (t *task) run() {
     // 第三步, 开启满电仓门
     t.step += 1
     t.steps[t.step].message = fmt.Sprintf("第③步, 开启满电仓门[%s]", t.fully.Name)
-    err = t.doorOpen(t.fully.Index)
+    err = t.doorOpen(t.fully)
     if err != nil {
         return
     }
@@ -276,7 +305,7 @@ func (t *task) run() {
     t.step += 1
     t.steps[t.step].message = fmt.Sprintf("第④步, 监控电池取走[%s]并关闭", t.fully.Name)
     // 识别仓门是否关闭且电池是否取走
-    err = t.doorOpenStatus(t.fully.Index, false, 2)
+    err = t.doorOpenStatus(t.fully, false, 2)
     if err != nil {
         return
     }
@@ -284,35 +313,35 @@ func (t *task) run() {
     log.Infof("%s, 成功", t.steps[t.step].message)
 }
 
-func (t *task) doorOpen(index int) (err error) {
+func (t *task) doorOpen(target *ent.Bin) (err error) {
     params := []kaixin.ControlParam{
         {SignalData: kaixin.SignalData{
             ID:    kaixin.SignalCabinetControl,
             Value: kaixin.ControlOpenDoor,
-        }, DoorID: fmt.Sprintf("%d", index+1)},
+        }, DoorID: fmt.Sprintf("%d", target.Index+1)},
     }
-    err = kaixin.SendControl(t.sn, kaixin.ControlRequest{ParamList: params})
+    err = kaixin.SendControl(t.serial, kaixin.ControlRequest{ParamList: params})
     if err != nil {
         return
     }
 
-    return t.doorOpenStatus(index, true, 0)
+    return t.doorOpenStatus(target, true, 0)
 }
 
 // 死循环查询仓门状态
-// index: 检查的仓门index
+// target: 检查的仓位
 // status: 待检查的状态 true:开门 false:关门
 // battery: 是否检查电池放入状态 0不检查 1放入检查 2取出检查
-func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) {
+func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err error) {
     var (
         // 仓位信息
         item *ent.Bin
 
         // 步骤最长时间
-        maxtime float64 = 30 // TODO 测试使用30s超时
+        maxtime float64 = 120 // TODO 测试使用120s超时
 
         // 开始时间
-        start = time.Now()
+        startAt = time.Now()
 
         // 检测电池是否放入或取出时间
         batteryCheckMaxtime float64 = 15
@@ -321,23 +350,24 @@ func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) 
         statusTime time.Time
     )
 
-    // time.Sleep(3 * time.Second)
-    // return
+    fakevoltage, _ := core.Hub.Bean.GetEmptyFake()
 
     for {
-        // 超时
-        if time.Now().Sub(start).Seconds() > maxtime {
-            err = errs.ExchangeTimeOut
-            return
-        }
         // 10ms查询一次
         time.Sleep(10 * time.Millisecond)
 
-        // TODO: 缓存
-        item, err = ent.Database.Bin.Query().Where(bin.Serial(t.sn), bin.Index(index), bin.Enable(true)).First(context.Background())
+        // 超时
+        if time.Now().Sub(startAt).Seconds() > maxtime {
+            err = errs.ExchangeTimeOut
+            return
+        }
+
+        // TODO: 使用缓存
+        item, err = ent.Database.Bin.Query().Where(bin.UUID(target.UUID)).First(context.Background())
         if err != nil {
             return
         }
+
         // 检查成功
         if item.Open == status {
             if statusTime.IsZero() {
@@ -348,23 +378,25 @@ func (t *task) doorOpenStatus(index int, status bool, battery uint) (err error) 
             switch battery {
             case 1:
                 // 检查电池是否放入
-                if item.BatterySn == "" {
-                    // TODO: 重复弹开
-                    if time.Now().Sub(statusTime).Seconds() > batteryCheckMaxtime {
-                        err = errs.ExchangeBatteryLost
-                        // 返回错误
-                        return
-                    }
-                    // 未检测到电池, 继续轮询
-                    continue
+                if item.IsStrictHasBattery(fakevoltage) {
+                    // 检测到电池, 返回成功
+                    return
                 }
-                // 检测到电池, 返回成功
-                return
+
+                // TODO: 重复弹开
+                // 未检测到电池, 继续轮询
+                // 超时
+                if time.Now().Sub(statusTime).Seconds() > batteryCheckMaxtime {
+                    err = errs.ExchangeBatteryLost
+                    // 返回错误
+                    return
+                }
+                continue
             case 2:
                 // 检查电池是否取出
                 // TODO: 是否取走, 重复弹开
-                if item.BatterySn != "" {
-                    err = errs.ExchangeBatteryExist
+                if !item.IsStrictHasBattery(fakevoltage) {
+                    return errs.ExchangeBatteryExist
                 }
             }
             return

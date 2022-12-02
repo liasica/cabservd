@@ -32,34 +32,35 @@ const (
 // BinMutation represents an operation that mutates the Bin nodes in the graph.
 type BinMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uint64
-	created_at    *time.Time
-	updated_at    *time.Time
-	uuid          *string
-	brand         *string
-	serial        *string
-	lock          *bool
-	name          *string
-	index         *int
-	addindex      *int
-	open          *bool
-	enable        *bool
-	health        *bool
-	battery_sn    *string
-	voltage       *float64
-	addvoltage    *float64
-	current       *float64
-	addcurrent    *float64
-	soc           *float64
-	addsoc        *float64
-	soh           *float64
-	addsoh        *float64
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Bin, error)
-	predicates    []predicate.Bin
+	op             Op
+	typ            string
+	id             *uint64
+	created_at     *time.Time
+	updated_at     *time.Time
+	uuid           *string
+	brand          *string
+	serial         *string
+	lock           *bool
+	name           *string
+	index          *int
+	addindex       *int
+	open           *bool
+	enable         *bool
+	health         *bool
+	battery_exists *bool
+	battery_sn     *string
+	voltage        *float64
+	addvoltage     *float64
+	current        *float64
+	addcurrent     *float64
+	soc            *float64
+	addsoc         *float64
+	soh            *float64
+	addsoh         *float64
+	clearedFields  map[string]struct{}
+	done           bool
+	oldValue       func(context.Context) (*Bin, error)
+	predicates     []predicate.Bin
 }
 
 var _ ent.Mutation = (*BinMutation)(nil)
@@ -576,6 +577,42 @@ func (m *BinMutation) ResetHealth() {
 	m.health = nil
 }
 
+// SetBatteryExists sets the "battery_exists" field.
+func (m *BinMutation) SetBatteryExists(b bool) {
+	m.battery_exists = &b
+}
+
+// BatteryExists returns the value of the "battery_exists" field in the mutation.
+func (m *BinMutation) BatteryExists() (r bool, exists bool) {
+	v := m.battery_exists
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBatteryExists returns the old "battery_exists" field's value of the Bin entity.
+// If the Bin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BinMutation) OldBatteryExists(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBatteryExists is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBatteryExists requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBatteryExists: %w", err)
+	}
+	return oldValue.BatteryExists, nil
+}
+
+// ResetBatteryExists resets all changes to the "battery_exists" field.
+func (m *BinMutation) ResetBatteryExists() {
+	m.battery_exists = nil
+}
+
 // SetBatterySn sets the "battery_sn" field.
 func (m *BinMutation) SetBatterySn(s string) {
 	m.battery_sn = &s
@@ -855,7 +892,7 @@ func (m *BinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BinMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, bin.FieldCreatedAt)
 	}
@@ -888,6 +925,9 @@ func (m *BinMutation) Fields() []string {
 	}
 	if m.health != nil {
 		fields = append(fields, bin.FieldHealth)
+	}
+	if m.battery_exists != nil {
+		fields = append(fields, bin.FieldBatteryExists)
 	}
 	if m.battery_sn != nil {
 		fields = append(fields, bin.FieldBatterySn)
@@ -934,6 +974,8 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.Enable()
 	case bin.FieldHealth:
 		return m.Health()
+	case bin.FieldBatteryExists:
+		return m.BatteryExists()
 	case bin.FieldBatterySn:
 		return m.BatterySn()
 	case bin.FieldVoltage:
@@ -975,6 +1017,8 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldEnable(ctx)
 	case bin.FieldHealth:
 		return m.OldHealth(ctx)
+	case bin.FieldBatteryExists:
+		return m.OldBatteryExists(ctx)
 	case bin.FieldBatterySn:
 		return m.OldBatterySn(ctx)
 	case bin.FieldVoltage:
@@ -1070,6 +1114,13 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetHealth(v)
+		return nil
+	case bin.FieldBatteryExists:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBatteryExists(v)
 		return nil
 	case bin.FieldBatterySn:
 		v, ok := value.(string)
@@ -1251,6 +1302,9 @@ func (m *BinMutation) ResetField(name string) error {
 	case bin.FieldHealth:
 		m.ResetHealth()
 		return nil
+	case bin.FieldBatteryExists:
+		m.ResetBatteryExists()
+		return nil
 	case bin.FieldBatterySn:
 		m.ResetBatterySn()
 		return nil
@@ -1326,6 +1380,7 @@ type CabinetMutation struct {
 	id             *uint64
 	created_at     *time.Time
 	updated_at     *time.Time
+	online         *bool
 	brand          *string
 	serial         *string
 	status         *cabinet.Status
@@ -1518,6 +1573,42 @@ func (m *CabinetMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err er
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *CabinetMutation) ResetUpdatedAt() {
 	m.updated_at = nil
+}
+
+// SetOnline sets the "online" field.
+func (m *CabinetMutation) SetOnline(b bool) {
+	m.online = &b
+}
+
+// Online returns the value of the "online" field in the mutation.
+func (m *CabinetMutation) Online() (r bool, exists bool) {
+	v := m.online
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOnline returns the old "online" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldOnline(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOnline is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOnline requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOnline: %w", err)
+	}
+	return oldValue.Online, nil
+}
+
+// ResetOnline resets all changes to the "online" field.
+func (m *CabinetMutation) ResetOnline() {
+	m.online = nil
 }
 
 // SetBrand sets the "brand" field.
@@ -2173,12 +2264,15 @@ func (m *CabinetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CabinetMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, cabinet.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, cabinet.FieldUpdatedAt)
+	}
+	if m.online != nil {
+		fields = append(fields, cabinet.FieldOnline)
 	}
 	if m.brand != nil {
 		fields = append(fields, cabinet.FieldBrand)
@@ -2225,6 +2319,8 @@ func (m *CabinetMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case cabinet.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case cabinet.FieldOnline:
+		return m.Online()
 	case cabinet.FieldBrand:
 		return m.Brand()
 	case cabinet.FieldSerial:
@@ -2260,6 +2356,8 @@ func (m *CabinetMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldCreatedAt(ctx)
 	case cabinet.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case cabinet.FieldOnline:
+		return m.OldOnline(ctx)
 	case cabinet.FieldBrand:
 		return m.OldBrand(ctx)
 	case cabinet.FieldSerial:
@@ -2304,6 +2402,13 @@ func (m *CabinetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case cabinet.FieldOnline:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOnline(v)
 		return nil
 	case cabinet.FieldBrand:
 		v, ok := value.(string)
@@ -2568,6 +2673,9 @@ func (m *CabinetMutation) ResetField(name string) error {
 		return nil
 	case cabinet.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case cabinet.FieldOnline:
+		m.ResetOnline()
 		return nil
 	case cabinet.FieldBrand:
 		m.ResetBrand()

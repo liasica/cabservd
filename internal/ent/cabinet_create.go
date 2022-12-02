@@ -50,6 +50,20 @@ func (cc *CabinetCreate) SetNillableUpdatedAt(t *time.Time) *CabinetCreate {
 	return cc
 }
 
+// SetOnline sets the "online" field.
+func (cc *CabinetCreate) SetOnline(b bool) *CabinetCreate {
+	cc.mutation.SetOnline(b)
+	return cc
+}
+
+// SetNillableOnline sets the "online" field if the given value is not nil.
+func (cc *CabinetCreate) SetNillableOnline(b *bool) *CabinetCreate {
+	if b != nil {
+		cc.SetOnline(*b)
+	}
+	return cc
+}
+
 // SetBrand sets the "brand" field.
 func (cc *CabinetCreate) SetBrand(s string) *CabinetCreate {
 	cc.mutation.SetBrand(s)
@@ -273,6 +287,10 @@ func (cc *CabinetCreate) defaults() {
 		v := cabinet.DefaultUpdatedAt()
 		cc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := cc.mutation.Online(); !ok {
+		v := cabinet.DefaultOnline
+		cc.mutation.SetOnline(v)
+	}
 	if _, ok := cc.mutation.Status(); !ok {
 		v := cabinet.DefaultStatus
 		cc.mutation.SetStatus(v)
@@ -290,6 +308,9 @@ func (cc *CabinetCreate) check() error {
 	}
 	if _, ok := cc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Cabinet.updated_at"`)}
+	}
+	if _, ok := cc.mutation.Online(); !ok {
+		return &ValidationError{Name: "online", err: errors.New(`ent: missing required field "Cabinet.online"`)}
 	}
 	if _, ok := cc.mutation.Brand(); !ok {
 		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "Cabinet.brand"`)}
@@ -343,6 +364,10 @@ func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.UpdatedAt(); ok {
 		_spec.SetField(cabinet.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := cc.mutation.Online(); ok {
+		_spec.SetField(cabinet.FieldOnline, field.TypeBool, value)
+		_node.Online = value
 	}
 	if value, ok := cc.mutation.Brand(); ok {
 		_spec.SetField(cabinet.FieldBrand, field.TypeString, value)
@@ -449,6 +474,18 @@ func (u *CabinetUpsert) SetUpdatedAt(v time.Time) *CabinetUpsert {
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
 func (u *CabinetUpsert) UpdateUpdatedAt() *CabinetUpsert {
 	u.SetExcluded(cabinet.FieldUpdatedAt)
+	return u
+}
+
+// SetOnline sets the "online" field.
+func (u *CabinetUpsert) SetOnline(v bool) *CabinetUpsert {
+	u.Set(cabinet.FieldOnline, v)
+	return u
+}
+
+// UpdateOnline sets the "online" field to the value that was provided on create.
+func (u *CabinetUpsert) UpdateOnline() *CabinetUpsert {
+	u.SetExcluded(cabinet.FieldOnline)
 	return u
 }
 
@@ -724,6 +761,20 @@ func (u *CabinetUpsertOne) SetUpdatedAt(v time.Time) *CabinetUpsertOne {
 func (u *CabinetUpsertOne) UpdateUpdatedAt() *CabinetUpsertOne {
 	return u.Update(func(s *CabinetUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetOnline sets the "online" field.
+func (u *CabinetUpsertOne) SetOnline(v bool) *CabinetUpsertOne {
+	return u.Update(func(s *CabinetUpsert) {
+		s.SetOnline(v)
+	})
+}
+
+// UpdateOnline sets the "online" field to the value that was provided on create.
+func (u *CabinetUpsertOne) UpdateOnline() *CabinetUpsertOne {
+	return u.Update(func(s *CabinetUpsert) {
+		s.UpdateOnline()
 	})
 }
 
@@ -1012,6 +1063,14 @@ func (u *CabinetUpsertOne) IDX(ctx context.Context) uint64 {
 	return id
 }
 
+// Save creates the Cabinet in the database.
+func (u *CabinetUpsertOne) Save(ctx context.Context) (*Cabinet, error) {
+	if len(u.create.conflict) == 0 {
+		return nil, errors.New("ent: missing options for CabinetCreate.OnConflict")
+	}
+	return u.create.Save(ctx)
+}
+
 // CabinetCreateBulk is the builder for creating many Cabinet entities in bulk.
 type CabinetCreateBulk struct {
 	config
@@ -1197,6 +1256,20 @@ func (u *CabinetUpsertBulk) SetUpdatedAt(v time.Time) *CabinetUpsertBulk {
 func (u *CabinetUpsertBulk) UpdateUpdatedAt() *CabinetUpsertBulk {
 	return u.Update(func(s *CabinetUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetOnline sets the "online" field.
+func (u *CabinetUpsertBulk) SetOnline(v bool) *CabinetUpsertBulk {
+	return u.Update(func(s *CabinetUpsert) {
+		s.SetOnline(v)
+	})
+}
+
+// UpdateOnline sets the "online" field to the value that was provided on create.
+func (u *CabinetUpsertBulk) UpdateOnline() *CabinetUpsertBulk {
+	return u.Update(func(s *CabinetUpsert) {
+		s.UpdateOnline()
 	})
 }
 

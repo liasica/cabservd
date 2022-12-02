@@ -26,14 +26,14 @@ type hub struct {
     brand string
 
     // 电柜协议
-    bean Hook
+    Bean Hook
 
     // 编码协议
     codec Codec
 
     // 在线的客户端
-    // *Client => deviceID
-    // deviceID 在初次连接的时候为空, 当登录成功后是设备的唯一编码
+    // *Client => serial
+    // serial 在初次连接的时候为空, 当登录成功后是设备的唯一编码
     clients sync.Map
 
     // 客户端发起连接
@@ -67,6 +67,7 @@ func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
     client, ok := c.Context().(*Client)
     // 删除客户端
     if ok {
+        client.Close()
         h.clients.Delete(client)
     }
     return
@@ -113,7 +114,7 @@ func (h *hub) handleMessage(b []byte, client *Client) {
 
     // 解析
     // TODO 未知的 Client
-    err := h.bean.OnMessage(b, client)
+    err := h.Bean.OnMessage(b, client)
     if err != nil {
         log.Errorf("[FD=%d / %s] 解析失败, err: %v, 原始消息: %s", client.Fd(), client.RemoteAddr(), err, b)
     }

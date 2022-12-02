@@ -23,6 +23,7 @@ var (
 		{Name: "open", Type: field.TypeBool, Default: false},
 		{Name: "enable", Type: field.TypeBool, Default: true},
 		{Name: "health", Type: field.TypeBool, Default: true},
+		{Name: "battery_exists", Type: field.TypeBool, Default: false},
 		{Name: "battery_sn", Type: field.TypeString, Default: ""},
 		{Name: "voltage", Type: field.TypeFloat64, Default: 0},
 		{Name: "current", Type: field.TypeFloat64, Default: 0},
@@ -46,6 +47,11 @@ var (
 				Columns: []*schema.Column{BinColumns[5], BinColumns[4]},
 			},
 			{
+				Name:    "bin_battery_exists",
+				Unique:  false,
+				Columns: []*schema.Column{BinColumns[12]},
+			},
+			{
 				Name:    "bin_index",
 				Unique:  false,
 				Columns: []*schema.Column{BinColumns[8]},
@@ -53,12 +59,12 @@ var (
 			{
 				Name:    "bin_battery_sn",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[12]},
+				Columns: []*schema.Column{BinColumns[13]},
 			},
 			{
 				Name:    "bin_soc",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[15]},
+				Columns: []*schema.Column{BinColumns[16]},
 			},
 		},
 	}
@@ -67,9 +73,10 @@ var (
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "online", Type: field.TypeBool, Default: false},
 		{Name: "brand", Type: field.TypeString},
 		{Name: "serial", Type: field.TypeString, Unique: true},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"poweron", "idle", "busy", "abnormal"}, Default: "poweron"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"initializing", "idle", "busy", "abnormal"}, Default: "initializing"},
 		{Name: "enable", Type: field.TypeBool, Default: false},
 		{Name: "lng", Type: field.TypeFloat64, Nullable: true},
 		{Name: "lat", Type: field.TypeFloat64, Nullable: true},
@@ -93,27 +100,27 @@ var (
 			{
 				Name:    "cabinet_brand",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[3]},
+				Columns: []*schema.Column{CabinetColumns[4]},
 			},
 			{
 				Name:    "cabinet_status",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[5]},
+				Columns: []*schema.Column{CabinetColumns[6]},
 			},
 			{
 				Name:    "cabinet_enable",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[6]},
+				Columns: []*schema.Column{CabinetColumns[7]},
 			},
 			{
 				Name:    "cabinet_lng",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[7]},
+				Columns: []*schema.Column{CabinetColumns[8]},
 			},
 			{
 				Name:    "cabinet_lat",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[8]},
+				Columns: []*schema.Column{CabinetColumns[9]},
 			},
 		},
 	}

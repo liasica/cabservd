@@ -38,6 +38,8 @@ type Bin struct {
 	Enable bool `json:"enable,omitempty"`
 	// 仓位是否健康
 	Health bool `json:"health,omitempty"`
+	// 是否有电池
+	BatteryExists bool `json:"battery_exists,omitempty"`
 	// 电池序列号
 	BatterySn string `json:"battery_sn,omitempty"`
 	// 当前电压
@@ -55,7 +57,7 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case bin.FieldLock, bin.FieldOpen, bin.FieldEnable, bin.FieldHealth:
+		case bin.FieldLock, bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists:
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
@@ -152,6 +154,12 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.Health = value.Bool
 			}
+		case bin.FieldBatteryExists:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field battery_exists", values[i])
+			} else if value.Valid {
+				b.BatteryExists = value.Bool
+			}
 		case bin.FieldBatterySn:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field battery_sn", values[i])
@@ -242,6 +250,9 @@ func (b *Bin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("health=")
 	builder.WriteString(fmt.Sprintf("%v", b.Health))
+	builder.WriteString(", ")
+	builder.WriteString("battery_exists=")
+	builder.WriteString(fmt.Sprintf("%v", b.BatteryExists))
 	builder.WriteString(", ")
 	builder.WriteString("battery_sn=")
 	builder.WriteString(b.BatterySn)

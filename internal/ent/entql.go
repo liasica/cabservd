@@ -26,22 +26,23 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Bin",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			bin.FieldCreatedAt: {Type: field.TypeTime, Column: bin.FieldCreatedAt},
-			bin.FieldUpdatedAt: {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
-			bin.FieldUUID:      {Type: field.TypeString, Column: bin.FieldUUID},
-			bin.FieldBrand:     {Type: field.TypeString, Column: bin.FieldBrand},
-			bin.FieldSerial:    {Type: field.TypeString, Column: bin.FieldSerial},
-			bin.FieldLock:      {Type: field.TypeBool, Column: bin.FieldLock},
-			bin.FieldName:      {Type: field.TypeString, Column: bin.FieldName},
-			bin.FieldIndex:     {Type: field.TypeInt, Column: bin.FieldIndex},
-			bin.FieldOpen:      {Type: field.TypeBool, Column: bin.FieldOpen},
-			bin.FieldEnable:    {Type: field.TypeBool, Column: bin.FieldEnable},
-			bin.FieldHealth:    {Type: field.TypeBool, Column: bin.FieldHealth},
-			bin.FieldBatterySn: {Type: field.TypeString, Column: bin.FieldBatterySn},
-			bin.FieldVoltage:   {Type: field.TypeFloat64, Column: bin.FieldVoltage},
-			bin.FieldCurrent:   {Type: field.TypeFloat64, Column: bin.FieldCurrent},
-			bin.FieldSoc:       {Type: field.TypeFloat64, Column: bin.FieldSoc},
-			bin.FieldSoh:       {Type: field.TypeFloat64, Column: bin.FieldSoh},
+			bin.FieldCreatedAt:     {Type: field.TypeTime, Column: bin.FieldCreatedAt},
+			bin.FieldUpdatedAt:     {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
+			bin.FieldUUID:          {Type: field.TypeString, Column: bin.FieldUUID},
+			bin.FieldBrand:         {Type: field.TypeString, Column: bin.FieldBrand},
+			bin.FieldSerial:        {Type: field.TypeString, Column: bin.FieldSerial},
+			bin.FieldLock:          {Type: field.TypeBool, Column: bin.FieldLock},
+			bin.FieldName:          {Type: field.TypeString, Column: bin.FieldName},
+			bin.FieldIndex:         {Type: field.TypeInt, Column: bin.FieldIndex},
+			bin.FieldOpen:          {Type: field.TypeBool, Column: bin.FieldOpen},
+			bin.FieldEnable:        {Type: field.TypeBool, Column: bin.FieldEnable},
+			bin.FieldHealth:        {Type: field.TypeBool, Column: bin.FieldHealth},
+			bin.FieldBatteryExists: {Type: field.TypeBool, Column: bin.FieldBatteryExists},
+			bin.FieldBatterySn:     {Type: field.TypeString, Column: bin.FieldBatterySn},
+			bin.FieldVoltage:       {Type: field.TypeFloat64, Column: bin.FieldVoltage},
+			bin.FieldCurrent:       {Type: field.TypeFloat64, Column: bin.FieldCurrent},
+			bin.FieldSoc:           {Type: field.TypeFloat64, Column: bin.FieldSoc},
+			bin.FieldSoh:           {Type: field.TypeFloat64, Column: bin.FieldSoh},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
@@ -57,6 +58,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			cabinet.FieldCreatedAt:   {Type: field.TypeTime, Column: cabinet.FieldCreatedAt},
 			cabinet.FieldUpdatedAt:   {Type: field.TypeTime, Column: cabinet.FieldUpdatedAt},
+			cabinet.FieldOnline:      {Type: field.TypeBool, Column: cabinet.FieldOnline},
 			cabinet.FieldBrand:       {Type: field.TypeString, Column: cabinet.FieldBrand},
 			cabinet.FieldSerial:      {Type: field.TypeString, Column: cabinet.FieldSerial},
 			cabinet.FieldStatus:      {Type: field.TypeEnum, Column: cabinet.FieldStatus},
@@ -174,6 +176,11 @@ func (f *BinFilter) WhereHealth(p entql.BoolP) {
 	f.Where(p.Field(bin.FieldHealth))
 }
 
+// WhereBatteryExists applies the entql bool predicate on the battery_exists field.
+func (f *BinFilter) WhereBatteryExists(p entql.BoolP) {
+	f.Where(p.Field(bin.FieldBatteryExists))
+}
+
 // WhereBatterySn applies the entql string predicate on the battery_sn field.
 func (f *BinFilter) WhereBatterySn(p entql.StringP) {
 	f.Where(p.Field(bin.FieldBatterySn))
@@ -247,6 +254,11 @@ func (f *CabinetFilter) WhereCreatedAt(p entql.TimeP) {
 // WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
 func (f *CabinetFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(cabinet.FieldUpdatedAt))
+}
+
+// WhereOnline applies the entql bool predicate on the online field.
+func (f *CabinetFilter) WhereOnline(p entql.BoolP) {
+	f.Where(p.Field(cabinet.FieldOnline))
 }
 
 // WhereBrand applies the entql string predicate on the brand field.

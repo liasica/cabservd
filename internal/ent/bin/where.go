@@ -157,6 +157,13 @@ func Health(v bool) predicate.Bin {
 	})
 }
 
+// BatteryExists applies equality check predicate on the "battery_exists" field. It's identical to BatteryExistsEQ.
+func BatteryExists(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldBatteryExists), v))
+	})
+}
+
 // BatterySn applies equality check predicate on the "battery_sn" field. It's identical to BatterySnEQ.
 func BatterySn(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
@@ -833,6 +840,20 @@ func HealthEQ(v bool) predicate.Bin {
 func HealthNEQ(v bool) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldHealth), v))
+	})
+}
+
+// BatteryExistsEQ applies the EQ predicate on the "battery_exists" field.
+func BatteryExistsEQ(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldBatteryExists), v))
+	})
+}
+
+// BatteryExistsNEQ applies the NEQ predicate on the "battery_exists" field.
+func BatteryExistsNEQ(v bool) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldBatteryExists), v))
 	})
 }
 

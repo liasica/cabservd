@@ -39,6 +39,11 @@ func SaveCabinetContext(ctx context.Context, brand, serial string, item ent.Cabi
         SetSerial(serial).
         OnConflictColumns(cabinet.FieldSerial).
         Update(func(u *ent.CabinetUpsert) {
+            // 在线
+            if item.Online != nil {
+                u.SetOnline(*item.Online)
+            }
+
             // 状态
             if item.Status != nil {
                 u.SetStatus(*item.Status)
@@ -121,15 +126,6 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
                     u.SetEnable(*item.Enable)
                 }
 
-                // 电池编号
-                if item.BatterySn != nil {
-                    fmt.Printf("%s battery:->%v\n", name, *item.BatterySn)
-                    u.SetBatterySn(*item.BatterySn)
-                    if *item.BatterySn == "" {
-                        u.ResetBattery()
-                    }
-                }
-
                 // 电压
                 if item.Voltage != nil {
                     u.SetVoltage(*item.Voltage)
@@ -148,6 +144,21 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
                 // 健康
                 if item.Soh != nil {
                     u.SetSoh(*item.Soh)
+                }
+
+                // 电池编号
+                if item.BatterySn != nil {
+                    fmt.Printf("%s battery:->%v\n", name, *item.BatterySn)
+                    u.SetBatterySn(*item.BatterySn)
+                }
+
+                // 电池在位
+                if item.BatteryExists != nil {
+                    u.SetBatteryExists(*item.BatteryExists)
+                    // TODO 电池不在位是否清除电池信息
+                    // if !*item.BatteryExists {
+                    //     u.ResetBattery()
+                    // }
                 }
             }).
             UpdateUUID().

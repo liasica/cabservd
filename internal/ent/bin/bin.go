@@ -33,6 +33,8 @@ const (
 	FieldEnable = "enable"
 	// FieldHealth holds the string denoting the health field in the database.
 	FieldHealth = "health"
+	// FieldBatteryExists holds the string denoting the battery_exists field in the database.
+	FieldBatteryExists = "battery_exists"
 	// FieldBatterySn holds the string denoting the battery_sn field in the database.
 	FieldBatterySn = "battery_sn"
 	// FieldVoltage holds the string denoting the voltage field in the database.
@@ -61,6 +63,7 @@ var Columns = []string{
 	FieldOpen,
 	FieldEnable,
 	FieldHealth,
+	FieldBatteryExists,
 	FieldBatterySn,
 	FieldVoltage,
 	FieldCurrent,
@@ -95,6 +98,8 @@ var (
 	DefaultEnable bool
 	// DefaultHealth holds the default value on creation for the "health" field.
 	DefaultHealth bool
+	// DefaultBatteryExists holds the default value on creation for the "battery_exists" field.
+	DefaultBatteryExists bool
 	// DefaultBatterySn holds the default value on creation for the "battery_sn" field.
 	DefaultBatterySn string
 	// DefaultVoltage holds the default value on creation for the "voltage" field.

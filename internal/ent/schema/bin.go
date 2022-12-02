@@ -74,6 +74,7 @@ func (Bin) Fields() []ent.Field {
         field.Bool("health").Default(true).Comment("仓位是否健康"),
 
         // 电池信息
+        field.Bool("battery_exists").Default(false).Comment("是否有电池"),
         field.String("battery_sn").Default("").Comment("电池序列号"),
         field.Float("voltage").Default(0).Comment("当前电压"),
         field.Float("current").Default(0).Comment("当前电流"),
@@ -96,6 +97,7 @@ func (Bin) Mixin() []ent.Mixin {
 func (Bin) Indexes() []ent.Index {
     return []ent.Index{
         index.Fields("serial", "brand"),
+        index.Fields("battery_exists"),
         index.Fields("index"),
         index.Fields("battery_sn"),
         index.Fields("soc"),

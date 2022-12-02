@@ -12,9 +12,12 @@ var (
 
     ParamValidateFailed = errors.New("数据校验失败")
 
-    CabinetDeviceIDRequired  = errors.New("电柜序号不存在")
+    CabinetSerialRequired    = errors.New("电柜序号不存在")
     CabinetBinIndexRequired  = errors.New("仓位序号不存在")
     CabinetNotFound          = errors.New("电柜未找到")
+    CabinetOffline           = errors.New("电柜不在线")
+    CabinetInitializing      = errors.New("电柜初始化中")
+    CabinetAbnormal          = errors.New("电柜状态异常")
     CabinetClientNotFound    = errors.New("未找到在线电柜")
     CabinetNoFully           = errors.New("无可换电池")
     CabinetNoEmpty           = errors.New("无空仓位")

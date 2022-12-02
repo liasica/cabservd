@@ -20,10 +20,16 @@ func New() *Hander {
     return &Hander{}
 }
 
+// GetEmptyFake TODO 后续做在数据库中
+func (h *Hander) GetEmptyFake() (voltage, current float64) {
+    voltage = 40
+    current = 1
+    return
+}
+
 // OnMessage 解析消息
 func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     req := new(Request)
-    // err = req.UnmarshalBinary(b)
     err = jsoniter.Unmarshal(b, req)
     if err != nil {
         return
@@ -52,7 +58,7 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
 // LoginHandle 登录请求
 func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     if req.DevID == "" {
-        return errs.CabinetDeviceIDRequired
+        return errs.CabinetSerialRequired
     }
 
     // // 清除仓位电池信息
@@ -63,7 +69,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     // }
 
     // 保存设备识别码
-    client.SetDeviceID(req.DevID)
+    client.SetSerial(req.DevID)
 
     // TODO: 保存其他信息
     return
@@ -72,9 +78,9 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 // ReportHandle 状态上报请求
 func (h *Hander) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
-        return errs.CabinetDeviceIDRequired
+        return errs.CabinetSerialRequired
     }
-    core.UpdateCabinet(types.BrandKaixin, req.DevID, req.AttrList)
+    core.UpdateCabinet(types.BrandKaixin, req.DevID, req)
     return
 }
 

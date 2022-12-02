@@ -6,6 +6,9 @@
 package core
 
 import (
+    "context"
+    "github.com/auroraride/cabservd/internal/ent"
+    "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/errs"
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
@@ -17,6 +20,9 @@ type Client struct {
     gnet.Conn
 
     Hub *hub
+
+    // 电柜编号
+    Serial string
 
     // 消息代理
     receiver chan *MessageProxy
@@ -48,9 +54,10 @@ func (c *Client) run() {
     }
 }
 
-// SetDeviceID 设置deviceID
-func (c *Client) SetDeviceID(id string) {
-    c.Hub.clients.Store(c, id)
+// SetSerial 设置serial
+func (c *Client) SetSerial(serial string) {
+    c.Hub.clients.Store(c, serial)
+    c.Serial = serial
 }
 
 // SendMessage 向客户端发送消息
@@ -98,4 +105,11 @@ func GetClient(devId string) (c *Client, err error) {
         err = errs.CabinetClientNotFound
     }
     return
+}
+
+func (c *Client) Close() {
+    // 标记电柜为离线
+    if c.Serial != "" {
+        _ = ent.Database.Cabinet.Update().Where(cabinet.Serial(c.Serial)).SetOnline(false).Exec(context.Background())
+    }
 }
