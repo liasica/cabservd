@@ -95,7 +95,6 @@
             <th>名称</th>
             <th>开门</th>
             <th>启用</th>
-            <th>锁仓</th>
             <th>电池编码</th>
             <th>电压</th>
             <th>电流</th>
@@ -116,11 +115,6 @@
                 <td>
                     <span class="tag is-{{ if .Enable }}primary{{ else }}danger{{ end }}">
                         {{ if .Enable }} 启用 {{ else }} 禁用 {{ end }}
-                    </span>
-                </td>
-                <td>
-                    <span class="tag is-{{ if .Lock }}danger{{ else }}primary{{ end }}">
-                        {{ if .Lock }} 锁 {{ else }} - {{ end }}
                     </span>
                 </td>
                 <td>{{ .BatterySn }}</td>

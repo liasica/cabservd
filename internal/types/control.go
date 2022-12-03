@@ -14,8 +14,8 @@ const (
 )
 
 type ControlRequest struct {
-    Brand  string      `json:"brand" binding:"required"`  // 电柜品牌
-    Type   ControlType `json:"type" binding:"required"`   // 控制类型
-    Serial string      `json:"serial" binding:"required"` // 待控制的柜子编号
-    Index  *int        `json:"index" binding:"required"`  // 待控制的仓位index
+    Brand   string      `json:"brand" binding:"required"`   // 电柜品牌
+    Type    ControlType `json:"type" binding:"required"`    // 控制类型
+    Serial  string      `json:"serial" binding:"required"`  // 待控制的柜子编号
+    Ordinal *int        `json:"ordinal" binding:"required"` // 待控制的仓位index
 }

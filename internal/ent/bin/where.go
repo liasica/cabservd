@@ -115,13 +115,6 @@ func Serial(v string) predicate.Bin {
 	})
 }
 
-// Lock applies equality check predicate on the "lock" field. It's identical to LockEQ.
-func Lock(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLock), v))
-	})
-}
-
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
@@ -129,10 +122,10 @@ func Name(v string) predicate.Bin {
 	})
 }
 
-// Index applies equality check predicate on the "index" field. It's identical to IndexEQ.
-func Index(v int) predicate.Bin {
+// Ordinal applies equality check predicate on the "ordinal" field. It's identical to OrdinalEQ.
+func Ordinal(v int) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIndex), v))
+		s.Where(sql.EQ(s.C(FieldOrdinal), v))
 	})
 }
 
@@ -196,6 +189,13 @@ func Soc(v float64) predicate.Bin {
 func Soh(v float64) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
 		s.Where(sql.EQ(s.C(FieldSoh), v))
+	})
+}
+
+// Remark applies equality check predicate on the "remark" field. It's identical to RemarkEQ.
+func Remark(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRemark), v))
 	})
 }
 
@@ -624,20 +624,6 @@ func SerialContainsFold(v string) predicate.Bin {
 	})
 }
 
-// LockEQ applies the EQ predicate on the "lock" field.
-func LockEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldLock), v))
-	})
-}
-
-// LockNEQ applies the NEQ predicate on the "lock" field.
-func LockNEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldLock), v))
-	})
-}
-
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
@@ -737,67 +723,67 @@ func NameContainsFold(v string) predicate.Bin {
 	})
 }
 
-// IndexEQ applies the EQ predicate on the "index" field.
-func IndexEQ(v int) predicate.Bin {
+// OrdinalEQ applies the EQ predicate on the "ordinal" field.
+func OrdinalEQ(v int) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldIndex), v))
+		s.Where(sql.EQ(s.C(FieldOrdinal), v))
 	})
 }
 
-// IndexNEQ applies the NEQ predicate on the "index" field.
-func IndexNEQ(v int) predicate.Bin {
+// OrdinalNEQ applies the NEQ predicate on the "ordinal" field.
+func OrdinalNEQ(v int) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldIndex), v))
+		s.Where(sql.NEQ(s.C(FieldOrdinal), v))
 	})
 }
 
-// IndexIn applies the In predicate on the "index" field.
-func IndexIn(vs ...int) predicate.Bin {
+// OrdinalIn applies the In predicate on the "ordinal" field.
+func OrdinalIn(vs ...int) predicate.Bin {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldIndex), v...))
+		s.Where(sql.In(s.C(FieldOrdinal), v...))
 	})
 }
 
-// IndexNotIn applies the NotIn predicate on the "index" field.
-func IndexNotIn(vs ...int) predicate.Bin {
+// OrdinalNotIn applies the NotIn predicate on the "ordinal" field.
+func OrdinalNotIn(vs ...int) predicate.Bin {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = vs[i]
 	}
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldIndex), v...))
+		s.Where(sql.NotIn(s.C(FieldOrdinal), v...))
 	})
 }
 
-// IndexGT applies the GT predicate on the "index" field.
-func IndexGT(v int) predicate.Bin {
+// OrdinalGT applies the GT predicate on the "ordinal" field.
+func OrdinalGT(v int) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldIndex), v))
+		s.Where(sql.GT(s.C(FieldOrdinal), v))
 	})
 }
 
-// IndexGTE applies the GTE predicate on the "index" field.
-func IndexGTE(v int) predicate.Bin {
+// OrdinalGTE applies the GTE predicate on the "ordinal" field.
+func OrdinalGTE(v int) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldIndex), v))
+		s.Where(sql.GTE(s.C(FieldOrdinal), v))
 	})
 }
 
-// IndexLT applies the LT predicate on the "index" field.
-func IndexLT(v int) predicate.Bin {
+// OrdinalLT applies the LT predicate on the "ordinal" field.
+func OrdinalLT(v int) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldIndex), v))
+		s.Where(sql.LT(s.C(FieldOrdinal), v))
 	})
 }
 
-// IndexLTE applies the LTE predicate on the "index" field.
-func IndexLTE(v int) predicate.Bin {
+// OrdinalLTE applies the LTE predicate on the "ordinal" field.
+func OrdinalLTE(v int) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldIndex), v))
+		s.Where(sql.LTE(s.C(FieldOrdinal), v))
 	})
 }
 
@@ -1209,6 +1195,119 @@ func SohLT(v float64) predicate.Bin {
 func SohLTE(v float64) predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldSoh), v))
+	})
+}
+
+// RemarkEQ applies the EQ predicate on the "remark" field.
+func RemarkEQ(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkNEQ applies the NEQ predicate on the "remark" field.
+func RemarkNEQ(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkIn applies the In predicate on the "remark" field.
+func RemarkIn(vs ...string) predicate.Bin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldRemark), v...))
+	})
+}
+
+// RemarkNotIn applies the NotIn predicate on the "remark" field.
+func RemarkNotIn(vs ...string) predicate.Bin {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldRemark), v...))
+	})
+}
+
+// RemarkGT applies the GT predicate on the "remark" field.
+func RemarkGT(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkGTE applies the GTE predicate on the "remark" field.
+func RemarkGTE(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkLT applies the LT predicate on the "remark" field.
+func RemarkLT(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkLTE applies the LTE predicate on the "remark" field.
+func RemarkLTE(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkContains applies the Contains predicate on the "remark" field.
+func RemarkContains(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkHasPrefix applies the HasPrefix predicate on the "remark" field.
+func RemarkHasPrefix(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkHasSuffix applies the HasSuffix predicate on the "remark" field.
+func RemarkHasSuffix(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkIsNil applies the IsNil predicate on the "remark" field.
+func RemarkIsNil() predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldRemark)))
+	})
+}
+
+// RemarkNotNil applies the NotNil predicate on the "remark" field.
+func RemarkNotNil() predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldRemark)))
+	})
+}
+
+// RemarkEqualFold applies the EqualFold predicate on the "remark" field.
+func RemarkEqualFold(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldRemark), v))
+	})
+}
+
+// RemarkContainsFold applies the ContainsFold predicate on the "remark" field.
+func RemarkContainsFold(v string) predicate.Bin {
+	return predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldRemark), v))
 	})
 }
 

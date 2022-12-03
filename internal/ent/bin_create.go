@@ -68,29 +68,15 @@ func (bc *BinCreate) SetSerial(s string) *BinCreate {
 	return bc
 }
 
-// SetLock sets the "lock" field.
-func (bc *BinCreate) SetLock(b bool) *BinCreate {
-	bc.mutation.SetLock(b)
-	return bc
-}
-
-// SetNillableLock sets the "lock" field if the given value is not nil.
-func (bc *BinCreate) SetNillableLock(b *bool) *BinCreate {
-	if b != nil {
-		bc.SetLock(*b)
-	}
-	return bc
-}
-
 // SetName sets the "name" field.
 func (bc *BinCreate) SetName(s string) *BinCreate {
 	bc.mutation.SetName(s)
 	return bc
 }
 
-// SetIndex sets the "index" field.
-func (bc *BinCreate) SetIndex(i int) *BinCreate {
-	bc.mutation.SetIndex(i)
+// SetOrdinal sets the "ordinal" field.
+func (bc *BinCreate) SetOrdinal(i int) *BinCreate {
+	bc.mutation.SetOrdinal(i)
 	return bc
 }
 
@@ -220,6 +206,20 @@ func (bc *BinCreate) SetNillableSoh(f *float64) *BinCreate {
 	return bc
 }
 
+// SetRemark sets the "remark" field.
+func (bc *BinCreate) SetRemark(s string) *BinCreate {
+	bc.mutation.SetRemark(s)
+	return bc
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (bc *BinCreate) SetNillableRemark(s *string) *BinCreate {
+	if s != nil {
+		bc.SetRemark(*s)
+	}
+	return bc
+}
+
 // Mutation returns the BinMutation object of the builder.
 func (bc *BinCreate) Mutation() *BinMutation {
 	return bc.mutation
@@ -305,10 +305,6 @@ func (bc *BinCreate) defaults() {
 		v := bin.DefaultUpdatedAt()
 		bc.mutation.SetUpdatedAt(v)
 	}
-	if _, ok := bc.mutation.Lock(); !ok {
-		v := bin.DefaultLock
-		bc.mutation.SetLock(v)
-	}
 	if _, ok := bc.mutation.Open(); !ok {
 		v := bin.DefaultOpen
 		bc.mutation.SetOpen(v)
@@ -369,14 +365,11 @@ func (bc *BinCreate) check() error {
 	if _, ok := bc.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Bin.serial"`)}
 	}
-	if _, ok := bc.mutation.Lock(); !ok {
-		return &ValidationError{Name: "lock", err: errors.New(`ent: missing required field "Bin.lock"`)}
-	}
 	if _, ok := bc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Bin.name"`)}
 	}
-	if _, ok := bc.mutation.Index(); !ok {
-		return &ValidationError{Name: "index", err: errors.New(`ent: missing required field "Bin.index"`)}
+	if _, ok := bc.mutation.Ordinal(); !ok {
+		return &ValidationError{Name: "ordinal", err: errors.New(`ent: missing required field "Bin.ordinal"`)}
 	}
 	if _, ok := bc.mutation.Open(); !ok {
 		return &ValidationError{Name: "open", err: errors.New(`ent: missing required field "Bin.open"`)}
@@ -453,17 +446,13 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
 		_node.Serial = value
 	}
-	if value, ok := bc.mutation.Lock(); ok {
-		_spec.SetField(bin.FieldLock, field.TypeBool, value)
-		_node.Lock = value
-	}
 	if value, ok := bc.mutation.Name(); ok {
 		_spec.SetField(bin.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := bc.mutation.Index(); ok {
-		_spec.SetField(bin.FieldIndex, field.TypeInt, value)
-		_node.Index = value
+	if value, ok := bc.mutation.Ordinal(); ok {
+		_spec.SetField(bin.FieldOrdinal, field.TypeInt, value)
+		_node.Ordinal = value
 	}
 	if value, ok := bc.mutation.Open(); ok {
 		_spec.SetField(bin.FieldOpen, field.TypeBool, value)
@@ -500,6 +489,10 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Soh(); ok {
 		_spec.SetField(bin.FieldSoh, field.TypeFloat64, value)
 		_node.Soh = value
+	}
+	if value, ok := bc.mutation.Remark(); ok {
+		_spec.SetField(bin.FieldRemark, field.TypeString, value)
+		_node.Remark = &value
 	}
 	return _node, _spec
 }
@@ -601,18 +594,6 @@ func (u *BinUpsert) UpdateSerial() *BinUpsert {
 	return u
 }
 
-// SetLock sets the "lock" field.
-func (u *BinUpsert) SetLock(v bool) *BinUpsert {
-	u.Set(bin.FieldLock, v)
-	return u
-}
-
-// UpdateLock sets the "lock" field to the value that was provided on create.
-func (u *BinUpsert) UpdateLock() *BinUpsert {
-	u.SetExcluded(bin.FieldLock)
-	return u
-}
-
 // SetName sets the "name" field.
 func (u *BinUpsert) SetName(v string) *BinUpsert {
 	u.Set(bin.FieldName, v)
@@ -625,21 +606,21 @@ func (u *BinUpsert) UpdateName() *BinUpsert {
 	return u
 }
 
-// SetIndex sets the "index" field.
-func (u *BinUpsert) SetIndex(v int) *BinUpsert {
-	u.Set(bin.FieldIndex, v)
+// SetOrdinal sets the "ordinal" field.
+func (u *BinUpsert) SetOrdinal(v int) *BinUpsert {
+	u.Set(bin.FieldOrdinal, v)
 	return u
 }
 
-// UpdateIndex sets the "index" field to the value that was provided on create.
-func (u *BinUpsert) UpdateIndex() *BinUpsert {
-	u.SetExcluded(bin.FieldIndex)
+// UpdateOrdinal sets the "ordinal" field to the value that was provided on create.
+func (u *BinUpsert) UpdateOrdinal() *BinUpsert {
+	u.SetExcluded(bin.FieldOrdinal)
 	return u
 }
 
-// AddIndex adds v to the "index" field.
-func (u *BinUpsert) AddIndex(v int) *BinUpsert {
-	u.Add(bin.FieldIndex, v)
+// AddOrdinal adds v to the "ordinal" field.
+func (u *BinUpsert) AddOrdinal(v int) *BinUpsert {
+	u.Add(bin.FieldOrdinal, v)
 	return u
 }
 
@@ -775,6 +756,24 @@ func (u *BinUpsert) AddSoh(v float64) *BinUpsert {
 	return u
 }
 
+// SetRemark sets the "remark" field.
+func (u *BinUpsert) SetRemark(v string) *BinUpsert {
+	u.Set(bin.FieldRemark, v)
+	return u
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *BinUpsert) UpdateRemark() *BinUpsert {
+	u.SetExcluded(bin.FieldRemark)
+	return u
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *BinUpsert) ClearRemark() *BinUpsert {
+	u.SetNull(bin.FieldRemark)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -876,20 +875,6 @@ func (u *BinUpsertOne) UpdateSerial() *BinUpsertOne {
 	})
 }
 
-// SetLock sets the "lock" field.
-func (u *BinUpsertOne) SetLock(v bool) *BinUpsertOne {
-	return u.Update(func(s *BinUpsert) {
-		s.SetLock(v)
-	})
-}
-
-// UpdateLock sets the "lock" field to the value that was provided on create.
-func (u *BinUpsertOne) UpdateLock() *BinUpsertOne {
-	return u.Update(func(s *BinUpsert) {
-		s.UpdateLock()
-	})
-}
-
 // SetName sets the "name" field.
 func (u *BinUpsertOne) SetName(v string) *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
@@ -904,24 +889,24 @@ func (u *BinUpsertOne) UpdateName() *BinUpsertOne {
 	})
 }
 
-// SetIndex sets the "index" field.
-func (u *BinUpsertOne) SetIndex(v int) *BinUpsertOne {
+// SetOrdinal sets the "ordinal" field.
+func (u *BinUpsertOne) SetOrdinal(v int) *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
-		s.SetIndex(v)
+		s.SetOrdinal(v)
 	})
 }
 
-// AddIndex adds v to the "index" field.
-func (u *BinUpsertOne) AddIndex(v int) *BinUpsertOne {
+// AddOrdinal adds v to the "ordinal" field.
+func (u *BinUpsertOne) AddOrdinal(v int) *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
-		s.AddIndex(v)
+		s.AddOrdinal(v)
 	})
 }
 
-// UpdateIndex sets the "index" field to the value that was provided on create.
-func (u *BinUpsertOne) UpdateIndex() *BinUpsertOne {
+// UpdateOrdinal sets the "ordinal" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateOrdinal() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
-		s.UpdateIndex()
+		s.UpdateOrdinal()
 	})
 }
 
@@ -1076,6 +1061,27 @@ func (u *BinUpsertOne) AddSoh(v float64) *BinUpsertOne {
 func (u *BinUpsertOne) UpdateSoh() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateSoh()
+	})
+}
+
+// SetRemark sets the "remark" field.
+func (u *BinUpsertOne) SetRemark(v string) *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.SetRemark(v)
+	})
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateRemark() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateRemark()
+	})
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *BinUpsertOne) ClearRemark() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.ClearRemark()
 	})
 }
 
@@ -1350,20 +1356,6 @@ func (u *BinUpsertBulk) UpdateSerial() *BinUpsertBulk {
 	})
 }
 
-// SetLock sets the "lock" field.
-func (u *BinUpsertBulk) SetLock(v bool) *BinUpsertBulk {
-	return u.Update(func(s *BinUpsert) {
-		s.SetLock(v)
-	})
-}
-
-// UpdateLock sets the "lock" field to the value that was provided on create.
-func (u *BinUpsertBulk) UpdateLock() *BinUpsertBulk {
-	return u.Update(func(s *BinUpsert) {
-		s.UpdateLock()
-	})
-}
-
 // SetName sets the "name" field.
 func (u *BinUpsertBulk) SetName(v string) *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
@@ -1378,24 +1370,24 @@ func (u *BinUpsertBulk) UpdateName() *BinUpsertBulk {
 	})
 }
 
-// SetIndex sets the "index" field.
-func (u *BinUpsertBulk) SetIndex(v int) *BinUpsertBulk {
+// SetOrdinal sets the "ordinal" field.
+func (u *BinUpsertBulk) SetOrdinal(v int) *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
-		s.SetIndex(v)
+		s.SetOrdinal(v)
 	})
 }
 
-// AddIndex adds v to the "index" field.
-func (u *BinUpsertBulk) AddIndex(v int) *BinUpsertBulk {
+// AddOrdinal adds v to the "ordinal" field.
+func (u *BinUpsertBulk) AddOrdinal(v int) *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
-		s.AddIndex(v)
+		s.AddOrdinal(v)
 	})
 }
 
-// UpdateIndex sets the "index" field to the value that was provided on create.
-func (u *BinUpsertBulk) UpdateIndex() *BinUpsertBulk {
+// UpdateOrdinal sets the "ordinal" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateOrdinal() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
-		s.UpdateIndex()
+		s.UpdateOrdinal()
 	})
 }
 
@@ -1550,6 +1542,27 @@ func (u *BinUpsertBulk) AddSoh(v float64) *BinUpsertBulk {
 func (u *BinUpsertBulk) UpdateSoh() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateSoh()
+	})
+}
+
+// SetRemark sets the "remark" field.
+func (u *BinUpsertBulk) SetRemark(v string) *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.SetRemark(v)
+	})
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateRemark() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateRemark()
+	})
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *BinUpsertBulk) ClearRemark() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.ClearRemark()
 	})
 }
 

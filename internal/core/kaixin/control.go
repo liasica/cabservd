@@ -38,7 +38,7 @@ var (
     }
 )
 
-func (h *Hander) OnControl(serial string, typ types.ControlType, index int) error {
+func (h *Hander) OnControl(serial string, typ types.ControlType, ordinal int) error {
     v, ok := controlValueMap[typ]
     if !ok {
         return errs.CabinetControlParamError
@@ -50,7 +50,7 @@ func (h *Hander) OnControl(serial string, typ types.ControlType, index int) erro
                 ID:    SignalCabinetControl,
                 Value: v,
             },
-            DoorID: fmt.Sprintf("%d", index+1),
+            DoorID: fmt.Sprintf("%d", ordinal),
         }},
     }
     return SendControl(serial, req)

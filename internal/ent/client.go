@@ -12,9 +12,11 @@ import (
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/ent/console"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // Client is the client that holds all ent builders.
@@ -26,6 +28,8 @@ type Client struct {
 	Bin *BinClient
 	// Cabinet is the client for interacting with the Cabinet builders.
 	Cabinet *CabinetClient
+	// Console is the client for interacting with the Console builders.
+	Console *ConsoleClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -41,6 +45,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Bin = NewBinClient(c.config)
 	c.Cabinet = NewCabinetClient(c.config)
+	c.Console = NewConsoleClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -76,6 +81,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:  cfg,
 		Bin:     NewBinClient(cfg),
 		Cabinet: NewCabinetClient(cfg),
+		Console: NewConsoleClient(cfg),
 	}, nil
 }
 
@@ -97,6 +103,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:  cfg,
 		Bin:     NewBinClient(cfg),
 		Cabinet: NewCabinetClient(cfg),
+		Console: NewConsoleClient(cfg),
 	}, nil
 }
 
@@ -127,6 +134,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Bin.Use(hooks...)
 	c.Cabinet.Use(hooks...)
+	c.Console.Use(hooks...)
 }
 
 // BinClient is a client for the Bin schema.
@@ -307,4 +315,126 @@ func (c *CabinetClient) GetX(ctx context.Context, id uint64) *Cabinet {
 // Hooks returns the client hooks.
 func (c *CabinetClient) Hooks() []Hook {
 	return c.hooks.Cabinet
+}
+
+// ConsoleClient is a client for the Console schema.
+type ConsoleClient struct {
+	config
+}
+
+// NewConsoleClient returns a client for the Console from the given config.
+func NewConsoleClient(c config) *ConsoleClient {
+	return &ConsoleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `console.Hooks(f(g(h())))`.
+func (c *ConsoleClient) Use(hooks ...Hook) {
+	c.hooks.Console = append(c.hooks.Console, hooks...)
+}
+
+// Create returns a builder for creating a Console entity.
+func (c *ConsoleClient) Create() *ConsoleCreate {
+	mutation := newConsoleMutation(c.config, OpCreate)
+	return &ConsoleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Console entities.
+func (c *ConsoleClient) CreateBulk(builders ...*ConsoleCreate) *ConsoleCreateBulk {
+	return &ConsoleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Console.
+func (c *ConsoleClient) Update() *ConsoleUpdate {
+	mutation := newConsoleMutation(c.config, OpUpdate)
+	return &ConsoleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ConsoleClient) UpdateOne(co *Console) *ConsoleUpdateOne {
+	mutation := newConsoleMutation(c.config, OpUpdateOne, withConsole(co))
+	return &ConsoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ConsoleClient) UpdateOneID(id uint64) *ConsoleUpdateOne {
+	mutation := newConsoleMutation(c.config, OpUpdateOne, withConsoleID(id))
+	return &ConsoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Console.
+func (c *ConsoleClient) Delete() *ConsoleDelete {
+	mutation := newConsoleMutation(c.config, OpDelete)
+	return &ConsoleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ConsoleClient) DeleteOne(co *Console) *ConsoleDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ConsoleClient) DeleteOneID(id uint64) *ConsoleDeleteOne {
+	builder := c.Delete().Where(console.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ConsoleDeleteOne{builder}
+}
+
+// Query returns a query builder for Console.
+func (c *ConsoleClient) Query() *ConsoleQuery {
+	return &ConsoleQuery{
+		config: c.config,
+	}
+}
+
+// Get returns a Console entity by its id.
+func (c *ConsoleClient) Get(ctx context.Context, id uint64) (*Console, error) {
+	return c.Query().Where(console.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ConsoleClient) GetX(ctx context.Context, id uint64) *Console {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCabinet queries the cabinet edge of a Console.
+func (c *ConsoleClient) QueryCabinet(co *Console) *CabinetQuery {
+	query := &CabinetQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(console.Table, console.FieldID, id),
+			sqlgraph.To(cabinet.Table, cabinet.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, console.CabinetTable, console.CabinetColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryBin queries the bin edge of a Console.
+func (c *ConsoleClient) QueryBin(co *Console) *BinQuery {
+	query := &BinQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := co.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(console.Table, console.FieldID, id),
+			sqlgraph.To(bin.Table, bin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, console.BinTable, console.BinColumn),
+		)
+		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ConsoleClient) Hooks() []Hook {
+	return c.hooks.Console
 }

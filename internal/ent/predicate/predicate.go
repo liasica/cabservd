@@ -11,3 +11,6 @@ type Bin func(*sql.Selector)
 
 // Cabinet is the predicate function for cabinet builders.
 type Cabinet func(*sql.Selector)
+
+// Console is the predicate function for console builders.
+type Console func(*sql.Selector)

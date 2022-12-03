@@ -63,12 +63,9 @@ func (Bin) Fields() []ent.Field {
         field.String("brand").Comment("品牌"),
         field.String("serial").Comment("电柜设备序列号"),
 
-        // 操作记录
-        field.Bool("lock").Default(false).Comment("锁仓"),
-
         // 仓位信息
         field.String("name").Comment("仓位名称(N号仓)"),
-        field.Int("index").Comment("仓位序号(从0开始)"),
+        field.Int("ordinal").Comment("仓位序号(从1开始)"),
         field.Bool("open").Default(false).Comment("仓门是否开启"),
         field.Bool("enable").Default(true).Comment("仓位是否启用"),
         field.Bool("health").Default(true).Comment("仓位是否健康"),
@@ -80,6 +77,9 @@ func (Bin) Fields() []ent.Field {
         field.Float("current").Default(0).Comment("当前电流"),
         field.Float("soc").Default(0).Comment("电池电量"),
         field.Float("soh").Default(0).Comment("电池健康程度"),
+
+        // 操作信息
+        field.String("remark").Optional().Nillable().Comment("仓位备注"),
     }
 }
 
@@ -98,7 +98,7 @@ func (Bin) Indexes() []ent.Index {
     return []ent.Index{
         index.Fields("serial", "brand"),
         index.Fields("battery_exists"),
-        index.Fields("index"),
+        index.Fields("ordinal"),
         index.Fields("battery_sn"),
         index.Fields("soc"),
     }

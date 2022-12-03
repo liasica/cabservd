@@ -21,12 +21,10 @@ const (
 	FieldBrand = "brand"
 	// FieldSerial holds the string denoting the serial field in the database.
 	FieldSerial = "serial"
-	// FieldLock holds the string denoting the lock field in the database.
-	FieldLock = "lock"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldIndex holds the string denoting the index field in the database.
-	FieldIndex = "index"
+	// FieldOrdinal holds the string denoting the ordinal field in the database.
+	FieldOrdinal = "ordinal"
 	// FieldOpen holds the string denoting the open field in the database.
 	FieldOpen = "open"
 	// FieldEnable holds the string denoting the enable field in the database.
@@ -45,6 +43,8 @@ const (
 	FieldSoc = "soc"
 	// FieldSoh holds the string denoting the soh field in the database.
 	FieldSoh = "soh"
+	// FieldRemark holds the string denoting the remark field in the database.
+	FieldRemark = "remark"
 	// Table holds the table name of the bin in the database.
 	Table = "bin"
 )
@@ -57,9 +57,8 @@ var Columns = []string{
 	FieldUUID,
 	FieldBrand,
 	FieldSerial,
-	FieldLock,
 	FieldName,
-	FieldIndex,
+	FieldOrdinal,
 	FieldOpen,
 	FieldEnable,
 	FieldHealth,
@@ -69,6 +68,7 @@ var Columns = []string{
 	FieldCurrent,
 	FieldSoc,
 	FieldSoh,
+	FieldRemark,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -90,8 +90,6 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// UUIDValidator is a validator for the "uuid" field. It is called by the builders before save.
 	UUIDValidator func(string) error
-	// DefaultLock holds the default value on creation for the "lock" field.
-	DefaultLock bool
 	// DefaultOpen holds the default value on creation for the "open" field.
 	DefaultOpen bool
 	// DefaultEnable holds the default value on creation for the "enable" field.

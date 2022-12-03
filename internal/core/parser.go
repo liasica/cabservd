@@ -100,14 +100,14 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
         return
     }
     for _, item := range items {
-        uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Index))
-        name := fmt.Sprintf("%d号仓", *item.Index+1)
+        uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
+        name := fmt.Sprintf("%d号仓", *item.Ordinal)
         err := ent.Database.Bin.Create().
             SetUUID(uuid).
             SetBrand(brand).
             SetSerial(serial).
             SetName(name).
-            SetIndex(*item.Index).
+            SetOrdinal(*item.Ordinal).
             OnConflictColumns(bin.FieldUUID).
             Update(func(u *ent.BinUpsert) {
                 // 健康状态

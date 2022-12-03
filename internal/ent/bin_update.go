@@ -53,36 +53,22 @@ func (bu *BinUpdate) SetSerial(s string) *BinUpdate {
 	return bu
 }
 
-// SetLock sets the "lock" field.
-func (bu *BinUpdate) SetLock(b bool) *BinUpdate {
-	bu.mutation.SetLock(b)
-	return bu
-}
-
-// SetNillableLock sets the "lock" field if the given value is not nil.
-func (bu *BinUpdate) SetNillableLock(b *bool) *BinUpdate {
-	if b != nil {
-		bu.SetLock(*b)
-	}
-	return bu
-}
-
 // SetName sets the "name" field.
 func (bu *BinUpdate) SetName(s string) *BinUpdate {
 	bu.mutation.SetName(s)
 	return bu
 }
 
-// SetIndex sets the "index" field.
-func (bu *BinUpdate) SetIndex(i int) *BinUpdate {
-	bu.mutation.ResetIndex()
-	bu.mutation.SetIndex(i)
+// SetOrdinal sets the "ordinal" field.
+func (bu *BinUpdate) SetOrdinal(i int) *BinUpdate {
+	bu.mutation.ResetOrdinal()
+	bu.mutation.SetOrdinal(i)
 	return bu
 }
 
-// AddIndex adds i to the "index" field.
-func (bu *BinUpdate) AddIndex(i int) *BinUpdate {
-	bu.mutation.AddIndex(i)
+// AddOrdinal adds i to the "ordinal" field.
+func (bu *BinUpdate) AddOrdinal(i int) *BinUpdate {
+	bu.mutation.AddOrdinal(i)
 	return bu
 }
 
@@ -240,6 +226,26 @@ func (bu *BinUpdate) AddSoh(f float64) *BinUpdate {
 	return bu
 }
 
+// SetRemark sets the "remark" field.
+func (bu *BinUpdate) SetRemark(s string) *BinUpdate {
+	bu.mutation.SetRemark(s)
+	return bu
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (bu *BinUpdate) SetNillableRemark(s *string) *BinUpdate {
+	if s != nil {
+		bu.SetRemark(*s)
+	}
+	return bu
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (bu *BinUpdate) ClearRemark() *BinUpdate {
+	bu.mutation.ClearRemark()
+	return bu
+}
+
 // Mutation returns the BinMutation object of the builder.
 func (bu *BinUpdate) Mutation() *BinMutation {
 	return bu.mutation
@@ -360,17 +366,14 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
 	}
-	if value, ok := bu.mutation.Lock(); ok {
-		_spec.SetField(bin.FieldLock, field.TypeBool, value)
-	}
 	if value, ok := bu.mutation.Name(); ok {
 		_spec.SetField(bin.FieldName, field.TypeString, value)
 	}
-	if value, ok := bu.mutation.Index(); ok {
-		_spec.SetField(bin.FieldIndex, field.TypeInt, value)
+	if value, ok := bu.mutation.Ordinal(); ok {
+		_spec.SetField(bin.FieldOrdinal, field.TypeInt, value)
 	}
-	if value, ok := bu.mutation.AddedIndex(); ok {
-		_spec.AddField(bin.FieldIndex, field.TypeInt, value)
+	if value, ok := bu.mutation.AddedOrdinal(); ok {
+		_spec.AddField(bin.FieldOrdinal, field.TypeInt, value)
 	}
 	if value, ok := bu.mutation.Open(); ok {
 		_spec.SetField(bin.FieldOpen, field.TypeBool, value)
@@ -410,6 +413,12 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.AddedSoh(); ok {
 		_spec.AddField(bin.FieldSoh, field.TypeFloat64, value)
+	}
+	if value, ok := bu.mutation.Remark(); ok {
+		_spec.SetField(bin.FieldRemark, field.TypeString, value)
+	}
+	if bu.mutation.RemarkCleared() {
+		_spec.ClearField(bin.FieldRemark, field.TypeString)
 	}
 	_spec.AddModifiers(bu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, bu.driver, _spec); err != nil {
@@ -456,36 +465,22 @@ func (buo *BinUpdateOne) SetSerial(s string) *BinUpdateOne {
 	return buo
 }
 
-// SetLock sets the "lock" field.
-func (buo *BinUpdateOne) SetLock(b bool) *BinUpdateOne {
-	buo.mutation.SetLock(b)
-	return buo
-}
-
-// SetNillableLock sets the "lock" field if the given value is not nil.
-func (buo *BinUpdateOne) SetNillableLock(b *bool) *BinUpdateOne {
-	if b != nil {
-		buo.SetLock(*b)
-	}
-	return buo
-}
-
 // SetName sets the "name" field.
 func (buo *BinUpdateOne) SetName(s string) *BinUpdateOne {
 	buo.mutation.SetName(s)
 	return buo
 }
 
-// SetIndex sets the "index" field.
-func (buo *BinUpdateOne) SetIndex(i int) *BinUpdateOne {
-	buo.mutation.ResetIndex()
-	buo.mutation.SetIndex(i)
+// SetOrdinal sets the "ordinal" field.
+func (buo *BinUpdateOne) SetOrdinal(i int) *BinUpdateOne {
+	buo.mutation.ResetOrdinal()
+	buo.mutation.SetOrdinal(i)
 	return buo
 }
 
-// AddIndex adds i to the "index" field.
-func (buo *BinUpdateOne) AddIndex(i int) *BinUpdateOne {
-	buo.mutation.AddIndex(i)
+// AddOrdinal adds i to the "ordinal" field.
+func (buo *BinUpdateOne) AddOrdinal(i int) *BinUpdateOne {
+	buo.mutation.AddOrdinal(i)
 	return buo
 }
 
@@ -643,6 +638,26 @@ func (buo *BinUpdateOne) AddSoh(f float64) *BinUpdateOne {
 	return buo
 }
 
+// SetRemark sets the "remark" field.
+func (buo *BinUpdateOne) SetRemark(s string) *BinUpdateOne {
+	buo.mutation.SetRemark(s)
+	return buo
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (buo *BinUpdateOne) SetNillableRemark(s *string) *BinUpdateOne {
+	if s != nil {
+		buo.SetRemark(*s)
+	}
+	return buo
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (buo *BinUpdateOne) ClearRemark() *BinUpdateOne {
+	buo.mutation.ClearRemark()
+	return buo
+}
+
 // Mutation returns the BinMutation object of the builder.
 func (buo *BinUpdateOne) Mutation() *BinMutation {
 	return buo.mutation
@@ -793,17 +808,14 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	if value, ok := buo.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
 	}
-	if value, ok := buo.mutation.Lock(); ok {
-		_spec.SetField(bin.FieldLock, field.TypeBool, value)
-	}
 	if value, ok := buo.mutation.Name(); ok {
 		_spec.SetField(bin.FieldName, field.TypeString, value)
 	}
-	if value, ok := buo.mutation.Index(); ok {
-		_spec.SetField(bin.FieldIndex, field.TypeInt, value)
+	if value, ok := buo.mutation.Ordinal(); ok {
+		_spec.SetField(bin.FieldOrdinal, field.TypeInt, value)
 	}
-	if value, ok := buo.mutation.AddedIndex(); ok {
-		_spec.AddField(bin.FieldIndex, field.TypeInt, value)
+	if value, ok := buo.mutation.AddedOrdinal(); ok {
+		_spec.AddField(bin.FieldOrdinal, field.TypeInt, value)
 	}
 	if value, ok := buo.mutation.Open(); ok {
 		_spec.SetField(bin.FieldOpen, field.TypeBool, value)
@@ -843,6 +855,12 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if value, ok := buo.mutation.AddedSoh(); ok {
 		_spec.AddField(bin.FieldSoh, field.TypeFloat64, value)
+	}
+	if value, ok := buo.mutation.Remark(); ok {
+		_spec.SetField(bin.FieldRemark, field.TypeString, value)
+	}
+	if buo.mutation.RemarkCleared() {
+		_spec.ClearField(bin.FieldRemark, field.TypeString)
 	}
 	_spec.AddModifiers(buo.modifiers...)
 	_node = &Bin{config: buo.config}

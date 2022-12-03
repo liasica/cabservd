@@ -75,7 +75,7 @@ func (*demo) Exchange(c *gin.Context) {
     var items ent.Bins
     items, err = ent.Database.Bin.Query().
         Where(bin.Serial(req.SN)).
-        Order(ent.Asc(bin.FieldIndex)).
+        Order(ent.Asc(bin.FieldOrdinal)).
         All(context.Background())
 
     c.HTML(http.StatusOK, "demo/exchange.go.html", gin.H{
@@ -134,7 +134,7 @@ func (d *demo) Start(c *gin.Context) {
     // 获取仓位状态
     var items ent.Bins
     items, err = ent.Database.Bin.Query().
-        Where(bin.Serial(req.SN), bin.Enable(true), bin.Open(false), bin.Lock(false)).
+        Where(bin.Serial(req.SN), bin.Enable(true), bin.Open(false)).
         Order(ent.Desc(bin.FieldSoc)).
         All(context.Background())
 
@@ -318,7 +318,7 @@ func (t *task) doorOpen(target *ent.Bin) (err error) {
         {SignalData: kaixin.SignalData{
             ID:    kaixin.SignalCabinetControl,
             Value: kaixin.ControlOpenDoor,
-        }, DoorID: fmt.Sprintf("%d", target.Index+1)},
+        }, DoorID: fmt.Sprintf("%d", target.Ordinal)},
     }
     err = kaixin.SendControl(t.serial, kaixin.ControlRequest{ParamList: params})
     if err != nil {

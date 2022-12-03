@@ -11,13 +11,13 @@ import (
 )
 
 func (h *hub) Control(req *types.ControlRequest) (err error) {
-    if req.Index == nil {
-        return errs.CabinetBinIndexRequired
+    if req.Ordinal == nil {
+        return errs.CabinetBinOrdinalRequired
     }
 
     switch req.Brand {
     case types.BrandKaixin:
-        err = h.Bean.OnControl(req.Serial, req.Type, *req.Index)
+        err = h.Bean.OnControl(req.Serial, req.Type, *req.Ordinal)
     }
 
     return

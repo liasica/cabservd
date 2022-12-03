@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/ent/console"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -34,6 +35,7 @@ func columnChecker(table string) func(string) error {
 	checks := map[string]func(string) bool{
 		bin.Table:     bin.ValidColumn,
 		cabinet.Table: cabinet.ValidColumn,
+		console.Table: console.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

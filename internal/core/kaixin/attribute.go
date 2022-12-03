@@ -31,17 +31,19 @@ func (d SignalData) ValueString() (str string) {
     return
 }
 
-func (a *Attribute) GetDoorIndex() (index int, exists bool) {
+func (a *Attribute) GetOrdinal() (ordinal int, exists bool) {
     if a.DoorID == "" {
         return
     }
 
-    exists = true
-    id, err := strconv.Atoi(a.DoorID)
+    var err error
+    ordinal, err = strconv.Atoi(a.DoorID)
     if err != nil {
         log.Errorf("仓位解析失败")
+        return
     }
-    index = id - 1
+
+    exists = true
     return
 }
 
@@ -64,8 +66,8 @@ func (req ReportRequest) Bins() (items ent.BinPointers) {
         // 原始字符串值
         v := attr.ValueString()
 
-        // 获取仓位Index
-        index, exists := attr.GetDoorIndex()
+        // 获取仓位序号
+        ordinal, exists := attr.GetOrdinal()
         // 如果没有仓门信息, 直接跳过
         if !exists {
             continue
@@ -74,7 +76,7 @@ func (req ReportRequest) Bins() (items ent.BinPointers) {
         // 查询是否存在仓位信息
         bin, ok := m[attr.DoorID]
         if !ok {
-            bin = &ent.BinPointer{Index: silk.Int(index)}
+            bin = &ent.BinPointer{Ordinal: silk.Int(ordinal)}
             m[attr.DoorID] = bin
         }
 

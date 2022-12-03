@@ -11,7 +11,9 @@ import (
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
+	"github.com/auroraride/cabservd/internal/types"
 
 	"entgo.io/ent"
 )
@@ -27,6 +29,7 @@ const (
 	// Node types.
 	TypeBin     = "Bin"
 	TypeCabinet = "Cabinet"
+	TypeConsole = "Console"
 )
 
 // BinMutation represents an operation that mutates the Bin nodes in the graph.
@@ -40,10 +43,9 @@ type BinMutation struct {
 	uuid           *string
 	brand          *string
 	serial         *string
-	lock           *bool
 	name           *string
-	index          *int
-	addindex       *int
+	ordinal        *int
+	addordinal     *int
 	open           *bool
 	enable         *bool
 	health         *bool
@@ -57,6 +59,7 @@ type BinMutation struct {
 	addsoc         *float64
 	soh            *float64
 	addsoh         *float64
+	remark         *string
 	clearedFields  map[string]struct{}
 	done           bool
 	oldValue       func(context.Context) (*Bin, error)
@@ -341,42 +344,6 @@ func (m *BinMutation) ResetSerial() {
 	m.serial = nil
 }
 
-// SetLock sets the "lock" field.
-func (m *BinMutation) SetLock(b bool) {
-	m.lock = &b
-}
-
-// Lock returns the value of the "lock" field in the mutation.
-func (m *BinMutation) Lock() (r bool, exists bool) {
-	v := m.lock
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLock returns the old "lock" field's value of the Bin entity.
-// If the Bin object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BinMutation) OldLock(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLock is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLock requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLock: %w", err)
-	}
-	return oldValue.Lock, nil
-}
-
-// ResetLock resets all changes to the "lock" field.
-func (m *BinMutation) ResetLock() {
-	m.lock = nil
-}
-
 // SetName sets the "name" field.
 func (m *BinMutation) SetName(s string) {
 	m.name = &s
@@ -413,60 +380,60 @@ func (m *BinMutation) ResetName() {
 	m.name = nil
 }
 
-// SetIndex sets the "index" field.
-func (m *BinMutation) SetIndex(i int) {
-	m.index = &i
-	m.addindex = nil
+// SetOrdinal sets the "ordinal" field.
+func (m *BinMutation) SetOrdinal(i int) {
+	m.ordinal = &i
+	m.addordinal = nil
 }
 
-// Index returns the value of the "index" field in the mutation.
-func (m *BinMutation) Index() (r int, exists bool) {
-	v := m.index
+// Ordinal returns the value of the "ordinal" field in the mutation.
+func (m *BinMutation) Ordinal() (r int, exists bool) {
+	v := m.ordinal
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIndex returns the old "index" field's value of the Bin entity.
+// OldOrdinal returns the old "ordinal" field's value of the Bin entity.
 // If the Bin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BinMutation) OldIndex(ctx context.Context) (v int, err error) {
+func (m *BinMutation) OldOrdinal(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIndex is only allowed on UpdateOne operations")
+		return v, errors.New("OldOrdinal is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIndex requires an ID field in the mutation")
+		return v, errors.New("OldOrdinal requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIndex: %w", err)
+		return v, fmt.Errorf("querying old value for OldOrdinal: %w", err)
 	}
-	return oldValue.Index, nil
+	return oldValue.Ordinal, nil
 }
 
-// AddIndex adds i to the "index" field.
-func (m *BinMutation) AddIndex(i int) {
-	if m.addindex != nil {
-		*m.addindex += i
+// AddOrdinal adds i to the "ordinal" field.
+func (m *BinMutation) AddOrdinal(i int) {
+	if m.addordinal != nil {
+		*m.addordinal += i
 	} else {
-		m.addindex = &i
+		m.addordinal = &i
 	}
 }
 
-// AddedIndex returns the value that was added to the "index" field in this mutation.
-func (m *BinMutation) AddedIndex() (r int, exists bool) {
-	v := m.addindex
+// AddedOrdinal returns the value that was added to the "ordinal" field in this mutation.
+func (m *BinMutation) AddedOrdinal() (r int, exists bool) {
+	v := m.addordinal
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetIndex resets all changes to the "index" field.
-func (m *BinMutation) ResetIndex() {
-	m.index = nil
-	m.addindex = nil
+// ResetOrdinal resets all changes to the "ordinal" field.
+func (m *BinMutation) ResetOrdinal() {
+	m.ordinal = nil
+	m.addordinal = nil
 }
 
 // SetOpen sets the "open" field.
@@ -873,6 +840,55 @@ func (m *BinMutation) ResetSoh() {
 	m.addsoh = nil
 }
 
+// SetRemark sets the "remark" field.
+func (m *BinMutation) SetRemark(s string) {
+	m.remark = &s
+}
+
+// Remark returns the value of the "remark" field in the mutation.
+func (m *BinMutation) Remark() (r string, exists bool) {
+	v := m.remark
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemark returns the old "remark" field's value of the Bin entity.
+// If the Bin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BinMutation) OldRemark(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemark is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemark requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemark: %w", err)
+	}
+	return oldValue.Remark, nil
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (m *BinMutation) ClearRemark() {
+	m.remark = nil
+	m.clearedFields[bin.FieldRemark] = struct{}{}
+}
+
+// RemarkCleared returns if the "remark" field was cleared in this mutation.
+func (m *BinMutation) RemarkCleared() bool {
+	_, ok := m.clearedFields[bin.FieldRemark]
+	return ok
+}
+
+// ResetRemark resets all changes to the "remark" field.
+func (m *BinMutation) ResetRemark() {
+	m.remark = nil
+	delete(m.clearedFields, bin.FieldRemark)
+}
+
 // Where appends a list predicates to the BinMutation builder.
 func (m *BinMutation) Where(ps ...predicate.Bin) {
 	m.predicates = append(m.predicates, ps...)
@@ -908,14 +924,11 @@ func (m *BinMutation) Fields() []string {
 	if m.serial != nil {
 		fields = append(fields, bin.FieldSerial)
 	}
-	if m.lock != nil {
-		fields = append(fields, bin.FieldLock)
-	}
 	if m.name != nil {
 		fields = append(fields, bin.FieldName)
 	}
-	if m.index != nil {
-		fields = append(fields, bin.FieldIndex)
+	if m.ordinal != nil {
+		fields = append(fields, bin.FieldOrdinal)
 	}
 	if m.open != nil {
 		fields = append(fields, bin.FieldOpen)
@@ -944,6 +957,9 @@ func (m *BinMutation) Fields() []string {
 	if m.soh != nil {
 		fields = append(fields, bin.FieldSoh)
 	}
+	if m.remark != nil {
+		fields = append(fields, bin.FieldRemark)
+	}
 	return fields
 }
 
@@ -962,12 +978,10 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.Brand()
 	case bin.FieldSerial:
 		return m.Serial()
-	case bin.FieldLock:
-		return m.Lock()
 	case bin.FieldName:
 		return m.Name()
-	case bin.FieldIndex:
-		return m.Index()
+	case bin.FieldOrdinal:
+		return m.Ordinal()
 	case bin.FieldOpen:
 		return m.Open()
 	case bin.FieldEnable:
@@ -986,6 +1000,8 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.Soc()
 	case bin.FieldSoh:
 		return m.Soh()
+	case bin.FieldRemark:
+		return m.Remark()
 	}
 	return nil, false
 }
@@ -1005,12 +1021,10 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldBrand(ctx)
 	case bin.FieldSerial:
 		return m.OldSerial(ctx)
-	case bin.FieldLock:
-		return m.OldLock(ctx)
 	case bin.FieldName:
 		return m.OldName(ctx)
-	case bin.FieldIndex:
-		return m.OldIndex(ctx)
+	case bin.FieldOrdinal:
+		return m.OldOrdinal(ctx)
 	case bin.FieldOpen:
 		return m.OldOpen(ctx)
 	case bin.FieldEnable:
@@ -1029,6 +1043,8 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldSoc(ctx)
 	case bin.FieldSoh:
 		return m.OldSoh(ctx)
+	case bin.FieldRemark:
+		return m.OldRemark(ctx)
 	}
 	return nil, fmt.Errorf("unknown Bin field %s", name)
 }
@@ -1073,13 +1089,6 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSerial(v)
 		return nil
-	case bin.FieldLock:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLock(v)
-		return nil
 	case bin.FieldName:
 		v, ok := value.(string)
 		if !ok {
@@ -1087,12 +1096,12 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case bin.FieldIndex:
+	case bin.FieldOrdinal:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIndex(v)
+		m.SetOrdinal(v)
 		return nil
 	case bin.FieldOpen:
 		v, ok := value.(bool)
@@ -1157,6 +1166,13 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetSoh(v)
 		return nil
+	case bin.FieldRemark:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemark(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Bin field %s", name)
 }
@@ -1165,8 +1181,8 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *BinMutation) AddedFields() []string {
 	var fields []string
-	if m.addindex != nil {
-		fields = append(fields, bin.FieldIndex)
+	if m.addordinal != nil {
+		fields = append(fields, bin.FieldOrdinal)
 	}
 	if m.addvoltage != nil {
 		fields = append(fields, bin.FieldVoltage)
@@ -1188,8 +1204,8 @@ func (m *BinMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *BinMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case bin.FieldIndex:
-		return m.AddedIndex()
+	case bin.FieldOrdinal:
+		return m.AddedOrdinal()
 	case bin.FieldVoltage:
 		return m.AddedVoltage()
 	case bin.FieldCurrent:
@@ -1207,12 +1223,12 @@ func (m *BinMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *BinMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case bin.FieldIndex:
+	case bin.FieldOrdinal:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.AddIndex(v)
+		m.AddOrdinal(v)
 		return nil
 	case bin.FieldVoltage:
 		v, ok := value.(float64)
@@ -1249,7 +1265,11 @@ func (m *BinMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *BinMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(bin.FieldRemark) {
+		fields = append(fields, bin.FieldRemark)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1262,6 +1282,11 @@ func (m *BinMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *BinMutation) ClearField(name string) error {
+	switch name {
+	case bin.FieldRemark:
+		m.ClearRemark()
+		return nil
+	}
 	return fmt.Errorf("unknown Bin nullable field %s", name)
 }
 
@@ -1284,14 +1309,11 @@ func (m *BinMutation) ResetField(name string) error {
 	case bin.FieldSerial:
 		m.ResetSerial()
 		return nil
-	case bin.FieldLock:
-		m.ResetLock()
-		return nil
 	case bin.FieldName:
 		m.ResetName()
 		return nil
-	case bin.FieldIndex:
-		m.ResetIndex()
+	case bin.FieldOrdinal:
+		m.ResetOrdinal()
 		return nil
 	case bin.FieldOpen:
 		m.ResetOpen()
@@ -1319,6 +1341,9 @@ func (m *BinMutation) ResetField(name string) error {
 		return nil
 	case bin.FieldSoh:
 		m.ResetSoh()
+		return nil
+	case bin.FieldRemark:
+		m.ResetRemark()
 		return nil
 	}
 	return fmt.Errorf("unknown Bin field %s", name)
@@ -2760,4 +2785,1195 @@ func (m *CabinetMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *CabinetMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Cabinet edge %s", name)
+}
+
+// ConsoleMutation represents an operation that mutates the Console nodes in the graph.
+type ConsoleMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *uint64
+	_type          *console.Type
+	user_id        *uint64
+	adduser_id     *int64
+	user_type      *console.UserType
+	phone          *string
+	step           *types.ExchangeStep
+	status         *console.Status
+	before_bin     **types.BinInfo
+	after_bin      **types.BinInfo
+	message        *string
+	startAt        *time.Time
+	stopAt         *time.Time
+	clearedFields  map[string]struct{}
+	cabinet        *uint64
+	clearedcabinet bool
+	bin            *uint64
+	clearedbin     bool
+	done           bool
+	oldValue       func(context.Context) (*Console, error)
+	predicates     []predicate.Console
+}
+
+var _ ent.Mutation = (*ConsoleMutation)(nil)
+
+// consoleOption allows management of the mutation configuration using functional options.
+type consoleOption func(*ConsoleMutation)
+
+// newConsoleMutation creates new mutation for the Console entity.
+func newConsoleMutation(c config, op Op, opts ...consoleOption) *ConsoleMutation {
+	m := &ConsoleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeConsole,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withConsoleID sets the ID field of the mutation.
+func withConsoleID(id uint64) consoleOption {
+	return func(m *ConsoleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Console
+		)
+		m.oldValue = func(ctx context.Context) (*Console, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Console.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withConsole sets the old Console of the mutation.
+func withConsole(node *Console) consoleOption {
+	return func(m *ConsoleMutation) {
+		m.oldValue = func(context.Context) (*Console, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ConsoleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ConsoleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ConsoleMutation) ID() (id uint64, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ConsoleMutation) IDs(ctx context.Context) ([]uint64, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uint64{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Console.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (m *ConsoleMutation) SetCabinetID(u uint64) {
+	m.cabinet = &u
+}
+
+// CabinetID returns the value of the "cabinet_id" field in the mutation.
+func (m *ConsoleMutation) CabinetID() (r uint64, exists bool) {
+	v := m.cabinet
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCabinetID returns the old "cabinet_id" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldCabinetID(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCabinetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCabinetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCabinetID: %w", err)
+	}
+	return oldValue.CabinetID, nil
+}
+
+// ResetCabinetID resets all changes to the "cabinet_id" field.
+func (m *ConsoleMutation) ResetCabinetID() {
+	m.cabinet = nil
+}
+
+// SetBinID sets the "bin_id" field.
+func (m *ConsoleMutation) SetBinID(u uint64) {
+	m.bin = &u
+}
+
+// BinID returns the value of the "bin_id" field in the mutation.
+func (m *ConsoleMutation) BinID() (r uint64, exists bool) {
+	v := m.bin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBinID returns the old "bin_id" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldBinID(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBinID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBinID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBinID: %w", err)
+	}
+	return oldValue.BinID, nil
+}
+
+// ResetBinID resets all changes to the "bin_id" field.
+func (m *ConsoleMutation) ResetBinID() {
+	m.bin = nil
+}
+
+// SetType sets the "type" field.
+func (m *ConsoleMutation) SetType(c console.Type) {
+	m._type = &c
+}
+
+// GetType returns the value of the "type" field in the mutation.
+func (m *ConsoleMutation) GetType() (r console.Type, exists bool) {
+	v := m._type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldType returns the old "type" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldType(ctx context.Context) (v console.Type, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldType: %w", err)
+	}
+	return oldValue.Type, nil
+}
+
+// ResetType resets all changes to the "type" field.
+func (m *ConsoleMutation) ResetType() {
+	m._type = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *ConsoleMutation) SetUserID(u uint64) {
+	m.user_id = &u
+	m.adduser_id = nil
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *ConsoleMutation) UserID() (r uint64, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldUserID(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// AddUserID adds u to the "user_id" field.
+func (m *ConsoleMutation) AddUserID(u int64) {
+	if m.adduser_id != nil {
+		*m.adduser_id += u
+	} else {
+		m.adduser_id = &u
+	}
+}
+
+// AddedUserID returns the value that was added to the "user_id" field in this mutation.
+func (m *ConsoleMutation) AddedUserID() (r int64, exists bool) {
+	v := m.adduser_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *ConsoleMutation) ResetUserID() {
+	m.user_id = nil
+	m.adduser_id = nil
+}
+
+// SetUserType sets the "user_type" field.
+func (m *ConsoleMutation) SetUserType(ct console.UserType) {
+	m.user_type = &ct
+}
+
+// UserType returns the value of the "user_type" field in the mutation.
+func (m *ConsoleMutation) UserType() (r console.UserType, exists bool) {
+	v := m.user_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserType returns the old "user_type" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldUserType(ctx context.Context) (v console.UserType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserType: %w", err)
+	}
+	return oldValue.UserType, nil
+}
+
+// ResetUserType resets all changes to the "user_type" field.
+func (m *ConsoleMutation) ResetUserType() {
+	m.user_type = nil
+}
+
+// SetPhone sets the "phone" field.
+func (m *ConsoleMutation) SetPhone(s string) {
+	m.phone = &s
+}
+
+// Phone returns the value of the "phone" field in the mutation.
+func (m *ConsoleMutation) Phone() (r string, exists bool) {
+	v := m.phone
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPhone returns the old "phone" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldPhone(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPhone is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPhone requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPhone: %w", err)
+	}
+	return oldValue.Phone, nil
+}
+
+// ClearPhone clears the value of the "phone" field.
+func (m *ConsoleMutation) ClearPhone() {
+	m.phone = nil
+	m.clearedFields[console.FieldPhone] = struct{}{}
+}
+
+// PhoneCleared returns if the "phone" field was cleared in this mutation.
+func (m *ConsoleMutation) PhoneCleared() bool {
+	_, ok := m.clearedFields[console.FieldPhone]
+	return ok
+}
+
+// ResetPhone resets all changes to the "phone" field.
+func (m *ConsoleMutation) ResetPhone() {
+	m.phone = nil
+	delete(m.clearedFields, console.FieldPhone)
+}
+
+// SetStep sets the "step" field.
+func (m *ConsoleMutation) SetStep(ts types.ExchangeStep) {
+	m.step = &ts
+}
+
+// Step returns the value of the "step" field in the mutation.
+func (m *ConsoleMutation) Step() (r types.ExchangeStep, exists bool) {
+	v := m.step
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStep returns the old "step" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldStep(ctx context.Context) (v *types.ExchangeStep, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStep is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStep requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStep: %w", err)
+	}
+	return oldValue.Step, nil
+}
+
+// ClearStep clears the value of the "step" field.
+func (m *ConsoleMutation) ClearStep() {
+	m.step = nil
+	m.clearedFields[console.FieldStep] = struct{}{}
+}
+
+// StepCleared returns if the "step" field was cleared in this mutation.
+func (m *ConsoleMutation) StepCleared() bool {
+	_, ok := m.clearedFields[console.FieldStep]
+	return ok
+}
+
+// ResetStep resets all changes to the "step" field.
+func (m *ConsoleMutation) ResetStep() {
+	m.step = nil
+	delete(m.clearedFields, console.FieldStep)
+}
+
+// SetStatus sets the "status" field.
+func (m *ConsoleMutation) SetStatus(c console.Status) {
+	m.status = &c
+}
+
+// Status returns the value of the "status" field in the mutation.
+func (m *ConsoleMutation) Status() (r console.Status, exists bool) {
+	v := m.status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStatus returns the old "status" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldStatus(ctx context.Context) (v console.Status, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStatus: %w", err)
+	}
+	return oldValue.Status, nil
+}
+
+// ResetStatus resets all changes to the "status" field.
+func (m *ConsoleMutation) ResetStatus() {
+	m.status = nil
+}
+
+// SetBeforeBin sets the "before_bin" field.
+func (m *ConsoleMutation) SetBeforeBin(ti *types.BinInfo) {
+	m.before_bin = &ti
+}
+
+// BeforeBin returns the value of the "before_bin" field in the mutation.
+func (m *ConsoleMutation) BeforeBin() (r *types.BinInfo, exists bool) {
+	v := m.before_bin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBeforeBin returns the old "before_bin" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldBeforeBin(ctx context.Context) (v *types.BinInfo, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBeforeBin is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBeforeBin requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBeforeBin: %w", err)
+	}
+	return oldValue.BeforeBin, nil
+}
+
+// ClearBeforeBin clears the value of the "before_bin" field.
+func (m *ConsoleMutation) ClearBeforeBin() {
+	m.before_bin = nil
+	m.clearedFields[console.FieldBeforeBin] = struct{}{}
+}
+
+// BeforeBinCleared returns if the "before_bin" field was cleared in this mutation.
+func (m *ConsoleMutation) BeforeBinCleared() bool {
+	_, ok := m.clearedFields[console.FieldBeforeBin]
+	return ok
+}
+
+// ResetBeforeBin resets all changes to the "before_bin" field.
+func (m *ConsoleMutation) ResetBeforeBin() {
+	m.before_bin = nil
+	delete(m.clearedFields, console.FieldBeforeBin)
+}
+
+// SetAfterBin sets the "after_bin" field.
+func (m *ConsoleMutation) SetAfterBin(ti *types.BinInfo) {
+	m.after_bin = &ti
+}
+
+// AfterBin returns the value of the "after_bin" field in the mutation.
+func (m *ConsoleMutation) AfterBin() (r *types.BinInfo, exists bool) {
+	v := m.after_bin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAfterBin returns the old "after_bin" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldAfterBin(ctx context.Context) (v *types.BinInfo, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAfterBin is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAfterBin requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAfterBin: %w", err)
+	}
+	return oldValue.AfterBin, nil
+}
+
+// ClearAfterBin clears the value of the "after_bin" field.
+func (m *ConsoleMutation) ClearAfterBin() {
+	m.after_bin = nil
+	m.clearedFields[console.FieldAfterBin] = struct{}{}
+}
+
+// AfterBinCleared returns if the "after_bin" field was cleared in this mutation.
+func (m *ConsoleMutation) AfterBinCleared() bool {
+	_, ok := m.clearedFields[console.FieldAfterBin]
+	return ok
+}
+
+// ResetAfterBin resets all changes to the "after_bin" field.
+func (m *ConsoleMutation) ResetAfterBin() {
+	m.after_bin = nil
+	delete(m.clearedFields, console.FieldAfterBin)
+}
+
+// SetMessage sets the "message" field.
+func (m *ConsoleMutation) SetMessage(s string) {
+	m.message = &s
+}
+
+// Message returns the value of the "message" field in the mutation.
+func (m *ConsoleMutation) Message() (r string, exists bool) {
+	v := m.message
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMessage returns the old "message" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldMessage(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMessage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMessage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMessage: %w", err)
+	}
+	return oldValue.Message, nil
+}
+
+// ClearMessage clears the value of the "message" field.
+func (m *ConsoleMutation) ClearMessage() {
+	m.message = nil
+	m.clearedFields[console.FieldMessage] = struct{}{}
+}
+
+// MessageCleared returns if the "message" field was cleared in this mutation.
+func (m *ConsoleMutation) MessageCleared() bool {
+	_, ok := m.clearedFields[console.FieldMessage]
+	return ok
+}
+
+// ResetMessage resets all changes to the "message" field.
+func (m *ConsoleMutation) ResetMessage() {
+	m.message = nil
+	delete(m.clearedFields, console.FieldMessage)
+}
+
+// SetStartAt sets the "startAt" field.
+func (m *ConsoleMutation) SetStartAt(t time.Time) {
+	m.startAt = &t
+}
+
+// StartAt returns the value of the "startAt" field in the mutation.
+func (m *ConsoleMutation) StartAt() (r time.Time, exists bool) {
+	v := m.startAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStartAt returns the old "startAt" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldStartAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStartAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStartAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStartAt: %w", err)
+	}
+	return oldValue.StartAt, nil
+}
+
+// ResetStartAt resets all changes to the "startAt" field.
+func (m *ConsoleMutation) ResetStartAt() {
+	m.startAt = nil
+}
+
+// SetStopAt sets the "stopAt" field.
+func (m *ConsoleMutation) SetStopAt(t time.Time) {
+	m.stopAt = &t
+}
+
+// StopAt returns the value of the "stopAt" field in the mutation.
+func (m *ConsoleMutation) StopAt() (r time.Time, exists bool) {
+	v := m.stopAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStopAt returns the old "stopAt" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldStopAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldStopAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldStopAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStopAt: %w", err)
+	}
+	return oldValue.StopAt, nil
+}
+
+// ResetStopAt resets all changes to the "stopAt" field.
+func (m *ConsoleMutation) ResetStopAt() {
+	m.stopAt = nil
+}
+
+// ClearCabinet clears the "cabinet" edge to the Cabinet entity.
+func (m *ConsoleMutation) ClearCabinet() {
+	m.clearedcabinet = true
+}
+
+// CabinetCleared reports if the "cabinet" edge to the Cabinet entity was cleared.
+func (m *ConsoleMutation) CabinetCleared() bool {
+	return m.clearedcabinet
+}
+
+// CabinetIDs returns the "cabinet" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CabinetID instead. It exists only for internal usage by the builders.
+func (m *ConsoleMutation) CabinetIDs() (ids []uint64) {
+	if id := m.cabinet; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCabinet resets all changes to the "cabinet" edge.
+func (m *ConsoleMutation) ResetCabinet() {
+	m.cabinet = nil
+	m.clearedcabinet = false
+}
+
+// ClearBin clears the "bin" edge to the Bin entity.
+func (m *ConsoleMutation) ClearBin() {
+	m.clearedbin = true
+}
+
+// BinCleared reports if the "bin" edge to the Bin entity was cleared.
+func (m *ConsoleMutation) BinCleared() bool {
+	return m.clearedbin
+}
+
+// BinIDs returns the "bin" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// BinID instead. It exists only for internal usage by the builders.
+func (m *ConsoleMutation) BinIDs() (ids []uint64) {
+	if id := m.bin; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetBin resets all changes to the "bin" edge.
+func (m *ConsoleMutation) ResetBin() {
+	m.bin = nil
+	m.clearedbin = false
+}
+
+// Where appends a list predicates to the ConsoleMutation builder.
+func (m *ConsoleMutation) Where(ps ...predicate.Console) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// Op returns the operation name.
+func (m *ConsoleMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Console).
+func (m *ConsoleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ConsoleMutation) Fields() []string {
+	fields := make([]string, 0, 13)
+	if m.cabinet != nil {
+		fields = append(fields, console.FieldCabinetID)
+	}
+	if m.bin != nil {
+		fields = append(fields, console.FieldBinID)
+	}
+	if m._type != nil {
+		fields = append(fields, console.FieldType)
+	}
+	if m.user_id != nil {
+		fields = append(fields, console.FieldUserID)
+	}
+	if m.user_type != nil {
+		fields = append(fields, console.FieldUserType)
+	}
+	if m.phone != nil {
+		fields = append(fields, console.FieldPhone)
+	}
+	if m.step != nil {
+		fields = append(fields, console.FieldStep)
+	}
+	if m.status != nil {
+		fields = append(fields, console.FieldStatus)
+	}
+	if m.before_bin != nil {
+		fields = append(fields, console.FieldBeforeBin)
+	}
+	if m.after_bin != nil {
+		fields = append(fields, console.FieldAfterBin)
+	}
+	if m.message != nil {
+		fields = append(fields, console.FieldMessage)
+	}
+	if m.startAt != nil {
+		fields = append(fields, console.FieldStartAt)
+	}
+	if m.stopAt != nil {
+		fields = append(fields, console.FieldStopAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case console.FieldCabinetID:
+		return m.CabinetID()
+	case console.FieldBinID:
+		return m.BinID()
+	case console.FieldType:
+		return m.GetType()
+	case console.FieldUserID:
+		return m.UserID()
+	case console.FieldUserType:
+		return m.UserType()
+	case console.FieldPhone:
+		return m.Phone()
+	case console.FieldStep:
+		return m.Step()
+	case console.FieldStatus:
+		return m.Status()
+	case console.FieldBeforeBin:
+		return m.BeforeBin()
+	case console.FieldAfterBin:
+		return m.AfterBin()
+	case console.FieldMessage:
+		return m.Message()
+	case console.FieldStartAt:
+		return m.StartAt()
+	case console.FieldStopAt:
+		return m.StopAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case console.FieldCabinetID:
+		return m.OldCabinetID(ctx)
+	case console.FieldBinID:
+		return m.OldBinID(ctx)
+	case console.FieldType:
+		return m.OldType(ctx)
+	case console.FieldUserID:
+		return m.OldUserID(ctx)
+	case console.FieldUserType:
+		return m.OldUserType(ctx)
+	case console.FieldPhone:
+		return m.OldPhone(ctx)
+	case console.FieldStep:
+		return m.OldStep(ctx)
+	case console.FieldStatus:
+		return m.OldStatus(ctx)
+	case console.FieldBeforeBin:
+		return m.OldBeforeBin(ctx)
+	case console.FieldAfterBin:
+		return m.OldAfterBin(ctx)
+	case console.FieldMessage:
+		return m.OldMessage(ctx)
+	case console.FieldStartAt:
+		return m.OldStartAt(ctx)
+	case console.FieldStopAt:
+		return m.OldStopAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Console field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case console.FieldCabinetID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCabinetID(v)
+		return nil
+	case console.FieldBinID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBinID(v)
+		return nil
+	case console.FieldType:
+		v, ok := value.(console.Type)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetType(v)
+		return nil
+	case console.FieldUserID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case console.FieldUserType:
+		v, ok := value.(console.UserType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserType(v)
+		return nil
+	case console.FieldPhone:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPhone(v)
+		return nil
+	case console.FieldStep:
+		v, ok := value.(types.ExchangeStep)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStep(v)
+		return nil
+	case console.FieldStatus:
+		v, ok := value.(console.Status)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStatus(v)
+		return nil
+	case console.FieldBeforeBin:
+		v, ok := value.(*types.BinInfo)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBeforeBin(v)
+		return nil
+	case console.FieldAfterBin:
+		v, ok := value.(*types.BinInfo)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAfterBin(v)
+		return nil
+	case console.FieldMessage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMessage(v)
+		return nil
+	case console.FieldStartAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStartAt(v)
+		return nil
+	case console.FieldStopAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStopAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Console field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ConsoleMutation) AddedFields() []string {
+	var fields []string
+	if m.adduser_id != nil {
+		fields = append(fields, console.FieldUserID)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ConsoleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case console.FieldUserID:
+		return m.AddedUserID()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ConsoleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case console.FieldUserID:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddUserID(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Console numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ConsoleMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(console.FieldPhone) {
+		fields = append(fields, console.FieldPhone)
+	}
+	if m.FieldCleared(console.FieldStep) {
+		fields = append(fields, console.FieldStep)
+	}
+	if m.FieldCleared(console.FieldBeforeBin) {
+		fields = append(fields, console.FieldBeforeBin)
+	}
+	if m.FieldCleared(console.FieldAfterBin) {
+		fields = append(fields, console.FieldAfterBin)
+	}
+	if m.FieldCleared(console.FieldMessage) {
+		fields = append(fields, console.FieldMessage)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ConsoleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ConsoleMutation) ClearField(name string) error {
+	switch name {
+	case console.FieldPhone:
+		m.ClearPhone()
+		return nil
+	case console.FieldStep:
+		m.ClearStep()
+		return nil
+	case console.FieldBeforeBin:
+		m.ClearBeforeBin()
+		return nil
+	case console.FieldAfterBin:
+		m.ClearAfterBin()
+		return nil
+	case console.FieldMessage:
+		m.ClearMessage()
+		return nil
+	}
+	return fmt.Errorf("unknown Console nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ConsoleMutation) ResetField(name string) error {
+	switch name {
+	case console.FieldCabinetID:
+		m.ResetCabinetID()
+		return nil
+	case console.FieldBinID:
+		m.ResetBinID()
+		return nil
+	case console.FieldType:
+		m.ResetType()
+		return nil
+	case console.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case console.FieldUserType:
+		m.ResetUserType()
+		return nil
+	case console.FieldPhone:
+		m.ResetPhone()
+		return nil
+	case console.FieldStep:
+		m.ResetStep()
+		return nil
+	case console.FieldStatus:
+		m.ResetStatus()
+		return nil
+	case console.FieldBeforeBin:
+		m.ResetBeforeBin()
+		return nil
+	case console.FieldAfterBin:
+		m.ResetAfterBin()
+		return nil
+	case console.FieldMessage:
+		m.ResetMessage()
+		return nil
+	case console.FieldStartAt:
+		m.ResetStartAt()
+		return nil
+	case console.FieldStopAt:
+		m.ResetStopAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Console field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ConsoleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.cabinet != nil {
+		edges = append(edges, console.EdgeCabinet)
+	}
+	if m.bin != nil {
+		edges = append(edges, console.EdgeBin)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ConsoleMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case console.EdgeCabinet:
+		if id := m.cabinet; id != nil {
+			return []ent.Value{*id}
+		}
+	case console.EdgeBin:
+		if id := m.bin; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ConsoleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ConsoleMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ConsoleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedcabinet {
+		edges = append(edges, console.EdgeCabinet)
+	}
+	if m.clearedbin {
+		edges = append(edges, console.EdgeBin)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ConsoleMutation) EdgeCleared(name string) bool {
+	switch name {
+	case console.EdgeCabinet:
+		return m.clearedcabinet
+	case console.EdgeBin:
+		return m.clearedbin
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ConsoleMutation) ClearEdge(name string) error {
+	switch name {
+	case console.EdgeCabinet:
+		m.ClearCabinet()
+		return nil
+	case console.EdgeBin:
+		m.ClearBin()
+		return nil
+	}
+	return fmt.Errorf("unknown Console unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ConsoleMutation) ResetEdge(name string) error {
+	switch name {
+	case console.EdgeCabinet:
+		m.ResetCabinet()
+		return nil
+	case console.EdgeBin:
+		m.ResetBin()
+		return nil
+	}
+	return fmt.Errorf("unknown Console edge %s", name)
 }

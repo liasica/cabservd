@@ -16,7 +16,7 @@ type (
         OnMessage(b []byte, client *Client) (err error)
 
         // OnControl 发送控制
-        OnControl(serial string, typ types.ControlType, index int) error
+        OnControl(serial string, typ types.ControlType, ordinal int) error
 
         // GetEmptyFake 获取空仓最大电压和电流
         // 空仓的时候有可能会有一定的电压和电流
@@ -34,7 +34,7 @@ func (h *Bean) OnMessage(_ []byte, _ *Client) (err error) {
     return
 }
 
-func (h *Bean) OnControl(serial string, typ types.ControlType, index int) (err error) {
+func (h *Bean) OnControl(serial string, typ types.ControlType, ordinal int) (err error) {
     return
 }
 

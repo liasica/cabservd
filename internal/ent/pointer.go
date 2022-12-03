@@ -2,16 +2,21 @@
 
 package ent
 
-import "github.com/auroraride/cabservd/internal/ent/cabinet"
+import (
+	"time"
+
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/ent/console"
+	"github.com/auroraride/cabservd/internal/types"
+)
 
 type BinPointers []*BinPointer
 type BinPointer struct {
 	UUID          *string  `json:"uuid,omitempty"`
 	Brand         *string  `json:"brand,omitempty"`
 	Serial        *string  `json:"serial,omitempty"`
-	Lock          *bool    `json:"lock,omitempty"`
 	Name          *string  `json:"name,omitempty"`
-	Index         *int     `json:"index,omitempty"`
+	Ordinal       *int     `json:"ordinal,omitempty"`
 	Open          *bool    `json:"open,omitempty"`
 	Enable        *bool    `json:"enable,omitempty"`
 	Health        *bool    `json:"health,omitempty"`
@@ -21,6 +26,7 @@ type BinPointer struct {
 	Current       *float64 `json:"current,omitempty"`
 	Soc           *float64 `json:"soc,omitempty"`
 	Soh           *float64 `json:"soh,omitempty"`
+	Remark        *string  `json:"remark,omitempty"`
 }
 
 type CabinetPointers []*CabinetPointer
@@ -37,4 +43,21 @@ type CabinetPointer struct {
 	Current     *float64        `json:"current,omitempty"`
 	Temperature *float64        `json:"temperature,omitempty"`
 	Electricity *float64        `json:"electricity,omitempty"`
+}
+
+type ConsolePointers []*ConsolePointer
+type ConsolePointer struct {
+	CabinetID *uint64             `json:"cabinet_id,omitempty"`
+	BinID     *uint64             `json:"bin_id,omitempty"`
+	Type      *console.Type       `json:"type,omitempty"`
+	UserID    *uint64             `json:"user_id,omitempty"`
+	UserType  *console.UserType   `json:"user_type,omitempty"`
+	Phone     *string             `json:"phone,omitempty"`
+	Step      *types.ExchangeStep `json:"step,omitempty"`
+	Status    *console.Status     `json:"status,omitempty"`
+	BeforeBin **types.BinInfo     `json:"before_bin,omitempty"`
+	AfterBin  **types.BinInfo     `json:"after_bin,omitempty"`
+	Message   *string             `json:"message,omitempty"`
+	StartAt   *time.Time          `json:"startAt,omitempty"`
+	StopAt    *time.Time          `json:"stopAt,omitempty"`
 }

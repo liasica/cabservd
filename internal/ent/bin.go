@@ -26,12 +26,10 @@ type Bin struct {
 	Brand string `json:"brand,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
-	// 锁仓
-	Lock bool `json:"lock,omitempty"`
 	// 仓位名称(N号仓)
 	Name string `json:"name,omitempty"`
-	// 仓位序号(从0开始)
-	Index int `json:"index,omitempty"`
+	// 仓位序号(从1开始)
+	Ordinal int `json:"ordinal,omitempty"`
 	// 仓门是否开启
 	Open bool `json:"open,omitempty"`
 	// 仓位是否启用
@@ -50,6 +48,8 @@ type Bin struct {
 	Soc float64 `json:"soc,omitempty"`
 	// 电池健康程度
 	Soh float64 `json:"soh,omitempty"`
+	// 仓位备注
+	Remark *string `json:"remark,omitempty"`
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -57,13 +57,13 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case bin.FieldLock, bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists:
+		case bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists:
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
-		case bin.FieldID, bin.FieldIndex:
+		case bin.FieldID, bin.FieldOrdinal:
 			values[i] = new(sql.NullInt64)
-		case bin.FieldUUID, bin.FieldBrand, bin.FieldSerial, bin.FieldName, bin.FieldBatterySn:
+		case bin.FieldUUID, bin.FieldBrand, bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
 			values[i] = new(sql.NullString)
 		case bin.FieldCreatedAt, bin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -118,23 +118,17 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.Serial = value.String
 			}
-		case bin.FieldLock:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field lock", values[i])
-			} else if value.Valid {
-				b.Lock = value.Bool
-			}
 		case bin.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				b.Name = value.String
 			}
-		case bin.FieldIndex:
+		case bin.FieldOrdinal:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field index", values[i])
+				return fmt.Errorf("unexpected type %T for field ordinal", values[i])
 			} else if value.Valid {
-				b.Index = int(value.Int64)
+				b.Ordinal = int(value.Int64)
 			}
 		case bin.FieldOpen:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -190,6 +184,13 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				b.Soh = value.Float64
 			}
+		case bin.FieldRemark:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field remark", values[i])
+			} else if value.Valid {
+				b.Remark = new(string)
+				*b.Remark = value.String
+			}
 		}
 	}
 	return nil
@@ -233,14 +234,11 @@ func (b *Bin) String() string {
 	builder.WriteString("serial=")
 	builder.WriteString(b.Serial)
 	builder.WriteString(", ")
-	builder.WriteString("lock=")
-	builder.WriteString(fmt.Sprintf("%v", b.Lock))
-	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(b.Name)
 	builder.WriteString(", ")
-	builder.WriteString("index=")
-	builder.WriteString(fmt.Sprintf("%v", b.Index))
+	builder.WriteString("ordinal=")
+	builder.WriteString(fmt.Sprintf("%v", b.Ordinal))
 	builder.WriteString(", ")
 	builder.WriteString("open=")
 	builder.WriteString(fmt.Sprintf("%v", b.Open))
@@ -268,6 +266,11 @@ func (b *Bin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("soh=")
 	builder.WriteString(fmt.Sprintf("%v", b.Soh))
+	builder.WriteString(", ")
+	if v := b.Remark; v != nil {
+		builder.WriteString("remark=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

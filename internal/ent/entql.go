@@ -5,6 +5,8 @@ package ent
 import (
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/ent/console"
+	"github.com/auroraride/cabservd/internal/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -14,7 +16,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 2)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 3)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   bin.Table,
@@ -31,9 +33,8 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldUUID:          {Type: field.TypeString, Column: bin.FieldUUID},
 			bin.FieldBrand:         {Type: field.TypeString, Column: bin.FieldBrand},
 			bin.FieldSerial:        {Type: field.TypeString, Column: bin.FieldSerial},
-			bin.FieldLock:          {Type: field.TypeBool, Column: bin.FieldLock},
 			bin.FieldName:          {Type: field.TypeString, Column: bin.FieldName},
-			bin.FieldIndex:         {Type: field.TypeInt, Column: bin.FieldIndex},
+			bin.FieldOrdinal:       {Type: field.TypeInt, Column: bin.FieldOrdinal},
 			bin.FieldOpen:          {Type: field.TypeBool, Column: bin.FieldOpen},
 			bin.FieldEnable:        {Type: field.TypeBool, Column: bin.FieldEnable},
 			bin.FieldHealth:        {Type: field.TypeBool, Column: bin.FieldHealth},
@@ -43,6 +44,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldCurrent:       {Type: field.TypeFloat64, Column: bin.FieldCurrent},
 			bin.FieldSoc:           {Type: field.TypeFloat64, Column: bin.FieldSoc},
 			bin.FieldSoh:           {Type: field.TypeFloat64, Column: bin.FieldSoh},
+			bin.FieldRemark:        {Type: field.TypeString, Column: bin.FieldRemark},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
@@ -72,6 +74,56 @@ var schemaGraph = func() *sqlgraph.Schema {
 			cabinet.FieldElectricity: {Type: field.TypeFloat64, Column: cabinet.FieldElectricity},
 		},
 	}
+	graph.Nodes[2] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   console.Table,
+			Columns: console.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUint64,
+				Column: console.FieldID,
+			},
+		},
+		Type: "Console",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			console.FieldCabinetID: {Type: field.TypeUint64, Column: console.FieldCabinetID},
+			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
+			console.FieldType:      {Type: field.TypeEnum, Column: console.FieldType},
+			console.FieldUserID:    {Type: field.TypeUint64, Column: console.FieldUserID},
+			console.FieldUserType:  {Type: field.TypeEnum, Column: console.FieldUserType},
+			console.FieldPhone:     {Type: field.TypeString, Column: console.FieldPhone},
+			console.FieldStep:      {Type: field.TypeOther, Column: console.FieldStep},
+			console.FieldStatus:    {Type: field.TypeEnum, Column: console.FieldStatus},
+			console.FieldBeforeBin: {Type: field.TypeJSON, Column: console.FieldBeforeBin},
+			console.FieldAfterBin:  {Type: field.TypeJSON, Column: console.FieldAfterBin},
+			console.FieldMessage:   {Type: field.TypeString, Column: console.FieldMessage},
+			console.FieldStartAt:   {Type: field.TypeTime, Column: console.FieldStartAt},
+			console.FieldStopAt:    {Type: field.TypeTime, Column: console.FieldStopAt},
+		},
+	}
+	graph.MustAddE(
+		"cabinet",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   console.CabinetTable,
+			Columns: []string{console.CabinetColumn},
+			Bidi:    false,
+		},
+		"Console",
+		"Cabinet",
+	)
+	graph.MustAddE(
+		"bin",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   console.BinTable,
+			Columns: []string{console.BinColumn},
+			Bidi:    false,
+		},
+		"Console",
+		"Bin",
+	)
 	return graph
 }()
 
@@ -146,19 +198,14 @@ func (f *BinFilter) WhereSerial(p entql.StringP) {
 	f.Where(p.Field(bin.FieldSerial))
 }
 
-// WhereLock applies the entql bool predicate on the lock field.
-func (f *BinFilter) WhereLock(p entql.BoolP) {
-	f.Where(p.Field(bin.FieldLock))
-}
-
 // WhereName applies the entql string predicate on the name field.
 func (f *BinFilter) WhereName(p entql.StringP) {
 	f.Where(p.Field(bin.FieldName))
 }
 
-// WhereIndex applies the entql int predicate on the index field.
-func (f *BinFilter) WhereIndex(p entql.IntP) {
-	f.Where(p.Field(bin.FieldIndex))
+// WhereOrdinal applies the entql int predicate on the ordinal field.
+func (f *BinFilter) WhereOrdinal(p entql.IntP) {
+	f.Where(p.Field(bin.FieldOrdinal))
 }
 
 // WhereOpen applies the entql bool predicate on the open field.
@@ -204,6 +251,11 @@ func (f *BinFilter) WhereSoc(p entql.Float64P) {
 // WhereSoh applies the entql float64 predicate on the soh field.
 func (f *BinFilter) WhereSoh(p entql.Float64P) {
 	f.Where(p.Field(bin.FieldSoh))
+}
+
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *BinFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(bin.FieldRemark))
 }
 
 // addPredicate implements the predicateAdder interface.
@@ -314,4 +366,137 @@ func (f *CabinetFilter) WhereTemperature(p entql.Float64P) {
 // WhereElectricity applies the entql float64 predicate on the electricity field.
 func (f *CabinetFilter) WhereElectricity(p entql.Float64P) {
 	f.Where(p.Field(cabinet.FieldElectricity))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (cq *ConsoleQuery) addPredicate(pred func(s *sql.Selector)) {
+	cq.predicates = append(cq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the ConsoleQuery builder.
+func (cq *ConsoleQuery) Filter() *ConsoleFilter {
+	return &ConsoleFilter{config: cq.config, predicateAdder: cq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *ConsoleMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the ConsoleMutation builder.
+func (m *ConsoleMutation) Filter() *ConsoleFilter {
+	return &ConsoleFilter{config: m.config, predicateAdder: m}
+}
+
+// ConsoleFilter provides a generic filtering capability at runtime for ConsoleQuery.
+type ConsoleFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *ConsoleFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql uint64 predicate on the id field.
+func (f *ConsoleFilter) WhereID(p entql.Uint64P) {
+	f.Where(p.Field(console.FieldID))
+}
+
+// WhereCabinetID applies the entql uint64 predicate on the cabinet_id field.
+func (f *ConsoleFilter) WhereCabinetID(p entql.Uint64P) {
+	f.Where(p.Field(console.FieldCabinetID))
+}
+
+// WhereBinID applies the entql uint64 predicate on the bin_id field.
+func (f *ConsoleFilter) WhereBinID(p entql.Uint64P) {
+	f.Where(p.Field(console.FieldBinID))
+}
+
+// WhereType applies the entql string predicate on the type field.
+func (f *ConsoleFilter) WhereType(p entql.StringP) {
+	f.Where(p.Field(console.FieldType))
+}
+
+// WhereUserID applies the entql uint64 predicate on the user_id field.
+func (f *ConsoleFilter) WhereUserID(p entql.Uint64P) {
+	f.Where(p.Field(console.FieldUserID))
+}
+
+// WhereUserType applies the entql string predicate on the user_type field.
+func (f *ConsoleFilter) WhereUserType(p entql.StringP) {
+	f.Where(p.Field(console.FieldUserType))
+}
+
+// WherePhone applies the entql string predicate on the phone field.
+func (f *ConsoleFilter) WherePhone(p entql.StringP) {
+	f.Where(p.Field(console.FieldPhone))
+}
+
+// WhereStep applies the entql other predicate on the step field.
+func (f *ConsoleFilter) WhereStep(p entql.OtherP) {
+	f.Where(p.Field(console.FieldStep))
+}
+
+// WhereStatus applies the entql string predicate on the status field.
+func (f *ConsoleFilter) WhereStatus(p entql.StringP) {
+	f.Where(p.Field(console.FieldStatus))
+}
+
+// WhereBeforeBin applies the entql json.RawMessage predicate on the before_bin field.
+func (f *ConsoleFilter) WhereBeforeBin(p entql.BytesP) {
+	f.Where(p.Field(console.FieldBeforeBin))
+}
+
+// WhereAfterBin applies the entql json.RawMessage predicate on the after_bin field.
+func (f *ConsoleFilter) WhereAfterBin(p entql.BytesP) {
+	f.Where(p.Field(console.FieldAfterBin))
+}
+
+// WhereMessage applies the entql string predicate on the message field.
+func (f *ConsoleFilter) WhereMessage(p entql.StringP) {
+	f.Where(p.Field(console.FieldMessage))
+}
+
+// WhereStartAt applies the entql time.Time predicate on the startAt field.
+func (f *ConsoleFilter) WhereStartAt(p entql.TimeP) {
+	f.Where(p.Field(console.FieldStartAt))
+}
+
+// WhereStopAt applies the entql time.Time predicate on the stopAt field.
+func (f *ConsoleFilter) WhereStopAt(p entql.TimeP) {
+	f.Where(p.Field(console.FieldStopAt))
+}
+
+// WhereHasCabinet applies a predicate to check if query has an edge cabinet.
+func (f *ConsoleFilter) WhereHasCabinet() {
+	f.Where(entql.HasEdge("cabinet"))
+}
+
+// WhereHasCabinetWith applies a predicate to check if query has an edge cabinet with a given conditions (other predicates).
+func (f *ConsoleFilter) WhereHasCabinetWith(preds ...predicate.Cabinet) {
+	f.Where(entql.HasEdgeWith("cabinet", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasBin applies a predicate to check if query has an edge bin.
+func (f *ConsoleFilter) WhereHasBin() {
+	f.Where(entql.HasEdge("bin"))
+}
+
+// WhereHasBinWith applies a predicate to check if query has an edge bin with a given conditions (other predicates).
+func (f *ConsoleFilter) WhereHasBinWith(preds ...predicate.Bin) {
+	f.Where(entql.HasEdgeWith("bin", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
 }

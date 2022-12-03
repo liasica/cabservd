@@ -18,6 +18,8 @@ type Tx struct {
 	Bin *BinClient
 	// Cabinet is the client for interacting with the Cabinet builders.
 	Cabinet *CabinetClient
+	// Console is the client for interacting with the Console builders.
+	Console *ConsoleClient
 
 	// lazily loaded.
 	client     *Client
@@ -151,6 +153,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Bin = NewBinClient(tx.config)
 	tx.Cabinet = NewCabinetClient(tx.config)
+	tx.Console = NewConsoleClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
