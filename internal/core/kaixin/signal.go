@@ -14,10 +14,10 @@ type SignalData struct {
 }
 
 const (
-    SignalBinID          Signal = "01309001" // 柜门ID 1~16:对应柜门ID
-    SignalBinStatus      Signal = "02104001" // 仓位状态 0:无电池 1:电池正在充电 2:电池充满 5:异常
-    SignalDoorStatus     Signal = "02103001" // 仓位柜门状态 0:关 1:开
-    SignalBinUsingStatus Signal = "02118001" // 柜门是否禁用 (0:禁用 1:启用)
+    SignalBinID         Signal = "01309001" // 柜门ID 1~16:对应柜门ID
+    SignalBinStatus     Signal = "02104001" // 仓位状态 0:无电池 1:电池正在充电 2:电池充满 5:异常
+    SignalBinDoorStatus Signal = "02103001" // 仓位柜门状态 0:关 1:开
+    SignalBinEnable     Signal = "02118001" // 柜门是否禁用 (0:禁用 1:启用)
 
     SignalBatteryExists      Signal = "02140001" // 电池在位检测 0:无电池 1:有电池
     SignalBatterySN          Signal = "02106001" // 柜内电池SN

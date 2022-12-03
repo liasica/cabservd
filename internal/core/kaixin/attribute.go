@@ -84,9 +84,9 @@ func (req ReportRequest) Bins() (items ent.BinPointers) {
         switch attr.ID {
         case SignalBinStatus:
             attr.BinStatus(bin, v)
-        case SignalDoorStatus:
+        case SignalBinDoorStatus:
             bin.Open = silk.Bool(v == "1")
-        case SignalBinUsingStatus:
+        case SignalBinEnable:
             bin.Enable = silk.Bool(v == "1")
         case SignalBatteryExists:
             bin.BatteryExists = silk.Bool(v == "1")
