@@ -32,38 +32,33 @@ const (
 
 var (
     controlValueMap = map[types.ControlType]ControlValue{
-        types.ControlTypeOpenDoor: ControlOpenDoor,
-        types.BinDisable:          ControlBinDisable,
-        types.BinEnable:           ControlBinEnable,
+        types.ControlTypeBinOpen:    ControlOpenDoor,
+        types.ControlTypeBinDisable: ControlBinDisable,
+        types.ControlTypeBinEnable:  ControlBinEnable,
     }
 )
 
-func (h *Hander) OnControl(serial string, typ types.ControlType, ordinal int) error {
+func (h *Hander) SendControl(serial string, typ types.ControlType, ordinal int) (err error) {
     v, ok := controlValueMap[typ]
     if !ok {
         return errs.CabinetControlParamError
     }
 
-    req := ControlRequest{
-        ParamList: []ControlParam{{
-            SignalData: SignalData{
-                ID:    SignalCabinetControl,
-                Value: v,
-            },
-            DoorID: fmt.Sprintf("%d", ordinal),
-        }},
-    }
-    return SendControl(serial, req)
-}
-
-func SendControl(serial string, req ControlRequest) (err error) {
     msg := &Request{
         Message: Message{
             MsgType: MessageTypeControlRequest,
             TxnNo:   time.Now().UnixMilli(),
             DevID:   serial,
         },
-        ControlRequest: req,
+        ControlRequest: ControlRequest{
+            ParamList: []ControlParam{{
+                SignalData: SignalData{
+                    ID:    SignalCabinetControl,
+                    Value: v,
+                },
+                DoorID: fmt.Sprintf("%d", ordinal),
+            }},
+        },
     }
 
     var c *core.Client

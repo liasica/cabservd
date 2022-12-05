@@ -8,9 +8,9 @@ package types
 type ControlType string
 
 const (
-    ControlTypeOpenDoor ControlType = "bin_open"    // 开门请求
-    BinDisable                      = "bin_disable" // 禁用
-    BinEnable                       = "bin_enable"  // 启用
+    ControlTypeBinOpen    ControlType = "binOpen"    // 仓位开门
+    ControlTypeBinDisable             = "binDisable" // 仓位禁用
+    ControlTypeBinEnable              = "binEnable"  // 仓位启用
 )
 
 type ControlRequest struct {

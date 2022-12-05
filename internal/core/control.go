@@ -17,7 +17,7 @@ func (h *hub) Control(req *types.ControlRequest) (err error) {
 
     switch req.Brand {
     case types.BrandKaixin:
-        err = h.Bean.OnControl(req.Serial, req.Type, *req.Ordinal)
+        err = h.Bean.SendControl(req.Serial, req.Type, *req.Ordinal)
     }
 
     return

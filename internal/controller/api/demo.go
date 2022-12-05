@@ -9,11 +9,11 @@ import (
     "context"
     "fmt"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/auroraride/cabservd/internal/core/kaixin"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/errs"
+    "github.com/auroraride/cabservd/internal/types"
     "github.com/gin-gonic/gin"
     log "github.com/sirupsen/logrus"
     "net/http"
@@ -45,12 +45,13 @@ var Demo = new(demo)
 
 func (*demo) Control(c *gin.Context) {
     var req struct {
-        SN     string                `form:"sn" json:"sn"`
-        Params []kaixin.ControlParam `json:"params"`
+        Serial  string            `form:"serial" json:"serial"`
+        Type    types.ControlType `json:"type" form:"type"`
+        Ordinal int               `json:"ordinal" form:"ordinal"`
     }
     err := c.Bind(&req)
     if err == nil {
-        err = kaixin.SendControl(req.SN, kaixin.ControlRequest{ParamList: req.Params})
+        err = core.Hub.Bean.SendControl(req.Serial, req.Type, req.Ordinal)
     }
 
     c.JSON(http.StatusOK, gin.H{
@@ -145,7 +146,7 @@ func (d *demo) Start(c *gin.Context) {
     )
 
     // 获取仓位
-    fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyFake()
+    fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
     for _, item := range items {
         // 获取满电仓位
         if fully == nil {
@@ -314,13 +315,7 @@ func (t *task) run() {
 }
 
 func (t *task) doorOpen(target *ent.Bin) (err error) {
-    params := []kaixin.ControlParam{
-        {SignalData: kaixin.SignalData{
-            ID:    kaixin.SignalCabinetControl,
-            Value: kaixin.ControlOpenDoor,
-        }, DoorID: fmt.Sprintf("%d", target.Ordinal)},
-    }
-    err = kaixin.SendControl(t.serial, kaixin.ControlRequest{ParamList: params})
+    err = core.Hub.Bean.SendControl(t.serial, types.ControlTypeBinOpen, target.Ordinal)
     if err != nil {
         return
     }
@@ -350,7 +345,7 @@ func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err e
         statusTime time.Time
     )
 
-    fakevoltage, _ := core.Hub.Bean.GetEmptyFake()
+    fakevoltage, _ := core.Hub.Bean.GetEmptyDeviation()
 
     for {
         // 10ms查询一次

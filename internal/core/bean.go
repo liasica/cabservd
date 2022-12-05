@@ -15,12 +15,12 @@ type (
         // OnMessage 收到消息
         OnMessage(b []byte, client *Client) (err error)
 
-        // OnControl 发送控制
-        OnControl(serial string, typ types.ControlType, ordinal int) error
+        // SendControl 发送控制
+        SendControl(serial string, typ types.ControlType, ordinal int) error
 
-        // GetEmptyFake 获取空仓最大电压和电流
+        // GetEmptyDeviation 获取空仓最大电压和电流
         // 空仓的时候有可能会有一定的电压和电流
-        GetEmptyFake() (fakevoltage, fakecurrent float64)
+        GetEmptyDeviation() (fakevoltage, fakecurrent float64)
     }
 
     Bean struct{}
@@ -34,10 +34,10 @@ func (h *Bean) OnMessage(_ []byte, _ *Client) (err error) {
     return
 }
 
-func (h *Bean) OnControl(serial string, typ types.ControlType, ordinal int) (err error) {
+func (h *Bean) SendControl(serial string, typ types.ControlType, ordinal int) (err error) {
     return
 }
 
-func (h *Bean) GetEmptyFake() (voltage, current float64) {
+func (h *Bean) GetEmptyDeviation() (voltage, current float64) {
     return
 }

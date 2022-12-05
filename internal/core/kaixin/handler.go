@@ -20,8 +20,8 @@ func New() *Hander {
     return &Hander{}
 }
 
-// GetEmptyFake TODO 后续做在数据库中
-func (h *Hander) GetEmptyFake() (voltage, current float64) {
+// GetEmptyDeviation TODO 后续做在数据库中
+func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
     voltage = 40
     current = 1
     return
