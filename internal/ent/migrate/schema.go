@@ -76,7 +76,7 @@ var (
 		{Name: "online", Type: field.TypeBool, Default: false},
 		{Name: "brand", Type: field.TypeString},
 		{Name: "serial", Type: field.TypeString, Unique: true},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"initializing", "idle", "busy", "abnormal"}, Default: "initializing"},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"initializing", "idle", "busy", "exchange", "abnormal"}, Default: "initializing"},
 		{Name: "enable", Type: field.TypeBool, Default: false},
 		{Name: "lng", Type: field.TypeFloat64, Nullable: true},
 		{Name: "lat", Type: field.TypeFloat64, Nullable: true},
