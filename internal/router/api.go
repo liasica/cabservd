@@ -6,9 +6,12 @@
 package router
 
 import (
+    "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/controller/api"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/gin-gonic/gin"
     log "github.com/sirupsen/logrus"
+    "html/template"
     "net/http"
 )
 
@@ -17,7 +20,8 @@ func Start() {
     _ = router.SetTrustedProxies([]string{"192.168.1.2"})
 
     // 引入HTML模板
-    router.LoadHTMLGlob("assets/templates/**/*")
+    tmpls := template.Must(assets.LoadTemplates())
+    router.SetHTMLTemplate(tmpls)
 
     // demo路由
     router.POST("/demo/control", api.Demo.Control)
@@ -26,7 +30,7 @@ func Start() {
     router.POST("/demo/status", api.Demo.Status)
 
     srv := &http.Server{
-        Addr:    ":18521",
+        Addr:    g.Config.Api.Bind,
         Handler: router,
     }
 

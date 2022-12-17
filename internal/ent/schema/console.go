@@ -11,6 +11,7 @@ import (
     "entgo.io/ent/schema/index"
     "entgo.io/ent/schema/mixin"
     "github.com/auroraride/cabservd/internal/types"
+    "github.com/google/uuid"
 )
 
 type ConsoleMixin struct {
@@ -59,21 +60,20 @@ func (Console) Annotations() []schema.Annotation {
 // Fields of the Console.
 func (Console) Fields() []ent.Field {
     return []ent.Field{
-        field.Enum("type").Values("exchange", "control").Comment("类别"),
+        field.UUID("uuid", uuid.UUID{}),
+        field.Enum("type").Values("exchange", "control", "cabinet").Comment("日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志"),
 
-        field.Uint64("user_id").Comment("用户ID"),
-        field.Enum("user_type").Values("manager", "rider").Comment("用户类别"),
-        field.String("phone").Optional().Nillable().Comment("用户电话"),
+        field.JSON("user", &types.User{}).Comment("操作用户"),
 
         field.Other("step", types.ExchangeStepFirst).SchemaType(map[string]string{dialect.Postgres: postgres.TypeSmallInt}).Optional().Nillable().Comment("换电步骤"),
 
-        field.Enum("status").Values("pending", "running", "success", "failed").Comment("状态"), // pending:未开始 running:执行中 success:成功 failed:失败
-        field.JSON("before_bin", &types.BinInfo{}).Optional().Comment("操作前仓位信息"),
-        field.JSON("after_bin", &types.BinInfo{}).Optional().Comment("操作后仓位信息"),
+        field.Enum("status").Values("pending", "running", "success", "failed").Comment("状态 pending:未开始 running:执行中 success:成功 failed:失败"),
+        field.JSON("before_bin", &types.BinInfo{}).Optional().Comment("变化前仓位信息"),
+        field.JSON("after_bin", &types.BinInfo{}).Optional().Comment("变化后仓位信息"),
 
         field.String("message").Optional().Nillable().Comment("消息"),
-        field.Time("startAt").Comment("开始时间"),
-        field.Time("stopAt").Comment("结束时间"),
+        field.Time("startAt").Comment("记录时间"),
+        field.Time("stopAt").Optional().Nillable().Comment("结束时间"),
     }
 }
 
@@ -90,5 +90,12 @@ func (Console) Mixin() []ent.Mixin {
 }
 
 func (Console) Indexes() []ent.Index {
-    return []ent.Index{}
+    return []ent.Index{
+        index.Fields("uuid"),
+        index.Fields("user").Annotations(
+            entsql.IndexTypes(map[string]string{
+                dialect.Postgres: "GIN",
+            }),
+        ),
+    }
 }

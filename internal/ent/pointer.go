@@ -8,6 +8,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/types"
+	"github.com/google/uuid"
 )
 
 type BinPointers []*BinPointer
@@ -49,10 +50,9 @@ type ConsolePointers []*ConsolePointer
 type ConsolePointer struct {
 	CabinetID *uint64             `json:"cabinet_id,omitempty"`
 	BinID     *uint64             `json:"bin_id,omitempty"`
+	UUID      *uuid.UUID          `json:"uuid,omitempty"`
 	Type      *console.Type       `json:"type,omitempty"`
-	UserID    *uint64             `json:"user_id,omitempty"`
-	UserType  *console.UserType   `json:"user_type,omitempty"`
-	Phone     *string             `json:"phone,omitempty"`
+	User      **types.User        `json:"user,omitempty"`
 	Step      *types.ExchangeStep `json:"step,omitempty"`
 	Status    *console.Status     `json:"status,omitempty"`
 	BeforeBin **types.BinInfo     `json:"before_bin,omitempty"`

@@ -13,6 +13,7 @@ var (
     ParamValidateFailed = errors.New("数据校验失败")
 
     CabinetSerialRequired     = errors.New("电柜序号不存在")
+    CabinetBrandRequired      = errors.New("电柜型号不存在")
     CabinetBinOrdinalRequired = errors.New("仓位序号不存在")
     CabinetNotFound           = errors.New("电柜未找到")
     CabinetOffline            = errors.New("电柜不在线")

@@ -4,7 +4,3 @@
 // Based on cabservd by liasica, magicrolan@qq.com.
 
 package g
-
-var (
-    Config *config
-)

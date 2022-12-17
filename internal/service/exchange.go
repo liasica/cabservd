@@ -5,14 +5,16 @@
 
 package service
 
-import "github.com/auroraride/cabservd/internal/ent"
+import (
+    "github.com/auroraride/cabservd/internal/types"
+)
 
 type exchange struct {
-    serial string
-    cab    *ent.Cabinet
-    bins   ent.Bins
+    user *types.User
 }
 
-func NewExchange(serial string, userID uint64) *exchange {
-    return &exchange{}
+func NewExchange(user *types.User) *exchange {
+    return &exchange{
+        user: user,
+    }
 }

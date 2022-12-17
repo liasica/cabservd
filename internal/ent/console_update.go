@@ -16,6 +16,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/types"
+	"github.com/google/uuid"
 )
 
 // ConsoleUpdate is the builder for updating Console entities.
@@ -44,48 +45,21 @@ func (cu *ConsoleUpdate) SetBinID(u uint64) *ConsoleUpdate {
 	return cu
 }
 
+// SetUUID sets the "uuid" field.
+func (cu *ConsoleUpdate) SetUUID(u uuid.UUID) *ConsoleUpdate {
+	cu.mutation.SetUUID(u)
+	return cu
+}
+
 // SetType sets the "type" field.
 func (cu *ConsoleUpdate) SetType(c console.Type) *ConsoleUpdate {
 	cu.mutation.SetType(c)
 	return cu
 }
 
-// SetUserID sets the "user_id" field.
-func (cu *ConsoleUpdate) SetUserID(u uint64) *ConsoleUpdate {
-	cu.mutation.ResetUserID()
-	cu.mutation.SetUserID(u)
-	return cu
-}
-
-// AddUserID adds u to the "user_id" field.
-func (cu *ConsoleUpdate) AddUserID(u int64) *ConsoleUpdate {
-	cu.mutation.AddUserID(u)
-	return cu
-}
-
-// SetUserType sets the "user_type" field.
-func (cu *ConsoleUpdate) SetUserType(ct console.UserType) *ConsoleUpdate {
-	cu.mutation.SetUserType(ct)
-	return cu
-}
-
-// SetPhone sets the "phone" field.
-func (cu *ConsoleUpdate) SetPhone(s string) *ConsoleUpdate {
-	cu.mutation.SetPhone(s)
-	return cu
-}
-
-// SetNillablePhone sets the "phone" field if the given value is not nil.
-func (cu *ConsoleUpdate) SetNillablePhone(s *string) *ConsoleUpdate {
-	if s != nil {
-		cu.SetPhone(*s)
-	}
-	return cu
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (cu *ConsoleUpdate) ClearPhone() *ConsoleUpdate {
-	cu.mutation.ClearPhone()
+// SetUser sets the "user" field.
+func (cu *ConsoleUpdate) SetUser(t *types.User) *ConsoleUpdate {
+	cu.mutation.SetUser(t)
 	return cu
 }
 
@@ -168,6 +142,20 @@ func (cu *ConsoleUpdate) SetStartAt(t time.Time) *ConsoleUpdate {
 // SetStopAt sets the "stopAt" field.
 func (cu *ConsoleUpdate) SetStopAt(t time.Time) *ConsoleUpdate {
 	cu.mutation.SetStopAt(t)
+	return cu
+}
+
+// SetNillableStopAt sets the "stopAt" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableStopAt(t *time.Time) *ConsoleUpdate {
+	if t != nil {
+		cu.SetStopAt(*t)
+	}
+	return cu
+}
+
+// ClearStopAt clears the value of the "stopAt" field.
+func (cu *ConsoleUpdate) ClearStopAt() *ConsoleUpdate {
+	cu.mutation.ClearStopAt()
 	return cu
 }
 
@@ -265,11 +253,6 @@ func (cu *ConsoleUpdate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Console.type": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.UserType(); ok {
-		if err := console.UserTypeValidator(v); err != nil {
-			return &ValidationError{Name: "user_type", err: fmt.Errorf(`ent: validator failed for field "Console.user_type": %w`, err)}
-		}
-	}
 	if v, ok := cu.mutation.Status(); ok {
 		if err := console.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Console.status": %w`, err)}
@@ -308,23 +291,14 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := cu.mutation.UUID(); ok {
+		_spec.SetField(console.FieldUUID, field.TypeUUID, value)
+	}
 	if value, ok := cu.mutation.GetType(); ok {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 	}
-	if value, ok := cu.mutation.UserID(); ok {
-		_spec.SetField(console.FieldUserID, field.TypeUint64, value)
-	}
-	if value, ok := cu.mutation.AddedUserID(); ok {
-		_spec.AddField(console.FieldUserID, field.TypeUint64, value)
-	}
-	if value, ok := cu.mutation.UserType(); ok {
-		_spec.SetField(console.FieldUserType, field.TypeEnum, value)
-	}
-	if value, ok := cu.mutation.Phone(); ok {
-		_spec.SetField(console.FieldPhone, field.TypeString, value)
-	}
-	if cu.mutation.PhoneCleared() {
-		_spec.ClearField(console.FieldPhone, field.TypeString)
+	if value, ok := cu.mutation.User(); ok {
+		_spec.SetField(console.FieldUser, field.TypeJSON, value)
 	}
 	if value, ok := cu.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -358,6 +332,9 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.StopAt(); ok {
 		_spec.SetField(console.FieldStopAt, field.TypeTime, value)
+	}
+	if cu.mutation.StopAtCleared() {
+		_spec.ClearField(console.FieldStopAt, field.TypeTime)
 	}
 	if cu.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -462,48 +439,21 @@ func (cuo *ConsoleUpdateOne) SetBinID(u uint64) *ConsoleUpdateOne {
 	return cuo
 }
 
+// SetUUID sets the "uuid" field.
+func (cuo *ConsoleUpdateOne) SetUUID(u uuid.UUID) *ConsoleUpdateOne {
+	cuo.mutation.SetUUID(u)
+	return cuo
+}
+
 // SetType sets the "type" field.
 func (cuo *ConsoleUpdateOne) SetType(c console.Type) *ConsoleUpdateOne {
 	cuo.mutation.SetType(c)
 	return cuo
 }
 
-// SetUserID sets the "user_id" field.
-func (cuo *ConsoleUpdateOne) SetUserID(u uint64) *ConsoleUpdateOne {
-	cuo.mutation.ResetUserID()
-	cuo.mutation.SetUserID(u)
-	return cuo
-}
-
-// AddUserID adds u to the "user_id" field.
-func (cuo *ConsoleUpdateOne) AddUserID(u int64) *ConsoleUpdateOne {
-	cuo.mutation.AddUserID(u)
-	return cuo
-}
-
-// SetUserType sets the "user_type" field.
-func (cuo *ConsoleUpdateOne) SetUserType(ct console.UserType) *ConsoleUpdateOne {
-	cuo.mutation.SetUserType(ct)
-	return cuo
-}
-
-// SetPhone sets the "phone" field.
-func (cuo *ConsoleUpdateOne) SetPhone(s string) *ConsoleUpdateOne {
-	cuo.mutation.SetPhone(s)
-	return cuo
-}
-
-// SetNillablePhone sets the "phone" field if the given value is not nil.
-func (cuo *ConsoleUpdateOne) SetNillablePhone(s *string) *ConsoleUpdateOne {
-	if s != nil {
-		cuo.SetPhone(*s)
-	}
-	return cuo
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (cuo *ConsoleUpdateOne) ClearPhone() *ConsoleUpdateOne {
-	cuo.mutation.ClearPhone()
+// SetUser sets the "user" field.
+func (cuo *ConsoleUpdateOne) SetUser(t *types.User) *ConsoleUpdateOne {
+	cuo.mutation.SetUser(t)
 	return cuo
 }
 
@@ -586,6 +536,20 @@ func (cuo *ConsoleUpdateOne) SetStartAt(t time.Time) *ConsoleUpdateOne {
 // SetStopAt sets the "stopAt" field.
 func (cuo *ConsoleUpdateOne) SetStopAt(t time.Time) *ConsoleUpdateOne {
 	cuo.mutation.SetStopAt(t)
+	return cuo
+}
+
+// SetNillableStopAt sets the "stopAt" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableStopAt(t *time.Time) *ConsoleUpdateOne {
+	if t != nil {
+		cuo.SetStopAt(*t)
+	}
+	return cuo
+}
+
+// ClearStopAt clears the value of the "stopAt" field.
+func (cuo *ConsoleUpdateOne) ClearStopAt() *ConsoleUpdateOne {
+	cuo.mutation.ClearStopAt()
 	return cuo
 }
 
@@ -696,11 +660,6 @@ func (cuo *ConsoleUpdateOne) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Console.type": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.UserType(); ok {
-		if err := console.UserTypeValidator(v); err != nil {
-			return &ValidationError{Name: "user_type", err: fmt.Errorf(`ent: validator failed for field "Console.user_type": %w`, err)}
-		}
-	}
 	if v, ok := cuo.mutation.Status(); ok {
 		if err := console.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Console.status": %w`, err)}
@@ -756,23 +715,14 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 			}
 		}
 	}
+	if value, ok := cuo.mutation.UUID(); ok {
+		_spec.SetField(console.FieldUUID, field.TypeUUID, value)
+	}
 	if value, ok := cuo.mutation.GetType(); ok {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 	}
-	if value, ok := cuo.mutation.UserID(); ok {
-		_spec.SetField(console.FieldUserID, field.TypeUint64, value)
-	}
-	if value, ok := cuo.mutation.AddedUserID(); ok {
-		_spec.AddField(console.FieldUserID, field.TypeUint64, value)
-	}
-	if value, ok := cuo.mutation.UserType(); ok {
-		_spec.SetField(console.FieldUserType, field.TypeEnum, value)
-	}
-	if value, ok := cuo.mutation.Phone(); ok {
-		_spec.SetField(console.FieldPhone, field.TypeString, value)
-	}
-	if cuo.mutation.PhoneCleared() {
-		_spec.ClearField(console.FieldPhone, field.TypeString)
+	if value, ok := cuo.mutation.User(); ok {
+		_spec.SetField(console.FieldUser, field.TypeJSON, value)
 	}
 	if value, ok := cuo.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -806,6 +756,9 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	}
 	if value, ok := cuo.mutation.StopAt(); ok {
 		_spec.SetField(console.FieldStopAt, field.TypeTime, value)
+	}
+	if cuo.mutation.StopAtCleared() {
+		_spec.ClearField(console.FieldStopAt, field.TypeTime)
 	}
 	if cuo.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{

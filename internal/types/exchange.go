@@ -14,6 +14,8 @@ type DetectBattery uint8
 
 const (
     DetectBatteryIgnore DetectBattery = iota // 忽略
+    DetectBatteryPutin                       // 检测放入
+    DetectBatteryPutout                      // 检测取走
 )
 
 // ExchangeStep 换电步骤
@@ -52,4 +54,9 @@ func (s ExchangeStep) String() string {
         return "第4步, 取出电池关仓"
     }
     return "-"
+}
+
+type ExchangeRequest struct {
+    User   *User  `json:"user" form:"user" binding:"required"` // 用户信息
+    Serial string `json:"serial" form:"serial"`
 }

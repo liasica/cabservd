@@ -87,10 +87,9 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			console.FieldCabinetID: {Type: field.TypeUint64, Column: console.FieldCabinetID},
 			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
+			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
 			console.FieldType:      {Type: field.TypeEnum, Column: console.FieldType},
-			console.FieldUserID:    {Type: field.TypeUint64, Column: console.FieldUserID},
-			console.FieldUserType:  {Type: field.TypeEnum, Column: console.FieldUserType},
-			console.FieldPhone:     {Type: field.TypeString, Column: console.FieldPhone},
+			console.FieldUser:      {Type: field.TypeJSON, Column: console.FieldUser},
 			console.FieldStep:      {Type: field.TypeOther, Column: console.FieldStep},
 			console.FieldStatus:    {Type: field.TypeEnum, Column: console.FieldStatus},
 			console.FieldBeforeBin: {Type: field.TypeJSON, Column: console.FieldBeforeBin},
@@ -418,24 +417,19 @@ func (f *ConsoleFilter) WhereBinID(p entql.Uint64P) {
 	f.Where(p.Field(console.FieldBinID))
 }
 
+// WhereUUID applies the entql [16]byte predicate on the uuid field.
+func (f *ConsoleFilter) WhereUUID(p entql.ValueP) {
+	f.Where(p.Field(console.FieldUUID))
+}
+
 // WhereType applies the entql string predicate on the type field.
 func (f *ConsoleFilter) WhereType(p entql.StringP) {
 	f.Where(p.Field(console.FieldType))
 }
 
-// WhereUserID applies the entql uint64 predicate on the user_id field.
-func (f *ConsoleFilter) WhereUserID(p entql.Uint64P) {
-	f.Where(p.Field(console.FieldUserID))
-}
-
-// WhereUserType applies the entql string predicate on the user_type field.
-func (f *ConsoleFilter) WhereUserType(p entql.StringP) {
-	f.Where(p.Field(console.FieldUserType))
-}
-
-// WherePhone applies the entql string predicate on the phone field.
-func (f *ConsoleFilter) WherePhone(p entql.StringP) {
-	f.Where(p.Field(console.FieldPhone))
+// WhereUser applies the entql json.RawMessage predicate on the user field.
+func (f *ConsoleFilter) WhereUser(p entql.BytesP) {
+	f.Where(p.Field(console.FieldUser))
 }
 
 // WhereStep applies the entql other predicate on the step field.

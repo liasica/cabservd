@@ -1,0 +1,16 @@
+brand: ''
+
+tcp:
+  bind: ''
+
+api:
+  bind: ''
+
+postgres:
+  dsn: host=localhost user=postgres password= dbname=cabinet port=5432 sslmode=disable TimeZone=Asia/Shanghai
+
+redis:
+  username: ''
+  password: ''
+  database: 0
+  host: 127.0.0.1

@@ -9,6 +9,7 @@
 - [grpc-go-middleware](https://www.cnblogs.com/FireworksEasyCool/p/12750339.html)
 - [GoKit CLI](https://github.com/GrantZheng/kit/blob/master/README_zh.md)
 - [Go 教程：使用 GO-KIT 来构建微服务（上）](https://learnku.com/go/t/36923)
+- [GO与PG实现缓存同步](https://pigsty.cc/zh/blog/2017/08/03/go%E4%B8%8Epg%E5%AE%9E%E7%8E%B0%E7%BC%93%E5%AD%98%E5%90%8C%E6%AD%A5/)
 
 ### 日志内容
 - 时间

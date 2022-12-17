@@ -14,6 +14,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/types"
+	"github.com/google/uuid"
 
 	"entgo.io/ent"
 )
@@ -2793,11 +2794,9 @@ type ConsoleMutation struct {
 	op             Op
 	typ            string
 	id             *uint64
+	uuid           *uuid.UUID
 	_type          *console.Type
-	user_id        *uint64
-	adduser_id     *int64
-	user_type      *console.UserType
-	phone          *string
+	user           **types.User
 	step           *types.ExchangeStep
 	status         *console.Status
 	before_bin     **types.BinInfo
@@ -2985,6 +2984,42 @@ func (m *ConsoleMutation) ResetBinID() {
 	m.bin = nil
 }
 
+// SetUUID sets the "uuid" field.
+func (m *ConsoleMutation) SetUUID(u uuid.UUID) {
+	m.uuid = &u
+}
+
+// UUID returns the value of the "uuid" field in the mutation.
+func (m *ConsoleMutation) UUID() (r uuid.UUID, exists bool) {
+	v := m.uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUUID returns the old "uuid" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldUUID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
+	}
+	return oldValue.UUID, nil
+}
+
+// ResetUUID resets all changes to the "uuid" field.
+func (m *ConsoleMutation) ResetUUID() {
+	m.uuid = nil
+}
+
 // SetType sets the "type" field.
 func (m *ConsoleMutation) SetType(c console.Type) {
 	m._type = &c
@@ -3021,145 +3056,40 @@ func (m *ConsoleMutation) ResetType() {
 	m._type = nil
 }
 
-// SetUserID sets the "user_id" field.
-func (m *ConsoleMutation) SetUserID(u uint64) {
-	m.user_id = &u
-	m.adduser_id = nil
+// SetUser sets the "user" field.
+func (m *ConsoleMutation) SetUser(t *types.User) {
+	m.user = &t
 }
 
-// UserID returns the value of the "user_id" field in the mutation.
-func (m *ConsoleMutation) UserID() (r uint64, exists bool) {
-	v := m.user_id
+// User returns the value of the "user" field in the mutation.
+func (m *ConsoleMutation) User() (r *types.User, exists bool) {
+	v := m.user
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUserID returns the old "user_id" field's value of the Console entity.
+// OldUser returns the old "user" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldUserID(ctx context.Context) (v uint64, err error) {
+func (m *ConsoleMutation) OldUser(ctx context.Context) (v *types.User, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+		return v, errors.New("OldUser is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserID requires an ID field in the mutation")
+		return v, errors.New("OldUser requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+		return v, fmt.Errorf("querying old value for OldUser: %w", err)
 	}
-	return oldValue.UserID, nil
+	return oldValue.User, nil
 }
 
-// AddUserID adds u to the "user_id" field.
-func (m *ConsoleMutation) AddUserID(u int64) {
-	if m.adduser_id != nil {
-		*m.adduser_id += u
-	} else {
-		m.adduser_id = &u
-	}
-}
-
-// AddedUserID returns the value that was added to the "user_id" field in this mutation.
-func (m *ConsoleMutation) AddedUserID() (r int64, exists bool) {
-	v := m.adduser_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUserID resets all changes to the "user_id" field.
-func (m *ConsoleMutation) ResetUserID() {
-	m.user_id = nil
-	m.adduser_id = nil
-}
-
-// SetUserType sets the "user_type" field.
-func (m *ConsoleMutation) SetUserType(ct console.UserType) {
-	m.user_type = &ct
-}
-
-// UserType returns the value of the "user_type" field in the mutation.
-func (m *ConsoleMutation) UserType() (r console.UserType, exists bool) {
-	v := m.user_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUserType returns the old "user_type" field's value of the Console entity.
-// If the Console object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldUserType(ctx context.Context) (v console.UserType, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserType: %w", err)
-	}
-	return oldValue.UserType, nil
-}
-
-// ResetUserType resets all changes to the "user_type" field.
-func (m *ConsoleMutation) ResetUserType() {
-	m.user_type = nil
-}
-
-// SetPhone sets the "phone" field.
-func (m *ConsoleMutation) SetPhone(s string) {
-	m.phone = &s
-}
-
-// Phone returns the value of the "phone" field in the mutation.
-func (m *ConsoleMutation) Phone() (r string, exists bool) {
-	v := m.phone
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldPhone returns the old "phone" field's value of the Console entity.
-// If the Console object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldPhone(ctx context.Context) (v *string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldPhone is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldPhone requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldPhone: %w", err)
-	}
-	return oldValue.Phone, nil
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (m *ConsoleMutation) ClearPhone() {
-	m.phone = nil
-	m.clearedFields[console.FieldPhone] = struct{}{}
-}
-
-// PhoneCleared returns if the "phone" field was cleared in this mutation.
-func (m *ConsoleMutation) PhoneCleared() bool {
-	_, ok := m.clearedFields[console.FieldPhone]
-	return ok
-}
-
-// ResetPhone resets all changes to the "phone" field.
-func (m *ConsoleMutation) ResetPhone() {
-	m.phone = nil
-	delete(m.clearedFields, console.FieldPhone)
+// ResetUser resets all changes to the "user" field.
+func (m *ConsoleMutation) ResetUser() {
+	m.user = nil
 }
 
 // SetStep sets the "step" field.
@@ -3447,7 +3377,7 @@ func (m *ConsoleMutation) StopAt() (r time.Time, exists bool) {
 // OldStopAt returns the old "stopAt" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldStopAt(ctx context.Context) (v time.Time, err error) {
+func (m *ConsoleMutation) OldStopAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStopAt is only allowed on UpdateOne operations")
 	}
@@ -3461,9 +3391,22 @@ func (m *ConsoleMutation) OldStopAt(ctx context.Context) (v time.Time, err error
 	return oldValue.StopAt, nil
 }
 
+// ClearStopAt clears the value of the "stopAt" field.
+func (m *ConsoleMutation) ClearStopAt() {
+	m.stopAt = nil
+	m.clearedFields[console.FieldStopAt] = struct{}{}
+}
+
+// StopAtCleared returns if the "stopAt" field was cleared in this mutation.
+func (m *ConsoleMutation) StopAtCleared() bool {
+	_, ok := m.clearedFields[console.FieldStopAt]
+	return ok
+}
+
 // ResetStopAt resets all changes to the "stopAt" field.
 func (m *ConsoleMutation) ResetStopAt() {
 	m.stopAt = nil
+	delete(m.clearedFields, console.FieldStopAt)
 }
 
 // ClearCabinet clears the "cabinet" edge to the Cabinet entity.
@@ -3537,24 +3480,21 @@ func (m *ConsoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConsoleMutation) Fields() []string {
-	fields := make([]string, 0, 13)
+	fields := make([]string, 0, 12)
 	if m.cabinet != nil {
 		fields = append(fields, console.FieldCabinetID)
 	}
 	if m.bin != nil {
 		fields = append(fields, console.FieldBinID)
 	}
+	if m.uuid != nil {
+		fields = append(fields, console.FieldUUID)
+	}
 	if m._type != nil {
 		fields = append(fields, console.FieldType)
 	}
-	if m.user_id != nil {
-		fields = append(fields, console.FieldUserID)
-	}
-	if m.user_type != nil {
-		fields = append(fields, console.FieldUserType)
-	}
-	if m.phone != nil {
-		fields = append(fields, console.FieldPhone)
+	if m.user != nil {
+		fields = append(fields, console.FieldUser)
 	}
 	if m.step != nil {
 		fields = append(fields, console.FieldStep)
@@ -3589,14 +3529,12 @@ func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
 		return m.CabinetID()
 	case console.FieldBinID:
 		return m.BinID()
+	case console.FieldUUID:
+		return m.UUID()
 	case console.FieldType:
 		return m.GetType()
-	case console.FieldUserID:
-		return m.UserID()
-	case console.FieldUserType:
-		return m.UserType()
-	case console.FieldPhone:
-		return m.Phone()
+	case console.FieldUser:
+		return m.User()
 	case console.FieldStep:
 		return m.Step()
 	case console.FieldStatus:
@@ -3624,14 +3562,12 @@ func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldCabinetID(ctx)
 	case console.FieldBinID:
 		return m.OldBinID(ctx)
+	case console.FieldUUID:
+		return m.OldUUID(ctx)
 	case console.FieldType:
 		return m.OldType(ctx)
-	case console.FieldUserID:
-		return m.OldUserID(ctx)
-	case console.FieldUserType:
-		return m.OldUserType(ctx)
-	case console.FieldPhone:
-		return m.OldPhone(ctx)
+	case console.FieldUser:
+		return m.OldUser(ctx)
 	case console.FieldStep:
 		return m.OldStep(ctx)
 	case console.FieldStatus:
@@ -3669,6 +3605,13 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetBinID(v)
 		return nil
+	case console.FieldUUID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUUID(v)
+		return nil
 	case console.FieldType:
 		v, ok := value.(console.Type)
 		if !ok {
@@ -3676,26 +3619,12 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetType(v)
 		return nil
-	case console.FieldUserID:
-		v, ok := value.(uint64)
+	case console.FieldUser:
+		v, ok := value.(*types.User)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUserID(v)
-		return nil
-	case console.FieldUserType:
-		v, ok := value.(console.UserType)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserType(v)
-		return nil
-	case console.FieldPhone:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetPhone(v)
+		m.SetUser(v)
 		return nil
 	case console.FieldStep:
 		v, ok := value.(types.ExchangeStep)
@@ -3754,9 +3683,6 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *ConsoleMutation) AddedFields() []string {
 	var fields []string
-	if m.adduser_id != nil {
-		fields = append(fields, console.FieldUserID)
-	}
 	return fields
 }
 
@@ -3765,8 +3691,6 @@ func (m *ConsoleMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *ConsoleMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case console.FieldUserID:
-		return m.AddedUserID()
 	}
 	return nil, false
 }
@@ -3776,13 +3700,6 @@ func (m *ConsoleMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ConsoleMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case console.FieldUserID:
-		v, ok := value.(int64)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUserID(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Console numeric field %s", name)
 }
@@ -3791,9 +3708,6 @@ func (m *ConsoleMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ConsoleMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(console.FieldPhone) {
-		fields = append(fields, console.FieldPhone)
-	}
 	if m.FieldCleared(console.FieldStep) {
 		fields = append(fields, console.FieldStep)
 	}
@@ -3805,6 +3719,9 @@ func (m *ConsoleMutation) ClearedFields() []string {
 	}
 	if m.FieldCleared(console.FieldMessage) {
 		fields = append(fields, console.FieldMessage)
+	}
+	if m.FieldCleared(console.FieldStopAt) {
+		fields = append(fields, console.FieldStopAt)
 	}
 	return fields
 }
@@ -3820,9 +3737,6 @@ func (m *ConsoleMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ConsoleMutation) ClearField(name string) error {
 	switch name {
-	case console.FieldPhone:
-		m.ClearPhone()
-		return nil
 	case console.FieldStep:
 		m.ClearStep()
 		return nil
@@ -3834,6 +3748,9 @@ func (m *ConsoleMutation) ClearField(name string) error {
 		return nil
 	case console.FieldMessage:
 		m.ClearMessage()
+		return nil
+	case console.FieldStopAt:
+		m.ClearStopAt()
 		return nil
 	}
 	return fmt.Errorf("unknown Console nullable field %s", name)
@@ -3849,17 +3766,14 @@ func (m *ConsoleMutation) ResetField(name string) error {
 	case console.FieldBinID:
 		m.ResetBinID()
 		return nil
+	case console.FieldUUID:
+		m.ResetUUID()
+		return nil
 	case console.FieldType:
 		m.ResetType()
 		return nil
-	case console.FieldUserID:
-		m.ResetUserID()
-		return nil
-	case console.FieldUserType:
-		m.ResetUserType()
-		return nil
-	case console.FieldPhone:
-		m.ResetPhone()
+	case console.FieldUser:
+		m.ResetUser()
 		return nil
 	case console.FieldStep:
 		m.ResetStep()

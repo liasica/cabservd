@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/types"
+	"github.com/google/uuid"
 )
 
 // ID filters vertices based on their ID field.
@@ -96,17 +97,10 @@ func BinID(v uint64) predicate.Console {
 	})
 }
 
-// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
-func UserID(v uint64) predicate.Console {
+// UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
+func UUID(v uuid.UUID) predicate.Console {
 	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserID), v))
-	})
-}
-
-// Phone applies equality check predicate on the "phone" field. It's identical to PhoneEQ.
-func Phone(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPhone), v))
+		s.Where(sql.EQ(s.C(FieldUUID), v))
 	})
 }
 
@@ -210,6 +204,70 @@ func BinIDNotIn(vs ...uint64) predicate.Console {
 	})
 }
 
+// UUIDEQ applies the EQ predicate on the "uuid" field.
+func UUIDEQ(v uuid.UUID) predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDNEQ applies the NEQ predicate on the "uuid" field.
+func UUIDNEQ(v uuid.UUID) predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDIn applies the In predicate on the "uuid" field.
+func UUIDIn(vs ...uuid.UUID) predicate.Console {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.In(s.C(FieldUUID), v...))
+	})
+}
+
+// UUIDNotIn applies the NotIn predicate on the "uuid" field.
+func UUIDNotIn(vs ...uuid.UUID) predicate.Console {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.NotIn(s.C(FieldUUID), v...))
+	})
+}
+
+// UUIDGT applies the GT predicate on the "uuid" field.
+func UUIDGT(v uuid.UUID) predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDGTE applies the GTE predicate on the "uuid" field.
+func UUIDGTE(v uuid.UUID) predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDLT applies the LT predicate on the "uuid" field.
+func UUIDLT(v uuid.UUID) predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldUUID), v))
+	})
+}
+
+// UUIDLTE applies the LTE predicate on the "uuid" field.
+func UUIDLTE(v uuid.UUID) predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldUUID), v))
+	})
+}
+
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v Type) predicate.Console {
 	return predicate.Console(func(s *sql.Selector) {
@@ -243,219 +301,6 @@ func TypeNotIn(vs ...Type) predicate.Console {
 	}
 	return predicate.Console(func(s *sql.Selector) {
 		s.Where(sql.NotIn(s.C(FieldType), v...))
-	})
-}
-
-// UserIDEQ applies the EQ predicate on the "user_id" field.
-func UserIDEQ(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserID), v))
-	})
-}
-
-// UserIDNEQ applies the NEQ predicate on the "user_id" field.
-func UserIDNEQ(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUserID), v))
-	})
-}
-
-// UserIDIn applies the In predicate on the "user_id" field.
-func UserIDIn(vs ...uint64) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUserID), v...))
-	})
-}
-
-// UserIDNotIn applies the NotIn predicate on the "user_id" field.
-func UserIDNotIn(vs ...uint64) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUserID), v...))
-	})
-}
-
-// UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUserID), v))
-	})
-}
-
-// UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUserID), v))
-	})
-}
-
-// UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUserID), v))
-	})
-}
-
-// UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUserID), v))
-	})
-}
-
-// UserTypeEQ applies the EQ predicate on the "user_type" field.
-func UserTypeEQ(v UserType) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUserType), v))
-	})
-}
-
-// UserTypeNEQ applies the NEQ predicate on the "user_type" field.
-func UserTypeNEQ(v UserType) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUserType), v))
-	})
-}
-
-// UserTypeIn applies the In predicate on the "user_type" field.
-func UserTypeIn(vs ...UserType) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUserType), v...))
-	})
-}
-
-// UserTypeNotIn applies the NotIn predicate on the "user_type" field.
-func UserTypeNotIn(vs ...UserType) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUserType), v...))
-	})
-}
-
-// PhoneEQ applies the EQ predicate on the "phone" field.
-func PhoneEQ(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneNEQ applies the NEQ predicate on the "phone" field.
-func PhoneNEQ(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneIn applies the In predicate on the "phone" field.
-func PhoneIn(vs ...string) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldPhone), v...))
-	})
-}
-
-// PhoneNotIn applies the NotIn predicate on the "phone" field.
-func PhoneNotIn(vs ...string) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldPhone), v...))
-	})
-}
-
-// PhoneGT applies the GT predicate on the "phone" field.
-func PhoneGT(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneGTE applies the GTE predicate on the "phone" field.
-func PhoneGTE(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneLT applies the LT predicate on the "phone" field.
-func PhoneLT(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneLTE applies the LTE predicate on the "phone" field.
-func PhoneLTE(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneContains applies the Contains predicate on the "phone" field.
-func PhoneContains(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneHasPrefix applies the HasPrefix predicate on the "phone" field.
-func PhoneHasPrefix(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneHasSuffix applies the HasSuffix predicate on the "phone" field.
-func PhoneHasSuffix(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneIsNil applies the IsNil predicate on the "phone" field.
-func PhoneIsNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldPhone)))
-	})
-}
-
-// PhoneNotNil applies the NotNil predicate on the "phone" field.
-func PhoneNotNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldPhone)))
-	})
-}
-
-// PhoneEqualFold applies the EqualFold predicate on the "phone" field.
-func PhoneEqualFold(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldPhone), v))
-	})
-}
-
-// PhoneContainsFold applies the ContainsFold predicate on the "phone" field.
-func PhoneContainsFold(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldPhone), v))
 	})
 }
 
@@ -839,6 +684,20 @@ func StopAtLT(v time.Time) predicate.Console {
 func StopAtLTE(v time.Time) predicate.Console {
 	return predicate.Console(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldStopAt), v))
+	})
+}
+
+// StopAtIsNil applies the IsNil predicate on the "stopAt" field.
+func StopAtIsNil() predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldStopAt)))
+	})
+}
+
+// StopAtNotNil applies the NotNil predicate on the "stopAt" field.
+func StopAtNotNil() predicate.Console {
+	return predicate.Console(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldStopAt)))
 	})
 }
 

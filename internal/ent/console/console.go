@@ -15,14 +15,12 @@ const (
 	FieldCabinetID = "cabinet_id"
 	// FieldBinID holds the string denoting the bin_id field in the database.
 	FieldBinID = "bin_id"
+	// FieldUUID holds the string denoting the uuid field in the database.
+	FieldUUID = "uuid"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldUserID holds the string denoting the user_id field in the database.
-	FieldUserID = "user_id"
-	// FieldUserType holds the string denoting the user_type field in the database.
-	FieldUserType = "user_type"
-	// FieldPhone holds the string denoting the phone field in the database.
-	FieldPhone = "phone"
+	// FieldUser holds the string denoting the user field in the database.
+	FieldUser = "user"
 	// FieldStep holds the string denoting the step field in the database.
 	FieldStep = "step"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -64,10 +62,9 @@ var Columns = []string{
 	FieldID,
 	FieldCabinetID,
 	FieldBinID,
+	FieldUUID,
 	FieldType,
-	FieldUserID,
-	FieldUserType,
-	FieldPhone,
+	FieldUser,
 	FieldStep,
 	FieldStatus,
 	FieldBeforeBin,
@@ -94,6 +91,7 @@ type Type string
 const (
 	TypeExchange Type = "exchange"
 	TypeControl  Type = "control"
+	TypeCabinet  Type = "cabinet"
 )
 
 func (_type Type) String() string {
@@ -103,33 +101,10 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeExchange, TypeControl:
+	case TypeExchange, TypeControl, TypeCabinet:
 		return nil
 	default:
 		return fmt.Errorf("console: invalid enum value for type field: %q", _type)
-	}
-}
-
-// UserType defines the type for the "user_type" enum field.
-type UserType string
-
-// UserType values.
-const (
-	UserTypeManager UserType = "manager"
-	UserTypeRider   UserType = "rider"
-)
-
-func (ut UserType) String() string {
-	return string(ut)
-}
-
-// UserTypeValidator is a validator for the "user_type" field enum values. It is called by the builders before save.
-func UserTypeValidator(ut UserType) error {
-	switch ut {
-	case UserTypeManager, UserTypeRider:
-		return nil
-	default:
-		return fmt.Errorf("console: invalid enum value for user_type field: %q", ut)
 	}
 }
 

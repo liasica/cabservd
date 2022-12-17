@@ -15,6 +15,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/types"
+	"github.com/google/uuid"
 )
 
 // ConsoleCreate is the builder for creating a Console entity.
@@ -37,35 +38,21 @@ func (cc *ConsoleCreate) SetBinID(u uint64) *ConsoleCreate {
 	return cc
 }
 
+// SetUUID sets the "uuid" field.
+func (cc *ConsoleCreate) SetUUID(u uuid.UUID) *ConsoleCreate {
+	cc.mutation.SetUUID(u)
+	return cc
+}
+
 // SetType sets the "type" field.
 func (cc *ConsoleCreate) SetType(c console.Type) *ConsoleCreate {
 	cc.mutation.SetType(c)
 	return cc
 }
 
-// SetUserID sets the "user_id" field.
-func (cc *ConsoleCreate) SetUserID(u uint64) *ConsoleCreate {
-	cc.mutation.SetUserID(u)
-	return cc
-}
-
-// SetUserType sets the "user_type" field.
-func (cc *ConsoleCreate) SetUserType(ct console.UserType) *ConsoleCreate {
-	cc.mutation.SetUserType(ct)
-	return cc
-}
-
-// SetPhone sets the "phone" field.
-func (cc *ConsoleCreate) SetPhone(s string) *ConsoleCreate {
-	cc.mutation.SetPhone(s)
-	return cc
-}
-
-// SetNillablePhone sets the "phone" field if the given value is not nil.
-func (cc *ConsoleCreate) SetNillablePhone(s *string) *ConsoleCreate {
-	if s != nil {
-		cc.SetPhone(*s)
-	}
+// SetUser sets the "user" field.
+func (cc *ConsoleCreate) SetUser(t *types.User) *ConsoleCreate {
+	cc.mutation.SetUser(t)
 	return cc
 }
 
@@ -124,6 +111,14 @@ func (cc *ConsoleCreate) SetStartAt(t time.Time) *ConsoleCreate {
 // SetStopAt sets the "stopAt" field.
 func (cc *ConsoleCreate) SetStopAt(t time.Time) *ConsoleCreate {
 	cc.mutation.SetStopAt(t)
+	return cc
+}
+
+// SetNillableStopAt sets the "stopAt" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableStopAt(t *time.Time) *ConsoleCreate {
+	if t != nil {
+		cc.SetStopAt(*t)
+	}
 	return cc
 }
 
@@ -219,6 +214,9 @@ func (cc *ConsoleCreate) check() error {
 	if _, ok := cc.mutation.BinID(); !ok {
 		return &ValidationError{Name: "bin_id", err: errors.New(`ent: missing required field "Console.bin_id"`)}
 	}
+	if _, ok := cc.mutation.UUID(); !ok {
+		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "Console.uuid"`)}
+	}
 	if _, ok := cc.mutation.GetType(); !ok {
 		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Console.type"`)}
 	}
@@ -227,16 +225,8 @@ func (cc *ConsoleCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Console.type": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Console.user_id"`)}
-	}
-	if _, ok := cc.mutation.UserType(); !ok {
-		return &ValidationError{Name: "user_type", err: errors.New(`ent: missing required field "Console.user_type"`)}
-	}
-	if v, ok := cc.mutation.UserType(); ok {
-		if err := console.UserTypeValidator(v); err != nil {
-			return &ValidationError{Name: "user_type", err: fmt.Errorf(`ent: validator failed for field "Console.user_type": %w`, err)}
-		}
+	if _, ok := cc.mutation.User(); !ok {
+		return &ValidationError{Name: "user", err: errors.New(`ent: missing required field "Console.user"`)}
 	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Console.status"`)}
@@ -248,9 +238,6 @@ func (cc *ConsoleCreate) check() error {
 	}
 	if _, ok := cc.mutation.StartAt(); !ok {
 		return &ValidationError{Name: "startAt", err: errors.New(`ent: missing required field "Console.startAt"`)}
-	}
-	if _, ok := cc.mutation.StopAt(); !ok {
-		return &ValidationError{Name: "stopAt", err: errors.New(`ent: missing required field "Console.stopAt"`)}
 	}
 	if _, ok := cc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet", err: errors.New(`ent: missing required edge "Console.cabinet"`)}
@@ -286,21 +273,17 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 		}
 	)
 	_spec.OnConflict = cc.conflict
+	if value, ok := cc.mutation.UUID(); ok {
+		_spec.SetField(console.FieldUUID, field.TypeUUID, value)
+		_node.UUID = value
+	}
 	if value, ok := cc.mutation.GetType(); ok {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
-	if value, ok := cc.mutation.UserID(); ok {
-		_spec.SetField(console.FieldUserID, field.TypeUint64, value)
-		_node.UserID = value
-	}
-	if value, ok := cc.mutation.UserType(); ok {
-		_spec.SetField(console.FieldUserType, field.TypeEnum, value)
-		_node.UserType = value
-	}
-	if value, ok := cc.mutation.Phone(); ok {
-		_spec.SetField(console.FieldPhone, field.TypeString, value)
-		_node.Phone = &value
+	if value, ok := cc.mutation.User(); ok {
+		_spec.SetField(console.FieldUser, field.TypeJSON, value)
+		_node.User = value
 	}
 	if value, ok := cc.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -328,7 +311,7 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cc.mutation.StopAt(); ok {
 		_spec.SetField(console.FieldStopAt, field.TypeTime, value)
-		_node.StopAt = value
+		_node.StopAt = &value
 	}
 	if nodes := cc.mutation.CabinetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -446,6 +429,18 @@ func (u *ConsoleUpsert) UpdateBinID() *ConsoleUpsert {
 	return u
 }
 
+// SetUUID sets the "uuid" field.
+func (u *ConsoleUpsert) SetUUID(v uuid.UUID) *ConsoleUpsert {
+	u.Set(console.FieldUUID, v)
+	return u
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateUUID() *ConsoleUpsert {
+	u.SetExcluded(console.FieldUUID)
+	return u
+}
+
 // SetType sets the "type" field.
 func (u *ConsoleUpsert) SetType(v console.Type) *ConsoleUpsert {
 	u.Set(console.FieldType, v)
@@ -458,51 +453,15 @@ func (u *ConsoleUpsert) UpdateType() *ConsoleUpsert {
 	return u
 }
 
-// SetUserID sets the "user_id" field.
-func (u *ConsoleUpsert) SetUserID(v uint64) *ConsoleUpsert {
-	u.Set(console.FieldUserID, v)
+// SetUser sets the "user" field.
+func (u *ConsoleUpsert) SetUser(v *types.User) *ConsoleUpsert {
+	u.Set(console.FieldUser, v)
 	return u
 }
 
-// UpdateUserID sets the "user_id" field to the value that was provided on create.
-func (u *ConsoleUpsert) UpdateUserID() *ConsoleUpsert {
-	u.SetExcluded(console.FieldUserID)
-	return u
-}
-
-// AddUserID adds v to the "user_id" field.
-func (u *ConsoleUpsert) AddUserID(v uint64) *ConsoleUpsert {
-	u.Add(console.FieldUserID, v)
-	return u
-}
-
-// SetUserType sets the "user_type" field.
-func (u *ConsoleUpsert) SetUserType(v console.UserType) *ConsoleUpsert {
-	u.Set(console.FieldUserType, v)
-	return u
-}
-
-// UpdateUserType sets the "user_type" field to the value that was provided on create.
-func (u *ConsoleUpsert) UpdateUserType() *ConsoleUpsert {
-	u.SetExcluded(console.FieldUserType)
-	return u
-}
-
-// SetPhone sets the "phone" field.
-func (u *ConsoleUpsert) SetPhone(v string) *ConsoleUpsert {
-	u.Set(console.FieldPhone, v)
-	return u
-}
-
-// UpdatePhone sets the "phone" field to the value that was provided on create.
-func (u *ConsoleUpsert) UpdatePhone() *ConsoleUpsert {
-	u.SetExcluded(console.FieldPhone)
-	return u
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (u *ConsoleUpsert) ClearPhone() *ConsoleUpsert {
-	u.SetNull(console.FieldPhone)
+// UpdateUser sets the "user" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateUser() *ConsoleUpsert {
+	u.SetExcluded(console.FieldUser)
 	return u
 }
 
@@ -614,6 +573,12 @@ func (u *ConsoleUpsert) UpdateStopAt() *ConsoleUpsert {
 	return u
 }
 
+// ClearStopAt clears the value of the "stopAt" field.
+func (u *ConsoleUpsert) ClearStopAt() *ConsoleUpsert {
+	u.SetNull(console.FieldStopAt)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -682,6 +647,20 @@ func (u *ConsoleUpsertOne) UpdateBinID() *ConsoleUpsertOne {
 	})
 }
 
+// SetUUID sets the "uuid" field.
+func (u *ConsoleUpsertOne) SetUUID(v uuid.UUID) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetUUID(v)
+	})
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateUUID() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateUUID()
+	})
+}
+
 // SetType sets the "type" field.
 func (u *ConsoleUpsertOne) SetType(v console.Type) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -696,59 +675,17 @@ func (u *ConsoleUpsertOne) UpdateType() *ConsoleUpsertOne {
 	})
 }
 
-// SetUserID sets the "user_id" field.
-func (u *ConsoleUpsertOne) SetUserID(v uint64) *ConsoleUpsertOne {
+// SetUser sets the "user" field.
+func (u *ConsoleUpsertOne) SetUser(v *types.User) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUserID(v)
+		s.SetUser(v)
 	})
 }
 
-// AddUserID adds v to the "user_id" field.
-func (u *ConsoleUpsertOne) AddUserID(v uint64) *ConsoleUpsertOne {
+// UpdateUser sets the "user" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateUser() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.AddUserID(v)
-	})
-}
-
-// UpdateUserID sets the "user_id" field to the value that was provided on create.
-func (u *ConsoleUpsertOne) UpdateUserID() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUserID()
-	})
-}
-
-// SetUserType sets the "user_type" field.
-func (u *ConsoleUpsertOne) SetUserType(v console.UserType) *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUserType(v)
-	})
-}
-
-// UpdateUserType sets the "user_type" field to the value that was provided on create.
-func (u *ConsoleUpsertOne) UpdateUserType() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUserType()
-	})
-}
-
-// SetPhone sets the "phone" field.
-func (u *ConsoleUpsertOne) SetPhone(v string) *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.SetPhone(v)
-	})
-}
-
-// UpdatePhone sets the "phone" field to the value that was provided on create.
-func (u *ConsoleUpsertOne) UpdatePhone() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdatePhone()
-	})
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (u *ConsoleUpsertOne) ClearPhone() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearPhone()
+		s.UpdateUser()
 	})
 }
 
@@ -875,6 +812,13 @@ func (u *ConsoleUpsertOne) SetStopAt(v time.Time) *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) UpdateStopAt() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateStopAt()
+	})
+}
+
+// ClearStopAt clears the value of the "stopAt" field.
+func (u *ConsoleUpsertOne) ClearStopAt() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearStopAt()
 	})
 }
 
@@ -1113,6 +1057,20 @@ func (u *ConsoleUpsertBulk) UpdateBinID() *ConsoleUpsertBulk {
 	})
 }
 
+// SetUUID sets the "uuid" field.
+func (u *ConsoleUpsertBulk) SetUUID(v uuid.UUID) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetUUID(v)
+	})
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateUUID() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateUUID()
+	})
+}
+
 // SetType sets the "type" field.
 func (u *ConsoleUpsertBulk) SetType(v console.Type) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -1127,59 +1085,17 @@ func (u *ConsoleUpsertBulk) UpdateType() *ConsoleUpsertBulk {
 	})
 }
 
-// SetUserID sets the "user_id" field.
-func (u *ConsoleUpsertBulk) SetUserID(v uint64) *ConsoleUpsertBulk {
+// SetUser sets the "user" field.
+func (u *ConsoleUpsertBulk) SetUser(v *types.User) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUserID(v)
+		s.SetUser(v)
 	})
 }
 
-// AddUserID adds v to the "user_id" field.
-func (u *ConsoleUpsertBulk) AddUserID(v uint64) *ConsoleUpsertBulk {
+// UpdateUser sets the "user" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateUser() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.AddUserID(v)
-	})
-}
-
-// UpdateUserID sets the "user_id" field to the value that was provided on create.
-func (u *ConsoleUpsertBulk) UpdateUserID() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUserID()
-	})
-}
-
-// SetUserType sets the "user_type" field.
-func (u *ConsoleUpsertBulk) SetUserType(v console.UserType) *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUserType(v)
-	})
-}
-
-// UpdateUserType sets the "user_type" field to the value that was provided on create.
-func (u *ConsoleUpsertBulk) UpdateUserType() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUserType()
-	})
-}
-
-// SetPhone sets the "phone" field.
-func (u *ConsoleUpsertBulk) SetPhone(v string) *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.SetPhone(v)
-	})
-}
-
-// UpdatePhone sets the "phone" field to the value that was provided on create.
-func (u *ConsoleUpsertBulk) UpdatePhone() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdatePhone()
-	})
-}
-
-// ClearPhone clears the value of the "phone" field.
-func (u *ConsoleUpsertBulk) ClearPhone() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearPhone()
+		s.UpdateUser()
 	})
 }
 
@@ -1306,6 +1222,13 @@ func (u *ConsoleUpsertBulk) SetStopAt(v time.Time) *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) UpdateStopAt() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateStopAt()
+	})
+}
+
+// ClearStopAt clears the value of the "stopAt" field.
+func (u *ConsoleUpsertBulk) ClearStopAt() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearStopAt()
 	})
 }
 

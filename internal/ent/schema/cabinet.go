@@ -60,7 +60,7 @@ func (Cabinet) Fields() []ent.Field {
         field.Bool("online").Default(false).Comment("是否在线"),
         field.String("brand").Comment("品牌"),
         field.String("serial").Unique().Comment("电柜编号"),
-        field.Enum("status").Default("initializing").Values("initializing", "idle", "busy", "exchange", "abnormal").Comment("状态"), // initializing:初始化中 idle:空闲 busy:忙 abnormal:异常 exchange:换电中
+        field.Enum("status").Default("initializing").Values("initializing", "idle", "busy", "exchange", "abnormal").Comment("状态"), // initializing:初始化中 idle:空闲 busy:忙(后台控制时) abnormal:异常 exchange:换电中
         field.Bool("enable").Default(false).Comment("电柜是否启用"),
         field.Float("lng").Optional().Nillable().Comment("经度"),
         field.Float("lat").Optional().Nillable().Comment("纬度"),

@@ -7,8 +7,9 @@ package main
 
 import (
     "github.com/auroraride/cabservd/internal"
+    "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/auroraride/cabservd/internal/core/kaixin"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/router"
 )
 
@@ -21,8 +22,8 @@ func main() {
 
     // 启动socket hub
     core.Start(
-        "0.0.0.0:18531",
-        "凯信",
+        g.Config.Tcp.Bind,
+        g.Config.Brand,
         kaixin.New(),
         new(core.HeaderLength),
     )

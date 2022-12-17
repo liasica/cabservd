@@ -13,6 +13,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/types"
+	"github.com/google/uuid"
 )
 
 // Console is the model entity for the Console schema.
@@ -24,28 +25,26 @@ type Console struct {
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// BinID holds the value of the "bin_id" field.
 	BinID uint64 `json:"bin_id,omitempty"`
-	// 类别
+	// UUID holds the value of the "uuid" field.
+	UUID uuid.UUID `json:"uuid,omitempty"`
+	// 日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志
 	Type console.Type `json:"type,omitempty"`
-	// 用户ID
-	UserID uint64 `json:"user_id,omitempty"`
-	// 用户类别
-	UserType console.UserType `json:"user_type,omitempty"`
-	// 用户电话
-	Phone *string `json:"phone,omitempty"`
+	// 操作用户
+	User *types.User `json:"user,omitempty"`
 	// 换电步骤
 	Step *types.ExchangeStep `json:"step,omitempty"`
-	// 状态
+	// 状态 pending:未开始 running:执行中 success:成功 failed:失败
 	Status console.Status `json:"status,omitempty"`
-	// 操作前仓位信息
+	// 变化前仓位信息
 	BeforeBin *types.BinInfo `json:"before_bin,omitempty"`
-	// 操作后仓位信息
+	// 变化后仓位信息
 	AfterBin *types.BinInfo `json:"after_bin,omitempty"`
 	// 消息
 	Message *string `json:"message,omitempty"`
-	// 开始时间
+	// 记录时间
 	StartAt time.Time `json:"startAt,omitempty"`
 	// 结束时间
-	StopAt time.Time `json:"stopAt,omitempty"`
+	StopAt *time.Time `json:"stopAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConsoleQuery when eager-loading is set.
 	Edges ConsoleEdges `json:"edges"`
@@ -95,14 +94,16 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case console.FieldStep:
 			values[i] = &sql.NullScanner{S: new(types.ExchangeStep)}
-		case console.FieldBeforeBin, console.FieldAfterBin:
+		case console.FieldUser, console.FieldBeforeBin, console.FieldAfterBin:
 			values[i] = new([]byte)
-		case console.FieldID, console.FieldCabinetID, console.FieldBinID, console.FieldUserID:
+		case console.FieldID, console.FieldCabinetID, console.FieldBinID:
 			values[i] = new(sql.NullInt64)
-		case console.FieldType, console.FieldUserType, console.FieldPhone, console.FieldStatus, console.FieldMessage:
+		case console.FieldType, console.FieldStatus, console.FieldMessage:
 			values[i] = new(sql.NullString)
 		case console.FieldStartAt, console.FieldStopAt:
 			values[i] = new(sql.NullTime)
+		case console.FieldUUID:
+			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Console", columns[i])
 		}
@@ -136,30 +137,25 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.BinID = uint64(value.Int64)
 			}
+		case console.FieldUUID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value != nil {
+				c.UUID = *value
+			}
 		case console.FieldType:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				c.Type = console.Type(value.String)
 			}
-		case console.FieldUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field user_id", values[i])
-			} else if value.Valid {
-				c.UserID = uint64(value.Int64)
-			}
-		case console.FieldUserType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field user_type", values[i])
-			} else if value.Valid {
-				c.UserType = console.UserType(value.String)
-			}
-		case console.FieldPhone:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field phone", values[i])
-			} else if value.Valid {
-				c.Phone = new(string)
-				*c.Phone = value.String
+		case console.FieldUser:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field user", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.User); err != nil {
+					return fmt.Errorf("unmarshal field user: %w", err)
+				}
 			}
 		case console.FieldStep:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -207,7 +203,8 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field stopAt", values[i])
 			} else if value.Valid {
-				c.StopAt = value.Time
+				c.StopAt = new(time.Time)
+				*c.StopAt = value.Time
 			}
 		}
 	}
@@ -253,19 +250,14 @@ func (c *Console) String() string {
 	builder.WriteString("bin_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.BinID))
 	builder.WriteString(", ")
+	builder.WriteString("uuid=")
+	builder.WriteString(fmt.Sprintf("%v", c.UUID))
+	builder.WriteString(", ")
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", c.Type))
 	builder.WriteString(", ")
-	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserID))
-	builder.WriteString(", ")
-	builder.WriteString("user_type=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserType))
-	builder.WriteString(", ")
-	if v := c.Phone; v != nil {
-		builder.WriteString("phone=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("user=")
+	builder.WriteString(fmt.Sprintf("%v", c.User))
 	builder.WriteString(", ")
 	if v := c.Step; v != nil {
 		builder.WriteString("step=")
@@ -289,8 +281,10 @@ func (c *Console) String() string {
 	builder.WriteString("startAt=")
 	builder.WriteString(c.StartAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("stopAt=")
-	builder.WriteString(c.StopAt.Format(time.ANSIC))
+	if v := c.StopAt; v != nil {
+		builder.WriteString("stopAt=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -127,17 +127,16 @@ var (
 	// ConsoleColumns holds the columns for the "console" table.
 	ConsoleColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "type", Type: field.TypeEnum, Enums: []string{"exchange", "control"}},
-		{Name: "user_id", Type: field.TypeUint64},
-		{Name: "user_type", Type: field.TypeEnum, Enums: []string{"manager", "rider"}},
-		{Name: "phone", Type: field.TypeString, Nullable: true},
+		{Name: "uuid", Type: field.TypeUUID},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"exchange", "control", "cabinet"}},
+		{Name: "user", Type: field.TypeJSON},
 		{Name: "step", Type: field.TypeOther, Nullable: true, SchemaType: map[string]string{"postgres": "smallint"}},
 		{Name: "status", Type: field.TypeEnum, Enums: []string{"pending", "running", "success", "failed"}},
 		{Name: "before_bin", Type: field.TypeJSON, Nullable: true},
 		{Name: "after_bin", Type: field.TypeJSON, Nullable: true},
 		{Name: "message", Type: field.TypeString, Nullable: true},
 		{Name: "start_at", Type: field.TypeTime},
-		{Name: "stop_at", Type: field.TypeTime},
+		{Name: "stop_at", Type: field.TypeTime, Nullable: true},
 		{Name: "cabinet_id", Type: field.TypeUint64},
 		{Name: "bin_id", Type: field.TypeUint64},
 	}
@@ -149,13 +148,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "console_cabinet_cabinet",
-				Columns:    []*schema.Column{ConsoleColumns[12]},
+				Columns:    []*schema.Column{ConsoleColumns[11]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "console_bin_bin",
-				Columns:    []*schema.Column{ConsoleColumns[13]},
+				Columns:    []*schema.Column{ConsoleColumns[12]},
 				RefColumns: []*schema.Column{BinColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -164,12 +163,27 @@ var (
 			{
 				Name:    "console_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[12]},
+				Columns: []*schema.Column{ConsoleColumns[11]},
 			},
 			{
 				Name:    "console_bin_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[13]},
+				Columns: []*schema.Column{ConsoleColumns[12]},
+			},
+			{
+				Name:    "console_uuid",
+				Unique:  false,
+				Columns: []*schema.Column{ConsoleColumns[1]},
+			},
+			{
+				Name:    "console_user",
+				Unique:  false,
+				Columns: []*schema.Column{ConsoleColumns[3]},
+				Annotation: &entsql.IndexAnnotation{
+					Types: map[string]string{
+						"postgres": "GIN",
+					},
+				},
 			},
 		},
 	}
