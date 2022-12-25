@@ -31,6 +31,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldCreatedAt:     {Type: field.TypeTime, Column: bin.FieldCreatedAt},
 			bin.FieldUpdatedAt:     {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
 			bin.FieldUUID:          {Type: field.TypeString, Column: bin.FieldUUID},
+			bin.FieldCabinetID:     {Type: field.TypeUint64, Column: bin.FieldCabinetID},
 			bin.FieldBrand:         {Type: field.TypeString, Column: bin.FieldBrand},
 			bin.FieldSerial:        {Type: field.TypeString, Column: bin.FieldSerial},
 			bin.FieldName:          {Type: field.TypeString, Column: bin.FieldName},
@@ -99,6 +100,30 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldStopAt:    {Type: field.TypeTime, Column: console.FieldStopAt},
 		},
 	}
+	graph.MustAddE(
+		"cabinet",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   bin.CabinetTable,
+			Columns: []string{bin.CabinetColumn},
+			Bidi:    false,
+		},
+		"Bin",
+		"Cabinet",
+	)
+	graph.MustAddE(
+		"bins",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+		},
+		"Cabinet",
+		"Bin",
+	)
 	graph.MustAddE(
 		"cabinet",
 		&sqlgraph.EdgeSpec{
@@ -187,6 +212,11 @@ func (f *BinFilter) WhereUUID(p entql.StringP) {
 	f.Where(p.Field(bin.FieldUUID))
 }
 
+// WhereCabinetID applies the entql uint64 predicate on the cabinet_id field.
+func (f *BinFilter) WhereCabinetID(p entql.Uint64P) {
+	f.Where(p.Field(bin.FieldCabinetID))
+}
+
 // WhereBrand applies the entql string predicate on the brand field.
 func (f *BinFilter) WhereBrand(p entql.StringP) {
 	f.Where(p.Field(bin.FieldBrand))
@@ -255,6 +285,20 @@ func (f *BinFilter) WhereSoh(p entql.Float64P) {
 // WhereRemark applies the entql string predicate on the remark field.
 func (f *BinFilter) WhereRemark(p entql.StringP) {
 	f.Where(p.Field(bin.FieldRemark))
+}
+
+// WhereHasCabinet applies a predicate to check if query has an edge cabinet.
+func (f *BinFilter) WhereHasCabinet() {
+	f.Where(entql.HasEdge("cabinet"))
+}
+
+// WhereHasCabinetWith applies a predicate to check if query has an edge cabinet with a given conditions (other predicates).
+func (f *BinFilter) WhereHasCabinetWith(preds ...predicate.Cabinet) {
+	f.Where(entql.HasEdgeWith("cabinet", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
 }
 
 // addPredicate implements the predicateAdder interface.
@@ -365,6 +409,20 @@ func (f *CabinetFilter) WhereTemperature(p entql.Float64P) {
 // WhereElectricity applies the entql float64 predicate on the electricity field.
 func (f *CabinetFilter) WhereElectricity(p entql.Float64P) {
 	f.Where(p.Field(cabinet.FieldElectricity))
+}
+
+// WhereHasBins applies a predicate to check if query has an edge bins.
+func (f *CabinetFilter) WhereHasBins() {
+	f.Where(entql.HasEdge("bins"))
+}
+
+// WhereHasBinsWith applies a predicate to check if query has an edge bins with a given conditions (other predicates).
+func (f *CabinetFilter) WhereHasBinsWith(preds ...predicate.Bin) {
+	f.Where(entql.HasEdgeWith("bins", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
 }
 
 // addPredicate implements the predicateAdder interface.

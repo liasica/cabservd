@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
 
 // Bin is the model entity for the Bin schema.
@@ -22,6 +23,8 @@ type Bin struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// 唯一标识
 	UUID string `json:"uuid,omitempty"`
+	// CabinetID holds the value of the "cabinet_id" field.
+	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// 品牌
 	Brand string `json:"brand,omitempty"`
 	// 电柜设备序列号
@@ -50,6 +53,31 @@ type Bin struct {
 	Soh float64 `json:"soh,omitempty"`
 	// 仓位备注
 	Remark *string `json:"remark,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the BinQuery when eager-loading is set.
+	Edges BinEdges `json:"edges"`
+}
+
+// BinEdges holds the relations/edges for other nodes in the graph.
+type BinEdges struct {
+	// Cabinet holds the value of the cabinet edge.
+	Cabinet *Cabinet `json:"cabinet,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// CabinetOrErr returns the Cabinet value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e BinEdges) CabinetOrErr() (*Cabinet, error) {
+	if e.loadedTypes[0] {
+		if e.Cabinet == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: cabinet.Label}
+		}
+		return e.Cabinet, nil
+	}
+	return nil, &NotLoadedError{edge: "cabinet"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -61,7 +89,7 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
-		case bin.FieldID, bin.FieldOrdinal:
+		case bin.FieldID, bin.FieldCabinetID, bin.FieldOrdinal:
 			values[i] = new(sql.NullInt64)
 		case bin.FieldUUID, bin.FieldBrand, bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
 			values[i] = new(sql.NullString)
@@ -105,6 +133,12 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
 			} else if value.Valid {
 				b.UUID = value.String
+			}
+		case bin.FieldCabinetID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field cabinet_id", values[i])
+			} else if value.Valid {
+				b.CabinetID = uint64(value.Int64)
 			}
 		case bin.FieldBrand:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -196,6 +230,11 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 	return nil
 }
 
+// QueryCabinet queries the "cabinet" edge of the Bin entity.
+func (b *Bin) QueryCabinet() *CabinetQuery {
+	return (&BinClient{config: b.config}).QueryCabinet(b)
+}
+
 // Update returns a builder for updating this Bin.
 // Note that you need to call Bin.Unwrap() before calling this method if this Bin
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -227,6 +266,9 @@ func (b *Bin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("uuid=")
 	builder.WriteString(b.UUID)
+	builder.WriteString(", ")
+	builder.WriteString("cabinet_id=")
+	builder.WriteString(fmt.Sprintf("%v", b.CabinetID))
 	builder.WriteString(", ")
 	builder.WriteString("brand=")
 	builder.WriteString(b.Brand)

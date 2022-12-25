@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
 
 // BinCreate is the builder for creating a Bin entity.
@@ -53,6 +54,12 @@ func (bc *BinCreate) SetNillableUpdatedAt(t *time.Time) *BinCreate {
 // SetUUID sets the "uuid" field.
 func (bc *BinCreate) SetUUID(s string) *BinCreate {
 	bc.mutation.SetUUID(s)
+	return bc
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (bc *BinCreate) SetCabinetID(u uint64) *BinCreate {
+	bc.mutation.SetCabinetID(u)
 	return bc
 }
 
@@ -220,6 +227,11 @@ func (bc *BinCreate) SetNillableRemark(s *string) *BinCreate {
 	return bc
 }
 
+// SetCabinet sets the "cabinet" edge to the Cabinet entity.
+func (bc *BinCreate) SetCabinet(c *Cabinet) *BinCreate {
+	return bc.SetCabinetID(c.ID)
+}
+
 // Mutation returns the BinMutation object of the builder.
 func (bc *BinCreate) Mutation() *BinMutation {
 	return bc.mutation
@@ -359,6 +371,9 @@ func (bc *BinCreate) check() error {
 			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
 		}
 	}
+	if _, ok := bc.mutation.CabinetID(); !ok {
+		return &ValidationError{Name: "cabinet_id", err: errors.New(`ent: missing required field "Bin.cabinet_id"`)}
+	}
 	if _, ok := bc.mutation.Brand(); !ok {
 		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "Bin.brand"`)}
 	}
@@ -397,6 +412,9 @@ func (bc *BinCreate) check() error {
 	}
 	if _, ok := bc.mutation.Soh(); !ok {
 		return &ValidationError{Name: "soh", err: errors.New(`ent: missing required field "Bin.soh"`)}
+	}
+	if _, ok := bc.mutation.CabinetID(); !ok {
+		return &ValidationError{Name: "cabinet", err: errors.New(`ent: missing required edge "Bin.cabinet"`)}
 	}
 	return nil
 }
@@ -494,6 +512,26 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 		_spec.SetField(bin.FieldRemark, field.TypeString, value)
 		_node.Remark = &value
 	}
+	if nodes := bc.mutation.CabinetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   bin.CabinetTable,
+			Columns: []string{bin.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CabinetID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -567,6 +605,18 @@ func (u *BinUpsert) SetUUID(v string) *BinUpsert {
 // UpdateUUID sets the "uuid" field to the value that was provided on create.
 func (u *BinUpsert) UpdateUUID() *BinUpsert {
 	u.SetExcluded(bin.FieldUUID)
+	return u
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (u *BinUpsert) SetCabinetID(v uint64) *BinUpsert {
+	u.Set(bin.FieldCabinetID, v)
+	return u
+}
+
+// UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
+func (u *BinUpsert) UpdateCabinetID() *BinUpsert {
+	u.SetExcluded(bin.FieldCabinetID)
 	return u
 }
 
@@ -844,6 +894,20 @@ func (u *BinUpsertOne) SetUUID(v string) *BinUpsertOne {
 func (u *BinUpsertOne) UpdateUUID() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateUUID()
+	})
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (u *BinUpsertOne) SetCabinetID(v uint64) *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.SetCabinetID(v)
+	})
+}
+
+// UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateCabinetID() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateCabinetID()
 	})
 }
 
@@ -1325,6 +1389,20 @@ func (u *BinUpsertBulk) SetUUID(v string) *BinUpsertBulk {
 func (u *BinUpsertBulk) UpdateUUID() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateUUID()
+	})
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (u *BinUpsertBulk) SetCabinetID(v uint64) *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.SetCabinetID(v)
+	})
+}
+
+// UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateCabinetID() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateCabinetID()
 	})
 }
 

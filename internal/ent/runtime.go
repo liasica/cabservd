@@ -34,39 +34,39 @@ func init() {
 	// bin.UUIDValidator is a validator for the "uuid" field. It is called by the builders before save.
 	bin.UUIDValidator = binDescUUID.Validators[0].(func(string) error)
 	// binDescOpen is the schema descriptor for open field.
-	binDescOpen := binFields[5].Descriptor()
+	binDescOpen := binFields[6].Descriptor()
 	// bin.DefaultOpen holds the default value on creation for the open field.
 	bin.DefaultOpen = binDescOpen.Default.(bool)
 	// binDescEnable is the schema descriptor for enable field.
-	binDescEnable := binFields[6].Descriptor()
+	binDescEnable := binFields[7].Descriptor()
 	// bin.DefaultEnable holds the default value on creation for the enable field.
 	bin.DefaultEnable = binDescEnable.Default.(bool)
 	// binDescHealth is the schema descriptor for health field.
-	binDescHealth := binFields[7].Descriptor()
+	binDescHealth := binFields[8].Descriptor()
 	// bin.DefaultHealth holds the default value on creation for the health field.
 	bin.DefaultHealth = binDescHealth.Default.(bool)
 	// binDescBatteryExists is the schema descriptor for battery_exists field.
-	binDescBatteryExists := binFields[8].Descriptor()
+	binDescBatteryExists := binFields[9].Descriptor()
 	// bin.DefaultBatteryExists holds the default value on creation for the battery_exists field.
 	bin.DefaultBatteryExists = binDescBatteryExists.Default.(bool)
 	// binDescBatterySn is the schema descriptor for battery_sn field.
-	binDescBatterySn := binFields[9].Descriptor()
+	binDescBatterySn := binFields[10].Descriptor()
 	// bin.DefaultBatterySn holds the default value on creation for the battery_sn field.
 	bin.DefaultBatterySn = binDescBatterySn.Default.(string)
 	// binDescVoltage is the schema descriptor for voltage field.
-	binDescVoltage := binFields[10].Descriptor()
+	binDescVoltage := binFields[11].Descriptor()
 	// bin.DefaultVoltage holds the default value on creation for the voltage field.
 	bin.DefaultVoltage = binDescVoltage.Default.(float64)
 	// binDescCurrent is the schema descriptor for current field.
-	binDescCurrent := binFields[11].Descriptor()
+	binDescCurrent := binFields[12].Descriptor()
 	// bin.DefaultCurrent holds the default value on creation for the current field.
 	bin.DefaultCurrent = binDescCurrent.Default.(float64)
 	// binDescSoc is the schema descriptor for soc field.
-	binDescSoc := binFields[12].Descriptor()
+	binDescSoc := binFields[13].Descriptor()
 	// bin.DefaultSoc holds the default value on creation for the soc field.
 	bin.DefaultSoc = binDescSoc.Default.(float64)
 	// binDescSoh is the schema descriptor for soh field.
-	binDescSoh := binFields[13].Descriptor()
+	binDescSoh := binFields[14].Descriptor()
 	// bin.DefaultSoh holds the default value on creation for the soh field.
 	bin.DefaultSoh = binDescSoh.Default.(float64)
 	cabinetMixin := schema.Cabinet{}.Mixin()

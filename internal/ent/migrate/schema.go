@@ -29,17 +29,31 @@ var (
 		{Name: "soc", Type: field.TypeFloat64, Default: 0},
 		{Name: "soh", Type: field.TypeFloat64, Default: 0},
 		{Name: "remark", Type: field.TypeString, Nullable: true},
+		{Name: "cabinet_id", Type: field.TypeUint64},
 	}
 	// BinTable holds the schema information for the "bin" table.
 	BinTable = &schema.Table{
 		Name:       "bin",
 		Columns:    BinColumns,
 		PrimaryKey: []*schema.Column{BinColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "bin_cabinet_bins",
+				Columns:    []*schema.Column{BinColumns[18]},
+				RefColumns: []*schema.Column{CabinetColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "bin_created_at",
 				Unique:  false,
 				Columns: []*schema.Column{BinColumns[1]},
+			},
+			{
+				Name:    "bin_cabinet_id",
+				Unique:  false,
+				Columns: []*schema.Column{BinColumns[18]},
 			},
 			{
 				Name:    "bin_serial_brand",
@@ -196,6 +210,7 @@ var (
 )
 
 func init() {
+	BinTable.ForeignKeys[0].RefTable = CabinetTable
 	BinTable.Annotation = &entsql.Annotation{
 		Table: "bin",
 	}

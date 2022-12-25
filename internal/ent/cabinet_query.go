@@ -4,12 +4,14 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 )
@@ -23,6 +25,7 @@ type CabinetQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.Cabinet
+	withBins   *BinQuery
 	modifiers  []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -58,6 +61,28 @@ func (cq *CabinetQuery) Unique(unique bool) *CabinetQuery {
 func (cq *CabinetQuery) Order(o ...OrderFunc) *CabinetQuery {
 	cq.order = append(cq.order, o...)
 	return cq
+}
+
+// QueryBins chains the current query on the "bins" edge.
+func (cq *CabinetQuery) QueryBins() *BinQuery {
+	query := &BinQuery{config: cq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cabinet.Table, cabinet.FieldID, selector),
+			sqlgraph.To(bin.Table, bin.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, cabinet.BinsTable, cabinet.BinsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Cabinet entity from the query.
@@ -241,11 +266,23 @@ func (cq *CabinetQuery) Clone() *CabinetQuery {
 		offset:     cq.offset,
 		order:      append([]OrderFunc{}, cq.order...),
 		predicates: append([]predicate.Cabinet{}, cq.predicates...),
+		withBins:   cq.withBins.Clone(),
 		// clone intermediate query.
 		sql:    cq.sql.Clone(),
 		path:   cq.path,
 		unique: cq.unique,
 	}
+}
+
+// WithBins tells the query-builder to eager-load the nodes that are connected to
+// the "bins" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CabinetQuery) WithBins(opts ...func(*BinQuery)) *CabinetQuery {
+	query := &BinQuery{config: cq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withBins = query
+	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -319,8 +356,11 @@ func (cq *CabinetQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CabinetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cabinet, error) {
 	var (
-		nodes = []*Cabinet{}
-		_spec = cq.querySpec()
+		nodes       = []*Cabinet{}
+		_spec       = cq.querySpec()
+		loadedTypes = [1]bool{
+			cq.withBins != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Cabinet).scanValues(nil, columns)
@@ -328,6 +368,7 @@ func (cq *CabinetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cabi
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Cabinet{config: cq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(cq.modifiers) > 0 {
@@ -342,7 +383,42 @@ func (cq *CabinetQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cabi
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withBins; query != nil {
+		if err := cq.loadBins(ctx, query, nodes,
+			func(n *Cabinet) { n.Edges.Bins = []*Bin{} },
+			func(n *Cabinet, e *Bin) { n.Edges.Bins = append(n.Edges.Bins, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (cq *CabinetQuery) loadBins(ctx context.Context, query *BinQuery, nodes []*Cabinet, init func(*Cabinet), assign func(*Cabinet, *Bin)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uint64]*Cabinet)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.Where(predicate.Bin(func(s *sql.Selector) {
+		s.Where(sql.InValues(cabinet.BinsColumn, fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CabinetID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "cabinet_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (cq *CabinetQuery) sqlCount(ctx context.Context) (int, error) {

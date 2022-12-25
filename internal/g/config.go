@@ -19,11 +19,14 @@ type config struct {
         Dsn   string
         Debug bool
     }
+    Tcp struct {
+        Bind string
+    }
     Api struct {
         Bind string
     }
-    Tcp struct {
-        Bind string
+    Bridge struct {
+        Address string
     }
 }
 

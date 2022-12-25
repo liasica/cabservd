@@ -62,6 +62,8 @@ type BinMutation struct {
 	addsoh         *float64
 	remark         *string
 	clearedFields  map[string]struct{}
+	cabinet        *uint64
+	clearedcabinet bool
 	done           bool
 	oldValue       func(context.Context) (*Bin, error)
 	predicates     []predicate.Bin
@@ -271,6 +273,42 @@ func (m *BinMutation) OldUUID(ctx context.Context) (v string, err error) {
 // ResetUUID resets all changes to the "uuid" field.
 func (m *BinMutation) ResetUUID() {
 	m.uuid = nil
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (m *BinMutation) SetCabinetID(u uint64) {
+	m.cabinet = &u
+}
+
+// CabinetID returns the value of the "cabinet_id" field in the mutation.
+func (m *BinMutation) CabinetID() (r uint64, exists bool) {
+	v := m.cabinet
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCabinetID returns the old "cabinet_id" field's value of the Bin entity.
+// If the Bin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BinMutation) OldCabinetID(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCabinetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCabinetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCabinetID: %w", err)
+	}
+	return oldValue.CabinetID, nil
+}
+
+// ResetCabinetID resets all changes to the "cabinet_id" field.
+func (m *BinMutation) ResetCabinetID() {
+	m.cabinet = nil
 }
 
 // SetBrand sets the "brand" field.
@@ -890,6 +928,32 @@ func (m *BinMutation) ResetRemark() {
 	delete(m.clearedFields, bin.FieldRemark)
 }
 
+// ClearCabinet clears the "cabinet" edge to the Cabinet entity.
+func (m *BinMutation) ClearCabinet() {
+	m.clearedcabinet = true
+}
+
+// CabinetCleared reports if the "cabinet" edge to the Cabinet entity was cleared.
+func (m *BinMutation) CabinetCleared() bool {
+	return m.clearedcabinet
+}
+
+// CabinetIDs returns the "cabinet" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CabinetID instead. It exists only for internal usage by the builders.
+func (m *BinMutation) CabinetIDs() (ids []uint64) {
+	if id := m.cabinet; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCabinet resets all changes to the "cabinet" edge.
+func (m *BinMutation) ResetCabinet() {
+	m.cabinet = nil
+	m.clearedcabinet = false
+}
+
 // Where appends a list predicates to the BinMutation builder.
 func (m *BinMutation) Where(ps ...predicate.Bin) {
 	m.predicates = append(m.predicates, ps...)
@@ -909,7 +973,7 @@ func (m *BinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BinMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 18)
 	if m.created_at != nil {
 		fields = append(fields, bin.FieldCreatedAt)
 	}
@@ -918,6 +982,9 @@ func (m *BinMutation) Fields() []string {
 	}
 	if m.uuid != nil {
 		fields = append(fields, bin.FieldUUID)
+	}
+	if m.cabinet != nil {
+		fields = append(fields, bin.FieldCabinetID)
 	}
 	if m.brand != nil {
 		fields = append(fields, bin.FieldBrand)
@@ -975,6 +1042,8 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case bin.FieldUUID:
 		return m.UUID()
+	case bin.FieldCabinetID:
+		return m.CabinetID()
 	case bin.FieldBrand:
 		return m.Brand()
 	case bin.FieldSerial:
@@ -1018,6 +1087,8 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldUpdatedAt(ctx)
 	case bin.FieldUUID:
 		return m.OldUUID(ctx)
+	case bin.FieldCabinetID:
+		return m.OldCabinetID(ctx)
 	case bin.FieldBrand:
 		return m.OldBrand(ctx)
 	case bin.FieldSerial:
@@ -1075,6 +1146,13 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUUID(v)
+		return nil
+	case bin.FieldCabinetID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCabinetID(v)
 		return nil
 	case bin.FieldBrand:
 		v, ok := value.(string)
@@ -1304,6 +1382,9 @@ func (m *BinMutation) ResetField(name string) error {
 	case bin.FieldUUID:
 		m.ResetUUID()
 		return nil
+	case bin.FieldCabinetID:
+		m.ResetCabinetID()
+		return nil
 	case bin.FieldBrand:
 		m.ResetBrand()
 		return nil
@@ -1352,19 +1433,28 @@ func (m *BinMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *BinMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.cabinet != nil {
+		edges = append(edges, bin.EdgeCabinet)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *BinMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case bin.EdgeCabinet:
+		if id := m.cabinet; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *BinMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -1376,25 +1466,42 @@ func (m *BinMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *BinMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedcabinet {
+		edges = append(edges, bin.EdgeCabinet)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *BinMutation) EdgeCleared(name string) bool {
+	switch name {
+	case bin.EdgeCabinet:
+		return m.clearedcabinet
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *BinMutation) ClearEdge(name string) error {
+	switch name {
+	case bin.EdgeCabinet:
+		m.ClearCabinet()
+		return nil
+	}
 	return fmt.Errorf("unknown Bin unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *BinMutation) ResetEdge(name string) error {
+	switch name {
+	case bin.EdgeCabinet:
+		m.ResetCabinet()
+		return nil
+	}
 	return fmt.Errorf("unknown Bin edge %s", name)
 }
 
@@ -1426,6 +1533,9 @@ type CabinetMutation struct {
 	electricity    *float64
 	addelectricity *float64
 	clearedFields  map[string]struct{}
+	bins           map[uint64]struct{}
+	removedbins    map[uint64]struct{}
+	clearedbins    bool
 	done           bool
 	oldValue       func(context.Context) (*Cabinet, error)
 	predicates     []predicate.Cabinet
@@ -2271,6 +2381,60 @@ func (m *CabinetMutation) ResetElectricity() {
 	delete(m.clearedFields, cabinet.FieldElectricity)
 }
 
+// AddBinIDs adds the "bins" edge to the Bin entity by ids.
+func (m *CabinetMutation) AddBinIDs(ids ...uint64) {
+	if m.bins == nil {
+		m.bins = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		m.bins[ids[i]] = struct{}{}
+	}
+}
+
+// ClearBins clears the "bins" edge to the Bin entity.
+func (m *CabinetMutation) ClearBins() {
+	m.clearedbins = true
+}
+
+// BinsCleared reports if the "bins" edge to the Bin entity was cleared.
+func (m *CabinetMutation) BinsCleared() bool {
+	return m.clearedbins
+}
+
+// RemoveBinIDs removes the "bins" edge to the Bin entity by IDs.
+func (m *CabinetMutation) RemoveBinIDs(ids ...uint64) {
+	if m.removedbins == nil {
+		m.removedbins = make(map[uint64]struct{})
+	}
+	for i := range ids {
+		delete(m.bins, ids[i])
+		m.removedbins[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedBins returns the removed IDs of the "bins" edge to the Bin entity.
+func (m *CabinetMutation) RemovedBinsIDs() (ids []uint64) {
+	for id := range m.removedbins {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// BinsIDs returns the "bins" edge IDs in the mutation.
+func (m *CabinetMutation) BinsIDs() (ids []uint64) {
+	for id := range m.bins {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetBins resets all changes to the "bins" edge.
+func (m *CabinetMutation) ResetBins() {
+	m.bins = nil
+	m.clearedbins = false
+	m.removedbins = nil
+}
+
 // Where appends a list predicates to the CabinetMutation builder.
 func (m *CabinetMutation) Where(ps ...predicate.Cabinet) {
 	m.predicates = append(m.predicates, ps...)
@@ -2742,49 +2906,85 @@ func (m *CabinetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CabinetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.bins != nil {
+		edges = append(edges, cabinet.EdgeBins)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *CabinetMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case cabinet.EdgeBins:
+		ids := make([]ent.Value, 0, len(m.bins))
+		for id := range m.bins {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CabinetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedbins != nil {
+		edges = append(edges, cabinet.EdgeBins)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *CabinetMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case cabinet.EdgeBins:
+		ids := make([]ent.Value, 0, len(m.removedbins))
+		for id := range m.removedbins {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CabinetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedbins {
+		edges = append(edges, cabinet.EdgeBins)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *CabinetMutation) EdgeCleared(name string) bool {
+	switch name {
+	case cabinet.EdgeBins:
+		return m.clearedbins
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *CabinetMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Cabinet unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *CabinetMutation) ResetEdge(name string) error {
+	switch name {
+	case cabinet.EdgeBins:
+		m.ResetBins()
+		return nil
+	}
 	return fmt.Errorf("unknown Cabinet edge %s", name)
 }
 

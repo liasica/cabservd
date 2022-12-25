@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 )
 
@@ -38,6 +39,12 @@ func (bu *BinUpdate) SetUpdatedAt(t time.Time) *BinUpdate {
 // SetUUID sets the "uuid" field.
 func (bu *BinUpdate) SetUUID(s string) *BinUpdate {
 	bu.mutation.SetUUID(s)
+	return bu
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (bu *BinUpdate) SetCabinetID(u uint64) *BinUpdate {
+	bu.mutation.SetCabinetID(u)
 	return bu
 }
 
@@ -246,9 +253,20 @@ func (bu *BinUpdate) ClearRemark() *BinUpdate {
 	return bu
 }
 
+// SetCabinet sets the "cabinet" edge to the Cabinet entity.
+func (bu *BinUpdate) SetCabinet(c *Cabinet) *BinUpdate {
+	return bu.SetCabinetID(c.ID)
+}
+
 // Mutation returns the BinMutation object of the builder.
 func (bu *BinUpdate) Mutation() *BinMutation {
 	return bu.mutation
+}
+
+// ClearCabinet clears the "cabinet" edge to the Cabinet entity.
+func (bu *BinUpdate) ClearCabinet() *BinUpdate {
+	bu.mutation.ClearCabinet()
+	return bu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -326,6 +344,9 @@ func (bu *BinUpdate) check() error {
 		if err := bin.UUIDValidator(v); err != nil {
 			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
 		}
+	}
+	if _, ok := bu.mutation.CabinetID(); bu.mutation.CabinetCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Bin.cabinet"`)
 	}
 	return nil
 }
@@ -420,6 +441,41 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if bu.mutation.RemarkCleared() {
 		_spec.ClearField(bin.FieldRemark, field.TypeString)
 	}
+	if bu.mutation.CabinetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   bin.CabinetTable,
+			Columns: []string{bin.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := bu.mutation.CabinetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   bin.CabinetTable,
+			Columns: []string{bin.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(bu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, bu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -450,6 +506,12 @@ func (buo *BinUpdateOne) SetUpdatedAt(t time.Time) *BinUpdateOne {
 // SetUUID sets the "uuid" field.
 func (buo *BinUpdateOne) SetUUID(s string) *BinUpdateOne {
 	buo.mutation.SetUUID(s)
+	return buo
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (buo *BinUpdateOne) SetCabinetID(u uint64) *BinUpdateOne {
+	buo.mutation.SetCabinetID(u)
 	return buo
 }
 
@@ -658,9 +720,20 @@ func (buo *BinUpdateOne) ClearRemark() *BinUpdateOne {
 	return buo
 }
 
+// SetCabinet sets the "cabinet" edge to the Cabinet entity.
+func (buo *BinUpdateOne) SetCabinet(c *Cabinet) *BinUpdateOne {
+	return buo.SetCabinetID(c.ID)
+}
+
 // Mutation returns the BinMutation object of the builder.
 func (buo *BinUpdateOne) Mutation() *BinMutation {
 	return buo.mutation
+}
+
+// ClearCabinet clears the "cabinet" edge to the Cabinet entity.
+func (buo *BinUpdateOne) ClearCabinet() *BinUpdateOne {
+	buo.mutation.ClearCabinet()
+	return buo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -751,6 +824,9 @@ func (buo *BinUpdateOne) check() error {
 		if err := bin.UUIDValidator(v); err != nil {
 			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
 		}
+	}
+	if _, ok := buo.mutation.CabinetID(); buo.mutation.CabinetCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Bin.cabinet"`)
 	}
 	return nil
 }
@@ -861,6 +937,41 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if buo.mutation.RemarkCleared() {
 		_spec.ClearField(bin.FieldRemark, field.TypeString)
+	}
+	if buo.mutation.CabinetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   bin.CabinetTable,
+			Columns: []string{bin.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := buo.mutation.CabinetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   bin.CabinetTable,
+			Columns: []string{bin.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(buo.modifiers...)
 	_node = &Bin{config: buo.config}

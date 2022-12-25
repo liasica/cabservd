@@ -74,7 +74,9 @@ func (Cabinet) Fields() []ent.Field {
 
 // Edges of the Cabinet.
 func (Cabinet) Edges() []ent.Edge {
-    return []ent.Edge{}
+    return []ent.Edge{
+        edge.To("bins", Bin.Type),
+    }
 }
 
 func (Cabinet) Mixin() []ent.Mixin {

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 )
@@ -278,9 +279,45 @@ func (cu *CabinetUpdate) ClearElectricity() *CabinetUpdate {
 	return cu
 }
 
+// AddBinIDs adds the "bins" edge to the Bin entity by IDs.
+func (cu *CabinetUpdate) AddBinIDs(ids ...uint64) *CabinetUpdate {
+	cu.mutation.AddBinIDs(ids...)
+	return cu
+}
+
+// AddBins adds the "bins" edges to the Bin entity.
+func (cu *CabinetUpdate) AddBins(b ...*Bin) *CabinetUpdate {
+	ids := make([]uint64, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return cu.AddBinIDs(ids...)
+}
+
 // Mutation returns the CabinetMutation object of the builder.
 func (cu *CabinetUpdate) Mutation() *CabinetMutation {
 	return cu.mutation
+}
+
+// ClearBins clears all "bins" edges to the Bin entity.
+func (cu *CabinetUpdate) ClearBins() *CabinetUpdate {
+	cu.mutation.ClearBins()
+	return cu
+}
+
+// RemoveBinIDs removes the "bins" edge to Bin entities by IDs.
+func (cu *CabinetUpdate) RemoveBinIDs(ids ...uint64) *CabinetUpdate {
+	cu.mutation.RemoveBinIDs(ids...)
+	return cu
+}
+
+// RemoveBins removes "bins" edges to Bin entities.
+func (cu *CabinetUpdate) RemoveBins(b ...*Bin) *CabinetUpdate {
+	ids := make([]uint64, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return cu.RemoveBinIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -466,6 +503,60 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.ElectricityCleared() {
 		_spec.ClearField(cabinet.FieldElectricity, field.TypeFloat64)
+	}
+	if cu.mutation.BinsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: bin.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedBinsIDs(); len(nodes) > 0 && !cu.mutation.BinsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: bin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.BinsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: bin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(cu.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
@@ -737,9 +828,45 @@ func (cuo *CabinetUpdateOne) ClearElectricity() *CabinetUpdateOne {
 	return cuo
 }
 
+// AddBinIDs adds the "bins" edge to the Bin entity by IDs.
+func (cuo *CabinetUpdateOne) AddBinIDs(ids ...uint64) *CabinetUpdateOne {
+	cuo.mutation.AddBinIDs(ids...)
+	return cuo
+}
+
+// AddBins adds the "bins" edges to the Bin entity.
+func (cuo *CabinetUpdateOne) AddBins(b ...*Bin) *CabinetUpdateOne {
+	ids := make([]uint64, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return cuo.AddBinIDs(ids...)
+}
+
 // Mutation returns the CabinetMutation object of the builder.
 func (cuo *CabinetUpdateOne) Mutation() *CabinetMutation {
 	return cuo.mutation
+}
+
+// ClearBins clears all "bins" edges to the Bin entity.
+func (cuo *CabinetUpdateOne) ClearBins() *CabinetUpdateOne {
+	cuo.mutation.ClearBins()
+	return cuo
+}
+
+// RemoveBinIDs removes the "bins" edge to Bin entities by IDs.
+func (cuo *CabinetUpdateOne) RemoveBinIDs(ids ...uint64) *CabinetUpdateOne {
+	cuo.mutation.RemoveBinIDs(ids...)
+	return cuo
+}
+
+// RemoveBins removes "bins" edges to Bin entities.
+func (cuo *CabinetUpdateOne) RemoveBins(b ...*Bin) *CabinetUpdateOne {
+	ids := make([]uint64, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return cuo.RemoveBinIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -955,6 +1082,60 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 	}
 	if cuo.mutation.ElectricityCleared() {
 		_spec.ClearField(cabinet.FieldElectricity, field.TypeFloat64)
+	}
+	if cuo.mutation.BinsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: bin.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedBinsIDs(); len(nodes) > 0 && !cuo.mutation.BinsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: bin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.BinsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: bin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(cuo.modifiers...)
 	_node = &Cabinet{config: cuo.config}

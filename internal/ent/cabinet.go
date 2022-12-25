@@ -44,6 +44,27 @@ type Cabinet struct {
 	Temperature *float64 `json:"temperature,omitempty"`
 	// 总用电量
 	Electricity *float64 `json:"electricity,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CabinetQuery when eager-loading is set.
+	Edges CabinetEdges `json:"edges"`
+}
+
+// CabinetEdges holds the relations/edges for other nodes in the graph.
+type CabinetEdges struct {
+	// Bins holds the value of the bins edge.
+	Bins []*Bin `json:"bins,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// BinsOrErr returns the Bins value or an error if the edge
+// was not loaded in eager-loading.
+func (e CabinetEdges) BinsOrErr() ([]*Bin, error) {
+	if e.loadedTypes[0] {
+		return e.Bins, nil
+	}
+	return nil, &NotLoadedError{edge: "bins"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -176,6 +197,11 @@ func (c *Cabinet) assignValues(columns []string, values []any) error {
 		}
 	}
 	return nil
+}
+
+// QueryBins queries the "bins" edge of the Cabinet entity.
+func (c *Cabinet) QueryBins() *BinQuery {
+	return (&CabinetClient{config: c.config}).QueryBins(c)
 }
 
 // Update returns a builder for updating this Cabinet.

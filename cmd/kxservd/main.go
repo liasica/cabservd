@@ -6,6 +6,7 @@
 package main
 
 import (
+    "github.com/auroraride/cabservd/bridge"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
@@ -16,6 +17,9 @@ import (
 func main() {
     // core boot
     internal.Boot()
+
+    // 启动bridge
+    go bridge.RunCabinet()
 
     // 启动 http server
     go router.Start()

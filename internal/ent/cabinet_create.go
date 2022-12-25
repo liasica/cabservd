@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
 
@@ -200,6 +201,21 @@ func (cc *CabinetCreate) SetNillableElectricity(f *float64) *CabinetCreate {
 		cc.SetElectricity(*f)
 	}
 	return cc
+}
+
+// AddBinIDs adds the "bins" edge to the Bin entity by IDs.
+func (cc *CabinetCreate) AddBinIDs(ids ...uint64) *CabinetCreate {
+	cc.mutation.AddBinIDs(ids...)
+	return cc
+}
+
+// AddBins adds the "bins" edges to the Bin entity.
+func (cc *CabinetCreate) AddBins(b ...*Bin) *CabinetCreate {
+	ids := make([]uint64, len(b))
+	for i := range b {
+		ids[i] = b[i].ID
+	}
+	return cc.AddBinIDs(ids...)
 }
 
 // Mutation returns the CabinetMutation object of the builder.
@@ -412,6 +428,25 @@ func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Electricity(); ok {
 		_spec.SetField(cabinet.FieldElectricity, field.TypeFloat64, value)
 		_node.Electricity = &value
+	}
+	if nodes := cc.mutation.BinsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   cabinet.BinsTable,
+			Columns: []string{cabinet.BinsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: bin.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

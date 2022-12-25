@@ -40,8 +40,17 @@ const (
 	FieldTemperature = "temperature"
 	// FieldElectricity holds the string denoting the electricity field in the database.
 	FieldElectricity = "electricity"
+	// EdgeBins holds the string denoting the bins edge name in mutations.
+	EdgeBins = "bins"
 	// Table holds the table name of the cabinet in the database.
 	Table = "cabinet"
+	// BinsTable is the table that holds the bins relation/edge.
+	BinsTable = "bin"
+	// BinsInverseTable is the table name for the Bin entity.
+	// It exists in this package in order to avoid circular dependency with the "bin" package.
+	BinsInverseTable = "bin"
+	// BinsColumn is the table column denoting the bins relation/edge.
+	BinsColumn = "cabinet_id"
 )
 
 // Columns holds all SQL columns for cabinet fields.

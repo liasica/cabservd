@@ -58,6 +58,7 @@ func (Bin) Annotations() []schema.Annotation {
 func (Bin) Fields() []ent.Field {
     return []ent.Field{
         field.String("uuid").Unique().MaxLen(32).Comment("唯一标识"),
+        field.Uint64("cabinet_id"),
 
         // 电柜信息
         field.String("brand").Comment("品牌"),
@@ -85,7 +86,13 @@ func (Bin) Fields() []ent.Field {
 
 // Edges of the Bin.
 func (Bin) Edges() []ent.Edge {
-    return []ent.Edge{}
+    return []ent.Edge{
+        edge.From("cabinet", Cabinet.Type).
+            Ref("bins").
+            Unique().
+            Required().
+            Field("cabinet_id"),
+    }
 }
 
 func (Bin) Mixin() []ent.Mixin {
@@ -96,6 +103,7 @@ func (Bin) Mixin() []ent.Mixin {
 
 func (Bin) Indexes() []ent.Index {
     return []ent.Index{
+        index.Fields("cabinet_id"),
         index.Fields("serial", "brand"),
         index.Fields("battery_exists"),
         index.Fields("ordinal"),

@@ -52,7 +52,6 @@ func (s *binService) Enable(enable bool) error {
     }
 
     return core.Hub.Control(&types.ControlRequest{
-        Brand:   s.bin.Brand,
         Type:    t,
         Serial:  s.bin.Serial,
         Ordinal: silk.Int(s.bin.Ordinal),
@@ -62,7 +61,6 @@ func (s *binService) Enable(enable bool) error {
 // Open 打开仓门
 func (s *binService) Open() error {
     return core.Hub.Control(&types.ControlRequest{
-        Brand:   s.bin.Brand,
         Type:    types.ControlTypeBinOpen,
         Serial:  s.bin.Serial,
         Ordinal: silk.Int(s.bin.Ordinal),

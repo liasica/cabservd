@@ -222,6 +222,22 @@ func (c *BinClient) GetX(ctx context.Context, id uint64) *Bin {
 	return obj
 }
 
+// QueryCabinet queries the cabinet edge of a Bin.
+func (c *BinClient) QueryCabinet(b *Bin) *CabinetQuery {
+	query := &CabinetQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := b.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(bin.Table, bin.FieldID, id),
+			sqlgraph.To(cabinet.Table, cabinet.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, bin.CabinetTable, bin.CabinetColumn),
+		)
+		fromV = sqlgraph.Neighbors(b.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *BinClient) Hooks() []Hook {
 	return c.hooks.Bin
@@ -310,6 +326,22 @@ func (c *CabinetClient) GetX(ctx context.Context, id uint64) *Cabinet {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryBins queries the bins edge of a Cabinet.
+func (c *CabinetClient) QueryBins(ca *Cabinet) *BinQuery {
+	query := &BinQuery{config: c.config}
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ca.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(cabinet.Table, cabinet.FieldID, id),
+			sqlgraph.To(bin.Table, bin.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, cabinet.BinsTable, cabinet.BinsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ca.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

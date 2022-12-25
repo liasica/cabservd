@@ -17,6 +17,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldUUID holds the string denoting the uuid field in the database.
 	FieldUUID = "uuid"
+	// FieldCabinetID holds the string denoting the cabinet_id field in the database.
+	FieldCabinetID = "cabinet_id"
 	// FieldBrand holds the string denoting the brand field in the database.
 	FieldBrand = "brand"
 	// FieldSerial holds the string denoting the serial field in the database.
@@ -45,8 +47,17 @@ const (
 	FieldSoh = "soh"
 	// FieldRemark holds the string denoting the remark field in the database.
 	FieldRemark = "remark"
+	// EdgeCabinet holds the string denoting the cabinet edge name in mutations.
+	EdgeCabinet = "cabinet"
 	// Table holds the table name of the bin in the database.
 	Table = "bin"
+	// CabinetTable is the table that holds the cabinet relation/edge.
+	CabinetTable = "bin"
+	// CabinetInverseTable is the table name for the Cabinet entity.
+	// It exists in this package in order to avoid circular dependency with the "cabinet" package.
+	CabinetInverseTable = "cabinet"
+	// CabinetColumn is the table column denoting the cabinet relation/edge.
+	CabinetColumn = "cabinet_id"
 )
 
 // Columns holds all SQL columns for bin fields.
@@ -55,6 +66,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldUUID,
+	FieldCabinetID,
 	FieldBrand,
 	FieldSerial,
 	FieldName,

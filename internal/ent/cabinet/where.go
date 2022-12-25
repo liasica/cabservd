@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 )
 
@@ -1104,6 +1105,34 @@ func ElectricityIsNil() predicate.Cabinet {
 func ElectricityNotNil() predicate.Cabinet {
 	return predicate.Cabinet(func(s *sql.Selector) {
 		s.Where(sql.NotNull(s.C(FieldElectricity)))
+	})
+}
+
+// HasBins applies the HasEdge predicate on the "bins" edge.
+func HasBins() predicate.Cabinet {
+	return predicate.Cabinet(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BinsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BinsTable, BinsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasBinsWith applies the HasEdge predicate on the "bins" edge with a given conditions (other predicates).
+func HasBinsWith(preds ...predicate.Bin) predicate.Cabinet {
+	return predicate.Cabinet(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(BinsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, BinsTable, BinsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

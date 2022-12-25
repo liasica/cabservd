@@ -9,7 +9,6 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/pkg/logger"
-    log "github.com/sirupsen/logrus"
     "os"
     "time"
 )
@@ -33,11 +32,5 @@ func Boot() {
     g.LoadConfig()
 
     // 加载数据库
-    // ent.Database = ent.OpenDatabase(g.Config.Database.Postgres.Dsn, g.Config.Database.Postgres.Debug)
-    dsn := os.Getenv("DSN")
-    if dsn == "" {
-        dsn = "host=localhost user=liasica dbname=cabinet port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-    }
-    log.Println(dsn)
-    ent.Database = ent.OpenDatabase(dsn, false)
+    ent.Database = ent.OpenDatabase(g.Config.Postgres.Dsn, false)
 }
