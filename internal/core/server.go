@@ -32,7 +32,7 @@ func Start(addr, brand string, bean Hook, codec Codec) {
         Hub.addr,
         gnet.WithMulticore(true),
         gnet.WithReuseAddr(true),
-        gnet.WithLogger(log.New()),
+        gnet.WithLogger(log.StandardLogger()),
     ))
 }
 
