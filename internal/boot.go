@@ -8,6 +8,7 @@ package internal
 import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
+    "github.com/auroraride/cabservd/internal/hook"
     "github.com/auroraride/cabservd/pkg/logger"
     "os"
     "time"
@@ -32,5 +33,8 @@ func Boot() {
     g.LoadConfig()
 
     // 加载数据库
-    ent.Database = ent.OpenDatabase(g.Config.Postgres.Dsn, false)
+    ent.Database = ent.OpenDatabase(g.Config.Postgres.Dsn, g.Config.Postgres.Debug)
+
+    // 加载hooks
+    go hook.ListenPqEvents()
 }

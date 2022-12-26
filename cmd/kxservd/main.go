@@ -19,7 +19,7 @@ func main() {
     internal.Boot()
 
     // 启动bridge
-    go bridge.RunCabinet()
+    go bridge.Start()
 
     // 启动 http server
     go router.Start()

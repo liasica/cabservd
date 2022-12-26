@@ -16,11 +16,12 @@ import (
 )
 
 type cabinetBridge struct {
-    *bridge.Cabinet
+    bridger *bridge.Cabinet
+
+    sender chan *pb.CabinetSyncRequest
 }
 
 var (
-    CabinetBridge = &cabinetBridge{bridge.NewCabinet(log.StandardLogger())}
     CabinetStatus = map[cabinet.Status]pb.CabinetStatus{
         cabinet.StatusInitializing: pb.CabinetStatus_INITIALIZING,
         cabinet.StatusIdle:         pb.CabinetStatus_IDLE,
@@ -30,10 +31,17 @@ var (
     }
 )
 
+func newCabinet() *cabinetBridge {
+    return &cabinetBridge{
+        bridger: bridge.NewCabinet(log.StandardLogger()),
+        sender:  make(chan *pb.CabinetSyncRequest),
+    }
+}
+
 func (c *cabinetBridge) FullUpdate() {
     cabs := service.NewCabinet().QueryAllCabinets()
     for _, cab := range cabs {
-        CabinetBridge.SendSyncData(c.WrapData(cab.Serial, cab, cab.Edges.Bins))
+        c.sender <- c.WrapData(cab.Serial, cab, cab.Edges.Bins)
     }
 }
 
@@ -44,7 +52,10 @@ func (c *cabinetBridge) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins)
         return
     }
 
-    data.Serial = serial
+    data = &pb.CabinetSyncRequest{
+        Serial: serial,
+    }
+
     if cab != nil {
         data.Cabinet = &pb.CabinetData{
             Online:      cab.Online,
@@ -79,6 +90,15 @@ func (c *cabinetBridge) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins)
     return
 }
 
-func RunCabinet() {
-    go CabinetBridge.RunClient(g.Config.Bridge.Address)
+func (c *cabinetBridge) run() {
+    go c.bridger.RunClient(g.Config.Bridge.Address, func() {
+        c.FullUpdate()
+    })
+
+    for {
+        select {
+        case data := <-c.sender:
+            c.bridger.SendSyncData(data)
+        }
+    }
 }
