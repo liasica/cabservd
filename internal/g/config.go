@@ -25,8 +25,8 @@ type config struct {
     Api struct {
         Bind string
     }
-    Bridge struct {
-        Address string
+    Adapter struct {
+        Cabinet string
     }
 }
 

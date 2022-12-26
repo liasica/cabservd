@@ -6,60 +6,49 @@
 package bridge
 
 import (
-    "github.com/auroraride/bridge"
-    "github.com/auroraride/bridge/pb"
+    "github.com/auroraride/adapter/codec"
+    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter/tcp"
     "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/service"
     log "github.com/sirupsen/logrus"
 )
 
-type cabinetBridge struct {
-    bridger *bridge.Cabinet
-
-    sender chan *pb.CabinetSyncRequest
+type cabinet struct {
+    *tcp.Client
 }
 
-var (
-    CabinetStatus = map[cabinet.Status]pb.CabinetStatus{
-        cabinet.StatusInitializing: pb.CabinetStatus_INITIALIZING,
-        cabinet.StatusIdle:         pb.CabinetStatus_IDLE,
-        cabinet.StatusBusy:         pb.CabinetStatus_BUSY,
-        cabinet.StatusExchange:     pb.CabinetStatus_EXCHANGE,
-        cabinet.StatusAbnormal:     pb.CabinetStatus_ABNORMAL,
-    }
-)
+var Cabinet *cabinet
 
-func newCabinet() *cabinetBridge {
-    return &cabinetBridge{
-        bridger: bridge.NewCabinet(log.StandardLogger()),
-        sender:  make(chan *pb.CabinetSyncRequest),
+func newCabinet() *cabinet {
+    return &cabinet{
+        tcp.NewClient(g.Config.Adapter.Cabinet, log.StandardLogger(), &codec.HeaderLength{}),
     }
 }
 
-func (c *cabinetBridge) FullUpdate() {
+func (c *cabinet) FullUpdate() {
     cabs := service.NewCabinet().QueryAllCabinets()
     for _, cab := range cabs {
-        c.sender <- c.WrapData(cab.Serial, cab, cab.Edges.Bins)
+        c.Sender <- c.WrapData(cab.Serial, cab, cab.Edges.Bins)
     }
 }
 
-func (c *cabinetBridge) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data *pb.CabinetSyncRequest) {
+func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.CabinetSyncRequest) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
         return
     }
 
-    data = &pb.CabinetSyncRequest{
+    data = &model.CabinetSyncRequest{
         Serial: serial,
     }
 
     if cab != nil {
-        data.Cabinet = &pb.CabinetData{
+        data.Cabinet = &model.Cabinet{
             Online:      cab.Online,
-            Status:      CabinetStatus[cab.Status],
+            Status:      cab.Status.String(),
             Enable:      cab.Enable,
             Lng:         cab.Lng,
             Lat:         cab.Lat,
@@ -72,8 +61,8 @@ func (c *cabinetBridge) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins)
     }
 
     for _, bin := range bins {
-        data.Bins = append(data.Bins, &pb.BinData{
-            Ordinal:       int32(bin.Ordinal),
+        data.Bins = append(data.Bins, &model.Bin{
+            Ordinal:       bin.Ordinal,
             Open:          bin.Open,
             Enable:        bin.Enable,
             Health:        bin.Health,
@@ -90,15 +79,14 @@ func (c *cabinetBridge) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins)
     return
 }
 
-func (c *cabinetBridge) run() {
-    go c.bridger.RunClient(g.Config.Bridge.Address, func() {
-        c.FullUpdate()
-    })
+func SendCabinet(serial string, cab *ent.Cabinet, bins ent.Bins) {
+    Cabinet.Sender <- Cabinet.WrapData(serial, cab, bins)
+}
 
-    for {
-        select {
-        case data := <-c.sender:
-            c.bridger.SendSyncData(data)
-        }
+func startCabinet() {
+    Cabinet = newCabinet()
+    Cabinet.Hooks.Connect = func() {
+        go Cabinet.FullUpdate()
     }
+    Cabinet.Run()
 }

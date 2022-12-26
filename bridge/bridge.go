@@ -5,24 +5,6 @@
 
 package bridge
 
-import "github.com/auroraride/cabservd/internal/ent"
-
-type Bridger struct {
-    cabinet *cabinetBridge
-}
-
-var (
-    hub *Bridger
-)
-
 func Start() {
-    hub = &Bridger{
-        cabinet: newCabinet(),
-    }
-
-    go hub.cabinet.run()
-}
-
-func SendCabinet(serial string, cab *ent.Cabinet, bins ent.Bins) {
-    hub.cabinet.bridger.SendSyncData(hub.cabinet.WrapData(serial, cab, bins))
+    go startCabinet()
 }
