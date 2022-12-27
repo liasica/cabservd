@@ -139,49 +139,7 @@ func (cc *ConsoleCreate) Mutation() *ConsoleMutation {
 
 // Save creates the Console in the database.
 func (cc *ConsoleCreate) Save(ctx context.Context) (*Console, error) {
-	var (
-		err  error
-		node *Console
-	)
-	if len(cc.hooks) == 0 {
-		if err = cc.check(); err != nil {
-			return nil, err
-		}
-		node, err = cc.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*ConsoleMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = cc.check(); err != nil {
-				return nil, err
-			}
-			cc.mutation = mutation
-			if node, err = cc.sqlSave(ctx); err != nil {
-				return nil, err
-			}
-			mutation.id = &node.ID
-			mutation.done = true
-			return node, err
-		})
-		for i := len(cc.hooks) - 1; i >= 0; i-- {
-			if cc.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = cc.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, cc.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Console)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from ConsoleMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Console, ConsoleMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -249,6 +207,9 @@ func (cc *ConsoleCreate) check() error {
 }
 
 func (cc *ConsoleCreate) sqlSave(ctx context.Context) (*Console, error) {
+	if err := cc.check(); err != nil {
+		return nil, err
+	}
 	_node, _spec := cc.createSpec()
 	if err := sqlgraph.CreateNode(ctx, cc.driver, _spec); err != nil {
 		if sqlgraph.IsConstraintError(err) {
@@ -258,6 +219,8 @@ func (cc *ConsoleCreate) sqlSave(ctx context.Context) (*Console, error) {
 	}
 	id := _spec.ID.Value.(int64)
 	_node.ID = uint64(id)
+	cc.mutation.id = &_node.ID
+	cc.mutation.done = true
 	return _node, nil
 }
 

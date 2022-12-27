@@ -14,691 +14,437 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Console(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Console(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Console(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Console(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Console(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Console(sql.FieldLTE(FieldID, id))
 }
 
 // CabinetID applies equality check predicate on the "cabinet_id" field. It's identical to CabinetIDEQ.
 func CabinetID(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCabinetID), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldCabinetID, v))
 }
 
 // BinID applies equality check predicate on the "bin_id" field. It's identical to BinIDEQ.
 func BinID(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBinID), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldBinID, v))
 }
 
 // UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
 func UUID(v uuid.UUID) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUUID), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldUUID, v))
 }
 
 // Step applies equality check predicate on the "step" field. It's identical to StepEQ.
 func Step(v types.ExchangeStep) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStep), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldStep, v))
 }
 
 // Message applies equality check predicate on the "message" field. It's identical to MessageEQ.
 func Message(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldMessage, v))
 }
 
 // StartAt applies equality check predicate on the "startAt" field. It's identical to StartAtEQ.
 func StartAt(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStartAt), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldStartAt, v))
 }
 
 // StopAt applies equality check predicate on the "stopAt" field. It's identical to StopAtEQ.
 func StopAt(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStopAt), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldStopAt, v))
 }
 
 // CabinetIDEQ applies the EQ predicate on the "cabinet_id" field.
 func CabinetIDEQ(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCabinetID), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldCabinetID, v))
 }
 
 // CabinetIDNEQ applies the NEQ predicate on the "cabinet_id" field.
 func CabinetIDNEQ(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCabinetID), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldCabinetID, v))
 }
 
 // CabinetIDIn applies the In predicate on the "cabinet_id" field.
 func CabinetIDIn(vs ...uint64) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCabinetID), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldCabinetID, vs...))
 }
 
 // CabinetIDNotIn applies the NotIn predicate on the "cabinet_id" field.
 func CabinetIDNotIn(vs ...uint64) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCabinetID), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldCabinetID, vs...))
 }
 
 // BinIDEQ applies the EQ predicate on the "bin_id" field.
 func BinIDEQ(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBinID), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldBinID, v))
 }
 
 // BinIDNEQ applies the NEQ predicate on the "bin_id" field.
 func BinIDNEQ(v uint64) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldBinID), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldBinID, v))
 }
 
 // BinIDIn applies the In predicate on the "bin_id" field.
 func BinIDIn(vs ...uint64) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldBinID), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldBinID, vs...))
 }
 
 // BinIDNotIn applies the NotIn predicate on the "bin_id" field.
 func BinIDNotIn(vs ...uint64) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldBinID), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldBinID, vs...))
 }
 
 // UUIDEQ applies the EQ predicate on the "uuid" field.
 func UUIDEQ(v uuid.UUID) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUUID), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldUUID, v))
 }
 
 // UUIDNEQ applies the NEQ predicate on the "uuid" field.
 func UUIDNEQ(v uuid.UUID) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUUID), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldUUID, v))
 }
 
 // UUIDIn applies the In predicate on the "uuid" field.
 func UUIDIn(vs ...uuid.UUID) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUUID), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldUUID, vs...))
 }
 
 // UUIDNotIn applies the NotIn predicate on the "uuid" field.
 func UUIDNotIn(vs ...uuid.UUID) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUUID), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldUUID, vs...))
 }
 
 // UUIDGT applies the GT predicate on the "uuid" field.
 func UUIDGT(v uuid.UUID) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUUID), v))
-	})
+	return predicate.Console(sql.FieldGT(FieldUUID, v))
 }
 
 // UUIDGTE applies the GTE predicate on the "uuid" field.
 func UUIDGTE(v uuid.UUID) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUUID), v))
-	})
+	return predicate.Console(sql.FieldGTE(FieldUUID, v))
 }
 
 // UUIDLT applies the LT predicate on the "uuid" field.
 func UUIDLT(v uuid.UUID) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUUID), v))
-	})
+	return predicate.Console(sql.FieldLT(FieldUUID, v))
 }
 
 // UUIDLTE applies the LTE predicate on the "uuid" field.
 func UUIDLTE(v uuid.UUID) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUUID), v))
-	})
+	return predicate.Console(sql.FieldLTE(FieldUUID, v))
 }
 
 // TypeEQ applies the EQ predicate on the "type" field.
 func TypeEQ(v Type) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldType), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldType, v))
 }
 
 // TypeNEQ applies the NEQ predicate on the "type" field.
 func TypeNEQ(v Type) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldType), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldType, v))
 }
 
 // TypeIn applies the In predicate on the "type" field.
 func TypeIn(vs ...Type) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldType), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldType, vs...))
 }
 
 // TypeNotIn applies the NotIn predicate on the "type" field.
 func TypeNotIn(vs ...Type) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldType), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldType, vs...))
 }
 
 // StepEQ applies the EQ predicate on the "step" field.
 func StepEQ(v types.ExchangeStep) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStep), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldStep, v))
 }
 
 // StepNEQ applies the NEQ predicate on the "step" field.
 func StepNEQ(v types.ExchangeStep) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStep), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldStep, v))
 }
 
 // StepIn applies the In predicate on the "step" field.
 func StepIn(vs ...types.ExchangeStep) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldStep), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldStep, vs...))
 }
 
 // StepNotIn applies the NotIn predicate on the "step" field.
 func StepNotIn(vs ...types.ExchangeStep) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldStep), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldStep, vs...))
 }
 
 // StepGT applies the GT predicate on the "step" field.
 func StepGT(v types.ExchangeStep) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldStep), v))
-	})
+	return predicate.Console(sql.FieldGT(FieldStep, v))
 }
 
 // StepGTE applies the GTE predicate on the "step" field.
 func StepGTE(v types.ExchangeStep) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldStep), v))
-	})
+	return predicate.Console(sql.FieldGTE(FieldStep, v))
 }
 
 // StepLT applies the LT predicate on the "step" field.
 func StepLT(v types.ExchangeStep) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldStep), v))
-	})
+	return predicate.Console(sql.FieldLT(FieldStep, v))
 }
 
 // StepLTE applies the LTE predicate on the "step" field.
 func StepLTE(v types.ExchangeStep) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldStep), v))
-	})
+	return predicate.Console(sql.FieldLTE(FieldStep, v))
 }
 
 // StepIsNil applies the IsNil predicate on the "step" field.
 func StepIsNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldStep)))
-	})
+	return predicate.Console(sql.FieldIsNull(FieldStep))
 }
 
 // StepNotNil applies the NotNil predicate on the "step" field.
 func StepNotNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldStep)))
-	})
+	return predicate.Console(sql.FieldNotNull(FieldStep))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.
 func StatusEQ(v Status) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStatus), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldStatus, v))
 }
 
 // StatusNEQ applies the NEQ predicate on the "status" field.
 func StatusNEQ(v Status) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStatus), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldStatus, v))
 }
 
 // StatusIn applies the In predicate on the "status" field.
 func StatusIn(vs ...Status) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldStatus), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldStatus, vs...))
 }
 
 // StatusNotIn applies the NotIn predicate on the "status" field.
 func StatusNotIn(vs ...Status) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldStatus), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldStatus, vs...))
 }
 
 // BeforeBinIsNil applies the IsNil predicate on the "before_bin" field.
 func BeforeBinIsNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldBeforeBin)))
-	})
+	return predicate.Console(sql.FieldIsNull(FieldBeforeBin))
 }
 
 // BeforeBinNotNil applies the NotNil predicate on the "before_bin" field.
 func BeforeBinNotNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldBeforeBin)))
-	})
+	return predicate.Console(sql.FieldNotNull(FieldBeforeBin))
 }
 
 // AfterBinIsNil applies the IsNil predicate on the "after_bin" field.
 func AfterBinIsNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldAfterBin)))
-	})
+	return predicate.Console(sql.FieldIsNull(FieldAfterBin))
 }
 
 // AfterBinNotNil applies the NotNil predicate on the "after_bin" field.
 func AfterBinNotNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldAfterBin)))
-	})
+	return predicate.Console(sql.FieldNotNull(FieldAfterBin))
 }
 
 // MessageEQ applies the EQ predicate on the "message" field.
 func MessageEQ(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldMessage, v))
 }
 
 // MessageNEQ applies the NEQ predicate on the "message" field.
 func MessageNEQ(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldMessage, v))
 }
 
 // MessageIn applies the In predicate on the "message" field.
 func MessageIn(vs ...string) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldMessage), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldMessage, vs...))
 }
 
 // MessageNotIn applies the NotIn predicate on the "message" field.
 func MessageNotIn(vs ...string) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldMessage), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldMessage, vs...))
 }
 
 // MessageGT applies the GT predicate on the "message" field.
 func MessageGT(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldGT(FieldMessage, v))
 }
 
 // MessageGTE applies the GTE predicate on the "message" field.
 func MessageGTE(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldGTE(FieldMessage, v))
 }
 
 // MessageLT applies the LT predicate on the "message" field.
 func MessageLT(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldLT(FieldMessage, v))
 }
 
 // MessageLTE applies the LTE predicate on the "message" field.
 func MessageLTE(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldLTE(FieldMessage, v))
 }
 
 // MessageContains applies the Contains predicate on the "message" field.
 func MessageContains(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldContains(FieldMessage, v))
 }
 
 // MessageHasPrefix applies the HasPrefix predicate on the "message" field.
 func MessageHasPrefix(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldHasPrefix(FieldMessage, v))
 }
 
 // MessageHasSuffix applies the HasSuffix predicate on the "message" field.
 func MessageHasSuffix(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldHasSuffix(FieldMessage, v))
 }
 
 // MessageIsNil applies the IsNil predicate on the "message" field.
 func MessageIsNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldMessage)))
-	})
+	return predicate.Console(sql.FieldIsNull(FieldMessage))
 }
 
 // MessageNotNil applies the NotNil predicate on the "message" field.
 func MessageNotNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldMessage)))
-	})
+	return predicate.Console(sql.FieldNotNull(FieldMessage))
 }
 
 // MessageEqualFold applies the EqualFold predicate on the "message" field.
 func MessageEqualFold(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldEqualFold(FieldMessage, v))
 }
 
 // MessageContainsFold applies the ContainsFold predicate on the "message" field.
 func MessageContainsFold(v string) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldMessage), v))
-	})
+	return predicate.Console(sql.FieldContainsFold(FieldMessage, v))
 }
 
 // StartAtEQ applies the EQ predicate on the "startAt" field.
 func StartAtEQ(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStartAt), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldStartAt, v))
 }
 
 // StartAtNEQ applies the NEQ predicate on the "startAt" field.
 func StartAtNEQ(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStartAt), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldStartAt, v))
 }
 
 // StartAtIn applies the In predicate on the "startAt" field.
 func StartAtIn(vs ...time.Time) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldStartAt), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldStartAt, vs...))
 }
 
 // StartAtNotIn applies the NotIn predicate on the "startAt" field.
 func StartAtNotIn(vs ...time.Time) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldStartAt), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldStartAt, vs...))
 }
 
 // StartAtGT applies the GT predicate on the "startAt" field.
 func StartAtGT(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldStartAt), v))
-	})
+	return predicate.Console(sql.FieldGT(FieldStartAt, v))
 }
 
 // StartAtGTE applies the GTE predicate on the "startAt" field.
 func StartAtGTE(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldStartAt), v))
-	})
+	return predicate.Console(sql.FieldGTE(FieldStartAt, v))
 }
 
 // StartAtLT applies the LT predicate on the "startAt" field.
 func StartAtLT(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldStartAt), v))
-	})
+	return predicate.Console(sql.FieldLT(FieldStartAt, v))
 }
 
 // StartAtLTE applies the LTE predicate on the "startAt" field.
 func StartAtLTE(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldStartAt), v))
-	})
+	return predicate.Console(sql.FieldLTE(FieldStartAt, v))
 }
 
 // StopAtEQ applies the EQ predicate on the "stopAt" field.
 func StopAtEQ(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldStopAt), v))
-	})
+	return predicate.Console(sql.FieldEQ(FieldStopAt, v))
 }
 
 // StopAtNEQ applies the NEQ predicate on the "stopAt" field.
 func StopAtNEQ(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldStopAt), v))
-	})
+	return predicate.Console(sql.FieldNEQ(FieldStopAt, v))
 }
 
 // StopAtIn applies the In predicate on the "stopAt" field.
 func StopAtIn(vs ...time.Time) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldStopAt), v...))
-	})
+	return predicate.Console(sql.FieldIn(FieldStopAt, vs...))
 }
 
 // StopAtNotIn applies the NotIn predicate on the "stopAt" field.
 func StopAtNotIn(vs ...time.Time) predicate.Console {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldStopAt), v...))
-	})
+	return predicate.Console(sql.FieldNotIn(FieldStopAt, vs...))
 }
 
 // StopAtGT applies the GT predicate on the "stopAt" field.
 func StopAtGT(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldStopAt), v))
-	})
+	return predicate.Console(sql.FieldGT(FieldStopAt, v))
 }
 
 // StopAtGTE applies the GTE predicate on the "stopAt" field.
 func StopAtGTE(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldStopAt), v))
-	})
+	return predicate.Console(sql.FieldGTE(FieldStopAt, v))
 }
 
 // StopAtLT applies the LT predicate on the "stopAt" field.
 func StopAtLT(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldStopAt), v))
-	})
+	return predicate.Console(sql.FieldLT(FieldStopAt, v))
 }
 
 // StopAtLTE applies the LTE predicate on the "stopAt" field.
 func StopAtLTE(v time.Time) predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldStopAt), v))
-	})
+	return predicate.Console(sql.FieldLTE(FieldStopAt, v))
 }
 
 // StopAtIsNil applies the IsNil predicate on the "stopAt" field.
 func StopAtIsNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldStopAt)))
-	})
+	return predicate.Console(sql.FieldIsNull(FieldStopAt))
 }
 
 // StopAtNotNil applies the NotNil predicate on the "stopAt" field.
 func StopAtNotNil() predicate.Console {
-	return predicate.Console(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldStopAt)))
-	})
+	return predicate.Console(sql.FieldNotNull(FieldStopAt))
 }
 
 // HasCabinet applies the HasEdge predicate on the "cabinet" edge.
@@ -706,7 +452,6 @@ func HasCabinet() predicate.Console {
 	return predicate.Console(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CabinetTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, CabinetTable, CabinetColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -734,7 +479,6 @@ func HasBin() predicate.Console {
 	return predicate.Console(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(BinTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, BinTable, BinColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

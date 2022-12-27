@@ -12,1347 +12,877 @@ import (
 
 // ID filters vertices based on their ID field.
 func ID(id uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
 func IDEQ(id uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldID), id))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
 func IDNEQ(id uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldID), id))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
 func IDIn(ids ...uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.In(s.C(FieldID), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
 func IDNotIn(ids ...uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		v := make([]any, len(ids))
-		for i := range v {
-			v[i] = ids[i]
-		}
-		s.Where(sql.NotIn(s.C(FieldID), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
 func IDGT(id uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldID), id))
-	})
+	return predicate.Bin(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
 func IDGTE(id uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldID), id))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
 func IDLT(id uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldID), id))
-	})
+	return predicate.Bin(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
 func IDLTE(id uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldID), id))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldID, id))
 }
 
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
 func UUID(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldUUID, v))
 }
 
 // CabinetID applies equality check predicate on the "cabinet_id" field. It's identical to CabinetIDEQ.
 func CabinetID(v uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCabinetID), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldCabinetID, v))
 }
 
 // Brand applies equality check predicate on the "brand" field. It's identical to BrandEQ.
 func Brand(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldBrand, v))
 }
 
 // Serial applies equality check predicate on the "serial" field. It's identical to SerialEQ.
 func Serial(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldSerial, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldName, v))
 }
 
 // Ordinal applies equality check predicate on the "ordinal" field. It's identical to OrdinalEQ.
 func Ordinal(v int) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOrdinal), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldOrdinal, v))
 }
 
 // Open applies equality check predicate on the "open" field. It's identical to OpenEQ.
 func Open(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOpen), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldOpen, v))
 }
 
 // Enable applies equality check predicate on the "enable" field. It's identical to EnableEQ.
 func Enable(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEnable), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldEnable, v))
 }
 
 // Health applies equality check predicate on the "health" field. It's identical to HealthEQ.
 func Health(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldHealth), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldHealth, v))
 }
 
 // BatteryExists applies equality check predicate on the "battery_exists" field. It's identical to BatteryExistsEQ.
 func BatteryExists(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBatteryExists), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldBatteryExists, v))
 }
 
 // BatterySn applies equality check predicate on the "battery_sn" field. It's identical to BatterySnEQ.
 func BatterySn(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldBatterySn, v))
 }
 
 // Voltage applies equality check predicate on the "voltage" field. It's identical to VoltageEQ.
 func Voltage(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVoltage), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldVoltage, v))
 }
 
 // Current applies equality check predicate on the "current" field. It's identical to CurrentEQ.
 func Current(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCurrent), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldCurrent, v))
 }
 
 // Soc applies equality check predicate on the "soc" field. It's identical to SocEQ.
 func Soc(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSoc), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldSoc, v))
 }
 
 // Soh applies equality check predicate on the "soh" field. It's identical to SohEQ.
 func Soh(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSoh), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldSoh, v))
 }
 
 // Remark applies equality check predicate on the "remark" field. It's identical to RemarkEQ.
 func Remark(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldRemark, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
 func CreatedAtNEQ(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
 // CreatedAtIn applies the In predicate on the "created_at" field.
 func CreatedAtIn(vs ...time.Time) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCreatedAt), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
 // CreatedAtGT applies the GT predicate on the "created_at" field.
 func CreatedAtGT(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldCreatedAt, v))
 }
 
 // CreatedAtGTE applies the GTE predicate on the "created_at" field.
 func CreatedAtGTE(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldCreatedAt, v))
 }
 
 // CreatedAtLT applies the LT predicate on the "created_at" field.
 func CreatedAtLT(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldCreatedAt, v))
 }
 
 // CreatedAtLTE applies the LTE predicate on the "created_at" field.
 func CreatedAtLTE(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCreatedAt), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldCreatedAt, v))
 }
 
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
 func UpdatedAtNEQ(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldUpdatedAt, v))
 }
 
 // UpdatedAtIn applies the In predicate on the "updated_at" field.
 func UpdatedAtIn(vs ...time.Time) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUpdatedAt), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
 func UpdatedAtNotIn(vs ...time.Time) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUpdatedAt), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldUpdatedAt, vs...))
 }
 
 // UpdatedAtGT applies the GT predicate on the "updated_at" field.
 func UpdatedAtGT(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
 func UpdatedAtGTE(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLT applies the LT predicate on the "updated_at" field.
 func UpdatedAtLT(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldUpdatedAt, v))
 }
 
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
 // UUIDEQ applies the EQ predicate on the "uuid" field.
 func UUIDEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldUUID, v))
 }
 
 // UUIDNEQ applies the NEQ predicate on the "uuid" field.
 func UUIDNEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldUUID, v))
 }
 
 // UUIDIn applies the In predicate on the "uuid" field.
 func UUIDIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldUUID), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldUUID, vs...))
 }
 
 // UUIDNotIn applies the NotIn predicate on the "uuid" field.
 func UUIDNotIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldUUID), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldUUID, vs...))
 }
 
 // UUIDGT applies the GT predicate on the "uuid" field.
 func UUIDGT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldUUID, v))
 }
 
 // UUIDGTE applies the GTE predicate on the "uuid" field.
 func UUIDGTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldUUID, v))
 }
 
 // UUIDLT applies the LT predicate on the "uuid" field.
 func UUIDLT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldUUID, v))
 }
 
 // UUIDLTE applies the LTE predicate on the "uuid" field.
 func UUIDLTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldUUID, v))
 }
 
 // UUIDContains applies the Contains predicate on the "uuid" field.
 func UUIDContains(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldContains(FieldUUID, v))
 }
 
 // UUIDHasPrefix applies the HasPrefix predicate on the "uuid" field.
 func UUIDHasPrefix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldHasPrefix(FieldUUID, v))
 }
 
 // UUIDHasSuffix applies the HasSuffix predicate on the "uuid" field.
 func UUIDHasSuffix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldHasSuffix(FieldUUID, v))
 }
 
 // UUIDEqualFold applies the EqualFold predicate on the "uuid" field.
 func UUIDEqualFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldEqualFold(FieldUUID, v))
 }
 
 // UUIDContainsFold applies the ContainsFold predicate on the "uuid" field.
 func UUIDContainsFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldUUID), v))
-	})
+	return predicate.Bin(sql.FieldContainsFold(FieldUUID, v))
 }
 
 // CabinetIDEQ applies the EQ predicate on the "cabinet_id" field.
 func CabinetIDEQ(v uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCabinetID), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldCabinetID, v))
 }
 
 // CabinetIDNEQ applies the NEQ predicate on the "cabinet_id" field.
 func CabinetIDNEQ(v uint64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCabinetID), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldCabinetID, v))
 }
 
 // CabinetIDIn applies the In predicate on the "cabinet_id" field.
 func CabinetIDIn(vs ...uint64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCabinetID), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldCabinetID, vs...))
 }
 
 // CabinetIDNotIn applies the NotIn predicate on the "cabinet_id" field.
 func CabinetIDNotIn(vs ...uint64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCabinetID), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldCabinetID, vs...))
 }
 
 // BrandEQ applies the EQ predicate on the "brand" field.
 func BrandEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldBrand, v))
 }
 
 // BrandNEQ applies the NEQ predicate on the "brand" field.
 func BrandNEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldBrand, v))
 }
 
 // BrandIn applies the In predicate on the "brand" field.
 func BrandIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldBrand), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldBrand, vs...))
 }
 
 // BrandNotIn applies the NotIn predicate on the "brand" field.
 func BrandNotIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldBrand), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldBrand, vs...))
 }
 
 // BrandGT applies the GT predicate on the "brand" field.
 func BrandGT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldBrand, v))
 }
 
 // BrandGTE applies the GTE predicate on the "brand" field.
 func BrandGTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldBrand, v))
 }
 
 // BrandLT applies the LT predicate on the "brand" field.
 func BrandLT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldBrand, v))
 }
 
 // BrandLTE applies the LTE predicate on the "brand" field.
 func BrandLTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldBrand, v))
 }
 
 // BrandContains applies the Contains predicate on the "brand" field.
 func BrandContains(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldContains(FieldBrand, v))
 }
 
 // BrandHasPrefix applies the HasPrefix predicate on the "brand" field.
 func BrandHasPrefix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldHasPrefix(FieldBrand, v))
 }
 
 // BrandHasSuffix applies the HasSuffix predicate on the "brand" field.
 func BrandHasSuffix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldHasSuffix(FieldBrand, v))
 }
 
 // BrandEqualFold applies the EqualFold predicate on the "brand" field.
 func BrandEqualFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldEqualFold(FieldBrand, v))
 }
 
 // BrandContainsFold applies the ContainsFold predicate on the "brand" field.
 func BrandContainsFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldBrand), v))
-	})
+	return predicate.Bin(sql.FieldContainsFold(FieldBrand, v))
 }
 
 // SerialEQ applies the EQ predicate on the "serial" field.
 func SerialEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldSerial, v))
 }
 
 // SerialNEQ applies the NEQ predicate on the "serial" field.
 func SerialNEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldSerial, v))
 }
 
 // SerialIn applies the In predicate on the "serial" field.
 func SerialIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSerial), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldSerial, vs...))
 }
 
 // SerialNotIn applies the NotIn predicate on the "serial" field.
 func SerialNotIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSerial), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldSerial, vs...))
 }
 
 // SerialGT applies the GT predicate on the "serial" field.
 func SerialGT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldSerial, v))
 }
 
 // SerialGTE applies the GTE predicate on the "serial" field.
 func SerialGTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldSerial, v))
 }
 
 // SerialLT applies the LT predicate on the "serial" field.
 func SerialLT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldSerial, v))
 }
 
 // SerialLTE applies the LTE predicate on the "serial" field.
 func SerialLTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldSerial, v))
 }
 
 // SerialContains applies the Contains predicate on the "serial" field.
 func SerialContains(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldContains(FieldSerial, v))
 }
 
 // SerialHasPrefix applies the HasPrefix predicate on the "serial" field.
 func SerialHasPrefix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldHasPrefix(FieldSerial, v))
 }
 
 // SerialHasSuffix applies the HasSuffix predicate on the "serial" field.
 func SerialHasSuffix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldHasSuffix(FieldSerial, v))
 }
 
 // SerialEqualFold applies the EqualFold predicate on the "serial" field.
 func SerialEqualFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldEqualFold(FieldSerial, v))
 }
 
 // SerialContainsFold applies the ContainsFold predicate on the "serial" field.
 func SerialContainsFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldSerial), v))
-	})
+	return predicate.Bin(sql.FieldContainsFold(FieldSerial, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldName, v))
 }
 
 // NameNEQ applies the NEQ predicate on the "name" field.
 func NameNEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldName, v))
 }
 
 // NameIn applies the In predicate on the "name" field.
 func NameIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldName), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldName, vs...))
 }
 
 // NameNotIn applies the NotIn predicate on the "name" field.
 func NameNotIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldName), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldName, vs...))
 }
 
 // NameGT applies the GT predicate on the "name" field.
 func NameGT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldName, v))
 }
 
 // NameGTE applies the GTE predicate on the "name" field.
 func NameGTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldName, v))
 }
 
 // NameLT applies the LT predicate on the "name" field.
 func NameLT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldName, v))
 }
 
 // NameLTE applies the LTE predicate on the "name" field.
 func NameLTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldName, v))
 }
 
 // NameContains applies the Contains predicate on the "name" field.
 func NameContains(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldContains(FieldName, v))
 }
 
 // NameHasPrefix applies the HasPrefix predicate on the "name" field.
 func NameHasPrefix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldHasPrefix(FieldName, v))
 }
 
 // NameHasSuffix applies the HasSuffix predicate on the "name" field.
 func NameHasSuffix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldHasSuffix(FieldName, v))
 }
 
 // NameEqualFold applies the EqualFold predicate on the "name" field.
 func NameEqualFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldEqualFold(FieldName, v))
 }
 
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldName), v))
-	})
+	return predicate.Bin(sql.FieldContainsFold(FieldName, v))
 }
 
 // OrdinalEQ applies the EQ predicate on the "ordinal" field.
 func OrdinalEQ(v int) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOrdinal), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldOrdinal, v))
 }
 
 // OrdinalNEQ applies the NEQ predicate on the "ordinal" field.
 func OrdinalNEQ(v int) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldOrdinal), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldOrdinal, v))
 }
 
 // OrdinalIn applies the In predicate on the "ordinal" field.
 func OrdinalIn(vs ...int) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldOrdinal), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldOrdinal, vs...))
 }
 
 // OrdinalNotIn applies the NotIn predicate on the "ordinal" field.
 func OrdinalNotIn(vs ...int) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldOrdinal), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldOrdinal, vs...))
 }
 
 // OrdinalGT applies the GT predicate on the "ordinal" field.
 func OrdinalGT(v int) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldOrdinal), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldOrdinal, v))
 }
 
 // OrdinalGTE applies the GTE predicate on the "ordinal" field.
 func OrdinalGTE(v int) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldOrdinal), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldOrdinal, v))
 }
 
 // OrdinalLT applies the LT predicate on the "ordinal" field.
 func OrdinalLT(v int) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldOrdinal), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldOrdinal, v))
 }
 
 // OrdinalLTE applies the LTE predicate on the "ordinal" field.
 func OrdinalLTE(v int) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldOrdinal), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldOrdinal, v))
 }
 
 // OpenEQ applies the EQ predicate on the "open" field.
 func OpenEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldOpen), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldOpen, v))
 }
 
 // OpenNEQ applies the NEQ predicate on the "open" field.
 func OpenNEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldOpen), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldOpen, v))
 }
 
 // EnableEQ applies the EQ predicate on the "enable" field.
 func EnableEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldEnable), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldEnable, v))
 }
 
 // EnableNEQ applies the NEQ predicate on the "enable" field.
 func EnableNEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldEnable), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldEnable, v))
 }
 
 // HealthEQ applies the EQ predicate on the "health" field.
 func HealthEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldHealth), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldHealth, v))
 }
 
 // HealthNEQ applies the NEQ predicate on the "health" field.
 func HealthNEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldHealth), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldHealth, v))
 }
 
 // BatteryExistsEQ applies the EQ predicate on the "battery_exists" field.
 func BatteryExistsEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBatteryExists), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldBatteryExists, v))
 }
 
 // BatteryExistsNEQ applies the NEQ predicate on the "battery_exists" field.
 func BatteryExistsNEQ(v bool) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldBatteryExists), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldBatteryExists, v))
 }
 
 // BatterySnEQ applies the EQ predicate on the "battery_sn" field.
 func BatterySnEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldBatterySn, v))
 }
 
 // BatterySnNEQ applies the NEQ predicate on the "battery_sn" field.
 func BatterySnNEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldBatterySn, v))
 }
 
 // BatterySnIn applies the In predicate on the "battery_sn" field.
 func BatterySnIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldBatterySn), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldBatterySn, vs...))
 }
 
 // BatterySnNotIn applies the NotIn predicate on the "battery_sn" field.
 func BatterySnNotIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldBatterySn), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldBatterySn, vs...))
 }
 
 // BatterySnGT applies the GT predicate on the "battery_sn" field.
 func BatterySnGT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldBatterySn, v))
 }
 
 // BatterySnGTE applies the GTE predicate on the "battery_sn" field.
 func BatterySnGTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldBatterySn, v))
 }
 
 // BatterySnLT applies the LT predicate on the "battery_sn" field.
 func BatterySnLT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldBatterySn, v))
 }
 
 // BatterySnLTE applies the LTE predicate on the "battery_sn" field.
 func BatterySnLTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldBatterySn, v))
 }
 
 // BatterySnContains applies the Contains predicate on the "battery_sn" field.
 func BatterySnContains(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldContains(FieldBatterySn, v))
 }
 
 // BatterySnHasPrefix applies the HasPrefix predicate on the "battery_sn" field.
 func BatterySnHasPrefix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldHasPrefix(FieldBatterySn, v))
 }
 
 // BatterySnHasSuffix applies the HasSuffix predicate on the "battery_sn" field.
 func BatterySnHasSuffix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldHasSuffix(FieldBatterySn, v))
 }
 
 // BatterySnEqualFold applies the EqualFold predicate on the "battery_sn" field.
 func BatterySnEqualFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldEqualFold(FieldBatterySn, v))
 }
 
 // BatterySnContainsFold applies the ContainsFold predicate on the "battery_sn" field.
 func BatterySnContainsFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldBatterySn), v))
-	})
+	return predicate.Bin(sql.FieldContainsFold(FieldBatterySn, v))
 }
 
 // VoltageEQ applies the EQ predicate on the "voltage" field.
 func VoltageEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldVoltage), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldVoltage, v))
 }
 
 // VoltageNEQ applies the NEQ predicate on the "voltage" field.
 func VoltageNEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldVoltage), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldVoltage, v))
 }
 
 // VoltageIn applies the In predicate on the "voltage" field.
 func VoltageIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldVoltage), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldVoltage, vs...))
 }
 
 // VoltageNotIn applies the NotIn predicate on the "voltage" field.
 func VoltageNotIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldVoltage), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldVoltage, vs...))
 }
 
 // VoltageGT applies the GT predicate on the "voltage" field.
 func VoltageGT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldVoltage), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldVoltage, v))
 }
 
 // VoltageGTE applies the GTE predicate on the "voltage" field.
 func VoltageGTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldVoltage), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldVoltage, v))
 }
 
 // VoltageLT applies the LT predicate on the "voltage" field.
 func VoltageLT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldVoltage), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldVoltage, v))
 }
 
 // VoltageLTE applies the LTE predicate on the "voltage" field.
 func VoltageLTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldVoltage), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldVoltage, v))
 }
 
 // CurrentEQ applies the EQ predicate on the "current" field.
 func CurrentEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldCurrent), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldCurrent, v))
 }
 
 // CurrentNEQ applies the NEQ predicate on the "current" field.
 func CurrentNEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldCurrent), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldCurrent, v))
 }
 
 // CurrentIn applies the In predicate on the "current" field.
 func CurrentIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldCurrent), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldCurrent, vs...))
 }
 
 // CurrentNotIn applies the NotIn predicate on the "current" field.
 func CurrentNotIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldCurrent), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldCurrent, vs...))
 }
 
 // CurrentGT applies the GT predicate on the "current" field.
 func CurrentGT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldCurrent), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldCurrent, v))
 }
 
 // CurrentGTE applies the GTE predicate on the "current" field.
 func CurrentGTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldCurrent), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldCurrent, v))
 }
 
 // CurrentLT applies the LT predicate on the "current" field.
 func CurrentLT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldCurrent), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldCurrent, v))
 }
 
 // CurrentLTE applies the LTE predicate on the "current" field.
 func CurrentLTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldCurrent), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldCurrent, v))
 }
 
 // SocEQ applies the EQ predicate on the "soc" field.
 func SocEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSoc), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldSoc, v))
 }
 
 // SocNEQ applies the NEQ predicate on the "soc" field.
 func SocNEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSoc), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldSoc, v))
 }
 
 // SocIn applies the In predicate on the "soc" field.
 func SocIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSoc), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldSoc, vs...))
 }
 
 // SocNotIn applies the NotIn predicate on the "soc" field.
 func SocNotIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSoc), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldSoc, vs...))
 }
 
 // SocGT applies the GT predicate on the "soc" field.
 func SocGT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSoc), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldSoc, v))
 }
 
 // SocGTE applies the GTE predicate on the "soc" field.
 func SocGTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSoc), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldSoc, v))
 }
 
 // SocLT applies the LT predicate on the "soc" field.
 func SocLT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSoc), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldSoc, v))
 }
 
 // SocLTE applies the LTE predicate on the "soc" field.
 func SocLTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSoc), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldSoc, v))
 }
 
 // SohEQ applies the EQ predicate on the "soh" field.
 func SohEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldSoh), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldSoh, v))
 }
 
 // SohNEQ applies the NEQ predicate on the "soh" field.
 func SohNEQ(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldSoh), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldSoh, v))
 }
 
 // SohIn applies the In predicate on the "soh" field.
 func SohIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldSoh), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldSoh, vs...))
 }
 
 // SohNotIn applies the NotIn predicate on the "soh" field.
 func SohNotIn(vs ...float64) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldSoh), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldSoh, vs...))
 }
 
 // SohGT applies the GT predicate on the "soh" field.
 func SohGT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldSoh), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldSoh, v))
 }
 
 // SohGTE applies the GTE predicate on the "soh" field.
 func SohGTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldSoh), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldSoh, v))
 }
 
 // SohLT applies the LT predicate on the "soh" field.
 func SohLT(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldSoh), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldSoh, v))
 }
 
 // SohLTE applies the LTE predicate on the "soh" field.
 func SohLTE(v float64) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldSoh), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldSoh, v))
 }
 
 // RemarkEQ applies the EQ predicate on the "remark" field.
 func RemarkEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EQ(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldEQ(FieldRemark, v))
 }
 
 // RemarkNEQ applies the NEQ predicate on the "remark" field.
 func RemarkNEQ(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NEQ(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldNEQ(FieldRemark, v))
 }
 
 // RemarkIn applies the In predicate on the "remark" field.
 func RemarkIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.In(s.C(FieldRemark), v...))
-	})
+	return predicate.Bin(sql.FieldIn(FieldRemark, vs...))
 }
 
 // RemarkNotIn applies the NotIn predicate on the "remark" field.
 func RemarkNotIn(vs ...string) predicate.Bin {
-	v := make([]any, len(vs))
-	for i := range v {
-		v[i] = vs[i]
-	}
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotIn(s.C(FieldRemark), v...))
-	})
+	return predicate.Bin(sql.FieldNotIn(FieldRemark, vs...))
 }
 
 // RemarkGT applies the GT predicate on the "remark" field.
 func RemarkGT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GT(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldGT(FieldRemark, v))
 }
 
 // RemarkGTE applies the GTE predicate on the "remark" field.
 func RemarkGTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.GTE(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldGTE(FieldRemark, v))
 }
 
 // RemarkLT applies the LT predicate on the "remark" field.
 func RemarkLT(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LT(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldLT(FieldRemark, v))
 }
 
 // RemarkLTE applies the LTE predicate on the "remark" field.
 func RemarkLTE(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.LTE(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldLTE(FieldRemark, v))
 }
 
 // RemarkContains applies the Contains predicate on the "remark" field.
 func RemarkContains(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.Contains(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldContains(FieldRemark, v))
 }
 
 // RemarkHasPrefix applies the HasPrefix predicate on the "remark" field.
 func RemarkHasPrefix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasPrefix(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldHasPrefix(FieldRemark, v))
 }
 
 // RemarkHasSuffix applies the HasSuffix predicate on the "remark" field.
 func RemarkHasSuffix(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.HasSuffix(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldHasSuffix(FieldRemark, v))
 }
 
 // RemarkIsNil applies the IsNil predicate on the "remark" field.
 func RemarkIsNil() predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.IsNull(s.C(FieldRemark)))
-	})
+	return predicate.Bin(sql.FieldIsNull(FieldRemark))
 }
 
 // RemarkNotNil applies the NotNil predicate on the "remark" field.
 func RemarkNotNil() predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.NotNull(s.C(FieldRemark)))
-	})
+	return predicate.Bin(sql.FieldNotNull(FieldRemark))
 }
 
 // RemarkEqualFold applies the EqualFold predicate on the "remark" field.
 func RemarkEqualFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.EqualFold(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldEqualFold(FieldRemark, v))
 }
 
 // RemarkContainsFold applies the ContainsFold predicate on the "remark" field.
 func RemarkContainsFold(v string) predicate.Bin {
-	return predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.ContainsFold(s.C(FieldRemark), v))
-	})
+	return predicate.Bin(sql.FieldContainsFold(FieldRemark, v))
 }
 
 // HasCabinet applies the HasEdge predicate on the "cabinet" edge.
@@ -1360,7 +890,6 @@ func HasCabinet() predicate.Bin {
 	return predicate.Bin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CabinetTable, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, CabinetTable, CabinetColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

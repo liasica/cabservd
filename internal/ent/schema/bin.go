@@ -51,6 +51,7 @@ type Bin struct {
 func (Bin) Annotations() []schema.Annotation {
     return []schema.Annotation{
         entsql.Annotation{Table: "bin"},
+        entsql.WithComments(true),
     }
 }
 

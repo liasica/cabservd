@@ -34,7 +34,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}}
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
 	cfg.options(opts...)
 	client := &Client{config: cfg}
 	client.init()
@@ -137,6 +137,28 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Console.Use(hooks...)
 }
 
+// Intercept adds the query interceptors to all the entity clients.
+// In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
+func (c *Client) Intercept(interceptors ...Interceptor) {
+	c.Bin.Intercept(interceptors...)
+	c.Cabinet.Intercept(interceptors...)
+	c.Console.Intercept(interceptors...)
+}
+
+// Mutate implements the ent.Mutator interface.
+func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
+	switch m := m.(type) {
+	case *BinMutation:
+		return c.Bin.mutate(ctx, m)
+	case *CabinetMutation:
+		return c.Cabinet.mutate(ctx, m)
+	case *ConsoleMutation:
+		return c.Console.mutate(ctx, m)
+	default:
+		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
 // BinClient is a client for the Bin schema.
 type BinClient struct {
 	config
@@ -151,6 +173,12 @@ func NewBinClient(c config) *BinClient {
 // A call to `Use(f, g, h)` equals to `bin.Hooks(f(g(h())))`.
 func (c *BinClient) Use(hooks ...Hook) {
 	c.hooks.Bin = append(c.hooks.Bin, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `bin.Intercept(f(g(h())))`.
+func (c *BinClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Bin = append(c.inters.Bin, interceptors...)
 }
 
 // Create returns a builder for creating a Bin entity.
@@ -205,6 +233,7 @@ func (c *BinClient) DeleteOneID(id uint64) *BinDeleteOne {
 func (c *BinClient) Query() *BinQuery {
 	return &BinQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -224,7 +253,7 @@ func (c *BinClient) GetX(ctx context.Context, id uint64) *Bin {
 
 // QueryCabinet queries the cabinet edge of a Bin.
 func (c *BinClient) QueryCabinet(b *Bin) *CabinetQuery {
-	query := &CabinetQuery{config: c.config}
+	query := (&CabinetClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := b.ID
 		step := sqlgraph.NewStep(
@@ -243,6 +272,26 @@ func (c *BinClient) Hooks() []Hook {
 	return c.hooks.Bin
 }
 
+// Interceptors returns the client interceptors.
+func (c *BinClient) Interceptors() []Interceptor {
+	return c.inters.Bin
+}
+
+func (c *BinClient) mutate(ctx context.Context, m *BinMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&BinCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&BinUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&BinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&BinDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Bin mutation op: %q", m.Op())
+	}
+}
+
 // CabinetClient is a client for the Cabinet schema.
 type CabinetClient struct {
 	config
@@ -257,6 +306,12 @@ func NewCabinetClient(c config) *CabinetClient {
 // A call to `Use(f, g, h)` equals to `cabinet.Hooks(f(g(h())))`.
 func (c *CabinetClient) Use(hooks ...Hook) {
 	c.hooks.Cabinet = append(c.hooks.Cabinet, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `cabinet.Intercept(f(g(h())))`.
+func (c *CabinetClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Cabinet = append(c.inters.Cabinet, interceptors...)
 }
 
 // Create returns a builder for creating a Cabinet entity.
@@ -311,6 +366,7 @@ func (c *CabinetClient) DeleteOneID(id uint64) *CabinetDeleteOne {
 func (c *CabinetClient) Query() *CabinetQuery {
 	return &CabinetQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -330,7 +386,7 @@ func (c *CabinetClient) GetX(ctx context.Context, id uint64) *Cabinet {
 
 // QueryBins queries the bins edge of a Cabinet.
 func (c *CabinetClient) QueryBins(ca *Cabinet) *BinQuery {
-	query := &BinQuery{config: c.config}
+	query := (&BinClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ca.ID
 		step := sqlgraph.NewStep(
@@ -349,6 +405,26 @@ func (c *CabinetClient) Hooks() []Hook {
 	return c.hooks.Cabinet
 }
 
+// Interceptors returns the client interceptors.
+func (c *CabinetClient) Interceptors() []Interceptor {
+	return c.inters.Cabinet
+}
+
+func (c *CabinetClient) mutate(ctx context.Context, m *CabinetMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CabinetCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CabinetUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CabinetUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CabinetDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Cabinet mutation op: %q", m.Op())
+	}
+}
+
 // ConsoleClient is a client for the Console schema.
 type ConsoleClient struct {
 	config
@@ -363,6 +439,12 @@ func NewConsoleClient(c config) *ConsoleClient {
 // A call to `Use(f, g, h)` equals to `console.Hooks(f(g(h())))`.
 func (c *ConsoleClient) Use(hooks ...Hook) {
 	c.hooks.Console = append(c.hooks.Console, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `console.Intercept(f(g(h())))`.
+func (c *ConsoleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Console = append(c.inters.Console, interceptors...)
 }
 
 // Create returns a builder for creating a Console entity.
@@ -417,6 +499,7 @@ func (c *ConsoleClient) DeleteOneID(id uint64) *ConsoleDeleteOne {
 func (c *ConsoleClient) Query() *ConsoleQuery {
 	return &ConsoleQuery{
 		config: c.config,
+		inters: c.Interceptors(),
 	}
 }
 
@@ -436,7 +519,7 @@ func (c *ConsoleClient) GetX(ctx context.Context, id uint64) *Console {
 
 // QueryCabinet queries the cabinet edge of a Console.
 func (c *ConsoleClient) QueryCabinet(co *Console) *CabinetQuery {
-	query := &CabinetQuery{config: c.config}
+	query := (&CabinetClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -452,7 +535,7 @@ func (c *ConsoleClient) QueryCabinet(co *Console) *CabinetQuery {
 
 // QueryBin queries the bin edge of a Console.
 func (c *ConsoleClient) QueryBin(co *Console) *BinQuery {
-	query := &BinQuery{config: c.config}
+	query := (&BinClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := co.ID
 		step := sqlgraph.NewStep(
@@ -469,4 +552,24 @@ func (c *ConsoleClient) QueryBin(co *Console) *BinQuery {
 // Hooks returns the client hooks.
 func (c *ConsoleClient) Hooks() []Hook {
 	return c.hooks.Console
+}
+
+// Interceptors returns the client interceptors.
+func (c *ConsoleClient) Interceptors() []Interceptor {
+	return c.inters.Console
+}
+
+func (c *ConsoleClient) mutate(ctx context.Context, m *ConsoleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ConsoleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ConsoleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ConsoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ConsoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Console mutation op: %q", m.Op())
+	}
 }

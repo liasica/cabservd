@@ -15,11 +15,10 @@ type BinFunc func(context.Context, *ent.BinMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f BinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.BinMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BinMutation", m)
+	if mv, ok := m.(*ent.BinMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.BinMutation", m)
 }
 
 // The CabinetFunc type is an adapter to allow the use of ordinary
@@ -28,11 +27,10 @@ type CabinetFunc func(context.Context, *ent.CabinetMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f CabinetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.CabinetMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CabinetMutation", m)
+	if mv, ok := m.(*ent.CabinetMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CabinetMutation", m)
 }
 
 // The ConsoleFunc type is an adapter to allow the use of ordinary
@@ -41,11 +39,10 @@ type ConsoleFunc func(context.Context, *ent.ConsoleMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
 func (f ConsoleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.ConsoleMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ConsoleMutation", m)
+	if mv, ok := m.(*ent.ConsoleMutation); ok {
+		return f(ctx, mv)
 	}
-	return f(ctx, mv)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ConsoleMutation", m)
 }
 
 // Condition is a hook condition function.

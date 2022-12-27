@@ -271,41 +271,8 @@ func (bu *BinUpdate) ClearCabinet() *BinUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (bu *BinUpdate) Save(ctx context.Context) (int, error) {
-	var (
-		err      error
-		affected int
-	)
 	bu.defaults()
-	if len(bu.hooks) == 0 {
-		if err = bu.check(); err != nil {
-			return 0, err
-		}
-		affected, err = bu.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*BinMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = bu.check(); err != nil {
-				return 0, err
-			}
-			bu.mutation = mutation
-			affected, err = bu.sqlSave(ctx)
-			mutation.done = true
-			return affected, err
-		})
-		for i := len(bu.hooks) - 1; i >= 0; i-- {
-			if bu.hooks[i] == nil {
-				return 0, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = bu.hooks[i](mut)
-		}
-		if _, err := mut.Mutate(ctx, bu.mutation); err != nil {
-			return 0, err
-		}
-	}
-	return affected, err
+	return withHooks[int, BinMutation](ctx, bu.sqlSave, bu.mutation, bu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -358,6 +325,9 @@ func (bu *BinUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *BinUpdate 
 }
 
 func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := bu.check(); err != nil {
+		return n, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   bin.Table,
@@ -485,6 +455,7 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		return 0, err
 	}
+	bu.mutation.done = true
 	return n, nil
 }
 
@@ -745,47 +716,8 @@ func (buo *BinUpdateOne) Select(field string, fields ...string) *BinUpdateOne {
 
 // Save executes the query and returns the updated Bin entity.
 func (buo *BinUpdateOne) Save(ctx context.Context) (*Bin, error) {
-	var (
-		err  error
-		node *Bin
-	)
 	buo.defaults()
-	if len(buo.hooks) == 0 {
-		if err = buo.check(); err != nil {
-			return nil, err
-		}
-		node, err = buo.sqlSave(ctx)
-	} else {
-		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-			mutation, ok := m.(*BinMutation)
-			if !ok {
-				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = buo.check(); err != nil {
-				return nil, err
-			}
-			buo.mutation = mutation
-			node, err = buo.sqlSave(ctx)
-			mutation.done = true
-			return node, err
-		})
-		for i := len(buo.hooks) - 1; i >= 0; i-- {
-			if buo.hooks[i] == nil {
-				return nil, fmt.Errorf("ent: uninitialized hook (forgotten import ent/runtime?)")
-			}
-			mut = buo.hooks[i](mut)
-		}
-		v, err := mut.Mutate(ctx, buo.mutation)
-		if err != nil {
-			return nil, err
-		}
-		nv, ok := v.(*Bin)
-		if !ok {
-			return nil, fmt.Errorf("unexpected node type %T returned from BinMutation", v)
-		}
-		node = nv
-	}
-	return node, err
+	return withHooks[*Bin, BinMutation](ctx, buo.sqlSave, buo.mutation, buo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -838,6 +770,9 @@ func (buo *BinUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *BinUpd
 }
 
 func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
+	if err := buo.check(); err != nil {
+		return _node, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   bin.Table,
@@ -985,5 +920,6 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 		}
 		return nil, err
 	}
+	buo.mutation.done = true
 	return _node, nil
 }

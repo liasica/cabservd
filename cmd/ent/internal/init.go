@@ -78,6 +78,7 @@ type {{ .name }} struct {
 func ({{ .name }}) Annotations() []schema.Annotation {
     return []schema.Annotation{
         entsql.Annotation{Table: "{{ .tableName }}"},
+        entsql.WithComments(true),
     }
 }
 

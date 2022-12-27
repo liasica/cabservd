@@ -17,6 +17,7 @@ import (
 	"github.com/google/uuid"
 
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -959,9 +960,24 @@ func (m *BinMutation) Where(ps ...predicate.Bin) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the BinMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *BinMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Bin, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *BinMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *BinMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Bin).
@@ -2440,9 +2456,24 @@ func (m *CabinetMutation) Where(ps ...predicate.Cabinet) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the CabinetMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CabinetMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Cabinet, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *CabinetMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CabinetMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Cabinet).
@@ -3666,9 +3697,24 @@ func (m *ConsoleMutation) Where(ps ...predicate.Console) {
 	m.predicates = append(m.predicates, ps...)
 }
 
+// WhereP appends storage-level predicates to the ConsoleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ConsoleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Console, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
 // Op returns the operation name.
 func (m *ConsoleMutation) Op() Op {
 	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ConsoleMutation) SetOp(op Op) {
+	m.op = op
 }
 
 // Type returns the node type of this mutation (Console).

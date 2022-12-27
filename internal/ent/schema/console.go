@@ -54,6 +54,7 @@ type Console struct {
 func (Console) Annotations() []schema.Annotation {
     return []schema.Annotation{
         entsql.Annotation{Table: "console"},
+        entsql.WithComments(true),
     }
 }
 
