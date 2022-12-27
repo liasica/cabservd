@@ -6,6 +6,7 @@
 package hook
 
 import (
+    "bytes"
     "fmt"
     "github.com/auroraride/cabservd/bridge"
     "github.com/auroraride/cabservd/internal/ent"
@@ -30,15 +31,10 @@ func waitForNotification(l *pq.Listener) {
     for {
         select {
         case n := <-l.Notify:
-            // fmt.Println("Received data from channel [", n.Channel, "] :")
-            // // Prepare notification payload for pretty print
-            // var prettyJSON bytes.Buffer
-            // err := json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
-            // if err != nil {
-            //     fmt.Println("Error processing JSON: ", err)
-            //     return
-            // }
-            // fmt.Println(string(prettyJSON.Bytes()))
+            fmt.Println("[EVENTS] 收到数据库变动 channel [", n.Channel, "] :")
+            var prettyJSON bytes.Buffer
+            _ = json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
+            fmt.Println(string(prettyJSON.Bytes()))
 
             var (
                 serial string
@@ -63,8 +59,7 @@ func waitForNotification(l *pq.Listener) {
 
             return
         case <-time.After(90 * time.Second):
-            // Received no events for 90 seconds, checking connection
-            log.Info("[EVENTS] Received no events for 90 seconds, checking connection")
+            log.Info("[EVENTS] 超过90s未检测到PostgreSQL变化, 检查连接...")
             go func() {
                 _ = l.Ping()
             }()
@@ -86,7 +81,7 @@ func ListenPqEvents() {
     _ = listener.Listen("bin")
     _ = listener.Listen("cabinet")
 
-    log.Println("[EVENTS] Start monitoring PostgreSQL...")
+    log.Println("[EVENTS] 开始监听PostgreSQL变化...")
     for {
         waitForNotification(listener)
     }

@@ -47,7 +47,10 @@ func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data
 
     if cab != nil {
         data.Cabinet = &model.Cabinet{
+            ID:          cab.ID,
             Online:      cab.Online,
+            Brand:       cab.Brand,
+            Serial:      cab.Serial,
             Status:      cab.Status.String(),
             Enable:      cab.Enable,
             Lng:         cab.Lng,
@@ -62,6 +65,12 @@ func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data
 
     for _, bin := range bins {
         data.Bins = append(data.Bins, &model.Bin{
+            ID:            bin.ID,
+            UUID:          bin.UUID,
+            CabinetID:     bin.CabinetID,
+            Brand:         bin.Brand,
+            Serial:        bin.Serial,
+            Name:          bin.Name,
             Ordinal:       bin.Ordinal,
             Open:          bin.Open,
             Enable:        bin.Enable,
