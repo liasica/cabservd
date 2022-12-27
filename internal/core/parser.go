@@ -11,7 +11,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    jsoniter "github.com/json-iterator/go"
+    "github.com/goccy/go-json"
     "github.com/liasica/go-helpers/tools"
     log "github.com/sirupsen/logrus"
 )
@@ -90,7 +90,7 @@ func SaveCabinetContext(ctx context.Context, brand, serial string, item ent.Cabi
             }
         }).Exec(ctx)
     if err != nil {
-        b, _ := jsoniter.Marshal(item)
+        b, _ := json.Marshal(item)
         log.Errorf("电柜保存失败, %s: %v", string(b), err)
     }
 }
@@ -164,7 +164,7 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
             UpdateUUID().
             Exec(ctx)
         if err != nil {
-            b, _ := jsoniter.Marshal(item)
+            b, _ := json.Marshal(item)
             log.Errorf("仓位保存失败, %s: %v", string(b), err)
         }
     }

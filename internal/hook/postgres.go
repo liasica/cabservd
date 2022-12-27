@@ -10,7 +10,7 @@ import (
     "github.com/auroraride/cabservd/bridge"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
-    jsoniter "github.com/json-iterator/go"
+    "github.com/goccy/go-json"
     "github.com/lib/pq"
     log "github.com/sirupsen/logrus"
     "time"
@@ -49,12 +49,12 @@ func waitForNotification(l *pq.Listener) {
             switch n.Channel {
             case "bin":
                 var d data[*ent.Bin]
-                _ = jsoniter.Unmarshal([]byte(n.Extra), &d)
+                _ = json.Unmarshal([]byte(n.Extra), &d)
                 serial = d.Data.Serial
                 bins = ent.Bins{d.Data}
             case "cabinet":
                 var d data[*ent.Cabinet]
-                _ = jsoniter.Unmarshal([]byte(n.Extra), &d)
+                _ = json.Unmarshal([]byte(n.Extra), &d)
                 cab = d.Data
                 serial = d.Data.Serial
             }

@@ -10,7 +10,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/errs"
-    jsoniter "github.com/json-iterator/go"
+    "github.com/goccy/go-json"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
 )
@@ -62,9 +62,9 @@ func (c *Client) SetSerial(serial string) {
 
 // SendMessage 向客户端发送消息
 func (c *Client) SendMessage(message any, params ...any) (err error) {
-    // return jsoniter.NewEncoder(c).Encode(c)
+    // return json.NewEncoder(c).Encode(c)
 
-    b, _ := jsoniter.Marshal(message)
+    b, _ := json.Marshal(message)
 
     var logMessage bool
     if len(params) > 0 {
