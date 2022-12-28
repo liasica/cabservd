@@ -78,6 +78,7 @@ func (Scan) Edges() []ent.Edge {
 func (Scan) Mixin() []ent.Mixin {
     return []ent.Mixin{
         internal.TimeMixin{},
+        CabinetMixin{},
     }
 }
 

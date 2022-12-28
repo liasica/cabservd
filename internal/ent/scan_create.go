@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
 )
@@ -50,6 +51,12 @@ func (sc *ScanCreate) SetNillableUpdatedAt(t *time.Time) *ScanCreate {
 	if t != nil {
 		sc.SetUpdatedAt(*t)
 	}
+	return sc
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (sc *ScanCreate) SetCabinetID(u uint64) *ScanCreate {
+	sc.mutation.SetCabinetID(u)
 	return sc
 }
 
@@ -97,6 +104,11 @@ func (sc *ScanCreate) SetNillableID(u *uuid.UUID) *ScanCreate {
 		sc.SetID(*u)
 	}
 	return sc
+}
+
+// SetCabinet sets the "cabinet" edge to the Cabinet entity.
+func (sc *ScanCreate) SetCabinet(c *Cabinet) *ScanCreate {
+	return sc.SetCabinetID(c.ID)
 }
 
 // Mutation returns the ScanMutation object of the builder.
@@ -156,11 +168,17 @@ func (sc *ScanCreate) check() error {
 	if _, ok := sc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Scan.updated_at"`)}
 	}
+	if _, ok := sc.mutation.CabinetID(); !ok {
+		return &ValidationError{Name: "cabinet_id", err: errors.New(`ent: missing required field "Scan.cabinet_id"`)}
+	}
 	if _, ok := sc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Scan.user_id"`)}
 	}
 	if _, ok := sc.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Scan.serial"`)}
+	}
+	if _, ok := sc.mutation.CabinetID(); !ok {
+		return &ValidationError{Name: "cabinet", err: errors.New(`ent: missing required edge "Scan.cabinet"`)}
 	}
 	return nil
 }
@@ -228,6 +246,26 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 		_spec.SetField(scan.FieldData, field.TypeJSON, value)
 		_node.Data = value
 	}
+	if nodes := sc.mutation.CabinetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   scan.CabinetTable,
+			Columns: []string{scan.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.CabinetID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -289,6 +327,18 @@ func (u *ScanUpsert) SetUpdatedAt(v time.Time) *ScanUpsert {
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
 func (u *ScanUpsert) UpdateUpdatedAt() *ScanUpsert {
 	u.SetExcluded(scan.FieldUpdatedAt)
+	return u
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (u *ScanUpsert) SetCabinetID(v uint64) *ScanUpsert {
+	u.Set(scan.FieldCabinetID, v)
+	return u
+}
+
+// UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
+func (u *ScanUpsert) UpdateCabinetID() *ScanUpsert {
+	u.SetExcluded(scan.FieldCabinetID)
 	return u
 }
 
@@ -414,6 +464,20 @@ func (u *ScanUpsertOne) SetUpdatedAt(v time.Time) *ScanUpsertOne {
 func (u *ScanUpsertOne) UpdateUpdatedAt() *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (u *ScanUpsertOne) SetCabinetID(v uint64) *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetCabinetID(v)
+	})
+}
+
+// UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
+func (u *ScanUpsertOne) UpdateCabinetID() *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateCabinetID()
 	})
 }
 
@@ -720,6 +784,20 @@ func (u *ScanUpsertBulk) SetUpdatedAt(v time.Time) *ScanUpsertBulk {
 func (u *ScanUpsertBulk) UpdateUpdatedAt() *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateUpdatedAt()
+	})
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (u *ScanUpsertBulk) SetCabinetID(v uint64) *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetCabinetID(v)
+	})
+}
+
+// UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
+func (u *ScanUpsertBulk) UpdateCabinetID() *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateCabinetID()
 	})
 }
 

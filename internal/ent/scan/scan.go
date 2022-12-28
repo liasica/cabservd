@@ -17,6 +17,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldCabinetID holds the string denoting the cabinet_id field in the database.
+	FieldCabinetID = "cabinet_id"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
 	// FieldUserType holds the string denoting the user_type field in the database.
@@ -25,8 +27,17 @@ const (
 	FieldSerial = "serial"
 	// FieldData holds the string denoting the data field in the database.
 	FieldData = "data"
+	// EdgeCabinet holds the string denoting the cabinet edge name in mutations.
+	EdgeCabinet = "cabinet"
 	// Table holds the table name of the scan in the database.
 	Table = "scan"
+	// CabinetTable is the table that holds the cabinet relation/edge.
+	CabinetTable = "scan"
+	// CabinetInverseTable is the table name for the Cabinet entity.
+	// It exists in this package in order to avoid circular dependency with the "cabinet" package.
+	CabinetInverseTable = "cabinet"
+	// CabinetColumn is the table column denoting the cabinet relation/edge.
+	CabinetColumn = "cabinet_id"
 )
 
 // Columns holds all SQL columns for scan fields.
@@ -34,6 +45,7 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldCabinetID,
 	FieldUserID,
 	FieldUserType,
 	FieldSerial,

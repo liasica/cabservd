@@ -115,6 +115,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			scan.FieldCreatedAt: {Type: field.TypeTime, Column: scan.FieldCreatedAt},
 			scan.FieldUpdatedAt: {Type: field.TypeTime, Column: scan.FieldUpdatedAt},
+			scan.FieldCabinetID: {Type: field.TypeUint64, Column: scan.FieldCabinetID},
 			scan.FieldUserID:    {Type: field.TypeString, Column: scan.FieldUserID},
 			scan.FieldUserType:  {Type: field.TypeOther, Column: scan.FieldUserType},
 			scan.FieldSerial:    {Type: field.TypeString, Column: scan.FieldSerial},
@@ -168,6 +169,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"Console",
 		"Bin",
+	)
+	graph.MustAddE(
+		"cabinet",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   scan.CabinetTable,
+			Columns: []string{scan.CabinetColumn},
+			Bidi:    false,
+		},
+		"Scan",
+		"Cabinet",
 	)
 	return graph
 }()
@@ -629,6 +642,11 @@ func (f *ScanFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(scan.FieldUpdatedAt))
 }
 
+// WhereCabinetID applies the entql uint64 predicate on the cabinet_id field.
+func (f *ScanFilter) WhereCabinetID(p entql.Uint64P) {
+	f.Where(p.Field(scan.FieldCabinetID))
+}
+
 // WhereUserID applies the entql string predicate on the user_id field.
 func (f *ScanFilter) WhereUserID(p entql.StringP) {
 	f.Where(p.Field(scan.FieldUserID))
@@ -647,4 +665,18 @@ func (f *ScanFilter) WhereSerial(p entql.StringP) {
 // WhereData applies the entql json.RawMessage predicate on the data field.
 func (f *ScanFilter) WhereData(p entql.BytesP) {
 	f.Where(p.Field(scan.FieldData))
+}
+
+// WhereHasCabinet applies a predicate to check if query has an edge cabinet.
+func (f *ScanFilter) WhereHasCabinet() {
+	f.Where(entql.HasEdge("cabinet"))
+}
+
+// WhereHasCabinetWith applies a predicate to check if query has an edge cabinet with a given conditions (other predicates).
+func (f *ScanFilter) WhereHasCabinetWith(preds ...predicate.Cabinet) {
+	f.Where(entql.HasEdgeWith("cabinet", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
 }

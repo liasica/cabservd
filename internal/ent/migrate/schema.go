@@ -211,17 +211,31 @@ var (
 		{Name: "user_type", Type: field.TypeOther, Nullable: true, Comment: "用户类别", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜编号"},
 		{Name: "data", Type: field.TypeJSON, Nullable: true, Comment: "换电信息"},
+		{Name: "cabinet_id", Type: field.TypeUint64},
 	}
 	// ScanTable holds the schema information for the "scan" table.
 	ScanTable = &schema.Table{
 		Name:       "scan",
 		Columns:    ScanColumns,
 		PrimaryKey: []*schema.Column{ScanColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "scan_cabinet_cabinet",
+				Columns:    []*schema.Column{ScanColumns[7]},
+				RefColumns: []*schema.Column{CabinetColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
 		Indexes: []*schema.Index{
 			{
 				Name:    "scan_created_at",
 				Unique:  false,
 				Columns: []*schema.Column{ScanColumns[1]},
+			},
+			{
+				Name:    "scan_cabinet_id",
+				Unique:  false,
+				Columns: []*schema.Column{ScanColumns[7]},
 			},
 			{
 				Name:    "scan_user_id",
@@ -262,6 +276,7 @@ func init() {
 	ConsoleTable.Annotation = &entsql.Annotation{
 		Table: "console",
 	}
+	ScanTable.ForeignKeys[0].RefTable = CabinetTable
 	ScanTable.Annotation = &entsql.Annotation{
 		Table: "scan",
 	}

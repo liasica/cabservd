@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
 )
@@ -23,6 +24,8 @@ type Scan struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// CabinetID holds the value of the "cabinet_id" field.
+	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
 	// 用户类别
@@ -31,6 +34,31 @@ type Scan struct {
 	Serial string `json:"serial,omitempty"`
 	// 换电信息
 	Data *model.ExchangeUsableResponse `json:"data,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ScanQuery when eager-loading is set.
+	Edges ScanEdges `json:"edges"`
+}
+
+// ScanEdges holds the relations/edges for other nodes in the graph.
+type ScanEdges struct {
+	// Cabinet holds the value of the cabinet edge.
+	Cabinet *Cabinet `json:"cabinet,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// CabinetOrErr returns the Cabinet value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ScanEdges) CabinetOrErr() (*Cabinet, error) {
+	if e.loadedTypes[0] {
+		if e.Cabinet == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: cabinet.Label}
+		}
+		return e.Cabinet, nil
+	}
+	return nil, &NotLoadedError{edge: "cabinet"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -42,6 +70,8 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 			values[i] = &sql.NullScanner{S: new(model.UserType)}
 		case scan.FieldData:
 			values[i] = new([]byte)
+		case scan.FieldCabinetID:
+			values[i] = new(sql.NullInt64)
 		case scan.FieldUserID, scan.FieldSerial:
 			values[i] = new(sql.NullString)
 		case scan.FieldCreatedAt, scan.FieldUpdatedAt:
@@ -81,6 +111,12 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.UpdatedAt = value.Time
 			}
+		case scan.FieldCabinetID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field cabinet_id", values[i])
+			} else if value.Valid {
+				s.CabinetID = uint64(value.Int64)
+			}
 		case scan.FieldUserID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field user_id", values[i])
@@ -113,6 +149,11 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 	return nil
 }
 
+// QueryCabinet queries the "cabinet" edge of the Scan entity.
+func (s *Scan) QueryCabinet() *CabinetQuery {
+	return (&ScanClient{config: s.config}).QueryCabinet(s)
+}
+
 // Update returns a builder for updating this Scan.
 // Note that you need to call Scan.Unwrap() before calling this method if this Scan
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -141,6 +182,9 @@ func (s *Scan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(s.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("cabinet_id=")
+	builder.WriteString(fmt.Sprintf("%v", s.CabinetID))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(s.UserID)

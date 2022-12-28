@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
@@ -18,14 +19,15 @@ import (
 // ScanQuery is the builder for querying Scan entities.
 type ScanQuery struct {
 	config
-	limit      *int
-	offset     *int
-	unique     *bool
-	order      []OrderFunc
-	fields     []string
-	inters     []Interceptor
-	predicates []predicate.Scan
-	modifiers  []func(*sql.Selector)
+	limit       *int
+	offset      *int
+	unique      *bool
+	order       []OrderFunc
+	fields      []string
+	inters      []Interceptor
+	predicates  []predicate.Scan
+	withCabinet *CabinetQuery
+	modifiers   []func(*sql.Selector)
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,6 +62,28 @@ func (sq *ScanQuery) Unique(unique bool) *ScanQuery {
 func (sq *ScanQuery) Order(o ...OrderFunc) *ScanQuery {
 	sq.order = append(sq.order, o...)
 	return sq
+}
+
+// QueryCabinet chains the current query on the "cabinet" edge.
+func (sq *ScanQuery) QueryCabinet() *CabinetQuery {
+	query := (&CabinetClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scan.Table, scan.FieldID, selector),
+			sqlgraph.To(cabinet.Table, cabinet.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, scan.CabinetTable, scan.CabinetColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Scan entity from the query.
@@ -247,16 +271,28 @@ func (sq *ScanQuery) Clone() *ScanQuery {
 		return nil
 	}
 	return &ScanQuery{
-		config:     sq.config,
-		limit:      sq.limit,
-		offset:     sq.offset,
-		order:      append([]OrderFunc{}, sq.order...),
-		predicates: append([]predicate.Scan{}, sq.predicates...),
+		config:      sq.config,
+		limit:       sq.limit,
+		offset:      sq.offset,
+		order:       append([]OrderFunc{}, sq.order...),
+		predicates:  append([]predicate.Scan{}, sq.predicates...),
+		withCabinet: sq.withCabinet.Clone(),
 		// clone intermediate query.
 		sql:    sq.sql.Clone(),
 		path:   sq.path,
 		unique: sq.unique,
 	}
+}
+
+// WithCabinet tells the query-builder to eager-load the nodes that are connected to
+// the "cabinet" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *ScanQuery) WithCabinet(opts ...func(*CabinetQuery)) *ScanQuery {
+	query := (&CabinetClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withCabinet = query
+	return sq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -335,8 +371,11 @@ func (sq *ScanQuery) prepareQuery(ctx context.Context) error {
 
 func (sq *ScanQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Scan, error) {
 	var (
-		nodes = []*Scan{}
-		_spec = sq.querySpec()
+		nodes       = []*Scan{}
+		_spec       = sq.querySpec()
+		loadedTypes = [1]bool{
+			sq.withCabinet != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Scan).scanValues(nil, columns)
@@ -344,6 +383,7 @@ func (sq *ScanQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Scan, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Scan{config: sq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(sq.modifiers) > 0 {
@@ -358,7 +398,40 @@ func (sq *ScanQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Scan, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := sq.withCabinet; query != nil {
+		if err := sq.loadCabinet(ctx, query, nodes, nil,
+			func(n *Scan, e *Cabinet) { n.Edges.Cabinet = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (sq *ScanQuery) loadCabinet(ctx context.Context, query *CabinetQuery, nodes []*Scan, init func(*Scan), assign func(*Scan, *Cabinet)) error {
+	ids := make([]uint64, 0, len(nodes))
+	nodeids := make(map[uint64][]*Scan)
+	for i := range nodes {
+		fk := nodes[i].CabinetID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	query.Where(cabinet.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "cabinet_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (sq *ScanQuery) sqlCount(ctx context.Context) (int, error) {

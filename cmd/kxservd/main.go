@@ -10,6 +10,7 @@ import (
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/g"
+    "github.com/auroraride/cabservd/internal/hook"
     "github.com/auroraride/cabservd/internal/mem"
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/service"
@@ -29,12 +30,17 @@ func main() {
     go router.Start()
 
     // 启动socket hub
-    core.Start(
+    go core.Start(
         g.Config.Tcp.Bind,
         g.Config.Brand,
         kaixin.New(),
         new(core.HeaderLength),
     )
+
+    // 加载hooks
+    go hook.Start()
+
+    select {}
 }
 
 func cache() {

@@ -677,6 +677,22 @@ func (c *ScanClient) GetX(ctx context.Context, id uuid.UUID) *Scan {
 	return obj
 }
 
+// QueryCabinet queries the cabinet edge of a Scan.
+func (c *ScanClient) QueryCabinet(s *Scan) *CabinetQuery {
+	query := (&CabinetClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(scan.Table, scan.FieldID, id),
+			sqlgraph.To(cabinet.Table, cabinet.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, scan.CabinetTable, scan.CabinetColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ScanClient) Hooks() []Hook {
 	return c.hooks.Scan

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/auroraride/adapter/model"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/google/uuid"
@@ -64,6 +65,11 @@ func CreatedAt(v time.Time) predicate.Scan {
 // UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
 func UpdatedAt(v time.Time) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldUpdatedAt, v))
+}
+
+// CabinetID applies equality check predicate on the "cabinet_id" field. It's identical to CabinetIDEQ.
+func CabinetID(v uint64) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldCabinetID, v))
 }
 
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
@@ -159,6 +165,26 @@ func UpdatedAtLT(v time.Time) predicate.Scan {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.Scan {
 	return predicate.Scan(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// CabinetIDEQ applies the EQ predicate on the "cabinet_id" field.
+func CabinetIDEQ(v uint64) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldCabinetID, v))
+}
+
+// CabinetIDNEQ applies the NEQ predicate on the "cabinet_id" field.
+func CabinetIDNEQ(v uint64) predicate.Scan {
+	return predicate.Scan(sql.FieldNEQ(FieldCabinetID, v))
+}
+
+// CabinetIDIn applies the In predicate on the "cabinet_id" field.
+func CabinetIDIn(vs ...uint64) predicate.Scan {
+	return predicate.Scan(sql.FieldIn(FieldCabinetID, vs...))
+}
+
+// CabinetIDNotIn applies the NotIn predicate on the "cabinet_id" field.
+func CabinetIDNotIn(vs ...uint64) predicate.Scan {
+	return predicate.Scan(sql.FieldNotIn(FieldCabinetID, vs...))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
@@ -349,6 +375,33 @@ func DataIsNil() predicate.Scan {
 // DataNotNil applies the NotNil predicate on the "data" field.
 func DataNotNil() predicate.Scan {
 	return predicate.Scan(sql.FieldNotNull(FieldData))
+}
+
+// HasCabinet applies the HasEdge predicate on the "cabinet" edge.
+func HasCabinet() predicate.Scan {
+	return predicate.Scan(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, CabinetTable, CabinetColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCabinetWith applies the HasEdge predicate on the "cabinet" edge with a given conditions (other predicates).
+func HasCabinetWith(preds ...predicate.Cabinet) predicate.Scan {
+	return predicate.Scan(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(CabinetInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, CabinetTable, CabinetColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

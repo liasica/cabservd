@@ -4217,19 +4217,21 @@ func (m *ConsoleMutation) ResetEdge(name string) error {
 // ScanMutation represents an operation that mutates the Scan nodes in the graph.
 type ScanMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uuid.UUID
-	created_at    *time.Time
-	updated_at    *time.Time
-	user_id       *string
-	user_type     *model.UserType
-	serial        *string
-	data          **model.ExchangeUsableResponse
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Scan, error)
-	predicates    []predicate.Scan
+	op             Op
+	typ            string
+	id             *uuid.UUID
+	created_at     *time.Time
+	updated_at     *time.Time
+	user_id        *string
+	user_type      *model.UserType
+	serial         *string
+	data           **model.ExchangeUsableResponse
+	clearedFields  map[string]struct{}
+	cabinet        *uint64
+	clearedcabinet bool
+	done           bool
+	oldValue       func(context.Context) (*Scan, error)
+	predicates     []predicate.Scan
 }
 
 var _ ent.Mutation = (*ScanMutation)(nil)
@@ -4408,6 +4410,42 @@ func (m *ScanMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetCabinetID sets the "cabinet_id" field.
+func (m *ScanMutation) SetCabinetID(u uint64) {
+	m.cabinet = &u
+}
+
+// CabinetID returns the value of the "cabinet_id" field in the mutation.
+func (m *ScanMutation) CabinetID() (r uint64, exists bool) {
+	v := m.cabinet
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCabinetID returns the old "cabinet_id" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldCabinetID(ctx context.Context) (v uint64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCabinetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCabinetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCabinetID: %w", err)
+	}
+	return oldValue.CabinetID, nil
+}
+
+// ResetCabinetID resets all changes to the "cabinet_id" field.
+func (m *ScanMutation) ResetCabinetID() {
+	m.cabinet = nil
+}
+
 // SetUserID sets the "user_id" field.
 func (m *ScanMutation) SetUserID(s string) {
 	m.user_id = &s
@@ -4578,6 +4616,32 @@ func (m *ScanMutation) ResetData() {
 	delete(m.clearedFields, scan.FieldData)
 }
 
+// ClearCabinet clears the "cabinet" edge to the Cabinet entity.
+func (m *ScanMutation) ClearCabinet() {
+	m.clearedcabinet = true
+}
+
+// CabinetCleared reports if the "cabinet" edge to the Cabinet entity was cleared.
+func (m *ScanMutation) CabinetCleared() bool {
+	return m.clearedcabinet
+}
+
+// CabinetIDs returns the "cabinet" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CabinetID instead. It exists only for internal usage by the builders.
+func (m *ScanMutation) CabinetIDs() (ids []uint64) {
+	if id := m.cabinet; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCabinet resets all changes to the "cabinet" edge.
+func (m *ScanMutation) ResetCabinet() {
+	m.cabinet = nil
+	m.clearedcabinet = false
+}
+
 // Where appends a list predicates to the ScanMutation builder.
 func (m *ScanMutation) Where(ps ...predicate.Scan) {
 	m.predicates = append(m.predicates, ps...)
@@ -4612,12 +4676,15 @@ func (m *ScanMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ScanMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, scan.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, scan.FieldUpdatedAt)
+	}
+	if m.cabinet != nil {
+		fields = append(fields, scan.FieldCabinetID)
 	}
 	if m.user_id != nil {
 		fields = append(fields, scan.FieldUserID)
@@ -4643,6 +4710,8 @@ func (m *ScanMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case scan.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case scan.FieldCabinetID:
+		return m.CabinetID()
 	case scan.FieldUserID:
 		return m.UserID()
 	case scan.FieldUserType:
@@ -4664,6 +4733,8 @@ func (m *ScanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case scan.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case scan.FieldCabinetID:
+		return m.OldCabinetID(ctx)
 	case scan.FieldUserID:
 		return m.OldUserID(ctx)
 	case scan.FieldUserType:
@@ -4694,6 +4765,13 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case scan.FieldCabinetID:
+		v, ok := value.(uint64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCabinetID(v)
 		return nil
 	case scan.FieldUserID:
 		v, ok := value.(string)
@@ -4730,13 +4808,16 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ScanMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ScanMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -4793,6 +4874,9 @@ func (m *ScanMutation) ResetField(name string) error {
 	case scan.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case scan.FieldCabinetID:
+		m.ResetCabinetID()
+		return nil
 	case scan.FieldUserID:
 		m.ResetUserID()
 		return nil
@@ -4811,19 +4895,28 @@ func (m *ScanMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ScanMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.cabinet != nil {
+		edges = append(edges, scan.EdgeCabinet)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ScanMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case scan.EdgeCabinet:
+		if id := m.cabinet; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ScanMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -4835,24 +4928,41 @@ func (m *ScanMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ScanMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedcabinet {
+		edges = append(edges, scan.EdgeCabinet)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ScanMutation) EdgeCleared(name string) bool {
+	switch name {
+	case scan.EdgeCabinet:
+		return m.clearedcabinet
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ScanMutation) ClearEdge(name string) error {
+	switch name {
+	case scan.EdgeCabinet:
+		m.ClearCabinet()
+		return nil
+	}
 	return fmt.Errorf("unknown Scan unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ScanMutation) ResetEdge(name string) error {
+	switch name {
+	case scan.EdgeCabinet:
+		m.ResetCabinet()
+		return nil
+	}
 	return fmt.Errorf("unknown Scan edge %s", name)
 }

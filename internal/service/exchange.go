@@ -11,9 +11,13 @@ import (
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/ent/scan"
     "github.com/auroraride/cabservd/internal/errs"
+    "github.com/goccy/go-json"
     "github.com/jinzhu/copier"
+    log "github.com/sirupsen/logrus"
     "net/http"
+    "time"
 )
 
 type exchangeService struct {
@@ -28,10 +32,10 @@ func NewExchange(params ...any) *exchangeService {
 
 func (s *exchangeService) Usable(req *model.ExchangeRequest) (res *model.ExchangeUsableResponse) {
     res = &model.ExchangeUsableResponse{}
-    creator := ent.Database.Scan.Create().SetSerial(req.Serial).SetUserID(s.User.ID).SetUserType(s.User.Type)
+
     defer func() {
-        scan, _ := creator.Save(s.ctx)
-        res.UUID = scan.ID.String()
+        b, _ := json.Marshal(res)
+        log.Infof("[SCAN] %s", b)
     }()
 
     // 获取电柜状态
@@ -51,6 +55,16 @@ func (s *exchangeService) Usable(req *model.ExchangeRequest) (res *model.Exchang
 
     if len(cab.Edges.Bins) < 2 {
         app.Panic(http.StatusBadRequest, errs.CabinetNoEmpty)
+    }
+
+    // 查询限定时间内其他扫码用户
+    exists, _ := ent.Database.Scan.Query().Where(
+        scan.CabinetID(cab.ID),
+        scan.UserIDNEQ(s.User.ID),
+        scan.CreatedAtGT(time.Now().Add(-req.Lock*time.Second)),
+    ).Exist(s.ctx)
+    if exists {
+        app.Panic(http.StatusBadRequest, errs.CabinetBusy)
     }
 
     // TODO 查询是否有正在执行的任务?
@@ -101,12 +115,14 @@ func (s *exchangeService) Usable(req *model.ExchangeRequest) (res *model.Exchang
         app.Panic(http.StatusBadRequest, errs.CabinetNoEmpty)
     }
 
-    // 存储扫码记录
-    creator.SetData(res)
-
     // 拷贝属性
     _ = copier.Copy(&res.Cabinet, cab)
     _ = copier.Copy(&res.Fully, fully)
+    _ = copier.Copy(&res.Empty, empty)
+
+    // 存储扫码记录
+    sm, _ := ent.Database.Scan.Create().SetSerial(req.Serial).SetUserID(s.User.ID).SetData(res).SetUserType(s.User.Type).SetCabinet(cab).Save(s.ctx)
+    res.UUID = sm.ID.String()
 
     return
 }

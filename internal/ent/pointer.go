@@ -67,8 +67,9 @@ type ConsolePointer struct {
 
 type ScanPointers []*ScanPointer
 type ScanPointer struct {
-	UserID   *string                        `json:"user_id,omitempty"`
-	UserType *model.UserType                `json:"user_type,omitempty"`
-	Serial   *string                        `json:"serial,omitempty"`
-	Data     **model.ExchangeUsableResponse `json:"data,omitempty"`
+	CabinetID *uint64                        `json:"cabinet_id,omitempty"`
+	UserID    *string                        `json:"user_id,omitempty"`
+	UserType  *model.UserType                `json:"user_type,omitempty"`
+	Serial    *string                        `json:"serial,omitempty"`
+	Data      **model.ExchangeUsableResponse `json:"data,omitempty"`
 }

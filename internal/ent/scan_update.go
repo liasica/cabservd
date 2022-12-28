@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 )
@@ -33,6 +34,12 @@ func (su *ScanUpdate) Where(ps ...predicate.Scan) *ScanUpdate {
 // SetUpdatedAt sets the "updated_at" field.
 func (su *ScanUpdate) SetUpdatedAt(t time.Time) *ScanUpdate {
 	su.mutation.SetUpdatedAt(t)
+	return su
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (su *ScanUpdate) SetCabinetID(u uint64) *ScanUpdate {
+	su.mutation.SetCabinetID(u)
 	return su
 }
 
@@ -80,9 +87,20 @@ func (su *ScanUpdate) ClearData() *ScanUpdate {
 	return su
 }
 
+// SetCabinet sets the "cabinet" edge to the Cabinet entity.
+func (su *ScanUpdate) SetCabinet(c *Cabinet) *ScanUpdate {
+	return su.SetCabinetID(c.ID)
+}
+
 // Mutation returns the ScanMutation object of the builder.
 func (su *ScanUpdate) Mutation() *ScanMutation {
 	return su.mutation
+}
+
+// ClearCabinet clears the "cabinet" edge to the Cabinet entity.
+func (su *ScanUpdate) ClearCabinet() *ScanUpdate {
+	su.mutation.ClearCabinet()
+	return su
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -121,6 +139,14 @@ func (su *ScanUpdate) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (su *ScanUpdate) check() error {
+	if _, ok := su.mutation.CabinetID(); su.mutation.CabinetCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Scan.cabinet"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (su *ScanUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ScanUpdate {
 	su.modifiers = append(su.modifiers, modifiers...)
@@ -128,6 +154,9 @@ func (su *ScanUpdate) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ScanUpdat
 }
 
 func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := su.check(); err != nil {
+		return n, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   scan.Table,
@@ -166,6 +195,41 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.DataCleared() {
 		_spec.ClearField(scan.FieldData, field.TypeJSON)
 	}
+	if su.mutation.CabinetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   scan.CabinetTable,
+			Columns: []string{scan.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.CabinetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   scan.CabinetTable,
+			Columns: []string{scan.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	_spec.AddModifiers(su.modifiers...)
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -191,6 +255,12 @@ type ScanUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (suo *ScanUpdateOne) SetUpdatedAt(t time.Time) *ScanUpdateOne {
 	suo.mutation.SetUpdatedAt(t)
+	return suo
+}
+
+// SetCabinetID sets the "cabinet_id" field.
+func (suo *ScanUpdateOne) SetCabinetID(u uint64) *ScanUpdateOne {
+	suo.mutation.SetCabinetID(u)
 	return suo
 }
 
@@ -238,9 +308,20 @@ func (suo *ScanUpdateOne) ClearData() *ScanUpdateOne {
 	return suo
 }
 
+// SetCabinet sets the "cabinet" edge to the Cabinet entity.
+func (suo *ScanUpdateOne) SetCabinet(c *Cabinet) *ScanUpdateOne {
+	return suo.SetCabinetID(c.ID)
+}
+
 // Mutation returns the ScanMutation object of the builder.
 func (suo *ScanUpdateOne) Mutation() *ScanMutation {
 	return suo.mutation
+}
+
+// ClearCabinet clears the "cabinet" edge to the Cabinet entity.
+func (suo *ScanUpdateOne) ClearCabinet() *ScanUpdateOne {
+	suo.mutation.ClearCabinet()
+	return suo
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -286,6 +367,14 @@ func (suo *ScanUpdateOne) defaults() {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (suo *ScanUpdateOne) check() error {
+	if _, ok := suo.mutation.CabinetID(); suo.mutation.CabinetCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Scan.cabinet"`)
+	}
+	return nil
+}
+
 // Modify adds a statement modifier for attaching custom logic to the UPDATE statement.
 func (suo *ScanUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ScanUpdateOne {
 	suo.modifiers = append(suo.modifiers, modifiers...)
@@ -293,6 +382,9 @@ func (suo *ScanUpdateOne) Modify(modifiers ...func(u *sql.UpdateBuilder)) *ScanU
 }
 
 func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) {
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
 			Table:   scan.Table,
@@ -347,6 +439,41 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 	}
 	if suo.mutation.DataCleared() {
 		_spec.ClearField(scan.FieldData, field.TypeJSON)
+	}
+	if suo.mutation.CabinetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   scan.CabinetTable,
+			Columns: []string{scan.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.CabinetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   scan.CabinetTable,
+			Columns: []string{scan.CabinetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUint64,
+					Column: cabinet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_spec.AddModifiers(suo.modifiers...)
 	_node = &Scan{config: suo.config}
