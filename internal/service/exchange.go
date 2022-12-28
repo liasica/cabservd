@@ -30,7 +30,8 @@ func NewExchange(params ...any) *exchangeService {
     }
 }
 
-func (s *exchangeService) Usable(req *model.ExchangeRequest) (res *model.ExchangeUsableResponse) {
+// Usable 获取电柜待换电信息
+func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.ExchangeUsableResponse) {
     res = &model.ExchangeUsableResponse{}
 
     defer func() {
@@ -121,8 +122,24 @@ func (s *exchangeService) Usable(req *model.ExchangeRequest) (res *model.Exchang
     _ = copier.Copy(&res.Empty, empty)
 
     // 存储扫码记录
-    sm, _ := ent.Database.Scan.Create().SetSerial(req.Serial).SetUserID(s.User.ID).SetData(res).SetUserType(s.User.Type).SetCabinet(cab).Save(s.ctx)
+    sm := NewScan(s.User).Create(req.Serial, cab, res)
     res.UUID = sm.ID.String()
 
     return
+}
+
+func (s *exchangeService) Do(req *model.ExchangeRequest) *model.ExchangeResponse {
+    // 查询扫码记录
+    sc := NewScan(s.User).CensorX(req.UUID, req.Expires)
+
+    now := time.Now()
+
+    // 开始换电流程
+    go s.run(sc, now)
+
+    return &model.ExchangeResponse{StartAt: now}
+}
+
+func (s *exchangeService) run(sc *ent.Scan, start time.Time) {
+    co := ent.Database.Console
 }

@@ -32,6 +32,7 @@ var (
     CabinetDoorOpened         = errors.New("有开启中的仓门")
 
     ExchangeTaskNotExist = errors.New("换电任务不存在")
+    ExchangeExpired      = errors.New("换电任务已过期")
     ExchangeFailed       = errors.New("换电失败")
     ExchangeTimeOut      = errors.New("换电超时")
     ExchangeBatteryLost  = errors.New("电池未放入")
