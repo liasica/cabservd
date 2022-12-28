@@ -9,10 +9,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/auroraride/adapter/model"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
+	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/auroraride/cabservd/internal/types"
 	"github.com/google/uuid"
 
@@ -32,6 +34,7 @@ const (
 	TypeBin     = "Bin"
 	TypeCabinet = "Cabinet"
 	TypeConsole = "Console"
+	TypeScan    = "Scan"
 )
 
 // BinMutation represents an operation that mutates the Bin nodes in the graph.
@@ -3027,8 +3030,9 @@ type ConsoleMutation struct {
 	id             *uint64
 	uuid           *uuid.UUID
 	_type          *console.Type
-	user           **types.User
-	step           *types.ExchangeStep
+	user_id        *string
+	user_type      *model.UserType
+	step           *model.ExchangeStep
 	status         *console.Status
 	before_bin     **types.BinInfo
 	after_bin      **types.BinInfo
@@ -3287,49 +3291,98 @@ func (m *ConsoleMutation) ResetType() {
 	m._type = nil
 }
 
-// SetUser sets the "user" field.
-func (m *ConsoleMutation) SetUser(t *types.User) {
-	m.user = &t
+// SetUserID sets the "user_id" field.
+func (m *ConsoleMutation) SetUserID(s string) {
+	m.user_id = &s
 }
 
-// User returns the value of the "user" field in the mutation.
-func (m *ConsoleMutation) User() (r *types.User, exists bool) {
-	v := m.user
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *ConsoleMutation) UserID() (r string, exists bool) {
+	v := m.user_id
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldUser returns the old "user" field's value of the Console entity.
+// OldUserID returns the old "user_id" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldUser(ctx context.Context) (v *types.User, err error) {
+func (m *ConsoleMutation) OldUserID(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUser is only allowed on UpdateOne operations")
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUser requires an ID field in the mutation")
+		return v, errors.New("OldUserID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUser: %w", err)
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
 	}
-	return oldValue.User, nil
+	return oldValue.UserID, nil
 }
 
-// ResetUser resets all changes to the "user" field.
-func (m *ConsoleMutation) ResetUser() {
-	m.user = nil
+// ResetUserID resets all changes to the "user_id" field.
+func (m *ConsoleMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetUserType sets the "user_type" field.
+func (m *ConsoleMutation) SetUserType(mt model.UserType) {
+	m.user_type = &mt
+}
+
+// UserType returns the value of the "user_type" field in the mutation.
+func (m *ConsoleMutation) UserType() (r model.UserType, exists bool) {
+	v := m.user_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserType returns the old "user_type" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldUserType(ctx context.Context) (v *model.UserType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserType: %w", err)
+	}
+	return oldValue.UserType, nil
+}
+
+// ClearUserType clears the value of the "user_type" field.
+func (m *ConsoleMutation) ClearUserType() {
+	m.user_type = nil
+	m.clearedFields[console.FieldUserType] = struct{}{}
+}
+
+// UserTypeCleared returns if the "user_type" field was cleared in this mutation.
+func (m *ConsoleMutation) UserTypeCleared() bool {
+	_, ok := m.clearedFields[console.FieldUserType]
+	return ok
+}
+
+// ResetUserType resets all changes to the "user_type" field.
+func (m *ConsoleMutation) ResetUserType() {
+	m.user_type = nil
+	delete(m.clearedFields, console.FieldUserType)
 }
 
 // SetStep sets the "step" field.
-func (m *ConsoleMutation) SetStep(ts types.ExchangeStep) {
-	m.step = &ts
+func (m *ConsoleMutation) SetStep(ms model.ExchangeStep) {
+	m.step = &ms
 }
 
 // Step returns the value of the "step" field in the mutation.
-func (m *ConsoleMutation) Step() (r types.ExchangeStep, exists bool) {
+func (m *ConsoleMutation) Step() (r model.ExchangeStep, exists bool) {
 	v := m.step
 	if v == nil {
 		return
@@ -3340,7 +3393,7 @@ func (m *ConsoleMutation) Step() (r types.ExchangeStep, exists bool) {
 // OldStep returns the old "step" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldStep(ctx context.Context) (v *types.ExchangeStep, err error) {
+func (m *ConsoleMutation) OldStep(ctx context.Context) (v *model.ExchangeStep, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldStep is only allowed on UpdateOne operations")
 	}
@@ -3726,7 +3779,7 @@ func (m *ConsoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConsoleMutation) Fields() []string {
-	fields := make([]string, 0, 12)
+	fields := make([]string, 0, 13)
 	if m.cabinet != nil {
 		fields = append(fields, console.FieldCabinetID)
 	}
@@ -3739,8 +3792,11 @@ func (m *ConsoleMutation) Fields() []string {
 	if m._type != nil {
 		fields = append(fields, console.FieldType)
 	}
-	if m.user != nil {
-		fields = append(fields, console.FieldUser)
+	if m.user_id != nil {
+		fields = append(fields, console.FieldUserID)
+	}
+	if m.user_type != nil {
+		fields = append(fields, console.FieldUserType)
 	}
 	if m.step != nil {
 		fields = append(fields, console.FieldStep)
@@ -3779,8 +3835,10 @@ func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
 		return m.UUID()
 	case console.FieldType:
 		return m.GetType()
-	case console.FieldUser:
-		return m.User()
+	case console.FieldUserID:
+		return m.UserID()
+	case console.FieldUserType:
+		return m.UserType()
 	case console.FieldStep:
 		return m.Step()
 	case console.FieldStatus:
@@ -3812,8 +3870,10 @@ func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldUUID(ctx)
 	case console.FieldType:
 		return m.OldType(ctx)
-	case console.FieldUser:
-		return m.OldUser(ctx)
+	case console.FieldUserID:
+		return m.OldUserID(ctx)
+	case console.FieldUserType:
+		return m.OldUserType(ctx)
 	case console.FieldStep:
 		return m.OldStep(ctx)
 	case console.FieldStatus:
@@ -3865,15 +3925,22 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetType(v)
 		return nil
-	case console.FieldUser:
-		v, ok := value.(*types.User)
+	case console.FieldUserID:
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUser(v)
+		m.SetUserID(v)
+		return nil
+	case console.FieldUserType:
+		v, ok := value.(model.UserType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserType(v)
 		return nil
 	case console.FieldStep:
-		v, ok := value.(types.ExchangeStep)
+		v, ok := value.(model.ExchangeStep)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3954,6 +4021,9 @@ func (m *ConsoleMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ConsoleMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(console.FieldUserType) {
+		fields = append(fields, console.FieldUserType)
+	}
 	if m.FieldCleared(console.FieldStep) {
 		fields = append(fields, console.FieldStep)
 	}
@@ -3983,6 +4053,9 @@ func (m *ConsoleMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ConsoleMutation) ClearField(name string) error {
 	switch name {
+	case console.FieldUserType:
+		m.ClearUserType()
+		return nil
 	case console.FieldStep:
 		m.ClearStep()
 		return nil
@@ -4018,8 +4091,11 @@ func (m *ConsoleMutation) ResetField(name string) error {
 	case console.FieldType:
 		m.ResetType()
 		return nil
-	case console.FieldUser:
-		m.ResetUser()
+	case console.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case console.FieldUserType:
+		m.ResetUserType()
 		return nil
 	case console.FieldStep:
 		m.ResetStep()
@@ -4136,4 +4212,647 @@ func (m *ConsoleMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Console edge %s", name)
+}
+
+// ScanMutation represents an operation that mutates the Scan nodes in the graph.
+type ScanMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *uuid.UUID
+	created_at    *time.Time
+	updated_at    *time.Time
+	user_id       *string
+	user_type     *model.UserType
+	serial        *string
+	data          **model.ExchangeUsableResponse
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Scan, error)
+	predicates    []predicate.Scan
+}
+
+var _ ent.Mutation = (*ScanMutation)(nil)
+
+// scanOption allows management of the mutation configuration using functional options.
+type scanOption func(*ScanMutation)
+
+// newScanMutation creates new mutation for the Scan entity.
+func newScanMutation(c config, op Op, opts ...scanOption) *ScanMutation {
+	m := &ScanMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeScan,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withScanID sets the ID field of the mutation.
+func withScanID(id uuid.UUID) scanOption {
+	return func(m *ScanMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Scan
+		)
+		m.oldValue = func(ctx context.Context) (*Scan, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Scan.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withScan sets the old Scan of the mutation.
+func withScan(node *Scan) scanOption {
+	return func(m *ScanMutation) {
+		m.oldValue = func(context.Context) (*Scan, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ScanMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ScanMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Scan entities.
+func (m *ScanMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ScanMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ScanMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Scan.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *ScanMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *ScanMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *ScanMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *ScanMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *ScanMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *ScanMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetUserID sets the "user_id" field.
+func (m *ScanMutation) SetUserID(s string) {
+	m.user_id = &s
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *ScanMutation) UserID() (r string, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldUserID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *ScanMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetUserType sets the "user_type" field.
+func (m *ScanMutation) SetUserType(mt model.UserType) {
+	m.user_type = &mt
+}
+
+// UserType returns the value of the "user_type" field in the mutation.
+func (m *ScanMutation) UserType() (r model.UserType, exists bool) {
+	v := m.user_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserType returns the old "user_type" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldUserType(ctx context.Context) (v *model.UserType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserType: %w", err)
+	}
+	return oldValue.UserType, nil
+}
+
+// ClearUserType clears the value of the "user_type" field.
+func (m *ScanMutation) ClearUserType() {
+	m.user_type = nil
+	m.clearedFields[scan.FieldUserType] = struct{}{}
+}
+
+// UserTypeCleared returns if the "user_type" field was cleared in this mutation.
+func (m *ScanMutation) UserTypeCleared() bool {
+	_, ok := m.clearedFields[scan.FieldUserType]
+	return ok
+}
+
+// ResetUserType resets all changes to the "user_type" field.
+func (m *ScanMutation) ResetUserType() {
+	m.user_type = nil
+	delete(m.clearedFields, scan.FieldUserType)
+}
+
+// SetSerial sets the "serial" field.
+func (m *ScanMutation) SetSerial(s string) {
+	m.serial = &s
+}
+
+// Serial returns the value of the "serial" field in the mutation.
+func (m *ScanMutation) Serial() (r string, exists bool) {
+	v := m.serial
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSerial returns the old "serial" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldSerial(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSerial is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSerial requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSerial: %w", err)
+	}
+	return oldValue.Serial, nil
+}
+
+// ResetSerial resets all changes to the "serial" field.
+func (m *ScanMutation) ResetSerial() {
+	m.serial = nil
+}
+
+// SetData sets the "data" field.
+func (m *ScanMutation) SetData(mur *model.ExchangeUsableResponse) {
+	m.data = &mur
+}
+
+// Data returns the value of the "data" field in the mutation.
+func (m *ScanMutation) Data() (r *model.ExchangeUsableResponse, exists bool) {
+	v := m.data
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldData returns the old "data" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldData(ctx context.Context) (v *model.ExchangeUsableResponse, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldData is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldData requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldData: %w", err)
+	}
+	return oldValue.Data, nil
+}
+
+// ClearData clears the value of the "data" field.
+func (m *ScanMutation) ClearData() {
+	m.data = nil
+	m.clearedFields[scan.FieldData] = struct{}{}
+}
+
+// DataCleared returns if the "data" field was cleared in this mutation.
+func (m *ScanMutation) DataCleared() bool {
+	_, ok := m.clearedFields[scan.FieldData]
+	return ok
+}
+
+// ResetData resets all changes to the "data" field.
+func (m *ScanMutation) ResetData() {
+	m.data = nil
+	delete(m.clearedFields, scan.FieldData)
+}
+
+// Where appends a list predicates to the ScanMutation builder.
+func (m *ScanMutation) Where(ps ...predicate.Scan) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ScanMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ScanMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Scan, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ScanMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ScanMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Scan).
+func (m *ScanMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ScanMutation) Fields() []string {
+	fields := make([]string, 0, 6)
+	if m.created_at != nil {
+		fields = append(fields, scan.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, scan.FieldUpdatedAt)
+	}
+	if m.user_id != nil {
+		fields = append(fields, scan.FieldUserID)
+	}
+	if m.user_type != nil {
+		fields = append(fields, scan.FieldUserType)
+	}
+	if m.serial != nil {
+		fields = append(fields, scan.FieldSerial)
+	}
+	if m.data != nil {
+		fields = append(fields, scan.FieldData)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ScanMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case scan.FieldCreatedAt:
+		return m.CreatedAt()
+	case scan.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case scan.FieldUserID:
+		return m.UserID()
+	case scan.FieldUserType:
+		return m.UserType()
+	case scan.FieldSerial:
+		return m.Serial()
+	case scan.FieldData:
+		return m.Data()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ScanMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case scan.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case scan.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case scan.FieldUserID:
+		return m.OldUserID(ctx)
+	case scan.FieldUserType:
+		return m.OldUserType(ctx)
+	case scan.FieldSerial:
+		return m.OldSerial(ctx)
+	case scan.FieldData:
+		return m.OldData(ctx)
+	}
+	return nil, fmt.Errorf("unknown Scan field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ScanMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case scan.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case scan.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case scan.FieldUserID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case scan.FieldUserType:
+		v, ok := value.(model.UserType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserType(v)
+		return nil
+	case scan.FieldSerial:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSerial(v)
+		return nil
+	case scan.FieldData:
+		v, ok := value.(*model.ExchangeUsableResponse)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetData(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Scan field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ScanMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ScanMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ScanMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Scan numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ScanMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(scan.FieldUserType) {
+		fields = append(fields, scan.FieldUserType)
+	}
+	if m.FieldCleared(scan.FieldData) {
+		fields = append(fields, scan.FieldData)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ScanMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ScanMutation) ClearField(name string) error {
+	switch name {
+	case scan.FieldUserType:
+		m.ClearUserType()
+		return nil
+	case scan.FieldData:
+		m.ClearData()
+		return nil
+	}
+	return fmt.Errorf("unknown Scan nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ScanMutation) ResetField(name string) error {
+	switch name {
+	case scan.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case scan.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case scan.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case scan.FieldUserType:
+		m.ResetUserType()
+		return nil
+	case scan.FieldSerial:
+		m.ResetSerial()
+		return nil
+	case scan.FieldData:
+		m.ResetData()
+		return nil
+	}
+	return fmt.Errorf("unknown Scan field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ScanMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ScanMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ScanMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ScanMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ScanMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ScanMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ScanMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Scan unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ScanMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Scan edge %s", name)
 }

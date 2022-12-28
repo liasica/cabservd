@@ -10,6 +10,7 @@ import (
     "entgo.io/ent/schema/field"
     "entgo.io/ent/schema/index"
     "entgo.io/ent/schema/mixin"
+    "github.com/auroraride/adapter/model"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
 )
@@ -61,14 +62,15 @@ func (Console) Annotations() []schema.Annotation {
 // Fields of the Console.
 func (Console) Fields() []ent.Field {
     return []ent.Field{
-        field.UUID("uuid", uuid.UUID{}),
+        field.UUID("uuid", uuid.UUID{}).Immutable().Comment("标识符"),
         field.Enum("type").Values("exchange", "control", "cabinet").Comment("日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志"),
 
-        field.JSON("user", &types.User{}).Comment("操作用户"),
+        field.String("user_id").Comment("用户ID"),
+        field.Other("user_type", model.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Optional().Nillable().Comment("用户类别"),
 
-        field.Other("step", types.ExchangeStepFirst).SchemaType(map[string]string{dialect.Postgres: postgres.TypeSmallInt}).Optional().Nillable().Comment("换电步骤"),
+        field.Other("step", model.ExchangeStepFirst).SchemaType(map[string]string{dialect.Postgres: postgres.TypeSmallInt}).Optional().Nillable().Comment("换电步骤"),
 
-        field.Enum("status").Values("pending", "running", "success", "failed").Comment("状态 pending:未开始 running:执行中 success:成功 failed:失败"),
+        field.Enum("status").Values("invalid", "pending", "running", "success", "failed").Comment("状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败"),
         field.JSON("before_bin", &types.BinInfo{}).Optional().Comment("变化前仓位信息"),
         field.JSON("after_bin", &types.BinInfo{}).Optional().Comment("变化后仓位信息"),
 
@@ -93,10 +95,7 @@ func (Console) Mixin() []ent.Mixin {
 func (Console) Indexes() []ent.Index {
     return []ent.Index{
         index.Fields("uuid"),
-        index.Fields("user").Annotations(
-            entsql.IndexTypes(map[string]string{
-                dialect.Postgres: "GIN",
-            }),
-        ),
+        index.Fields("user_id"),
+        index.Fields("user_type"),
     }
 }

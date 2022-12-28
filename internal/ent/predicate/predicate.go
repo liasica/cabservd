@@ -14,3 +14,6 @@ type Cabinet func(*sql.Selector)
 
 // Console is the predicate function for console builders.
 type Console func(*sql.Selector)
+
+// Scan is the predicate function for scan builders.
+type Scan func(*sql.Selector)

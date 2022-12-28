@@ -222,6 +222,30 @@ func (f ConsoleMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutatio
 	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ConsoleMutation", m)
 }
 
+// The ScanQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type ScanQueryRuleFunc func(context.Context, *ent.ScanQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f ScanQueryRuleFunc) EvalQuery(ctx context.Context, q ent.Query) error {
+	if q, ok := q.(*ent.ScanQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("ent/privacy: unexpected query type %T, expect *ent.ScanQuery", q)
+}
+
+// The ScanMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type ScanMutationRuleFunc func(context.Context, *ent.ScanMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f ScanMutationRuleFunc) EvalMutation(ctx context.Context, m ent.Mutation) error {
+	if m, ok := m.(*ent.ScanMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("ent/privacy: unexpected mutation type %T, expect *ent.ScanMutation", m)
+}
+
 type (
 	// Filter is the interface that wraps the Where function
 	// for filtering nodes in queries and mutations.
@@ -263,6 +287,8 @@ func queryFilter(q ent.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *ent.ConsoleQuery:
 		return q.Filter(), nil
+	case *ent.ScanQuery:
+		return q.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected query type %T for query filter", q)
 	}
@@ -275,6 +301,8 @@ func mutationFilter(m ent.Mutation) (Filter, error) {
 	case *ent.CabinetMutation:
 		return m.Filter(), nil
 	case *ent.ConsoleMutation:
+		return m.Filter(), nil
+	case *ent.ScanMutation:
 		return m.Filter(), nil
 	default:
 		return nil, Denyf("ent/privacy: unexpected mutation type %T for mutation filter", m)

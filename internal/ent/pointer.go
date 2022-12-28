@@ -5,6 +5,7 @@ package ent
 import (
 	"time"
 
+	"github.com/auroraride/adapter/model"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/types"
@@ -53,12 +54,21 @@ type ConsolePointer struct {
 	BinID     *uint64             `json:"bin_id,omitempty"`
 	UUID      *uuid.UUID          `json:"uuid,omitempty"`
 	Type      *console.Type       `json:"type,omitempty"`
-	User      **types.User        `json:"user,omitempty"`
-	Step      *types.ExchangeStep `json:"step,omitempty"`
+	UserID    *string             `json:"user_id,omitempty"`
+	UserType  *model.UserType     `json:"user_type,omitempty"`
+	Step      *model.ExchangeStep `json:"step,omitempty"`
 	Status    *console.Status     `json:"status,omitempty"`
 	BeforeBin **types.BinInfo     `json:"before_bin,omitempty"`
 	AfterBin  **types.BinInfo     `json:"after_bin,omitempty"`
 	Message   *string             `json:"message,omitempty"`
 	StartAt   *time.Time          `json:"startAt,omitempty"`
 	StopAt    *time.Time          `json:"stopAt,omitempty"`
+}
+
+type ScanPointers []*ScanPointer
+type ScanPointer struct {
+	UserID   *string                        `json:"user_id,omitempty"`
+	UserType *model.UserType                `json:"user_type,omitempty"`
+	Serial   *string                        `json:"serial,omitempty"`
+	Data     **model.ExchangeUsableResponse `json:"data,omitempty"`
 }

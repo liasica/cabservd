@@ -7,6 +7,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
+	"github.com/auroraride/cabservd/internal/ent/scan"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -16,7 +17,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 3)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 4)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   bin.Table,
@@ -90,7 +91,8 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
 			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
 			console.FieldType:      {Type: field.TypeEnum, Column: console.FieldType},
-			console.FieldUser:      {Type: field.TypeJSON, Column: console.FieldUser},
+			console.FieldUserID:    {Type: field.TypeString, Column: console.FieldUserID},
+			console.FieldUserType:  {Type: field.TypeOther, Column: console.FieldUserType},
 			console.FieldStep:      {Type: field.TypeOther, Column: console.FieldStep},
 			console.FieldStatus:    {Type: field.TypeEnum, Column: console.FieldStatus},
 			console.FieldBeforeBin: {Type: field.TypeJSON, Column: console.FieldBeforeBin},
@@ -98,6 +100,25 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldMessage:   {Type: field.TypeString, Column: console.FieldMessage},
 			console.FieldStartAt:   {Type: field.TypeTime, Column: console.FieldStartAt},
 			console.FieldStopAt:    {Type: field.TypeTime, Column: console.FieldStopAt},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   scan.Table,
+			Columns: scan.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeUUID,
+				Column: scan.FieldID,
+			},
+		},
+		Type: "Scan",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			scan.FieldCreatedAt: {Type: field.TypeTime, Column: scan.FieldCreatedAt},
+			scan.FieldUpdatedAt: {Type: field.TypeTime, Column: scan.FieldUpdatedAt},
+			scan.FieldUserID:    {Type: field.TypeString, Column: scan.FieldUserID},
+			scan.FieldUserType:  {Type: field.TypeOther, Column: scan.FieldUserType},
+			scan.FieldSerial:    {Type: field.TypeString, Column: scan.FieldSerial},
+			scan.FieldData:      {Type: field.TypeJSON, Column: scan.FieldData},
 		},
 	}
 	graph.MustAddE(
@@ -485,9 +506,14 @@ func (f *ConsoleFilter) WhereType(p entql.StringP) {
 	f.Where(p.Field(console.FieldType))
 }
 
-// WhereUser applies the entql json.RawMessage predicate on the user field.
-func (f *ConsoleFilter) WhereUser(p entql.BytesP) {
-	f.Where(p.Field(console.FieldUser))
+// WhereUserID applies the entql string predicate on the user_id field.
+func (f *ConsoleFilter) WhereUserID(p entql.StringP) {
+	f.Where(p.Field(console.FieldUserID))
+}
+
+// WhereUserType applies the entql other predicate on the user_type field.
+func (f *ConsoleFilter) WhereUserType(p entql.OtherP) {
+	f.Where(p.Field(console.FieldUserType))
 }
 
 // WhereStep applies the entql other predicate on the step field.
@@ -551,4 +577,74 @@ func (f *ConsoleFilter) WhereHasBinWith(preds ...predicate.Bin) {
 			p(s)
 		}
 	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (sq *ScanQuery) addPredicate(pred func(s *sql.Selector)) {
+	sq.predicates = append(sq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the ScanQuery builder.
+func (sq *ScanQuery) Filter() *ScanFilter {
+	return &ScanFilter{config: sq.config, predicateAdder: sq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *ScanMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the ScanMutation builder.
+func (m *ScanMutation) Filter() *ScanFilter {
+	return &ScanFilter{config: m.config, predicateAdder: m}
+}
+
+// ScanFilter provides a generic filtering capability at runtime for ScanQuery.
+type ScanFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *ScanFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql [16]byte predicate on the id field.
+func (f *ScanFilter) WhereID(p entql.ValueP) {
+	f.Where(p.Field(scan.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *ScanFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(scan.FieldCreatedAt))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *ScanFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(scan.FieldUpdatedAt))
+}
+
+// WhereUserID applies the entql string predicate on the user_id field.
+func (f *ScanFilter) WhereUserID(p entql.StringP) {
+	f.Where(p.Field(scan.FieldUserID))
+}
+
+// WhereUserType applies the entql other predicate on the user_type field.
+func (f *ScanFilter) WhereUserType(p entql.OtherP) {
+	f.Where(p.Field(scan.FieldUserType))
+}
+
+// WhereSerial applies the entql string predicate on the serial field.
+func (f *ScanFilter) WhereSerial(p entql.StringP) {
+	f.Where(p.Field(scan.FieldSerial))
+}
+
+// WhereData applies the entql json.RawMessage predicate on the data field.
+func (f *ScanFilter) WhereData(p entql.BytesP) {
+	f.Where(p.Field(scan.FieldData))
 }

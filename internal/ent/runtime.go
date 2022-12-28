@@ -7,7 +7,9 @@ import (
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/auroraride/cabservd/internal/ent/schema"
+	"github.com/google/uuid"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -92,4 +94,23 @@ func init() {
 	cabinetDescEnable := cabinetFields[4].Descriptor()
 	// cabinet.DefaultEnable holds the default value on creation for the enable field.
 	cabinet.DefaultEnable = cabinetDescEnable.Default.(bool)
+	scanMixin := schema.Scan{}.Mixin()
+	scanMixinFields0 := scanMixin[0].Fields()
+	_ = scanMixinFields0
+	scanFields := schema.Scan{}.Fields()
+	_ = scanFields
+	// scanDescCreatedAt is the schema descriptor for created_at field.
+	scanDescCreatedAt := scanMixinFields0[0].Descriptor()
+	// scan.DefaultCreatedAt holds the default value on creation for the created_at field.
+	scan.DefaultCreatedAt = scanDescCreatedAt.Default.(func() time.Time)
+	// scanDescUpdatedAt is the schema descriptor for updated_at field.
+	scanDescUpdatedAt := scanMixinFields0[1].Descriptor()
+	// scan.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	scan.DefaultUpdatedAt = scanDescUpdatedAt.Default.(func() time.Time)
+	// scan.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	scan.UpdateDefaultUpdatedAt = scanDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// scanDescID is the schema descriptor for id field.
+	scanDescID := scanFields[0].Descriptor()
+	// scan.DefaultID holds the default value on creation for the id field.
+	scan.DefaultID = scanDescID.Default.(func() uuid.UUID)
 }

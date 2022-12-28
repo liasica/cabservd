@@ -34,11 +34,13 @@ type (
 		Bin     []ent.Hook
 		Cabinet []ent.Hook
 		Console []ent.Hook
+		Scan    []ent.Hook
 	}
 	inters struct {
 		Bin     []ent.Interceptor
 		Cabinet []ent.Interceptor
 		Console []ent.Interceptor
+		Scan    []ent.Interceptor
 	}
 )
 

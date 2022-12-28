@@ -8,8 +8,6 @@ package hook
 import (
     "bytes"
     "fmt"
-    "github.com/auroraride/cabservd/bridge"
-    "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/goccy/go-json"
     "github.com/lib/pq"
@@ -18,15 +16,6 @@ import (
 )
 
 func waitForNotification(l *pq.Listener) {
-    type notificationData interface {
-        *ent.Cabinet | *ent.Bin
-    }
-
-    type data[T notificationData] struct {
-        Table  string `json:"table"`
-        Action string `json:"action"`
-        Data   T      `json:"data"`
-    }
 
     for {
         select {
@@ -36,26 +25,7 @@ func waitForNotification(l *pq.Listener) {
             _ = json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
             fmt.Println(string(prettyJSON.Bytes()))
 
-            var (
-                serial string
-                cab    *ent.Cabinet
-                bins   ent.Bins
-            )
-
-            switch n.Channel {
-            case "bin":
-                var d data[*ent.Bin]
-                _ = json.Unmarshal([]byte(n.Extra), &d)
-                serial = d.Data.Serial
-                bins = ent.Bins{d.Data}
-            case "cabinet":
-                var d data[*ent.Cabinet]
-                _ = json.Unmarshal([]byte(n.Extra), &d)
-                cab = d.Data
-                serial = d.Data.Serial
-            }
-
-            bridge.SendCabinet(serial, cab, bins)
+            // bridge.SendCabinetSyncData(n)
 
             return
         case <-time.After(90 * time.Second):

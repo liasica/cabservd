@@ -14,6 +14,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
+	"github.com/auroraride/cabservd/internal/ent/scan"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -43,6 +44,7 @@ func columnChecker(table string) func(string) error {
 		bin.Table:     bin.ValidColumn,
 		cabinet.Table: cabinet.ValidColumn,
 		console.Table: console.ValidColumn,
+		scan.Table:    scan.ValidColumn,
 	}
 	check, ok := checks[table]
 	if !ok {

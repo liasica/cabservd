@@ -19,8 +19,10 @@ const (
 	FieldUUID = "uuid"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
-	// FieldUser holds the string denoting the user field in the database.
-	FieldUser = "user"
+	// FieldUserID holds the string denoting the user_id field in the database.
+	FieldUserID = "user_id"
+	// FieldUserType holds the string denoting the user_type field in the database.
+	FieldUserType = "user_type"
 	// FieldStep holds the string denoting the step field in the database.
 	FieldStep = "step"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -64,7 +66,8 @@ var Columns = []string{
 	FieldBinID,
 	FieldUUID,
 	FieldType,
-	FieldUser,
+	FieldUserID,
+	FieldUserType,
 	FieldStep,
 	FieldStatus,
 	FieldBeforeBin,
@@ -113,6 +116,7 @@ type Status string
 
 // Status values.
 const (
+	StatusInvalid Status = "invalid"
 	StatusPending Status = "pending"
 	StatusRunning Status = "running"
 	StatusSuccess Status = "success"
@@ -126,7 +130,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusPending, StatusRunning, StatusSuccess, StatusFailed:
+	case StatusInvalid, StatusPending, StatusRunning, StatusSuccess, StatusFailed:
 		return nil
 	default:
 		return fmt.Errorf("console: invalid enum value for status field: %q", s)

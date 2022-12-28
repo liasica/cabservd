@@ -8,6 +8,11 @@ package errs
 import "errors"
 
 var (
+    BadRequest          = errors.New("请求参数错误")
+    InternalServerError = errors.New("服务器未知错误")
+
+    UserRequired = errors.New("需要用户信息")
+
     IncompletePacket = errors.New("incomplete packet") // 数据包不完整
 
     ParamValidateFailed = errors.New("数据校验失败")
@@ -24,6 +29,7 @@ var (
     CabinetNoEmpty            = errors.New("无空仓位")
     CabinetBusy               = errors.New("电柜忙")
     CabinetControlParamError  = errors.New("电柜控制参数错误")
+    CabinetDoorOpened         = errors.New("有开启中的仓门")
 
     ExchangeTaskNotExist = errors.New("换电任务不存在")
     ExchangeFailed       = errors.New("换电失败")

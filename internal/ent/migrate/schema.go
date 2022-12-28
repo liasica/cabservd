@@ -141,11 +141,12 @@ var (
 	// ConsoleColumns holds the columns for the "console" table.
 	ConsoleColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "uuid", Type: field.TypeUUID},
+		{Name: "uuid", Type: field.TypeUUID, Comment: "标识符"},
 		{Name: "type", Type: field.TypeEnum, Comment: "日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志", Enums: []string{"exchange", "control", "cabinet"}},
-		{Name: "user", Type: field.TypeJSON, Comment: "操作用户"},
+		{Name: "user_id", Type: field.TypeString, Comment: "用户ID"},
+		{Name: "user_type", Type: field.TypeOther, Nullable: true, Comment: "用户类别", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "step", Type: field.TypeOther, Nullable: true, Comment: "换电步骤", SchemaType: map[string]string{"postgres": "smallint"}},
-		{Name: "status", Type: field.TypeEnum, Comment: "状态 pending:未开始 running:执行中 success:成功 failed:失败", Enums: []string{"pending", "running", "success", "failed"}},
+		{Name: "status", Type: field.TypeEnum, Comment: "状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败", Enums: []string{"invalid", "pending", "running", "success", "failed"}},
 		{Name: "before_bin", Type: field.TypeJSON, Nullable: true, Comment: "变化前仓位信息"},
 		{Name: "after_bin", Type: field.TypeJSON, Nullable: true, Comment: "变化后仓位信息"},
 		{Name: "message", Type: field.TypeString, Nullable: true, Comment: "消息"},
@@ -162,13 +163,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "console_cabinet_cabinet",
-				Columns:    []*schema.Column{ConsoleColumns[11]},
+				Columns:    []*schema.Column{ConsoleColumns[12]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "console_bin_bin",
-				Columns:    []*schema.Column{ConsoleColumns[12]},
+				Columns:    []*schema.Column{ConsoleColumns[13]},
 				RefColumns: []*schema.Column{BinColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -177,12 +178,12 @@ var (
 			{
 				Name:    "console_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[11]},
+				Columns: []*schema.Column{ConsoleColumns[12]},
 			},
 			{
 				Name:    "console_bin_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[12]},
+				Columns: []*schema.Column{ConsoleColumns[13]},
 			},
 			{
 				Name:    "console_uuid",
@@ -190,14 +191,52 @@ var (
 				Columns: []*schema.Column{ConsoleColumns[1]},
 			},
 			{
-				Name:    "console_user",
+				Name:    "console_user_id",
 				Unique:  false,
 				Columns: []*schema.Column{ConsoleColumns[3]},
-				Annotation: &entsql.IndexAnnotation{
-					Types: map[string]string{
-						"postgres": "GIN",
-					},
-				},
+			},
+			{
+				Name:    "console_user_type",
+				Unique:  false,
+				Columns: []*schema.Column{ConsoleColumns[4]},
+			},
+		},
+	}
+	// ScanColumns holds the columns for the "scan" table.
+	ScanColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeString, Comment: "用户ID"},
+		{Name: "user_type", Type: field.TypeOther, Nullable: true, Comment: "用户类别", SchemaType: map[string]string{"postgres": "varchar"}},
+		{Name: "serial", Type: field.TypeString, Comment: "电柜编号"},
+		{Name: "data", Type: field.TypeJSON, Nullable: true, Comment: "换电信息"},
+	}
+	// ScanTable holds the schema information for the "scan" table.
+	ScanTable = &schema.Table{
+		Name:       "scan",
+		Columns:    ScanColumns,
+		PrimaryKey: []*schema.Column{ScanColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "scan_created_at",
+				Unique:  false,
+				Columns: []*schema.Column{ScanColumns[1]},
+			},
+			{
+				Name:    "scan_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{ScanColumns[3]},
+			},
+			{
+				Name:    "scan_user_type",
+				Unique:  false,
+				Columns: []*schema.Column{ScanColumns[4]},
+			},
+			{
+				Name:    "scan_serial",
+				Unique:  false,
+				Columns: []*schema.Column{ScanColumns[5]},
 			},
 		},
 	}
@@ -206,6 +245,7 @@ var (
 		BinTable,
 		CabinetTable,
 		ConsoleTable,
+		ScanTable,
 	}
 )
 
@@ -221,5 +261,8 @@ func init() {
 	ConsoleTable.ForeignKeys[1].RefTable = BinTable
 	ConsoleTable.Annotation = &entsql.Annotation{
 		Table: "console",
+	}
+	ScanTable.Annotation = &entsql.Annotation{
+		Table: "scan",
 	}
 }

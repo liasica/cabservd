@@ -6,20 +6,24 @@
 package main
 
 import (
-    "github.com/auroraride/cabservd/bridge"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/g"
+    "github.com/auroraride/cabservd/internal/mem"
     "github.com/auroraride/cabservd/internal/router"
+    "github.com/auroraride/cabservd/internal/service"
 )
 
 func main() {
     // core boot
     internal.Boot()
 
-    // 启动bridge
-    go bridge.Start()
+    // TODO 缓存数据?
+    // cache()
+
+    // TODO 启动bridge?
+    // go bridge.Start()
 
     // 启动 http server
     go router.Start()
@@ -31,4 +35,16 @@ func main() {
         kaixin.New(),
         new(core.HeaderLength),
     )
+}
+
+func cache() {
+    cabs := service.NewCabinet().QueryAllCabinetWithBin()
+    for _, cab := range cabs {
+        mem.SetCabinet(cab)
+    }
+
+    bins := service.NewBin().QueryAllBin()
+    for _, b := range bins {
+        mem.SetBin(b)
+    }
 }

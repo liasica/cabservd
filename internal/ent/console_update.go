@@ -11,12 +11,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/auroraride/adapter/model"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/types"
-	"github.com/google/uuid"
 )
 
 // ConsoleUpdate is the builder for updating Console entities.
@@ -45,34 +45,48 @@ func (cu *ConsoleUpdate) SetBinID(u uint64) *ConsoleUpdate {
 	return cu
 }
 
-// SetUUID sets the "uuid" field.
-func (cu *ConsoleUpdate) SetUUID(u uuid.UUID) *ConsoleUpdate {
-	cu.mutation.SetUUID(u)
-	return cu
-}
-
 // SetType sets the "type" field.
 func (cu *ConsoleUpdate) SetType(c console.Type) *ConsoleUpdate {
 	cu.mutation.SetType(c)
 	return cu
 }
 
-// SetUser sets the "user" field.
-func (cu *ConsoleUpdate) SetUser(t *types.User) *ConsoleUpdate {
-	cu.mutation.SetUser(t)
+// SetUserID sets the "user_id" field.
+func (cu *ConsoleUpdate) SetUserID(s string) *ConsoleUpdate {
+	cu.mutation.SetUserID(s)
+	return cu
+}
+
+// SetUserType sets the "user_type" field.
+func (cu *ConsoleUpdate) SetUserType(mt model.UserType) *ConsoleUpdate {
+	cu.mutation.SetUserType(mt)
+	return cu
+}
+
+// SetNillableUserType sets the "user_type" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableUserType(mt *model.UserType) *ConsoleUpdate {
+	if mt != nil {
+		cu.SetUserType(*mt)
+	}
+	return cu
+}
+
+// ClearUserType clears the value of the "user_type" field.
+func (cu *ConsoleUpdate) ClearUserType() *ConsoleUpdate {
+	cu.mutation.ClearUserType()
 	return cu
 }
 
 // SetStep sets the "step" field.
-func (cu *ConsoleUpdate) SetStep(ts types.ExchangeStep) *ConsoleUpdate {
-	cu.mutation.SetStep(ts)
+func (cu *ConsoleUpdate) SetStep(ms model.ExchangeStep) *ConsoleUpdate {
+	cu.mutation.SetStep(ms)
 	return cu
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cu *ConsoleUpdate) SetNillableStep(ts *types.ExchangeStep) *ConsoleUpdate {
-	if ts != nil {
-		cu.SetStep(*ts)
+func (cu *ConsoleUpdate) SetNillableStep(ms *model.ExchangeStep) *ConsoleUpdate {
+	if ms != nil {
+		cu.SetStep(*ms)
 	}
 	return cu
 }
@@ -261,14 +275,17 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := cu.mutation.UUID(); ok {
-		_spec.SetField(console.FieldUUID, field.TypeUUID, value)
-	}
 	if value, ok := cu.mutation.GetType(); ok {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 	}
-	if value, ok := cu.mutation.User(); ok {
-		_spec.SetField(console.FieldUser, field.TypeJSON, value)
+	if value, ok := cu.mutation.UserID(); ok {
+		_spec.SetField(console.FieldUserID, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.UserType(); ok {
+		_spec.SetField(console.FieldUserType, field.TypeOther, value)
+	}
+	if cu.mutation.UserTypeCleared() {
+		_spec.ClearField(console.FieldUserType, field.TypeOther)
 	}
 	if value, ok := cu.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -410,34 +427,48 @@ func (cuo *ConsoleUpdateOne) SetBinID(u uint64) *ConsoleUpdateOne {
 	return cuo
 }
 
-// SetUUID sets the "uuid" field.
-func (cuo *ConsoleUpdateOne) SetUUID(u uuid.UUID) *ConsoleUpdateOne {
-	cuo.mutation.SetUUID(u)
-	return cuo
-}
-
 // SetType sets the "type" field.
 func (cuo *ConsoleUpdateOne) SetType(c console.Type) *ConsoleUpdateOne {
 	cuo.mutation.SetType(c)
 	return cuo
 }
 
-// SetUser sets the "user" field.
-func (cuo *ConsoleUpdateOne) SetUser(t *types.User) *ConsoleUpdateOne {
-	cuo.mutation.SetUser(t)
+// SetUserID sets the "user_id" field.
+func (cuo *ConsoleUpdateOne) SetUserID(s string) *ConsoleUpdateOne {
+	cuo.mutation.SetUserID(s)
+	return cuo
+}
+
+// SetUserType sets the "user_type" field.
+func (cuo *ConsoleUpdateOne) SetUserType(mt model.UserType) *ConsoleUpdateOne {
+	cuo.mutation.SetUserType(mt)
+	return cuo
+}
+
+// SetNillableUserType sets the "user_type" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableUserType(mt *model.UserType) *ConsoleUpdateOne {
+	if mt != nil {
+		cuo.SetUserType(*mt)
+	}
+	return cuo
+}
+
+// ClearUserType clears the value of the "user_type" field.
+func (cuo *ConsoleUpdateOne) ClearUserType() *ConsoleUpdateOne {
+	cuo.mutation.ClearUserType()
 	return cuo
 }
 
 // SetStep sets the "step" field.
-func (cuo *ConsoleUpdateOne) SetStep(ts types.ExchangeStep) *ConsoleUpdateOne {
-	cuo.mutation.SetStep(ts)
+func (cuo *ConsoleUpdateOne) SetStep(ms model.ExchangeStep) *ConsoleUpdateOne {
+	cuo.mutation.SetStep(ms)
 	return cuo
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cuo *ConsoleUpdateOne) SetNillableStep(ts *types.ExchangeStep) *ConsoleUpdateOne {
-	if ts != nil {
-		cuo.SetStep(*ts)
+func (cuo *ConsoleUpdateOne) SetNillableStep(ms *model.ExchangeStep) *ConsoleUpdateOne {
+	if ms != nil {
+		cuo.SetStep(*ms)
 	}
 	return cuo
 }
@@ -650,14 +681,17 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 			}
 		}
 	}
-	if value, ok := cuo.mutation.UUID(); ok {
-		_spec.SetField(console.FieldUUID, field.TypeUUID, value)
-	}
 	if value, ok := cuo.mutation.GetType(); ok {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 	}
-	if value, ok := cuo.mutation.User(); ok {
-		_spec.SetField(console.FieldUser, field.TypeJSON, value)
+	if value, ok := cuo.mutation.UserID(); ok {
+		_spec.SetField(console.FieldUserID, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.UserType(); ok {
+		_spec.SetField(console.FieldUserType, field.TypeOther, value)
+	}
+	if cuo.mutation.UserTypeCleared() {
+		_spec.ClearField(console.FieldUserType, field.TypeOther)
 	}
 	if value, ok := cuo.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)

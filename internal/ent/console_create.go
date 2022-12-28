@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/auroraride/adapter/model"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -50,22 +51,36 @@ func (cc *ConsoleCreate) SetType(c console.Type) *ConsoleCreate {
 	return cc
 }
 
-// SetUser sets the "user" field.
-func (cc *ConsoleCreate) SetUser(t *types.User) *ConsoleCreate {
-	cc.mutation.SetUser(t)
+// SetUserID sets the "user_id" field.
+func (cc *ConsoleCreate) SetUserID(s string) *ConsoleCreate {
+	cc.mutation.SetUserID(s)
+	return cc
+}
+
+// SetUserType sets the "user_type" field.
+func (cc *ConsoleCreate) SetUserType(mt model.UserType) *ConsoleCreate {
+	cc.mutation.SetUserType(mt)
+	return cc
+}
+
+// SetNillableUserType sets the "user_type" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableUserType(mt *model.UserType) *ConsoleCreate {
+	if mt != nil {
+		cc.SetUserType(*mt)
+	}
 	return cc
 }
 
 // SetStep sets the "step" field.
-func (cc *ConsoleCreate) SetStep(ts types.ExchangeStep) *ConsoleCreate {
-	cc.mutation.SetStep(ts)
+func (cc *ConsoleCreate) SetStep(ms model.ExchangeStep) *ConsoleCreate {
+	cc.mutation.SetStep(ms)
 	return cc
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cc *ConsoleCreate) SetNillableStep(ts *types.ExchangeStep) *ConsoleCreate {
-	if ts != nil {
-		cc.SetStep(*ts)
+func (cc *ConsoleCreate) SetNillableStep(ms *model.ExchangeStep) *ConsoleCreate {
+	if ms != nil {
+		cc.SetStep(*ms)
 	}
 	return cc
 }
@@ -183,8 +198,8 @@ func (cc *ConsoleCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Console.type": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.User(); !ok {
-		return &ValidationError{Name: "user", err: errors.New(`ent: missing required field "Console.user"`)}
+	if _, ok := cc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Console.user_id"`)}
 	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Console.status"`)}
@@ -244,9 +259,13 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 		_node.Type = value
 	}
-	if value, ok := cc.mutation.User(); ok {
-		_spec.SetField(console.FieldUser, field.TypeJSON, value)
-		_node.User = value
+	if value, ok := cc.mutation.UserID(); ok {
+		_spec.SetField(console.FieldUserID, field.TypeString, value)
+		_node.UserID = value
+	}
+	if value, ok := cc.mutation.UserType(); ok {
+		_spec.SetField(console.FieldUserType, field.TypeOther, value)
+		_node.UserType = &value
 	}
 	if value, ok := cc.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -392,18 +411,6 @@ func (u *ConsoleUpsert) UpdateBinID() *ConsoleUpsert {
 	return u
 }
 
-// SetUUID sets the "uuid" field.
-func (u *ConsoleUpsert) SetUUID(v uuid.UUID) *ConsoleUpsert {
-	u.Set(console.FieldUUID, v)
-	return u
-}
-
-// UpdateUUID sets the "uuid" field to the value that was provided on create.
-func (u *ConsoleUpsert) UpdateUUID() *ConsoleUpsert {
-	u.SetExcluded(console.FieldUUID)
-	return u
-}
-
 // SetType sets the "type" field.
 func (u *ConsoleUpsert) SetType(v console.Type) *ConsoleUpsert {
 	u.Set(console.FieldType, v)
@@ -416,20 +423,38 @@ func (u *ConsoleUpsert) UpdateType() *ConsoleUpsert {
 	return u
 }
 
-// SetUser sets the "user" field.
-func (u *ConsoleUpsert) SetUser(v *types.User) *ConsoleUpsert {
-	u.Set(console.FieldUser, v)
+// SetUserID sets the "user_id" field.
+func (u *ConsoleUpsert) SetUserID(v string) *ConsoleUpsert {
+	u.Set(console.FieldUserID, v)
 	return u
 }
 
-// UpdateUser sets the "user" field to the value that was provided on create.
-func (u *ConsoleUpsert) UpdateUser() *ConsoleUpsert {
-	u.SetExcluded(console.FieldUser)
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateUserID() *ConsoleUpsert {
+	u.SetExcluded(console.FieldUserID)
+	return u
+}
+
+// SetUserType sets the "user_type" field.
+func (u *ConsoleUpsert) SetUserType(v model.UserType) *ConsoleUpsert {
+	u.Set(console.FieldUserType, v)
+	return u
+}
+
+// UpdateUserType sets the "user_type" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateUserType() *ConsoleUpsert {
+	u.SetExcluded(console.FieldUserType)
+	return u
+}
+
+// ClearUserType clears the value of the "user_type" field.
+func (u *ConsoleUpsert) ClearUserType() *ConsoleUpsert {
+	u.SetNull(console.FieldUserType)
 	return u
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsert) SetStep(v types.ExchangeStep) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetStep(v model.ExchangeStep) *ConsoleUpsert {
 	u.Set(console.FieldStep, v)
 	return u
 }
@@ -552,6 +577,11 @@ func (u *ConsoleUpsert) ClearStopAt() *ConsoleUpsert {
 //		Exec(ctx)
 func (u *ConsoleUpsertOne) UpdateNewValues() *ConsoleUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		if _, exists := u.create.mutation.UUID(); exists {
+			s.SetIgnore(console.FieldUUID)
+		}
+	}))
 	return u
 }
 
@@ -610,20 +640,6 @@ func (u *ConsoleUpsertOne) UpdateBinID() *ConsoleUpsertOne {
 	})
 }
 
-// SetUUID sets the "uuid" field.
-func (u *ConsoleUpsertOne) SetUUID(v uuid.UUID) *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUUID(v)
-	})
-}
-
-// UpdateUUID sets the "uuid" field to the value that was provided on create.
-func (u *ConsoleUpsertOne) UpdateUUID() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUUID()
-	})
-}
-
 // SetType sets the "type" field.
 func (u *ConsoleUpsertOne) SetType(v console.Type) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -638,22 +654,43 @@ func (u *ConsoleUpsertOne) UpdateType() *ConsoleUpsertOne {
 	})
 }
 
-// SetUser sets the "user" field.
-func (u *ConsoleUpsertOne) SetUser(v *types.User) *ConsoleUpsertOne {
+// SetUserID sets the "user_id" field.
+func (u *ConsoleUpsertOne) SetUserID(v string) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUser(v)
+		s.SetUserID(v)
 	})
 }
 
-// UpdateUser sets the "user" field to the value that was provided on create.
-func (u *ConsoleUpsertOne) UpdateUser() *ConsoleUpsertOne {
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateUserID() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUser()
+		s.UpdateUserID()
+	})
+}
+
+// SetUserType sets the "user_type" field.
+func (u *ConsoleUpsertOne) SetUserType(v model.UserType) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetUserType(v)
+	})
+}
+
+// UpdateUserType sets the "user_type" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateUserType() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateUserType()
+	})
+}
+
+// ClearUserType clears the value of the "user_type" field.
+func (u *ConsoleUpsertOne) ClearUserType() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearUserType()
 	})
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsertOne) SetStep(v types.ExchangeStep) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetStep(v model.ExchangeStep) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetStep(v)
 	})
@@ -962,6 +999,13 @@ type ConsoleUpsertBulk struct {
 //		Exec(ctx)
 func (u *ConsoleUpsertBulk) UpdateNewValues() *ConsoleUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
+	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
+		for _, b := range u.create.builders {
+			if _, exists := b.mutation.UUID(); exists {
+				s.SetIgnore(console.FieldUUID)
+			}
+		}
+	}))
 	return u
 }
 
@@ -1020,20 +1064,6 @@ func (u *ConsoleUpsertBulk) UpdateBinID() *ConsoleUpsertBulk {
 	})
 }
 
-// SetUUID sets the "uuid" field.
-func (u *ConsoleUpsertBulk) SetUUID(v uuid.UUID) *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUUID(v)
-	})
-}
-
-// UpdateUUID sets the "uuid" field to the value that was provided on create.
-func (u *ConsoleUpsertBulk) UpdateUUID() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUUID()
-	})
-}
-
 // SetType sets the "type" field.
 func (u *ConsoleUpsertBulk) SetType(v console.Type) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -1048,22 +1078,43 @@ func (u *ConsoleUpsertBulk) UpdateType() *ConsoleUpsertBulk {
 	})
 }
 
-// SetUser sets the "user" field.
-func (u *ConsoleUpsertBulk) SetUser(v *types.User) *ConsoleUpsertBulk {
+// SetUserID sets the "user_id" field.
+func (u *ConsoleUpsertBulk) SetUserID(v string) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.SetUser(v)
+		s.SetUserID(v)
 	})
 }
 
-// UpdateUser sets the "user" field to the value that was provided on create.
-func (u *ConsoleUpsertBulk) UpdateUser() *ConsoleUpsertBulk {
+// UpdateUserID sets the "user_id" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateUserID() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateUser()
+		s.UpdateUserID()
+	})
+}
+
+// SetUserType sets the "user_type" field.
+func (u *ConsoleUpsertBulk) SetUserType(v model.UserType) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetUserType(v)
+	})
+}
+
+// UpdateUserType sets the "user_type" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateUserType() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateUserType()
+	})
+}
+
+// ClearUserType clears the value of the "user_type" field.
+func (u *ConsoleUpsertBulk) ClearUserType() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearUserType()
 	})
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsertBulk) SetStep(v types.ExchangeStep) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetStep(v model.ExchangeStep) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetStep(v)
 	})

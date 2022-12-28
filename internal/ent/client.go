@@ -9,10 +9,12 @@ import (
 	"log"
 
 	"github.com/auroraride/cabservd/internal/ent/migrate"
+	"github.com/google/uuid"
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
+	"github.com/auroraride/cabservd/internal/ent/scan"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
@@ -30,6 +32,8 @@ type Client struct {
 	Cabinet *CabinetClient
 	// Console is the client for interacting with the Console builders.
 	Console *ConsoleClient
+	// Scan is the client for interacting with the Scan builders.
+	Scan *ScanClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -46,6 +50,7 @@ func (c *Client) init() {
 	c.Bin = NewBinClient(c.config)
 	c.Cabinet = NewCabinetClient(c.config)
 	c.Console = NewConsoleClient(c.config)
+	c.Scan = NewScanClient(c.config)
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -82,6 +87,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Bin:     NewBinClient(cfg),
 		Cabinet: NewCabinetClient(cfg),
 		Console: NewConsoleClient(cfg),
+		Scan:    NewScanClient(cfg),
 	}, nil
 }
 
@@ -104,6 +110,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Bin:     NewBinClient(cfg),
 		Cabinet: NewCabinetClient(cfg),
 		Console: NewConsoleClient(cfg),
+		Scan:    NewScanClient(cfg),
 	}, nil
 }
 
@@ -135,6 +142,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Bin.Use(hooks...)
 	c.Cabinet.Use(hooks...)
 	c.Console.Use(hooks...)
+	c.Scan.Use(hooks...)
 }
 
 // Intercept adds the query interceptors to all the entity clients.
@@ -143,6 +151,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.Bin.Intercept(interceptors...)
 	c.Cabinet.Intercept(interceptors...)
 	c.Console.Intercept(interceptors...)
+	c.Scan.Intercept(interceptors...)
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -154,6 +163,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Cabinet.mutate(ctx, m)
 	case *ConsoleMutation:
 		return c.Console.mutate(ctx, m)
+	case *ScanMutation:
+		return c.Scan.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -571,5 +582,122 @@ func (c *ConsoleClient) mutate(ctx context.Context, m *ConsoleMutation) (Value, 
 		return (&ConsoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Console mutation op: %q", m.Op())
+	}
+}
+
+// ScanClient is a client for the Scan schema.
+type ScanClient struct {
+	config
+}
+
+// NewScanClient returns a client for the Scan from the given config.
+func NewScanClient(c config) *ScanClient {
+	return &ScanClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `scan.Hooks(f(g(h())))`.
+func (c *ScanClient) Use(hooks ...Hook) {
+	c.hooks.Scan = append(c.hooks.Scan, hooks...)
+}
+
+// Use adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `scan.Intercept(f(g(h())))`.
+func (c *ScanClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Scan = append(c.inters.Scan, interceptors...)
+}
+
+// Create returns a builder for creating a Scan entity.
+func (c *ScanClient) Create() *ScanCreate {
+	mutation := newScanMutation(c.config, OpCreate)
+	return &ScanCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Scan entities.
+func (c *ScanClient) CreateBulk(builders ...*ScanCreate) *ScanCreateBulk {
+	return &ScanCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Scan.
+func (c *ScanClient) Update() *ScanUpdate {
+	mutation := newScanMutation(c.config, OpUpdate)
+	return &ScanUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ScanClient) UpdateOne(s *Scan) *ScanUpdateOne {
+	mutation := newScanMutation(c.config, OpUpdateOne, withScan(s))
+	return &ScanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ScanClient) UpdateOneID(id uuid.UUID) *ScanUpdateOne {
+	mutation := newScanMutation(c.config, OpUpdateOne, withScanID(id))
+	return &ScanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Scan.
+func (c *ScanClient) Delete() *ScanDelete {
+	mutation := newScanMutation(c.config, OpDelete)
+	return &ScanDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ScanClient) DeleteOne(s *Scan) *ScanDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ScanClient) DeleteOneID(id uuid.UUID) *ScanDeleteOne {
+	builder := c.Delete().Where(scan.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ScanDeleteOne{builder}
+}
+
+// Query returns a query builder for Scan.
+func (c *ScanClient) Query() *ScanQuery {
+	return &ScanQuery{
+		config: c.config,
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Scan entity by its id.
+func (c *ScanClient) Get(ctx context.Context, id uuid.UUID) (*Scan, error) {
+	return c.Query().Where(scan.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ScanClient) GetX(ctx context.Context, id uuid.UUID) *Scan {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ScanClient) Hooks() []Hook {
+	return c.hooks.Scan
+}
+
+// Interceptors returns the client interceptors.
+func (c *ScanClient) Interceptors() []Interceptor {
+	return c.inters.Scan
+}
+
+func (c *ScanClient) mutate(ctx context.Context, m *ScanMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ScanCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ScanUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ScanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ScanDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Scan mutation op: %q", m.Op())
 	}
 }

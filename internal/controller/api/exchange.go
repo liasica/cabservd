@@ -1,19 +1,22 @@
 // Copyright (C) liasica. 2022-present.
 //
-// Created at 2022-12-27
+// Created at 2022-12-28
 // Based on cabservd by liasica, magicrolan@qq.com.
 
 package api
 
-import "github.com/gin-gonic/gin"
+import (
+    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/cabservd/internal/app"
+    "github.com/auroraride/cabservd/internal/service"
+    "github.com/labstack/echo/v4"
+)
 
-type exchange struct {
-}
+type exchange struct{}
 
-func NewExchange() *exchange {
-    return &exchange{}
-}
+var Exchange = new(exchange)
 
-func (*exchange) Usable(c *gin.Context) {
-
+func (*exchange) Usable(c echo.Context) (err error) {
+    ctx, req := app.ContextValidate[model.ExchangeRequest](c)
+    return ctx.SendResponse(service.NewExchange(ctx.User).Usable(req))
 }

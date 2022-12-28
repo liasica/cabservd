@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/auroraride/adapter/model"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -25,15 +26,17 @@ type Console struct {
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// BinID holds the value of the "bin_id" field.
 	BinID uint64 `json:"bin_id,omitempty"`
-	// UUID holds the value of the "uuid" field.
+	// 标识符
 	UUID uuid.UUID `json:"uuid,omitempty"`
 	// 日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志
 	Type console.Type `json:"type,omitempty"`
-	// 操作用户
-	User *types.User `json:"user,omitempty"`
+	// 用户ID
+	UserID string `json:"user_id,omitempty"`
+	// 用户类别
+	UserType *model.UserType `json:"user_type,omitempty"`
 	// 换电步骤
-	Step *types.ExchangeStep `json:"step,omitempty"`
-	// 状态 pending:未开始 running:执行中 success:成功 failed:失败
+	Step *model.ExchangeStep `json:"step,omitempty"`
+	// 状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败
 	Status console.Status `json:"status,omitempty"`
 	// 变化前仓位信息
 	BeforeBin *types.BinInfo `json:"before_bin,omitempty"`
@@ -93,12 +96,14 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case console.FieldStep:
-			values[i] = &sql.NullScanner{S: new(types.ExchangeStep)}
-		case console.FieldUser, console.FieldBeforeBin, console.FieldAfterBin:
+			values[i] = &sql.NullScanner{S: new(model.ExchangeStep)}
+		case console.FieldUserType:
+			values[i] = &sql.NullScanner{S: new(model.UserType)}
+		case console.FieldBeforeBin, console.FieldAfterBin:
 			values[i] = new([]byte)
 		case console.FieldID, console.FieldCabinetID, console.FieldBinID:
 			values[i] = new(sql.NullInt64)
-		case console.FieldType, console.FieldStatus, console.FieldMessage:
+		case console.FieldType, console.FieldUserID, console.FieldStatus, console.FieldMessage:
 			values[i] = new(sql.NullString)
 		case console.FieldStartAt, console.FieldStopAt:
 			values[i] = new(sql.NullTime)
@@ -149,20 +154,25 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Type = console.Type(value.String)
 			}
-		case console.FieldUser:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field user", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &c.User); err != nil {
-					return fmt.Errorf("unmarshal field user: %w", err)
-				}
+		case console.FieldUserID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value.Valid {
+				c.UserID = value.String
+			}
+		case console.FieldUserType:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_type", values[i])
+			} else if value.Valid {
+				c.UserType = new(model.UserType)
+				*c.UserType = *value.S.(*model.UserType)
 			}
 		case console.FieldStep:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field step", values[i])
 			} else if value.Valid {
-				c.Step = new(types.ExchangeStep)
-				*c.Step = *value.S.(*types.ExchangeStep)
+				c.Step = new(model.ExchangeStep)
+				*c.Step = *value.S.(*model.ExchangeStep)
 			}
 		case console.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -256,8 +266,13 @@ func (c *Console) String() string {
 	builder.WriteString("type=")
 	builder.WriteString(fmt.Sprintf("%v", c.Type))
 	builder.WriteString(", ")
-	builder.WriteString("user=")
-	builder.WriteString(fmt.Sprintf("%v", c.User))
+	builder.WriteString("user_id=")
+	builder.WriteString(c.UserID)
+	builder.WriteString(", ")
+	if v := c.UserType; v != nil {
+		builder.WriteString("user_type=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	if v := c.Step; v != nil {
 		builder.WriteString("step=")

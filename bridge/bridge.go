@@ -5,6 +5,16 @@
 
 package bridge
 
+import "sync"
+
+var (
+    worker sync.WaitGroup
+)
+
 func Start() {
+    worker.Add(1)
+
     go startCabinet()
+
+    worker.Wait()
 }

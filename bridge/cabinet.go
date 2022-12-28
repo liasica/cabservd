@@ -12,6 +12,8 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/service"
+    "github.com/goccy/go-json"
+    "github.com/lib/pq"
     log "github.com/sirupsen/logrus"
 )
 
@@ -23,12 +25,13 @@ var Cabinet *cabinet
 
 func newCabinet() *cabinet {
     return &cabinet{
-        tcp.NewClient(g.Config.Adapter.Cabinet, log.StandardLogger(), &codec.HeaderLength{}),
+        Client: tcp.NewClient(g.Config.Adapter.Cabinet, log.StandardLogger(), &codec.HeaderLength{}),
     }
 }
 
 func (c *cabinet) FullUpdate() {
-    cabs := service.NewCabinet().QueryAllCabinets()
+    panic("TODO")
+    cabs := service.NewCabinet().QueryAllCabinetWithBin()
     for _, cab := range cabs {
         c.Sender <- c.WrapData(cab.Serial, cab, cab.Edges.Bins)
     }
@@ -51,7 +54,7 @@ func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data
             Online:      cab.Online,
             Brand:       cab.Brand,
             Serial:      cab.Serial,
-            Status:      cab.Status.String(),
+            Status:      model.CabinetStatus(cab.Status),
             Enable:      cab.Enable,
             Lng:         cab.Lng,
             Lat:         cab.Lat,
@@ -88,6 +91,39 @@ func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data
     return
 }
 
+func SendCabinetSyncData(n *pq.Notification) {
+    type notificationData interface {
+        *ent.Cabinet | *ent.Bin
+    }
+
+    type data[T notificationData] struct {
+        Table  string `json:"table"`
+        Action string `json:"action"`
+        Data   T      `json:"data"`
+    }
+
+    var (
+        serial string
+        cab    *ent.Cabinet
+        bins   ent.Bins
+    )
+
+    switch n.Channel {
+    case "bin":
+        var d data[*ent.Bin]
+        _ = json.Unmarshal([]byte(n.Extra), &d)
+        serial = d.Data.Serial
+        bins = ent.Bins{d.Data}
+    case "cabinet":
+        var d data[*ent.Cabinet]
+        _ = json.Unmarshal([]byte(n.Extra), &d)
+        cab = d.Data
+        serial = d.Data.Serial
+    }
+
+    SendCabinet(serial, cab, bins)
+}
+
 func SendCabinet(serial string, cab *ent.Cabinet, bins ent.Bins) {
     Cabinet.Sender <- Cabinet.WrapData(serial, cab, bins)
 }
@@ -95,7 +131,8 @@ func SendCabinet(serial string, cab *ent.Cabinet, bins ent.Bins) {
 func startCabinet() {
     Cabinet = newCabinet()
     Cabinet.Hooks.Connect = func() {
-        go Cabinet.FullUpdate()
+        // go Cabinet.FullUpdate()
+        worker.Done()
     }
     Cabinet.Run()
 }

@@ -7,62 +7,70 @@ package service
 
 import (
     "context"
-    "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/bin"
-    "github.com/auroraride/cabservd/internal/errs"
-    "github.com/auroraride/cabservd/internal/types"
-    "github.com/liasica/go-helpers/silk"
 )
 
 type binService struct {
-    ordinal int
-    bin     *ent.Bin
-    cabinet *ent.Cabinet
-    ctx     context.Context
+    // ordinal int
+    // bin     *ent.Bin
+    // cabinet *ent.Cabinet
+    ctx context.Context
+    orm *ent.BinClient
 }
 
-func NewBin(cab *ent.Cabinet, ordinal int) *binService {
-    s := &binService{
-        cabinet: cab,
-        ordinal: ordinal,
-        ctx:     context.WithValue(context.Background(), "cabinet", cab),
+func NewBin() *binService {
+    return &binService{
+        ctx: context.Background(),
+        orm: ent.Database.Bin,
     }
-
-    ctx := context.Background()
-    cb, _ := ent.Database.Bin.Query().Where(bin.Serial(cab.Serial), bin.Brand(cab.Brand), bin.Ordinal(ordinal)).First(ctx)
-    ctx = context.WithValue(ctx, "bin", cb)
-
-    s.ctx = ctx
-    s.bin = cb
-    return s
 }
 
-// Enable 控制仓位启用/禁用
-func (s *binService) Enable(enable bool) error {
-    var t types.ControlType
+// func NewBin(cab *ent.Cabinet, ordinal int) *binService {
+//     s := &binService{
+//         cabinet: cab,
+//         ordinal: ordinal,
+//         ctx:     context.WithValue(context.Background(), "cabinet", cab),
+//     }
+//
+//     ctx := context.Background()
+//     cb, _ := ent.Database.Bin.Query().Where(bin.Serial(cab.Serial), bin.Brand(cab.Brand), bin.Ordinal(ordinal)).First(ctx)
+//     ctx = context.WithValue(ctx, "bin", cb)
+//
+//     s.ctx = ctx
+//     s.bin = cb
+//     return s
+// }
+//
+// // Enable 控制仓位启用/禁用
+// func (s *binService) Enable(enable bool) error {
+//     var t types.ControlType
+//
+//     switch enable {
+//     case true:
+//         t = types.ControlTypeBinEnable
+//     case false:
+//         t = types.ControlTypeBinDisable
+//     default:
+//         return errs.CabinetControlParamError
+//     }
+//
+//     return core.Hub.Control(&types.ControlRequest{
+//         Type:    t,
+//         Serial:  s.bin.Serial,
+//         Ordinal: silk.Int(s.bin.Ordinal),
+//     })
+// }
+//
+// // Open 打开仓门
+// func (s *binService) Open() error {
+//     return core.Hub.Control(&types.ControlRequest{
+//         Type:    types.ControlTypeBinOpen,
+//         Serial:  s.bin.Serial,
+//         Ordinal: silk.Int(s.bin.Ordinal),
+//     })
+// }
 
-    switch enable {
-    case true:
-        t = types.ControlTypeBinEnable
-    case false:
-        t = types.ControlTypeBinDisable
-    default:
-        return errs.CabinetControlParamError
-    }
-
-    return core.Hub.Control(&types.ControlRequest{
-        Type:    t,
-        Serial:  s.bin.Serial,
-        Ordinal: silk.Int(s.bin.Ordinal),
-    })
-}
-
-// Open 打开仓门
-func (s *binService) Open() error {
-    return core.Hub.Control(&types.ControlRequest{
-        Type:    types.ControlTypeBinOpen,
-        Serial:  s.bin.Serial,
-        Ordinal: silk.Int(s.bin.Ordinal),
-    })
+func (s *binService) QueryAllBin() ent.Bins {
+    items, _ := s.orm.Query().All(s.ctx)
+    return items
 }
