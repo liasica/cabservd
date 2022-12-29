@@ -99,6 +99,13 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
     if len(items) == 0 {
         return
     }
+
+    cab, _ := ent.Database.Cabinet.Query().Where(cabinet.Serial(serial)).First(ctx)
+    if cab == nil {
+        log.Error("仓位保存失败: 未找到电柜信息")
+        return
+    }
+
     for _, item := range items {
         uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
         name := fmt.Sprintf("%d号仓", *item.Ordinal)
@@ -107,6 +114,7 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
             SetBrand(brand).
             SetSerial(serial).
             SetName(name).
+            SetCabinetID(cab.ID).
             SetOrdinal(*item.Ordinal).
             OnConflictColumns(bin.FieldUUID).
             Update(func(u *ent.BinUpsert) {
