@@ -34,19 +34,22 @@ func (c *aurservd) CabinetFullUpdate() {
     }
 }
 
-func (c *aurservd) CabinetWrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.CabinetSyncRequest) {
+func (c *aurservd) CabinetWrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.Data[*model.CabinetSyncData]) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
         return
     }
 
-    data = &model.CabinetSyncRequest{
-        Serial: serial,
+    data = &model.Data[*model.CabinetSyncData]{
+        Type: model.DataTypeCabinetSync,
+        Value: &model.CabinetSyncData{
+            Serial: serial,
+        },
     }
 
     if cab != nil {
-        data.Cabinet = &model.Cabinet{
+        data.Value.Cabinet = &model.Cabinet{
             ID:          cab.ID,
             Online:      cab.Online,
             Brand:       cab.Brand,
@@ -64,7 +67,7 @@ func (c *aurservd) CabinetWrapData(serial string, cab *ent.Cabinet, bins ent.Bin
     }
 
     for _, bin := range bins {
-        data.Bins = append(data.Bins, &model.Bin{
+        data.Value.Bins = append(data.Value.Bins, &model.Bin{
             ID:            bin.ID,
             Brand:         bin.Brand,
             Serial:        bin.Serial,
