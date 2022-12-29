@@ -8,6 +8,7 @@ package hook
 import (
     "bytes"
     "fmt"
+    "github.com/auroraride/cabservd/bridge"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/goccy/go-json"
@@ -70,6 +71,8 @@ func (h *PostgresHook) Start() {
     _ = l.Listen("cabinet")
 
     log.Println("[EVENTS] 开始监听PostgreSQL变化...")
+    worker.Done()
+
     for {
         select {
         case n := <-l.Notify:
@@ -78,33 +81,36 @@ func (h *PostgresHook) Start() {
             _ = json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
             fmt.Println(string(prettyJSON.Bytes()))
 
-            // TODO 发送同步数据?
-            // bridge.SendCabinetSyncData(n)
+            switch n.Channel {
+            case PostgresChannelCabinet:
+                cab := new(ent.Cabinet)
+                _ = json.Unmarshal([]byte(n.Extra), cab)
 
-            go h.notice(n)
+                // 发送aurservd同步数据
+                go bridge.SendCabinet(cab.Serial, cab, nil)
+
+                // 发送监听数据
+                if v, ok := h.cabinets.Load(cab.ID); ok {
+                    go func() { v.(chan *ent.Cabinet) <- cab }()
+                }
+            case PostgresChannelBin:
+                b := new(ent.Bin)
+                _ = json.Unmarshal([]byte(n.Extra), b)
+
+                // 发送aurservd同步数据
+                go bridge.SendCabinet(b.Serial, nil, ent.Bins{b})
+
+                // 发送监听数据
+                if v, ok := h.bins.Load(b.ID); ok {
+                    go func() { v.(chan *ent.Bin) <- b }()
+                }
+            }
 
         case <-time.After(90 * time.Second):
             // log.Info("[EVENTS] 超过90s未检测到PostgreSQL变化, 检查连接...")
             go func() {
                 _ = l.Ping()
             }()
-        }
-    }
-}
-
-func (h *PostgresHook) notice(n *pq.Notification) {
-    switch n.Channel {
-    case PostgresChannelCabinet:
-        cab := new(ent.Cabinet)
-        _ = json.Unmarshal([]byte(n.Extra), cab)
-        if v, ok := h.cabinets.Load(cab.ID); ok {
-            v.(chan *ent.Cabinet) <- cab
-        }
-    case PostgresChannelBin:
-        b := new(ent.Bin)
-        _ = json.Unmarshal([]byte(n.Extra), b)
-        if v, ok := h.bins.Load(b.ID); ok {
-            v.(chan *ent.Bin) <- b
         }
     }
 }

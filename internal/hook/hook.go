@@ -5,10 +5,17 @@
 
 package hook
 
+import "sync"
+
 var (
     Postgres = NewPostgresHook()
+    worker   sync.WaitGroup
 )
 
 func Start() {
+    worker.Add(1)
+
     go Postgres.Start()
+
+    worker.Wait()
 }

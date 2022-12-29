@@ -6,6 +6,7 @@
 package main
 
 import (
+    "github.com/auroraride/cabservd/bridge"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
@@ -23,8 +24,11 @@ func main() {
     // TODO 缓存数据?
     // cache()
 
-    // TODO 启动bridge?
-    // go bridge.Start()
+    // 启动bridge
+    bridge.Start()
+
+    // 加载hooks
+    hook.Start()
 
     // 启动 http server
     go router.Start()
@@ -36,9 +40,6 @@ func main() {
         kaixin.New(),
         new(core.HeaderLength),
     )
-
-    // 加载hooks
-    hook.Start()
 
     select {}
 }

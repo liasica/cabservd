@@ -26,7 +26,7 @@ type config struct {
         Bind string
     }
     Adapter struct {
-        Cabinet string
+        Aurservd string
     }
 }
 

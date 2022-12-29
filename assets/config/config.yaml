@@ -6,8 +6,8 @@ tcp:
 api:
   bind: ''
 
-bridge:
-  address: 127.0.0.1:5534
+adapter:
+  aurservd: 127.0.0.1:5534
 
 postgres:
   dsn: host=localhost user=postgres password= dbname=cabinet port=5432 sslmode=disable TimeZone=Asia/Shanghai

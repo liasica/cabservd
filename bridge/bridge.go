@@ -14,7 +14,7 @@ var (
 func Start() {
     worker.Add(1)
 
-    go startCabinet()
+    go startAurservd()
 
     worker.Wait()
 }

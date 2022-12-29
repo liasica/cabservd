@@ -12,32 +12,29 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/service"
-    "github.com/goccy/go-json"
-    "github.com/lib/pq"
     log "github.com/sirupsen/logrus"
 )
 
-type cabinet struct {
+type aurservd struct {
     *tcp.Client
 }
 
-var Cabinet *cabinet
+var Aurservd *aurservd
 
-func newCabinet() *cabinet {
-    return &cabinet{
-        Client: tcp.NewClient(g.Config.Adapter.Cabinet, log.StandardLogger(), &codec.HeaderLength{}),
+func newAurservd() *aurservd {
+    return &aurservd{
+        Client: tcp.NewClient(g.Config.Adapter.Aurservd, log.StandardLogger(), &codec.HeaderLength{}),
     }
 }
 
-func (c *cabinet) FullUpdate() {
-    panic("TODO")
+func (c *aurservd) CabinetFullUpdate() {
     cabs := service.NewCabinet().QueryAllCabinetWithBin()
     for _, cab := range cabs {
-        c.Sender <- c.WrapData(cab.Serial, cab, cab.Edges.Bins)
+        c.Sender <- c.CabinetWrapData(cab.Serial, cab, cab.Edges.Bins)
     }
 }
 
-func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.CabinetSyncRequest) {
+func (c *aurservd) CabinetWrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.CabinetSyncRequest) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
@@ -69,8 +66,6 @@ func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data
     for _, bin := range bins {
         data.Bins = append(data.Bins, &model.Bin{
             ID:            bin.ID,
-            UUID:          bin.UUID,
-            CabinetID:     bin.CabinetID,
             Brand:         bin.Brand,
             Serial:        bin.Serial,
             Name:          bin.Name,
@@ -91,48 +86,15 @@ func (c *cabinet) WrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data
     return
 }
 
-func SendCabinetSyncData(n *pq.Notification) {
-    type notificationData interface {
-        *ent.Cabinet | *ent.Bin
-    }
-
-    type data[T notificationData] struct {
-        Table  string `json:"table"`
-        Action string `json:"action"`
-        Data   T      `json:"data"`
-    }
-
-    var (
-        serial string
-        cab    *ent.Cabinet
-        bins   ent.Bins
-    )
-
-    switch n.Channel {
-    case "bin":
-        var d data[*ent.Bin]
-        _ = json.Unmarshal([]byte(n.Extra), &d)
-        serial = d.Data.Serial
-        bins = ent.Bins{d.Data}
-    case "cabinet":
-        var d data[*ent.Cabinet]
-        _ = json.Unmarshal([]byte(n.Extra), &d)
-        cab = d.Data
-        serial = d.Data.Serial
-    }
-
-    SendCabinet(serial, cab, bins)
-}
-
 func SendCabinet(serial string, cab *ent.Cabinet, bins ent.Bins) {
-    Cabinet.Sender <- Cabinet.WrapData(serial, cab, bins)
+    Aurservd.Sender <- Aurservd.CabinetWrapData(serial, cab, bins)
 }
 
-func startCabinet() {
-    Cabinet = newCabinet()
-    Cabinet.Hooks.Connect = func() {
-        // go Cabinet.FullUpdate()
+func startAurservd() {
+    Aurservd = newAurservd()
+    Aurservd.Hooks.Connect = func() {
+        Aurservd.CabinetFullUpdate()
         worker.Done()
     }
-    Cabinet.Run()
+    Aurservd.Run()
 }
