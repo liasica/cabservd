@@ -18,7 +18,7 @@ import (
 
 type Parser interface {
     Bins() ent.BinPointers
-    Cabinet() (ent.CabinetPointer, bool)
+    Cabinet() (*ent.CabinetPointer, bool)
 }
 
 func UpdateCabinet(brand, serial string, p Parser) {
@@ -33,7 +33,7 @@ func UpdateCabinet(brand, serial string, p Parser) {
     SaveBinsContext(ctx, brand, serial, bins)
 }
 
-func SaveCabinetContext(ctx context.Context, brand, serial string, item ent.CabinetPointer) {
+func SaveCabinetContext(ctx context.Context, brand, serial string, item *ent.CabinetPointer) {
     err := ent.Database.Cabinet.Create().
         SetBrand(brand).
         SetSerial(serial).

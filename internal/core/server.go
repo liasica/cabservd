@@ -6,8 +6,6 @@
 package core
 
 import (
-    "context"
-    "github.com/auroraride/cabservd/internal/ent"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
 )
@@ -21,9 +19,6 @@ func Start(addr, brand string, bean Hook, codec Codec) {
         connect:    make(chan *Client),
         disconnect: make(chan *Client),
     }
-
-    // 标记所有电柜为离线
-    _ = ent.Database.Cabinet.Update().SetOnline(false).Exec(context.Background())
 
     go Hub.run()
 

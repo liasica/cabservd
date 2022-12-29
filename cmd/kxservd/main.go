@@ -6,13 +6,14 @@
 package main
 
 import (
-    "github.com/auroraride/cabservd/bridge"
+    "context"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
+    "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
-    "github.com/auroraride/cabservd/internal/hook"
     "github.com/auroraride/cabservd/internal/mem"
+    "github.com/auroraride/cabservd/internal/notice"
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/service"
 )
@@ -21,14 +22,14 @@ func main() {
     // core boot
     internal.Boot()
 
+    // 标记所有电柜为离线
+    _ = ent.Database.Cabinet.Update().SetOnline(false).Exec(context.Background())
+
     // TODO 缓存数据?
     // cache()
 
-    // 启动bridge
-    bridge.Start()
-
     // 加载hooks
-    hook.Start()
+    notice.Start()
 
     // 启动 http server
     go router.Start()

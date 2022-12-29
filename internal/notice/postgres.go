@@ -3,12 +3,11 @@
 // Created at 2022-12-26
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package hook
+package notice
 
 import (
     "bytes"
     "fmt"
-    "github.com/auroraride/cabservd/bridge"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/goccy/go-json"
@@ -53,11 +52,19 @@ func (h *PostgresHook) DeleteBinListener(id uint64) {
     }
 }
 
-func NewPostgresHook() *PostgresHook {
+func NewPostgres() *PostgresHook {
     return &PostgresHook{}
 }
 
+type PostgresNoticeData[T any] struct {
+    Table  string `json:"table"`
+    Action string `json:"action"`
+    Data   *T     `json:"data"`
+}
+
 func (h *PostgresHook) Start() {
+    worker.Add(1)
+
     dsn := g.Config.Postgres.Dsn
 
     reportProblem := func(ev pq.ListenerEventType, err error) {
@@ -71,6 +78,7 @@ func (h *PostgresHook) Start() {
     _ = l.Listen("cabinet")
 
     log.Println("[EVENTS] 开始监听PostgreSQL变化...")
+
     worker.Done()
 
     for {
@@ -83,22 +91,34 @@ func (h *PostgresHook) Start() {
 
             switch n.Channel {
             case PostgresChannelCabinet:
-                cab := new(ent.Cabinet)
-                _ = json.Unmarshal([]byte(n.Extra), cab)
+                v := new(PostgresNoticeData[ent.Cabinet])
+                err := json.Unmarshal([]byte(n.Extra), v)
+                if err != nil {
+                    log.Errorf("[EVENTS] 消息解析失败: %v", err)
+                    continue
+                }
+
+                cab := v.Data
 
                 // 发送aurservd同步数据
-                go bridge.SendCabinet(cab.Serial, cab, nil)
+                go SendCabinet(cab.Serial, cab, nil)
 
                 // 发送监听数据
                 if v, ok := h.cabinets.Load(cab.ID); ok {
                     go func() { v.(chan *ent.Cabinet) <- cab }()
                 }
             case PostgresChannelBin:
-                b := new(ent.Bin)
-                _ = json.Unmarshal([]byte(n.Extra), b)
+                v := new(PostgresNoticeData[ent.Bin])
+                err := json.Unmarshal([]byte(n.Extra), v)
+                if err != nil {
+                    log.Errorf("[EVENTS] 消息解析失败: %v", err)
+                    continue
+                }
+
+                b := v.Data
 
                 // 发送aurservd同步数据
-                go bridge.SendCabinet(b.Serial, nil, ent.Bins{b})
+                go SendCabinet(b.Serial, nil, ent.Bins{b})
 
                 // 发送监听数据
                 if v, ok := h.bins.Load(b.ID); ok {

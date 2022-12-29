@@ -14,7 +14,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/ent/scan"
-    "github.com/auroraride/cabservd/internal/hook"
+    "github.com/auroraride/cabservd/internal/notice"
     "github.com/goccy/go-json"
     "github.com/jinzhu/copier"
     log "github.com/sirupsen/logrus"
@@ -178,7 +178,7 @@ func (s *exchangeService) start(req *model.ExchangeRequest, sc *ent.Scan) (resul
 
     defer func() {
         // 删除监听
-        hook.Postgres.DeleteBinListener(eb.ID)
+        notice.Postgres.DeleteBinListener(eb.ID)
 
         // 标记电柜为空闲
         _ = cab.Update().SetStatus(cabinet.StatusIdle).Exec(s.ctx)
@@ -207,7 +207,7 @@ func (s *exchangeService) start(req *model.ExchangeRequest, sc *ent.Scan) (resul
         }
 
         ch := make(chan *ent.Bin)
-        hook.Postgres.SetBinListener(eb.ID, ch)
+        notice.Postgres.SetBinListener(eb.ID, ch)
 
         // 如果需要开仓
         if conf.Door == model.DetectDoorOpen {
