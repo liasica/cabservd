@@ -9,7 +9,7 @@ import (
     "bufio"
     "bytes"
     "encoding/binary"
-    "github.com/auroraride/cabservd/internal/errs"
+    errs "github.com/auroraride/adapter/errors"
     "github.com/panjf2000/gnet/v2"
 )
 

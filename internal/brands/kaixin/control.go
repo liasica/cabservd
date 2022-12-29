@@ -7,8 +7,8 @@ package kaixin
 
 import (
     "fmt"
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/auroraride/cabservd/internal/errs"
     "github.com/auroraride/cabservd/internal/types"
     "time"
 )

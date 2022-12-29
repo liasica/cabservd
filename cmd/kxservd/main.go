@@ -38,7 +38,7 @@ func main() {
     )
 
     // 加载hooks
-    go hook.Start()
+    hook.Start()
 
     select {}
 }

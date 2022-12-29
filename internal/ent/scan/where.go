@@ -292,16 +292,6 @@ func UserTypeLTE(v model.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldLTE(FieldUserType, v))
 }
 
-// UserTypeIsNil applies the IsNil predicate on the "user_type" field.
-func UserTypeIsNil() predicate.Scan {
-	return predicate.Scan(sql.FieldIsNull(FieldUserType))
-}
-
-// UserTypeNotNil applies the NotNil predicate on the "user_type" field.
-func UserTypeNotNil() predicate.Scan {
-	return predicate.Scan(sql.FieldNotNull(FieldUserType))
-}
-
 // SerialEQ applies the EQ predicate on the "serial" field.
 func SerialEQ(v string) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldSerial, v))

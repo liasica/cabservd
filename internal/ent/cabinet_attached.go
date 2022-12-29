@@ -5,7 +5,9 @@
 
 package ent
 
-import "github.com/auroraride/cabservd/internal/errs"
+import (
+    errs "github.com/auroraride/adapter/errors"
+)
 
 func (c *Cabinet) DetectOnline() (err error) {
     if !c.Online {
@@ -19,6 +21,5 @@ func (c *Cabinet) DetectExchangeTask() (err error) {
     if err != nil {
         return
     }
-
     return
 }

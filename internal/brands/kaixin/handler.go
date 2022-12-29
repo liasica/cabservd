@@ -6,8 +6,8 @@
 package kaixin
 
 import (
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/auroraride/cabservd/internal/errs"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/goccy/go-json"
 )

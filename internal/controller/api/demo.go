@@ -8,11 +8,11 @@ package api
 import (
     "context"
     "fmt"
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/auroraride/cabservd/internal/errs"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/gin-gonic/gin"
     log "github.com/sirupsen/logrus"

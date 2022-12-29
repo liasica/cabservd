@@ -5,6 +5,8 @@
 
 package ent
 
+import "github.com/auroraride/adapter/model"
+
 // ResetBattery 无电池的时候清除电池信息
 // TODO: 是否有必要?
 func (u *BinUpsert) ResetBattery() *BinUpsert {
@@ -34,4 +36,38 @@ func (b *Bin) IsStrictHasBattery(fakevoltage float64) (has bool) {
         b.Voltage > fakevoltage &&
         b.Soc > 0
     return
+}
+
+// IsUsable 检查仓位是否可用
+func (b *Bin) IsUsable() bool {
+    return b.Health && b.Enable
+}
+
+// ExchangePossible 检查仓位是否可操作换电
+func (b *Bin) ExchangePossible(isFull bool, fakevoltage, fakecurrent, minsoc float64) bool {
+    if !b.IsUsable() || b.Open {
+        return false
+    }
+    if isFull {
+        // 满仓严格检查是否有电池并且电量高于指定电量
+        return b.IsStrictHasBattery(fakevoltage) && b.Soc >= minsoc
+    } else {
+        // 空仓宽松检查是否有电池
+        return !b.IsLooseHasBattery(fakevoltage, fakecurrent)
+    }
+}
+
+func (b *Bin) Info() *model.BinInfo {
+    return &model.BinInfo{
+        Ordinal:       b.Ordinal,
+        BatterySN:     b.BatterySn,
+        Voltage:       b.Voltage,
+        Current:       b.Current,
+        Soc:           b.Soc,
+        Soh:           b.Soh,
+        Health:        b.Health,
+        Enable:        b.Enable,
+        Open:          b.Open,
+        BatteryExists: b.BatteryExists,
+    }
 }

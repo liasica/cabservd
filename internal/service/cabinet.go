@@ -24,6 +24,10 @@ func NewCabinet() *cabinetService {
     }
 }
 
+func (s *cabinetService) Query(id uint64) (*ent.Cabinet, error) {
+    return s.orm.Query().Where(cabinet.ID(id)).First(s.ctx)
+}
+
 func (s *cabinetService) QueryCabinet(serial string) (*ent.Cabinet, error) {
     return s.orm.Query().Where(cabinet.Serial(serial)).First(s.ctx)
 }

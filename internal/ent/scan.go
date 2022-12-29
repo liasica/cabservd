@@ -29,7 +29,7 @@ type Scan struct {
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
 	// 用户类别
-	UserType *model.UserType `json:"user_type,omitempty"`
+	UserType model.UserType `json:"user_type,omitempty"`
 	// 电柜编号
 	Serial string `json:"serial,omitempty"`
 	// 换电信息
@@ -66,10 +66,10 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case scan.FieldUserType:
-			values[i] = &sql.NullScanner{S: new(model.UserType)}
 		case scan.FieldData:
 			values[i] = new([]byte)
+		case scan.FieldUserType:
+			values[i] = new(model.UserType)
 		case scan.FieldCabinetID:
 			values[i] = new(sql.NullInt64)
 		case scan.FieldUserID, scan.FieldSerial:
@@ -124,11 +124,10 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 				s.UserID = value.String
 			}
 		case scan.FieldUserType:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+			if value, ok := values[i].(*model.UserType); !ok {
 				return fmt.Errorf("unexpected type %T for field user_type", values[i])
-			} else if value.Valid {
-				s.UserType = new(model.UserType)
-				*s.UserType = *value.S.(*model.UserType)
+			} else if value != nil {
+				s.UserType = *value
 			}
 		case scan.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -189,10 +188,8 @@ func (s *Scan) String() string {
 	builder.WriteString("user_id=")
 	builder.WriteString(s.UserID)
 	builder.WriteString(", ")
-	if v := s.UserType; v != nil {
-		builder.WriteString("user_type=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("user_type=")
+	builder.WriteString(fmt.Sprintf("%v", s.UserType))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(s.Serial)

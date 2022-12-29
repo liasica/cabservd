@@ -6,12 +6,14 @@
 package service
 
 import (
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/adapter/model"
     "github.com/auroraride/cabservd/internal/app"
+    "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
+    "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/ent/scan"
-    "github.com/auroraride/cabservd/internal/errs"
     "github.com/google/uuid"
     "net/http"
     "time"
@@ -46,9 +48,9 @@ func (s *scanService) Query(str string) (*ent.Scan, error) {
 }
 
 // CensorX 获取并检查扫码是否有效
-func (s *scanService) CensorX(str string, expires time.Duration) (sc *ent.Scan) {
-    sc, _ = s.Query(str)
-    if sc == nil {
+func (s *scanService) CensorX(req *model.ExchangeRequest) (sc *ent.Scan) {
+    sc, _ = s.Query(req.UUID)
+    if sc == nil || sc.Data == nil {
         app.Panic(http.StatusBadRequest, errs.ExchangeTaskNotExist)
     }
 
@@ -59,8 +61,22 @@ func (s *scanService) CensorX(str string, expires time.Duration) (sc *ent.Scan) 
     ec, _ := ent.Database.Console.Query().Where(console.CabinetID(sc.CabinetID), console.StartAtGT(sc.CreatedAt)).Exist(s.ctx)
 
     // 超时判定
-    if es || ec || time.Now().After(sc.CreatedAt.Add(expires*time.Second)) {
+    if es || ec || time.Now().After(sc.CreatedAt.Add(req.Expires*time.Second)) {
         app.Panic(http.StatusBadRequest, errs.ExchangeExpired)
+    }
+
+    // 再次检查仓位是否正确
+    data := sc.Data
+    bins, _ := ent.Database.Bin.Query().Where(bin.IDIn(data.Fully.ID, data.Empty.ID)).All(s.ctx)
+    if len(bins) != 2 {
+        app.Panic(http.StatusBadRequest, errs.ExchangeExpired)
+    }
+
+    fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
+    for _, b := range bins {
+        if !b.ExchangePossible(b.ID == data.Fully.ID, fakevoltage, fakecurrent, req.Minsoc) {
+            app.Panic(http.StatusBadRequest, errs.ExchangeExpired)
+        }
     }
 
     return

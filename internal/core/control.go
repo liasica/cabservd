@@ -6,7 +6,7 @@
 package core
 
 import (
-    "github.com/auroraride/cabservd/internal/errs"
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/types"
 )

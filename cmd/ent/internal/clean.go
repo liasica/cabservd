@@ -28,6 +28,7 @@ var (
         "connect.go":          FileInfoTypeFile,
         "bin_attached.go":     FileInfoTypeFile,
         "cabinet_attached.go": FileInfoTypeFile,
+        "console_attached.go": FileInfoTypeFile,
         "internal":            FileInfoTypeDir,
         "schema":              FileInfoTypeDir,
     }

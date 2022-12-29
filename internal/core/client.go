@@ -7,9 +7,9 @@ package core
 
 import (
     "context"
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/auroraride/cabservd/internal/errs"
     "github.com/goccy/go-json"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
@@ -61,6 +61,7 @@ func (c *Client) SetSerial(serial string) {
 }
 
 // SendMessage 向客户端发送消息
+// params[0]: 是否记录消息
 func (c *Client) SendMessage(message any, params ...any) (err error) {
     // return json.NewEncoder(c).Encode(c)
 

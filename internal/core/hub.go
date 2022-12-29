@@ -6,7 +6,7 @@
 package core
 
 import (
-    "github.com/auroraride/cabservd/internal/errs"
+    errs "github.com/auroraride/adapter/errors"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
     "sync"

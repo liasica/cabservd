@@ -39,7 +39,7 @@ func (c *BaseContext) BindValidate(ptr any) {
     }
 }
 
-func ContextValidate[T any](c echo.Context) (ctx *BaseContext, req *T) {
+func ContextAndBinding[T any](c echo.Context) (ctx *BaseContext, req *T) {
     ctx = Context(c)
     req = new(T)
     ctx.BindValidate(req)

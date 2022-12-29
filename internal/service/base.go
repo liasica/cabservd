@@ -7,9 +7,9 @@ package service
 
 import (
     "context"
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/adapter/model"
     "github.com/auroraride/cabservd/internal/app"
-    "github.com/auroraride/cabservd/internal/errs"
     "net/http"
 )
 

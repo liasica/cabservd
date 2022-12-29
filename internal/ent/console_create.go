@@ -15,7 +15,6 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
-	"github.com/auroraride/cabservd/internal/types"
 	"github.com/google/uuid"
 )
 
@@ -36,6 +35,12 @@ func (cc *ConsoleCreate) SetCabinetID(u uint64) *ConsoleCreate {
 // SetBinID sets the "bin_id" field.
 func (cc *ConsoleCreate) SetBinID(u uint64) *ConsoleCreate {
 	cc.mutation.SetBinID(u)
+	return cc
+}
+
+// SetSerial sets the "serial" field.
+func (cc *ConsoleCreate) SetSerial(s string) *ConsoleCreate {
+	cc.mutation.SetSerial(s)
 	return cc
 }
 
@@ -63,14 +68,6 @@ func (cc *ConsoleCreate) SetUserType(mt model.UserType) *ConsoleCreate {
 	return cc
 }
 
-// SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (cc *ConsoleCreate) SetNillableUserType(mt *model.UserType) *ConsoleCreate {
-	if mt != nil {
-		cc.SetUserType(*mt)
-	}
-	return cc
-}
-
 // SetStep sets the "step" field.
 func (cc *ConsoleCreate) SetStep(ms model.ExchangeStep) *ConsoleCreate {
 	cc.mutation.SetStep(ms)
@@ -92,14 +89,14 @@ func (cc *ConsoleCreate) SetStatus(c console.Status) *ConsoleCreate {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cc *ConsoleCreate) SetBeforeBin(ti *types.BinInfo) *ConsoleCreate {
-	cc.mutation.SetBeforeBin(ti)
+func (cc *ConsoleCreate) SetBeforeBin(mi *model.BinInfo) *ConsoleCreate {
+	cc.mutation.SetBeforeBin(mi)
 	return cc
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cc *ConsoleCreate) SetAfterBin(ti *types.BinInfo) *ConsoleCreate {
-	cc.mutation.SetAfterBin(ti)
+func (cc *ConsoleCreate) SetAfterBin(mi *model.BinInfo) *ConsoleCreate {
+	cc.mutation.SetAfterBin(mi)
 	return cc
 }
 
@@ -123,6 +120,14 @@ func (cc *ConsoleCreate) SetStartAt(t time.Time) *ConsoleCreate {
 	return cc
 }
 
+// SetNillableStartAt sets the "startAt" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableStartAt(t *time.Time) *ConsoleCreate {
+	if t != nil {
+		cc.SetStartAt(*t)
+	}
+	return cc
+}
+
 // SetStopAt sets the "stopAt" field.
 func (cc *ConsoleCreate) SetStopAt(t time.Time) *ConsoleCreate {
 	cc.mutation.SetStopAt(t)
@@ -133,6 +138,20 @@ func (cc *ConsoleCreate) SetStopAt(t time.Time) *ConsoleCreate {
 func (cc *ConsoleCreate) SetNillableStopAt(t *time.Time) *ConsoleCreate {
 	if t != nil {
 		cc.SetStopAt(*t)
+	}
+	return cc
+}
+
+// SetDuration sets the "duration" field.
+func (cc *ConsoleCreate) SetDuration(f float64) *ConsoleCreate {
+	cc.mutation.SetDuration(f)
+	return cc
+}
+
+// SetNillableDuration sets the "duration" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableDuration(f *float64) *ConsoleCreate {
+	if f != nil {
+		cc.SetDuration(*f)
 	}
 	return cc
 }
@@ -187,6 +206,9 @@ func (cc *ConsoleCreate) check() error {
 	if _, ok := cc.mutation.BinID(); !ok {
 		return &ValidationError{Name: "bin_id", err: errors.New(`ent: missing required field "Console.bin_id"`)}
 	}
+	if _, ok := cc.mutation.Serial(); !ok {
+		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Console.serial"`)}
+	}
 	if _, ok := cc.mutation.UUID(); !ok {
 		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "Console.uuid"`)}
 	}
@@ -201,6 +223,9 @@ func (cc *ConsoleCreate) check() error {
 	if _, ok := cc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Console.user_id"`)}
 	}
+	if _, ok := cc.mutation.UserType(); !ok {
+		return &ValidationError{Name: "user_type", err: errors.New(`ent: missing required field "Console.user_type"`)}
+	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Console.status"`)}
 	}
@@ -208,9 +233,6 @@ func (cc *ConsoleCreate) check() error {
 		if err := console.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Console.status": %w`, err)}
 		}
-	}
-	if _, ok := cc.mutation.StartAt(); !ok {
-		return &ValidationError{Name: "startAt", err: errors.New(`ent: missing required field "Console.startAt"`)}
 	}
 	if _, ok := cc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet", err: errors.New(`ent: missing required edge "Console.cabinet"`)}
@@ -251,6 +273,10 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 		}
 	)
 	_spec.OnConflict = cc.conflict
+	if value, ok := cc.mutation.Serial(); ok {
+		_spec.SetField(console.FieldSerial, field.TypeString, value)
+		_node.Serial = value
+	}
 	if value, ok := cc.mutation.UUID(); ok {
 		_spec.SetField(console.FieldUUID, field.TypeUUID, value)
 		_node.UUID = value
@@ -265,7 +291,7 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cc.mutation.UserType(); ok {
 		_spec.SetField(console.FieldUserType, field.TypeOther, value)
-		_node.UserType = &value
+		_node.UserType = value
 	}
 	if value, ok := cc.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -289,11 +315,15 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cc.mutation.StartAt(); ok {
 		_spec.SetField(console.FieldStartAt, field.TypeTime, value)
-		_node.StartAt = value
+		_node.StartAt = &value
 	}
 	if value, ok := cc.mutation.StopAt(); ok {
 		_spec.SetField(console.FieldStopAt, field.TypeTime, value)
 		_node.StopAt = &value
+	}
+	if value, ok := cc.mutation.Duration(); ok {
+		_spec.SetField(console.FieldDuration, field.TypeFloat64, value)
+		_node.Duration = &value
 	}
 	if nodes := cc.mutation.CabinetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -411,6 +441,18 @@ func (u *ConsoleUpsert) UpdateBinID() *ConsoleUpsert {
 	return u
 }
 
+// SetSerial sets the "serial" field.
+func (u *ConsoleUpsert) SetSerial(v string) *ConsoleUpsert {
+	u.Set(console.FieldSerial, v)
+	return u
+}
+
+// UpdateSerial sets the "serial" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateSerial() *ConsoleUpsert {
+	u.SetExcluded(console.FieldSerial)
+	return u
+}
+
 // SetType sets the "type" field.
 func (u *ConsoleUpsert) SetType(v console.Type) *ConsoleUpsert {
 	u.Set(console.FieldType, v)
@@ -447,12 +489,6 @@ func (u *ConsoleUpsert) UpdateUserType() *ConsoleUpsert {
 	return u
 }
 
-// ClearUserType clears the value of the "user_type" field.
-func (u *ConsoleUpsert) ClearUserType() *ConsoleUpsert {
-	u.SetNull(console.FieldUserType)
-	return u
-}
-
 // SetStep sets the "step" field.
 func (u *ConsoleUpsert) SetStep(v model.ExchangeStep) *ConsoleUpsert {
 	u.Set(console.FieldStep, v)
@@ -484,7 +520,7 @@ func (u *ConsoleUpsert) UpdateStatus() *ConsoleUpsert {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsert) SetBeforeBin(v *types.BinInfo) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetBeforeBin(v *model.BinInfo) *ConsoleUpsert {
 	u.Set(console.FieldBeforeBin, v)
 	return u
 }
@@ -502,7 +538,7 @@ func (u *ConsoleUpsert) ClearBeforeBin() *ConsoleUpsert {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsert) SetAfterBin(v *types.BinInfo) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetAfterBin(v *model.BinInfo) *ConsoleUpsert {
 	u.Set(console.FieldAfterBin, v)
 	return u
 }
@@ -549,6 +585,12 @@ func (u *ConsoleUpsert) UpdateStartAt() *ConsoleUpsert {
 	return u
 }
 
+// ClearStartAt clears the value of the "startAt" field.
+func (u *ConsoleUpsert) ClearStartAt() *ConsoleUpsert {
+	u.SetNull(console.FieldStartAt)
+	return u
+}
+
 // SetStopAt sets the "stopAt" field.
 func (u *ConsoleUpsert) SetStopAt(v time.Time) *ConsoleUpsert {
 	u.Set(console.FieldStopAt, v)
@@ -564,6 +606,30 @@ func (u *ConsoleUpsert) UpdateStopAt() *ConsoleUpsert {
 // ClearStopAt clears the value of the "stopAt" field.
 func (u *ConsoleUpsert) ClearStopAt() *ConsoleUpsert {
 	u.SetNull(console.FieldStopAt)
+	return u
+}
+
+// SetDuration sets the "duration" field.
+func (u *ConsoleUpsert) SetDuration(v float64) *ConsoleUpsert {
+	u.Set(console.FieldDuration, v)
+	return u
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateDuration() *ConsoleUpsert {
+	u.SetExcluded(console.FieldDuration)
+	return u
+}
+
+// AddDuration adds v to the "duration" field.
+func (u *ConsoleUpsert) AddDuration(v float64) *ConsoleUpsert {
+	u.Add(console.FieldDuration, v)
+	return u
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (u *ConsoleUpsert) ClearDuration() *ConsoleUpsert {
+	u.SetNull(console.FieldDuration)
 	return u
 }
 
@@ -640,6 +706,20 @@ func (u *ConsoleUpsertOne) UpdateBinID() *ConsoleUpsertOne {
 	})
 }
 
+// SetSerial sets the "serial" field.
+func (u *ConsoleUpsertOne) SetSerial(v string) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetSerial(v)
+	})
+}
+
+// UpdateSerial sets the "serial" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateSerial() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateSerial()
+	})
+}
+
 // SetType sets the "type" field.
 func (u *ConsoleUpsertOne) SetType(v console.Type) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -682,13 +762,6 @@ func (u *ConsoleUpsertOne) UpdateUserType() *ConsoleUpsertOne {
 	})
 }
 
-// ClearUserType clears the value of the "user_type" field.
-func (u *ConsoleUpsertOne) ClearUserType() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearUserType()
-	})
-}
-
 // SetStep sets the "step" field.
 func (u *ConsoleUpsertOne) SetStep(v model.ExchangeStep) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -725,7 +798,7 @@ func (u *ConsoleUpsertOne) UpdateStatus() *ConsoleUpsertOne {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsertOne) SetBeforeBin(v *types.BinInfo) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetBeforeBin(v *model.BinInfo) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBeforeBin(v)
 	})
@@ -746,7 +819,7 @@ func (u *ConsoleUpsertOne) ClearBeforeBin() *ConsoleUpsertOne {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsertOne) SetAfterBin(v *types.BinInfo) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetAfterBin(v *model.BinInfo) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetAfterBin(v)
 	})
@@ -801,6 +874,13 @@ func (u *ConsoleUpsertOne) UpdateStartAt() *ConsoleUpsertOne {
 	})
 }
 
+// ClearStartAt clears the value of the "startAt" field.
+func (u *ConsoleUpsertOne) ClearStartAt() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearStartAt()
+	})
+}
+
 // SetStopAt sets the "stopAt" field.
 func (u *ConsoleUpsertOne) SetStopAt(v time.Time) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -819,6 +899,34 @@ func (u *ConsoleUpsertOne) UpdateStopAt() *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) ClearStopAt() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.ClearStopAt()
+	})
+}
+
+// SetDuration sets the "duration" field.
+func (u *ConsoleUpsertOne) SetDuration(v float64) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetDuration(v)
+	})
+}
+
+// AddDuration adds v to the "duration" field.
+func (u *ConsoleUpsertOne) AddDuration(v float64) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.AddDuration(v)
+	})
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateDuration() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateDuration()
+	})
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (u *ConsoleUpsertOne) ClearDuration() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearDuration()
 	})
 }
 
@@ -1064,6 +1172,20 @@ func (u *ConsoleUpsertBulk) UpdateBinID() *ConsoleUpsertBulk {
 	})
 }
 
+// SetSerial sets the "serial" field.
+func (u *ConsoleUpsertBulk) SetSerial(v string) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetSerial(v)
+	})
+}
+
+// UpdateSerial sets the "serial" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateSerial() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateSerial()
+	})
+}
+
 // SetType sets the "type" field.
 func (u *ConsoleUpsertBulk) SetType(v console.Type) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -1106,13 +1228,6 @@ func (u *ConsoleUpsertBulk) UpdateUserType() *ConsoleUpsertBulk {
 	})
 }
 
-// ClearUserType clears the value of the "user_type" field.
-func (u *ConsoleUpsertBulk) ClearUserType() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearUserType()
-	})
-}
-
 // SetStep sets the "step" field.
 func (u *ConsoleUpsertBulk) SetStep(v model.ExchangeStep) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -1149,7 +1264,7 @@ func (u *ConsoleUpsertBulk) UpdateStatus() *ConsoleUpsertBulk {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsertBulk) SetBeforeBin(v *types.BinInfo) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetBeforeBin(v *model.BinInfo) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBeforeBin(v)
 	})
@@ -1170,7 +1285,7 @@ func (u *ConsoleUpsertBulk) ClearBeforeBin() *ConsoleUpsertBulk {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsertBulk) SetAfterBin(v *types.BinInfo) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetAfterBin(v *model.BinInfo) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetAfterBin(v)
 	})
@@ -1225,6 +1340,13 @@ func (u *ConsoleUpsertBulk) UpdateStartAt() *ConsoleUpsertBulk {
 	})
 }
 
+// ClearStartAt clears the value of the "startAt" field.
+func (u *ConsoleUpsertBulk) ClearStartAt() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearStartAt()
+	})
+}
+
 // SetStopAt sets the "stopAt" field.
 func (u *ConsoleUpsertBulk) SetStopAt(v time.Time) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -1243,6 +1365,34 @@ func (u *ConsoleUpsertBulk) UpdateStopAt() *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) ClearStopAt() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.ClearStopAt()
+	})
+}
+
+// SetDuration sets the "duration" field.
+func (u *ConsoleUpsertBulk) SetDuration(v float64) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetDuration(v)
+	})
+}
+
+// AddDuration adds v to the "duration" field.
+func (u *ConsoleUpsertBulk) AddDuration(v float64) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.AddDuration(v)
+	})
+}
+
+// UpdateDuration sets the "duration" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateDuration() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateDuration()
+	})
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (u *ConsoleUpsertBulk) ClearDuration() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearDuration()
 	})
 }
 

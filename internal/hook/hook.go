@@ -5,6 +5,10 @@
 
 package hook
 
+var (
+    Postgres = NewPostgresHook()
+)
+
 func Start() {
-    ListenPqEvents()
+    go Postgres.Start()
 }

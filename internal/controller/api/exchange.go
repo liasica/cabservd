@@ -17,6 +17,11 @@ type exchange struct{}
 var Exchange = new(exchange)
 
 func (*exchange) Usable(c echo.Context) (err error) {
-    ctx, req := app.ContextValidate[model.ExchangeRequest](c)
+    ctx, req := app.ContextAndBinding[model.ExchangeUsableRequest](c)
     return ctx.SendResponse(service.NewExchange(ctx.User).Usable(req))
+}
+
+func (*exchange) Do(c echo.Context) (err error) {
+    ctx, req := app.ContextAndBinding[model.ExchangeRequest](c)
+    return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
 }

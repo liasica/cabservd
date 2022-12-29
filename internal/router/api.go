@@ -35,7 +35,8 @@ func Start() {
         }),
         // TODO body dump middleware
     )
-    r.GET("/exchange/usable", api.Exchange.Usable)
+    r.POST("/exchange/usable", api.Exchange.Usable)
+    r.POST("/exchange/do", api.Exchange.Do)
 
     log.Fatal(r.Start(g.Config.Api.Bind))
     // router := gin.Default()

@@ -67,6 +67,11 @@ func BinID(v uint64) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldBinID, v))
 }
 
+// Serial applies equality check predicate on the "serial" field. It's identical to SerialEQ.
+func Serial(v string) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldSerial, v))
+}
+
 // UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
 func UUID(v uuid.UUID) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldUUID, v))
@@ -100,6 +105,11 @@ func StartAt(v time.Time) predicate.Console {
 // StopAt applies equality check predicate on the "stopAt" field. It's identical to StopAtEQ.
 func StopAt(v time.Time) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldStopAt, v))
+}
+
+// Duration applies equality check predicate on the "duration" field. It's identical to DurationEQ.
+func Duration(v float64) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldDuration, v))
 }
 
 // CabinetIDEQ applies the EQ predicate on the "cabinet_id" field.
@@ -140,6 +150,71 @@ func BinIDIn(vs ...uint64) predicate.Console {
 // BinIDNotIn applies the NotIn predicate on the "bin_id" field.
 func BinIDNotIn(vs ...uint64) predicate.Console {
 	return predicate.Console(sql.FieldNotIn(FieldBinID, vs...))
+}
+
+// SerialEQ applies the EQ predicate on the "serial" field.
+func SerialEQ(v string) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldSerial, v))
+}
+
+// SerialNEQ applies the NEQ predicate on the "serial" field.
+func SerialNEQ(v string) predicate.Console {
+	return predicate.Console(sql.FieldNEQ(FieldSerial, v))
+}
+
+// SerialIn applies the In predicate on the "serial" field.
+func SerialIn(vs ...string) predicate.Console {
+	return predicate.Console(sql.FieldIn(FieldSerial, vs...))
+}
+
+// SerialNotIn applies the NotIn predicate on the "serial" field.
+func SerialNotIn(vs ...string) predicate.Console {
+	return predicate.Console(sql.FieldNotIn(FieldSerial, vs...))
+}
+
+// SerialGT applies the GT predicate on the "serial" field.
+func SerialGT(v string) predicate.Console {
+	return predicate.Console(sql.FieldGT(FieldSerial, v))
+}
+
+// SerialGTE applies the GTE predicate on the "serial" field.
+func SerialGTE(v string) predicate.Console {
+	return predicate.Console(sql.FieldGTE(FieldSerial, v))
+}
+
+// SerialLT applies the LT predicate on the "serial" field.
+func SerialLT(v string) predicate.Console {
+	return predicate.Console(sql.FieldLT(FieldSerial, v))
+}
+
+// SerialLTE applies the LTE predicate on the "serial" field.
+func SerialLTE(v string) predicate.Console {
+	return predicate.Console(sql.FieldLTE(FieldSerial, v))
+}
+
+// SerialContains applies the Contains predicate on the "serial" field.
+func SerialContains(v string) predicate.Console {
+	return predicate.Console(sql.FieldContains(FieldSerial, v))
+}
+
+// SerialHasPrefix applies the HasPrefix predicate on the "serial" field.
+func SerialHasPrefix(v string) predicate.Console {
+	return predicate.Console(sql.FieldHasPrefix(FieldSerial, v))
+}
+
+// SerialHasSuffix applies the HasSuffix predicate on the "serial" field.
+func SerialHasSuffix(v string) predicate.Console {
+	return predicate.Console(sql.FieldHasSuffix(FieldSerial, v))
+}
+
+// SerialEqualFold applies the EqualFold predicate on the "serial" field.
+func SerialEqualFold(v string) predicate.Console {
+	return predicate.Console(sql.FieldEqualFold(FieldSerial, v))
+}
+
+// SerialContainsFold applies the ContainsFold predicate on the "serial" field.
+func SerialContainsFold(v string) predicate.Console {
+	return predicate.Console(sql.FieldContainsFold(FieldSerial, v))
 }
 
 // UUIDEQ applies the EQ predicate on the "uuid" field.
@@ -305,16 +380,6 @@ func UserTypeLT(v model.UserType) predicate.Console {
 // UserTypeLTE applies the LTE predicate on the "user_type" field.
 func UserTypeLTE(v model.UserType) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldUserType, v))
-}
-
-// UserTypeIsNil applies the IsNil predicate on the "user_type" field.
-func UserTypeIsNil() predicate.Console {
-	return predicate.Console(sql.FieldIsNull(FieldUserType))
-}
-
-// UserTypeNotNil applies the NotNil predicate on the "user_type" field.
-func UserTypeNotNil() predicate.Console {
-	return predicate.Console(sql.FieldNotNull(FieldUserType))
 }
 
 // StepEQ applies the EQ predicate on the "step" field.
@@ -522,6 +587,16 @@ func StartAtLTE(v time.Time) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldStartAt, v))
 }
 
+// StartAtIsNil applies the IsNil predicate on the "startAt" field.
+func StartAtIsNil() predicate.Console {
+	return predicate.Console(sql.FieldIsNull(FieldStartAt))
+}
+
+// StartAtNotNil applies the NotNil predicate on the "startAt" field.
+func StartAtNotNil() predicate.Console {
+	return predicate.Console(sql.FieldNotNull(FieldStartAt))
+}
+
 // StopAtEQ applies the EQ predicate on the "stopAt" field.
 func StopAtEQ(v time.Time) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldStopAt, v))
@@ -570,6 +645,56 @@ func StopAtIsNil() predicate.Console {
 // StopAtNotNil applies the NotNil predicate on the "stopAt" field.
 func StopAtNotNil() predicate.Console {
 	return predicate.Console(sql.FieldNotNull(FieldStopAt))
+}
+
+// DurationEQ applies the EQ predicate on the "duration" field.
+func DurationEQ(v float64) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldDuration, v))
+}
+
+// DurationNEQ applies the NEQ predicate on the "duration" field.
+func DurationNEQ(v float64) predicate.Console {
+	return predicate.Console(sql.FieldNEQ(FieldDuration, v))
+}
+
+// DurationIn applies the In predicate on the "duration" field.
+func DurationIn(vs ...float64) predicate.Console {
+	return predicate.Console(sql.FieldIn(FieldDuration, vs...))
+}
+
+// DurationNotIn applies the NotIn predicate on the "duration" field.
+func DurationNotIn(vs ...float64) predicate.Console {
+	return predicate.Console(sql.FieldNotIn(FieldDuration, vs...))
+}
+
+// DurationGT applies the GT predicate on the "duration" field.
+func DurationGT(v float64) predicate.Console {
+	return predicate.Console(sql.FieldGT(FieldDuration, v))
+}
+
+// DurationGTE applies the GTE predicate on the "duration" field.
+func DurationGTE(v float64) predicate.Console {
+	return predicate.Console(sql.FieldGTE(FieldDuration, v))
+}
+
+// DurationLT applies the LT predicate on the "duration" field.
+func DurationLT(v float64) predicate.Console {
+	return predicate.Console(sql.FieldLT(FieldDuration, v))
+}
+
+// DurationLTE applies the LTE predicate on the "duration" field.
+func DurationLTE(v float64) predicate.Console {
+	return predicate.Console(sql.FieldLTE(FieldDuration, v))
+}
+
+// DurationIsNil applies the IsNil predicate on the "duration" field.
+func DurationIsNil() predicate.Console {
+	return predicate.Console(sql.FieldIsNull(FieldDuration))
+}
+
+// DurationNotNil applies the NotNil predicate on the "duration" field.
+func DurationNotNil() predicate.Console {
+	return predicate.Console(sql.FieldNotNull(FieldDuration))
 }
 
 // HasCabinet applies the HasEdge predicate on the "cabinet" edge.

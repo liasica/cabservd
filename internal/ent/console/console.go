@@ -15,6 +15,8 @@ const (
 	FieldCabinetID = "cabinet_id"
 	// FieldBinID holds the string denoting the bin_id field in the database.
 	FieldBinID = "bin_id"
+	// FieldSerial holds the string denoting the serial field in the database.
+	FieldSerial = "serial"
 	// FieldUUID holds the string denoting the uuid field in the database.
 	FieldUUID = "uuid"
 	// FieldType holds the string denoting the type field in the database.
@@ -37,6 +39,8 @@ const (
 	FieldStartAt = "start_at"
 	// FieldStopAt holds the string denoting the stopat field in the database.
 	FieldStopAt = "stop_at"
+	// FieldDuration holds the string denoting the duration field in the database.
+	FieldDuration = "duration"
 	// EdgeCabinet holds the string denoting the cabinet edge name in mutations.
 	EdgeCabinet = "cabinet"
 	// EdgeBin holds the string denoting the bin edge name in mutations.
@@ -64,6 +68,7 @@ var Columns = []string{
 	FieldID,
 	FieldCabinetID,
 	FieldBinID,
+	FieldSerial,
 	FieldUUID,
 	FieldType,
 	FieldUserID,
@@ -75,6 +80,7 @@ var Columns = []string{
 	FieldMessage,
 	FieldStartAt,
 	FieldStopAt,
+	FieldDuration,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

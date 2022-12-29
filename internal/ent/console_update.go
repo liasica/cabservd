@@ -16,7 +16,6 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
-	"github.com/auroraride/cabservd/internal/types"
 )
 
 // ConsoleUpdate is the builder for updating Console entities.
@@ -45,6 +44,12 @@ func (cu *ConsoleUpdate) SetBinID(u uint64) *ConsoleUpdate {
 	return cu
 }
 
+// SetSerial sets the "serial" field.
+func (cu *ConsoleUpdate) SetSerial(s string) *ConsoleUpdate {
+	cu.mutation.SetSerial(s)
+	return cu
+}
+
 // SetType sets the "type" field.
 func (cu *ConsoleUpdate) SetType(c console.Type) *ConsoleUpdate {
 	cu.mutation.SetType(c)
@@ -60,20 +65,6 @@ func (cu *ConsoleUpdate) SetUserID(s string) *ConsoleUpdate {
 // SetUserType sets the "user_type" field.
 func (cu *ConsoleUpdate) SetUserType(mt model.UserType) *ConsoleUpdate {
 	cu.mutation.SetUserType(mt)
-	return cu
-}
-
-// SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (cu *ConsoleUpdate) SetNillableUserType(mt *model.UserType) *ConsoleUpdate {
-	if mt != nil {
-		cu.SetUserType(*mt)
-	}
-	return cu
-}
-
-// ClearUserType clears the value of the "user_type" field.
-func (cu *ConsoleUpdate) ClearUserType() *ConsoleUpdate {
-	cu.mutation.ClearUserType()
 	return cu
 }
 
@@ -104,8 +95,8 @@ func (cu *ConsoleUpdate) SetStatus(c console.Status) *ConsoleUpdate {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cu *ConsoleUpdate) SetBeforeBin(ti *types.BinInfo) *ConsoleUpdate {
-	cu.mutation.SetBeforeBin(ti)
+func (cu *ConsoleUpdate) SetBeforeBin(mi *model.BinInfo) *ConsoleUpdate {
+	cu.mutation.SetBeforeBin(mi)
 	return cu
 }
 
@@ -116,8 +107,8 @@ func (cu *ConsoleUpdate) ClearBeforeBin() *ConsoleUpdate {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cu *ConsoleUpdate) SetAfterBin(ti *types.BinInfo) *ConsoleUpdate {
-	cu.mutation.SetAfterBin(ti)
+func (cu *ConsoleUpdate) SetAfterBin(mi *model.BinInfo) *ConsoleUpdate {
+	cu.mutation.SetAfterBin(mi)
 	return cu
 }
 
@@ -153,6 +144,20 @@ func (cu *ConsoleUpdate) SetStartAt(t time.Time) *ConsoleUpdate {
 	return cu
 }
 
+// SetNillableStartAt sets the "startAt" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableStartAt(t *time.Time) *ConsoleUpdate {
+	if t != nil {
+		cu.SetStartAt(*t)
+	}
+	return cu
+}
+
+// ClearStartAt clears the value of the "startAt" field.
+func (cu *ConsoleUpdate) ClearStartAt() *ConsoleUpdate {
+	cu.mutation.ClearStartAt()
+	return cu
+}
+
 // SetStopAt sets the "stopAt" field.
 func (cu *ConsoleUpdate) SetStopAt(t time.Time) *ConsoleUpdate {
 	cu.mutation.SetStopAt(t)
@@ -170,6 +175,33 @@ func (cu *ConsoleUpdate) SetNillableStopAt(t *time.Time) *ConsoleUpdate {
 // ClearStopAt clears the value of the "stopAt" field.
 func (cu *ConsoleUpdate) ClearStopAt() *ConsoleUpdate {
 	cu.mutation.ClearStopAt()
+	return cu
+}
+
+// SetDuration sets the "duration" field.
+func (cu *ConsoleUpdate) SetDuration(f float64) *ConsoleUpdate {
+	cu.mutation.ResetDuration()
+	cu.mutation.SetDuration(f)
+	return cu
+}
+
+// SetNillableDuration sets the "duration" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableDuration(f *float64) *ConsoleUpdate {
+	if f != nil {
+		cu.SetDuration(*f)
+	}
+	return cu
+}
+
+// AddDuration adds f to the "duration" field.
+func (cu *ConsoleUpdate) AddDuration(f float64) *ConsoleUpdate {
+	cu.mutation.AddDuration(f)
+	return cu
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (cu *ConsoleUpdate) ClearDuration() *ConsoleUpdate {
+	cu.mutation.ClearDuration()
 	return cu
 }
 
@@ -275,6 +307,9 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := cu.mutation.Serial(); ok {
+		_spec.SetField(console.FieldSerial, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.GetType(); ok {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 	}
@@ -283,9 +318,6 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.UserType(); ok {
 		_spec.SetField(console.FieldUserType, field.TypeOther, value)
-	}
-	if cu.mutation.UserTypeCleared() {
-		_spec.ClearField(console.FieldUserType, field.TypeOther)
 	}
 	if value, ok := cu.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -317,11 +349,23 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.StartAt(); ok {
 		_spec.SetField(console.FieldStartAt, field.TypeTime, value)
 	}
+	if cu.mutation.StartAtCleared() {
+		_spec.ClearField(console.FieldStartAt, field.TypeTime)
+	}
 	if value, ok := cu.mutation.StopAt(); ok {
 		_spec.SetField(console.FieldStopAt, field.TypeTime, value)
 	}
 	if cu.mutation.StopAtCleared() {
 		_spec.ClearField(console.FieldStopAt, field.TypeTime)
+	}
+	if value, ok := cu.mutation.Duration(); ok {
+		_spec.SetField(console.FieldDuration, field.TypeFloat64, value)
+	}
+	if value, ok := cu.mutation.AddedDuration(); ok {
+		_spec.AddField(console.FieldDuration, field.TypeFloat64, value)
+	}
+	if cu.mutation.DurationCleared() {
+		_spec.ClearField(console.FieldDuration, field.TypeFloat64)
 	}
 	if cu.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -427,6 +471,12 @@ func (cuo *ConsoleUpdateOne) SetBinID(u uint64) *ConsoleUpdateOne {
 	return cuo
 }
 
+// SetSerial sets the "serial" field.
+func (cuo *ConsoleUpdateOne) SetSerial(s string) *ConsoleUpdateOne {
+	cuo.mutation.SetSerial(s)
+	return cuo
+}
+
 // SetType sets the "type" field.
 func (cuo *ConsoleUpdateOne) SetType(c console.Type) *ConsoleUpdateOne {
 	cuo.mutation.SetType(c)
@@ -442,20 +492,6 @@ func (cuo *ConsoleUpdateOne) SetUserID(s string) *ConsoleUpdateOne {
 // SetUserType sets the "user_type" field.
 func (cuo *ConsoleUpdateOne) SetUserType(mt model.UserType) *ConsoleUpdateOne {
 	cuo.mutation.SetUserType(mt)
-	return cuo
-}
-
-// SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (cuo *ConsoleUpdateOne) SetNillableUserType(mt *model.UserType) *ConsoleUpdateOne {
-	if mt != nil {
-		cuo.SetUserType(*mt)
-	}
-	return cuo
-}
-
-// ClearUserType clears the value of the "user_type" field.
-func (cuo *ConsoleUpdateOne) ClearUserType() *ConsoleUpdateOne {
-	cuo.mutation.ClearUserType()
 	return cuo
 }
 
@@ -486,8 +522,8 @@ func (cuo *ConsoleUpdateOne) SetStatus(c console.Status) *ConsoleUpdateOne {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cuo *ConsoleUpdateOne) SetBeforeBin(ti *types.BinInfo) *ConsoleUpdateOne {
-	cuo.mutation.SetBeforeBin(ti)
+func (cuo *ConsoleUpdateOne) SetBeforeBin(mi *model.BinInfo) *ConsoleUpdateOne {
+	cuo.mutation.SetBeforeBin(mi)
 	return cuo
 }
 
@@ -498,8 +534,8 @@ func (cuo *ConsoleUpdateOne) ClearBeforeBin() *ConsoleUpdateOne {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cuo *ConsoleUpdateOne) SetAfterBin(ti *types.BinInfo) *ConsoleUpdateOne {
-	cuo.mutation.SetAfterBin(ti)
+func (cuo *ConsoleUpdateOne) SetAfterBin(mi *model.BinInfo) *ConsoleUpdateOne {
+	cuo.mutation.SetAfterBin(mi)
 	return cuo
 }
 
@@ -535,6 +571,20 @@ func (cuo *ConsoleUpdateOne) SetStartAt(t time.Time) *ConsoleUpdateOne {
 	return cuo
 }
 
+// SetNillableStartAt sets the "startAt" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableStartAt(t *time.Time) *ConsoleUpdateOne {
+	if t != nil {
+		cuo.SetStartAt(*t)
+	}
+	return cuo
+}
+
+// ClearStartAt clears the value of the "startAt" field.
+func (cuo *ConsoleUpdateOne) ClearStartAt() *ConsoleUpdateOne {
+	cuo.mutation.ClearStartAt()
+	return cuo
+}
+
 // SetStopAt sets the "stopAt" field.
 func (cuo *ConsoleUpdateOne) SetStopAt(t time.Time) *ConsoleUpdateOne {
 	cuo.mutation.SetStopAt(t)
@@ -552,6 +602,33 @@ func (cuo *ConsoleUpdateOne) SetNillableStopAt(t *time.Time) *ConsoleUpdateOne {
 // ClearStopAt clears the value of the "stopAt" field.
 func (cuo *ConsoleUpdateOne) ClearStopAt() *ConsoleUpdateOne {
 	cuo.mutation.ClearStopAt()
+	return cuo
+}
+
+// SetDuration sets the "duration" field.
+func (cuo *ConsoleUpdateOne) SetDuration(f float64) *ConsoleUpdateOne {
+	cuo.mutation.ResetDuration()
+	cuo.mutation.SetDuration(f)
+	return cuo
+}
+
+// SetNillableDuration sets the "duration" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableDuration(f *float64) *ConsoleUpdateOne {
+	if f != nil {
+		cuo.SetDuration(*f)
+	}
+	return cuo
+}
+
+// AddDuration adds f to the "duration" field.
+func (cuo *ConsoleUpdateOne) AddDuration(f float64) *ConsoleUpdateOne {
+	cuo.mutation.AddDuration(f)
+	return cuo
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (cuo *ConsoleUpdateOne) ClearDuration() *ConsoleUpdateOne {
+	cuo.mutation.ClearDuration()
 	return cuo
 }
 
@@ -681,6 +758,9 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 			}
 		}
 	}
+	if value, ok := cuo.mutation.Serial(); ok {
+		_spec.SetField(console.FieldSerial, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.GetType(); ok {
 		_spec.SetField(console.FieldType, field.TypeEnum, value)
 	}
@@ -689,9 +769,6 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	}
 	if value, ok := cuo.mutation.UserType(); ok {
 		_spec.SetField(console.FieldUserType, field.TypeOther, value)
-	}
-	if cuo.mutation.UserTypeCleared() {
-		_spec.ClearField(console.FieldUserType, field.TypeOther)
 	}
 	if value, ok := cuo.mutation.Step(); ok {
 		_spec.SetField(console.FieldStep, field.TypeOther, value)
@@ -723,11 +800,23 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	if value, ok := cuo.mutation.StartAt(); ok {
 		_spec.SetField(console.FieldStartAt, field.TypeTime, value)
 	}
+	if cuo.mutation.StartAtCleared() {
+		_spec.ClearField(console.FieldStartAt, field.TypeTime)
+	}
 	if value, ok := cuo.mutation.StopAt(); ok {
 		_spec.SetField(console.FieldStopAt, field.TypeTime, value)
 	}
 	if cuo.mutation.StopAtCleared() {
 		_spec.ClearField(console.FieldStopAt, field.TypeTime)
+	}
+	if value, ok := cuo.mutation.Duration(); ok {
+		_spec.SetField(console.FieldDuration, field.TypeFloat64, value)
+	}
+	if value, ok := cuo.mutation.AddedDuration(); ok {
+		_spec.AddField(console.FieldDuration, field.TypeFloat64, value)
+	}
+	if cuo.mutation.DurationCleared() {
+		_spec.ClearField(console.FieldDuration, field.TypeFloat64)
 	}
 	if cuo.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{

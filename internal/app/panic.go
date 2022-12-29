@@ -6,7 +6,7 @@
 package app
 
 import (
-    "github.com/auroraride/cabservd/internal/errs"
+    errs "github.com/auroraride/adapter/errors"
     "net/http"
 )
 

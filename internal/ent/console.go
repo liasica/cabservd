@@ -13,7 +13,6 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
-	"github.com/auroraride/cabservd/internal/types"
 	"github.com/google/uuid"
 )
 
@@ -26,6 +25,8 @@ type Console struct {
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// BinID holds the value of the "bin_id" field.
 	BinID uint64 `json:"bin_id,omitempty"`
+	// 电柜设备序列号
+	Serial string `json:"serial,omitempty"`
 	// 标识符
 	UUID uuid.UUID `json:"uuid,omitempty"`
 	// 日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志
@@ -33,21 +34,23 @@ type Console struct {
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
 	// 用户类别
-	UserType *model.UserType `json:"user_type,omitempty"`
+	UserType model.UserType `json:"user_type,omitempty"`
 	// 换电步骤
 	Step *model.ExchangeStep `json:"step,omitempty"`
 	// 状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败
 	Status console.Status `json:"status,omitempty"`
 	// 变化前仓位信息
-	BeforeBin *types.BinInfo `json:"before_bin,omitempty"`
+	BeforeBin *model.BinInfo `json:"before_bin,omitempty"`
 	// 变化后仓位信息
-	AfterBin *types.BinInfo `json:"after_bin,omitempty"`
+	AfterBin *model.BinInfo `json:"after_bin,omitempty"`
 	// 消息
 	Message *string `json:"message,omitempty"`
-	// 记录时间
-	StartAt time.Time `json:"startAt,omitempty"`
+	// 开始时间
+	StartAt *time.Time `json:"startAt,omitempty"`
 	// 结束时间
 	StopAt *time.Time `json:"stopAt,omitempty"`
+	// 耗时
+	Duration *float64 `json:"duration,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConsoleQuery when eager-loading is set.
 	Edges ConsoleEdges `json:"edges"`
@@ -97,13 +100,15 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case console.FieldStep:
 			values[i] = &sql.NullScanner{S: new(model.ExchangeStep)}
-		case console.FieldUserType:
-			values[i] = &sql.NullScanner{S: new(model.UserType)}
 		case console.FieldBeforeBin, console.FieldAfterBin:
 			values[i] = new([]byte)
+		case console.FieldUserType:
+			values[i] = new(model.UserType)
+		case console.FieldDuration:
+			values[i] = new(sql.NullFloat64)
 		case console.FieldID, console.FieldCabinetID, console.FieldBinID:
 			values[i] = new(sql.NullInt64)
-		case console.FieldType, console.FieldUserID, console.FieldStatus, console.FieldMessage:
+		case console.FieldSerial, console.FieldType, console.FieldUserID, console.FieldStatus, console.FieldMessage:
 			values[i] = new(sql.NullString)
 		case console.FieldStartAt, console.FieldStopAt:
 			values[i] = new(sql.NullTime)
@@ -142,6 +147,12 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.BinID = uint64(value.Int64)
 			}
+		case console.FieldSerial:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field serial", values[i])
+			} else if value.Valid {
+				c.Serial = value.String
+			}
 		case console.FieldUUID:
 			if value, ok := values[i].(*uuid.UUID); !ok {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
@@ -161,11 +172,10 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				c.UserID = value.String
 			}
 		case console.FieldUserType:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+			if value, ok := values[i].(*model.UserType); !ok {
 				return fmt.Errorf("unexpected type %T for field user_type", values[i])
-			} else if value.Valid {
-				c.UserType = new(model.UserType)
-				*c.UserType = *value.S.(*model.UserType)
+			} else if value != nil {
+				c.UserType = *value
 			}
 		case console.FieldStep:
 			if value, ok := values[i].(*sql.NullScanner); !ok {
@@ -207,7 +217,8 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field startAt", values[i])
 			} else if value.Valid {
-				c.StartAt = value.Time
+				c.StartAt = new(time.Time)
+				*c.StartAt = value.Time
 			}
 		case console.FieldStopAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -215,6 +226,13 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.StopAt = new(time.Time)
 				*c.StopAt = value.Time
+			}
+		case console.FieldDuration:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field duration", values[i])
+			} else if value.Valid {
+				c.Duration = new(float64)
+				*c.Duration = value.Float64
 			}
 		}
 	}
@@ -260,6 +278,9 @@ func (c *Console) String() string {
 	builder.WriteString("bin_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.BinID))
 	builder.WriteString(", ")
+	builder.WriteString("serial=")
+	builder.WriteString(c.Serial)
+	builder.WriteString(", ")
 	builder.WriteString("uuid=")
 	builder.WriteString(fmt.Sprintf("%v", c.UUID))
 	builder.WriteString(", ")
@@ -269,10 +290,8 @@ func (c *Console) String() string {
 	builder.WriteString("user_id=")
 	builder.WriteString(c.UserID)
 	builder.WriteString(", ")
-	if v := c.UserType; v != nil {
-		builder.WriteString("user_type=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("user_type=")
+	builder.WriteString(fmt.Sprintf("%v", c.UserType))
 	builder.WriteString(", ")
 	if v := c.Step; v != nil {
 		builder.WriteString("step=")
@@ -293,12 +312,19 @@ func (c *Console) String() string {
 		builder.WriteString(*v)
 	}
 	builder.WriteString(", ")
-	builder.WriteString("startAt=")
-	builder.WriteString(c.StartAt.Format(time.ANSIC))
+	if v := c.StartAt; v != nil {
+		builder.WriteString("startAt=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
 	builder.WriteString(", ")
 	if v := c.StopAt; v != nil {
 		builder.WriteString("stopAt=")
 		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := c.Duration; v != nil {
+		builder.WriteString("duration=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
 	}
 	builder.WriteByte(')')
 	return builder.String()

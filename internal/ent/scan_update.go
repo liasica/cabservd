@@ -55,20 +55,6 @@ func (su *ScanUpdate) SetUserType(mt model.UserType) *ScanUpdate {
 	return su
 }
 
-// SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (su *ScanUpdate) SetNillableUserType(mt *model.UserType) *ScanUpdate {
-	if mt != nil {
-		su.SetUserType(*mt)
-	}
-	return su
-}
-
-// ClearUserType clears the value of the "user_type" field.
-func (su *ScanUpdate) ClearUserType() *ScanUpdate {
-	su.mutation.ClearUserType()
-	return su
-}
-
 // SetSerial sets the "serial" field.
 func (su *ScanUpdate) SetSerial(s string) *ScanUpdate {
 	su.mutation.SetSerial(s)
@@ -183,9 +169,6 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.UserType(); ok {
 		_spec.SetField(scan.FieldUserType, field.TypeOther, value)
 	}
-	if su.mutation.UserTypeCleared() {
-		_spec.ClearField(scan.FieldUserType, field.TypeOther)
-	}
 	if value, ok := su.mutation.Serial(); ok {
 		_spec.SetField(scan.FieldSerial, field.TypeString, value)
 	}
@@ -273,20 +256,6 @@ func (suo *ScanUpdateOne) SetUserID(s string) *ScanUpdateOne {
 // SetUserType sets the "user_type" field.
 func (suo *ScanUpdateOne) SetUserType(mt model.UserType) *ScanUpdateOne {
 	suo.mutation.SetUserType(mt)
-	return suo
-}
-
-// SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (suo *ScanUpdateOne) SetNillableUserType(mt *model.UserType) *ScanUpdateOne {
-	if mt != nil {
-		suo.SetUserType(*mt)
-	}
-	return suo
-}
-
-// ClearUserType clears the value of the "user_type" field.
-func (suo *ScanUpdateOne) ClearUserType() *ScanUpdateOne {
-	suo.mutation.ClearUserType()
 	return suo
 }
 
@@ -427,9 +396,6 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 	}
 	if value, ok := suo.mutation.UserType(); ok {
 		_spec.SetField(scan.FieldUserType, field.TypeOther, value)
-	}
-	if suo.mutation.UserTypeCleared() {
-		_spec.ClearField(scan.FieldUserType, field.TypeOther)
 	}
 	if value, ok := suo.mutation.Serial(); ok {
 		_spec.SetField(scan.FieldSerial, field.TypeString, value)

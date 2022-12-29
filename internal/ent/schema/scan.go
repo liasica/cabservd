@@ -64,7 +64,7 @@ func (Scan) Fields() []ent.Field {
     return []ent.Field{
         field.UUID("id", uuid.UUID{}).Default(uuid.New),
         field.String("user_id").Comment("用户ID"),
-        field.Other("user_type", model.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Optional().Nillable().Comment("用户类别"),
+        field.Other("user_type", model.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("用户类别"),
         field.String("serial").Comment("电柜编号"),
         field.JSON("data", &model.ExchangeUsableResponse{}).Optional().Comment("换电信息"),
     }

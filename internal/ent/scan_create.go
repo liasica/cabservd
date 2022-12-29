@@ -72,14 +72,6 @@ func (sc *ScanCreate) SetUserType(mt model.UserType) *ScanCreate {
 	return sc
 }
 
-// SetNillableUserType sets the "user_type" field if the given value is not nil.
-func (sc *ScanCreate) SetNillableUserType(mt *model.UserType) *ScanCreate {
-	if mt != nil {
-		sc.SetUserType(*mt)
-	}
-	return sc
-}
-
 // SetSerial sets the "serial" field.
 func (sc *ScanCreate) SetSerial(s string) *ScanCreate {
 	sc.mutation.SetSerial(s)
@@ -174,6 +166,9 @@ func (sc *ScanCreate) check() error {
 	if _, ok := sc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Scan.user_id"`)}
 	}
+	if _, ok := sc.mutation.UserType(); !ok {
+		return &ValidationError{Name: "user_type", err: errors.New(`ent: missing required field "Scan.user_type"`)}
+	}
 	if _, ok := sc.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Scan.serial"`)}
 	}
@@ -236,7 +231,7 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.UserType(); ok {
 		_spec.SetField(scan.FieldUserType, field.TypeOther, value)
-		_node.UserType = &value
+		_node.UserType = value
 	}
 	if value, ok := sc.mutation.Serial(); ok {
 		_spec.SetField(scan.FieldSerial, field.TypeString, value)
@@ -363,12 +358,6 @@ func (u *ScanUpsert) SetUserType(v model.UserType) *ScanUpsert {
 // UpdateUserType sets the "user_type" field to the value that was provided on create.
 func (u *ScanUpsert) UpdateUserType() *ScanUpsert {
 	u.SetExcluded(scan.FieldUserType)
-	return u
-}
-
-// ClearUserType clears the value of the "user_type" field.
-func (u *ScanUpsert) ClearUserType() *ScanUpsert {
-	u.SetNull(scan.FieldUserType)
 	return u
 }
 
@@ -506,13 +495,6 @@ func (u *ScanUpsertOne) SetUserType(v model.UserType) *ScanUpsertOne {
 func (u *ScanUpsertOne) UpdateUserType() *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateUserType()
-	})
-}
-
-// ClearUserType clears the value of the "user_type" field.
-func (u *ScanUpsertOne) ClearUserType() *ScanUpsertOne {
-	return u.Update(func(s *ScanUpsert) {
-		s.ClearUserType()
 	})
 }
 
@@ -826,13 +808,6 @@ func (u *ScanUpsertBulk) SetUserType(v model.UserType) *ScanUpsertBulk {
 func (u *ScanUpsertBulk) UpdateUserType() *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateUserType()
-	})
-}
-
-// ClearUserType clears the value of the "user_type" field.
-func (u *ScanUpsertBulk) ClearUserType() *ScanUpsertBulk {
-	return u.Update(func(s *ScanUpsert) {
-		s.ClearUserType()
 	})
 }
 

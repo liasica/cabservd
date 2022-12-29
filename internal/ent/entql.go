@@ -89,6 +89,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			console.FieldCabinetID: {Type: field.TypeUint64, Column: console.FieldCabinetID},
 			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
+			console.FieldSerial:    {Type: field.TypeString, Column: console.FieldSerial},
 			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
 			console.FieldType:      {Type: field.TypeEnum, Column: console.FieldType},
 			console.FieldUserID:    {Type: field.TypeString, Column: console.FieldUserID},
@@ -100,6 +101,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldMessage:   {Type: field.TypeString, Column: console.FieldMessage},
 			console.FieldStartAt:   {Type: field.TypeTime, Column: console.FieldStartAt},
 			console.FieldStopAt:    {Type: field.TypeTime, Column: console.FieldStopAt},
+			console.FieldDuration:  {Type: field.TypeFloat64, Column: console.FieldDuration},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -509,6 +511,11 @@ func (f *ConsoleFilter) WhereBinID(p entql.Uint64P) {
 	f.Where(p.Field(console.FieldBinID))
 }
 
+// WhereSerial applies the entql string predicate on the serial field.
+func (f *ConsoleFilter) WhereSerial(p entql.StringP) {
+	f.Where(p.Field(console.FieldSerial))
+}
+
 // WhereUUID applies the entql [16]byte predicate on the uuid field.
 func (f *ConsoleFilter) WhereUUID(p entql.ValueP) {
 	f.Where(p.Field(console.FieldUUID))
@@ -562,6 +569,11 @@ func (f *ConsoleFilter) WhereStartAt(p entql.TimeP) {
 // WhereStopAt applies the entql time.Time predicate on the stopAt field.
 func (f *ConsoleFilter) WhereStopAt(p entql.TimeP) {
 	f.Where(p.Field(console.FieldStopAt))
+}
+
+// WhereDuration applies the entql float64 predicate on the duration field.
+func (f *ConsoleFilter) WhereDuration(p entql.Float64P) {
+	f.Where(p.Field(console.FieldDuration))
 }
 
 // WhereHasCabinet applies a predicate to check if query has an edge cabinet.

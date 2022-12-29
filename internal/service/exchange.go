@@ -6,13 +6,15 @@
 package service
 
 import (
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/adapter/model"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/ent/scan"
-    "github.com/auroraride/cabservd/internal/errs"
+    "github.com/auroraride/cabservd/internal/hook"
     "github.com/goccy/go-json"
     "github.com/jinzhu/copier"
     log "github.com/sirupsen/logrus"
@@ -30,6 +32,26 @@ func NewExchange(params ...any) *exchangeService {
     }
 }
 
+func (s *exchangeService) DetectCabinet(cab *ent.Cabinet) error {
+    if cab == nil {
+        return errs.CabinetNotFound
+    }
+
+    if cab.Status != cabinet.StatusIdle {
+        return errs.CabinetBusy
+    }
+
+    if !cab.Online {
+        return errs.CabinetOffline
+    }
+
+    if len(cab.Edges.Bins) < 2 {
+        return errs.CabinetNoEmpty
+    }
+
+    return nil
+}
+
 // Usable 获取电柜待换电信息
 func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.ExchangeUsableResponse) {
     res = &model.ExchangeUsableResponse{}
@@ -42,20 +64,10 @@ func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.E
     // 获取电柜状态
     cab, _ := NewCabinet().QueryCabinetWithBin(req.Serial)
 
-    if cab == nil {
-        app.Panic(http.StatusBadRequest, errs.CabinetNotFound)
-    }
-
-    if cab.Status != cabinet.StatusIdle {
-        app.Panic(http.StatusBadRequest, errs.CabinetBusy)
-    }
-
-    if !cab.Online {
-        app.Panic(http.StatusBadRequest, errs.CabinetOffline)
-    }
-
-    if len(cab.Edges.Bins) < 2 {
-        app.Panic(http.StatusBadRequest, errs.CabinetNoEmpty)
+    // 检查电柜是否可换电
+    err := s.DetectCabinet(cab)
+    if err != nil {
+        app.Panic(http.StatusBadRequest, err)
     }
 
     // 查询限定时间内其他扫码用户
@@ -92,7 +104,7 @@ func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.E
                 continue
             }
             // 该仓位电量小于最小电量
-            if item.Soc < req.MinSoc {
+            if item.Soc < req.Minsoc {
                 continue
             }
             // 标定满仓
@@ -128,18 +140,116 @@ func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.E
     return
 }
 
-func (s *exchangeService) Do(req *model.ExchangeRequest) *model.ExchangeResponse {
+func (s *exchangeService) Do(req *model.ExchangeRequest) (res *model.ExchangeResponse) {
     // 查询扫码记录
-    sc := NewScan(s.User).CensorX(req.UUID, req.Expires)
+    sc := NewScan(s.User).CensorX(req)
 
-    now := time.Now()
+    // 开始同步换电流程
+    results, err := s.start(req, sc)
 
-    // 开始换电流程
-    go s.run(sc, now)
-
-    return &model.ExchangeResponse{StartAt: now}
+    return &model.ExchangeResponse{
+        Results: results,
+        Error:   err.Error(),
+    }
 }
 
-func (s *exchangeService) run(sc *ent.Scan, start time.Time) {
-    co := ent.Database.Console
+func (s *exchangeService) start(req *model.ExchangeRequest, sc *ent.Scan) (results []*model.ExchangeStepResult, err error) {
+    var (
+        // bin service
+        bs = NewBin(s.User)
+
+        // 仓位
+        eb *ent.Bin
+
+        // 记录
+        ec *ent.Console
+    )
+
+    cab, _ := NewCabinet().Query(sc.CabinetID)
+
+    // 检查电柜是否可换电
+    err = s.DetectCabinet(cab)
+    if err != nil {
+        return
+    }
+
+    // 标记电柜为换电中
+    _ = cab.Update().SetStatus(cabinet.StatusExchange).Exec(s.ctx)
+
+    defer func() {
+        // 删除监听
+        hook.Postgres.DeleteBinListener(eb.ID)
+
+        // 标记电柜为空闲
+        _ = cab.Update().SetStatus(cabinet.StatusIdle).Exec(s.ctx)
+
+        // TODO 任务标记
+
+        // 更新记录
+        cr := ec.Update().SetStopAt(time.Now()).SetAfterBin(eb.Info())
+        if err != nil {
+            cr.SetStatus(console.StatusFailed).SetMessage(err.Error())
+        } else {
+            cr.SetStatus(console.StatusSuccess)
+        }
+
+        ec, _ = cr.Save(s.ctx)
+
+        results = append(results, ec.StepResult())
+    }()
+
+    for _, conf := range model.ExchangeStepConfigures {
+
+        // 创建换电步骤
+        ec, eb, err = NewConsole(s.User).StartExchangeStep(sc, conf.Step)
+        if err != nil {
+            return
+        }
+
+        ch := make(chan *ent.Bin)
+        hook.Postgres.SetBinListener(eb.ID, ch)
+
+        // 如果需要开仓
+        if conf.Door == model.DetectDoorOpen {
+            // 开仓
+            err = bs.OpenDoor(sc.Serial, eb.Ordinal)
+            if err != nil {
+                return
+            }
+        }
+
+        // TODO: 开仓失败后是否重复弹开逻辑???
+
+        var batteryOk, doorOk model.Bool
+
+        for {
+            select {
+            case b := <-ch:
+                // 检查仓位是否满足条件
+                doorOk, err = bs.DetectDoor(b, conf.Door)
+                if err != nil {
+                    return
+                }
+
+                // 检查电池是否满足条件
+                batteryOk, err = bs.DetectBattery(b, conf.Battery)
+                if err != nil {
+                    return
+                }
+
+                if doorOk && batteryOk {
+                    // 更新仓位信息
+                    *eb = *b
+                    return
+                }
+
+            case <-time.After(req.TimeOut * time.Second):
+                // 超时
+                err = errs.ExchangeTimeOut
+                return
+            }
+        }
+    }
+
+    return
 }
