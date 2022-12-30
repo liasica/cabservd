@@ -118,6 +118,8 @@ func (req ReportRequest) Bins() (items ent.BinPointers) {
 }
 
 func (req ReportRequest) Cabinet() (cab *ent.CabinetPointer, exists bool) {
+    cab = &ent.CabinetPointer{}
+
     // 如果是全量上报, 标记电柜在线
     if req.IsFull == ReportCateFull {
         cab.Online = silk.Bool(true)

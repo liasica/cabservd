@@ -23,3 +23,11 @@ func (c *Cabinet) DetectExchangeTask() (err error) {
     }
     return
 }
+
+func (c *Cabinet) GetID() uint64 {
+    return c.ID
+}
+
+func (c *Cabinet) GetSerial() string {
+    return c.Serial
+}

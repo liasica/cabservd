@@ -60,6 +60,20 @@ func (sc *ScanCreate) SetCabinetID(u uint64) *ScanCreate {
 	return sc
 }
 
+// SetEfficient sets the "efficient" field.
+func (sc *ScanCreate) SetEfficient(b bool) *ScanCreate {
+	sc.mutation.SetEfficient(b)
+	return sc
+}
+
+// SetNillableEfficient sets the "efficient" field if the given value is not nil.
+func (sc *ScanCreate) SetNillableEfficient(b *bool) *ScanCreate {
+	if b != nil {
+		sc.SetEfficient(*b)
+	}
+	return sc
+}
+
 // SetUserID sets the "user_id" field.
 func (sc *ScanCreate) SetUserID(s string) *ScanCreate {
 	sc.mutation.SetUserID(s)
@@ -146,6 +160,10 @@ func (sc *ScanCreate) defaults() {
 		v := scan.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := sc.mutation.Efficient(); !ok {
+		v := scan.DefaultEfficient
+		sc.mutation.SetEfficient(v)
+	}
 	if _, ok := sc.mutation.ID(); !ok {
 		v := scan.DefaultID()
 		sc.mutation.SetID(v)
@@ -162,6 +180,9 @@ func (sc *ScanCreate) check() error {
 	}
 	if _, ok := sc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet_id", err: errors.New(`ent: missing required field "Scan.cabinet_id"`)}
+	}
+	if _, ok := sc.mutation.Efficient(); !ok {
+		return &ValidationError{Name: "efficient", err: errors.New(`ent: missing required field "Scan.efficient"`)}
 	}
 	if _, ok := sc.mutation.UserID(); !ok {
 		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Scan.user_id"`)}
@@ -224,6 +245,10 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.UpdatedAt(); ok {
 		_spec.SetField(scan.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := sc.mutation.Efficient(); ok {
+		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
+		_node.Efficient = value
 	}
 	if value, ok := sc.mutation.UserID(); ok {
 		_spec.SetField(scan.FieldUserID, field.TypeString, value)
@@ -334,6 +359,18 @@ func (u *ScanUpsert) SetCabinetID(v uint64) *ScanUpsert {
 // UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
 func (u *ScanUpsert) UpdateCabinetID() *ScanUpsert {
 	u.SetExcluded(scan.FieldCabinetID)
+	return u
+}
+
+// SetEfficient sets the "efficient" field.
+func (u *ScanUpsert) SetEfficient(v bool) *ScanUpsert {
+	u.Set(scan.FieldEfficient, v)
+	return u
+}
+
+// UpdateEfficient sets the "efficient" field to the value that was provided on create.
+func (u *ScanUpsert) UpdateEfficient() *ScanUpsert {
+	u.SetExcluded(scan.FieldEfficient)
 	return u
 }
 
@@ -467,6 +504,20 @@ func (u *ScanUpsertOne) SetCabinetID(v uint64) *ScanUpsertOne {
 func (u *ScanUpsertOne) UpdateCabinetID() *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateCabinetID()
+	})
+}
+
+// SetEfficient sets the "efficient" field.
+func (u *ScanUpsertOne) SetEfficient(v bool) *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetEfficient(v)
+	})
+}
+
+// UpdateEfficient sets the "efficient" field to the value that was provided on create.
+func (u *ScanUpsertOne) UpdateEfficient() *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateEfficient()
 	})
 }
 
@@ -780,6 +831,20 @@ func (u *ScanUpsertBulk) SetCabinetID(v uint64) *ScanUpsertBulk {
 func (u *ScanUpsertBulk) UpdateCabinetID() *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateCabinetID()
+	})
+}
+
+// SetEfficient sets the "efficient" field.
+func (u *ScanUpsertBulk) SetEfficient(v bool) *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetEfficient(v)
+	})
+}
+
+// UpdateEfficient sets the "efficient" field to the value that was provided on create.
+func (u *ScanUpsertBulk) UpdateEfficient() *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateEfficient()
 	})
 }
 

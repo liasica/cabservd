@@ -61,7 +61,7 @@ func (s *scanService) CensorX(req *model.ExchangeRequest) (sc *ent.Scan) {
     ec, _ := ent.Database.Console.Query().Where(console.CabinetID(sc.CabinetID), console.StartAtGT(sc.CreatedAt)).Exist(s.ctx)
 
     // 超时判定
-    if es || ec || time.Now().After(sc.CreatedAt.Add(req.Expires*time.Second)) {
+    if es || ec || !sc.Efficient || time.Now().After(sc.CreatedAt.Add(time.Duration(req.Expires)*time.Second)) {
         app.Panic(http.StatusBadRequest, errs.ExchangeExpired)
     }
 

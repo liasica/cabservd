@@ -15,6 +15,8 @@ const (
 	FieldCabinetID = "cabinet_id"
 	// FieldBinID holds the string denoting the bin_id field in the database.
 	FieldBinID = "bin_id"
+	// FieldOperate holds the string denoting the operate field in the database.
+	FieldOperate = "operate"
 	// FieldSerial holds the string denoting the serial field in the database.
 	FieldSerial = "serial"
 	// FieldUUID holds the string denoting the uuid field in the database.
@@ -68,6 +70,7 @@ var Columns = []string{
 	FieldID,
 	FieldCabinetID,
 	FieldBinID,
+	FieldOperate,
 	FieldSerial,
 	FieldUUID,
 	FieldType,
@@ -99,7 +102,7 @@ type Type string
 // Type values.
 const (
 	TypeExchange Type = "exchange"
-	TypeControl  Type = "control"
+	TypeOperate  Type = "operate"
 	TypeCabinet  Type = "cabinet"
 )
 
@@ -110,7 +113,7 @@ func (_type Type) String() string {
 // TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
 func TypeValidator(_type Type) error {
 	switch _type {
-	case TypeExchange, TypeControl, TypeCabinet:
+	case TypeExchange, TypeOperate, TypeCabinet:
 		return nil
 	default:
 		return fmt.Errorf("console: invalid enum value for type field: %q", _type)

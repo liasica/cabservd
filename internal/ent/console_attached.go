@@ -12,11 +12,12 @@ import (
 
 func (c *Console) StepResult() *model.ExchangeStepResult {
     return &model.ExchangeStepResult{
-        StartAt: c.StartAt,
-        StopAt:  c.StopAt,
-        Success: c.Status == console.StatusSuccess,
-        Step:    c.Step,
-        Before:  c.BeforeBin,
-        After:   c.AfterBin,
+        StartAt:  c.StartAt,
+        StopAt:   c.StopAt,
+        Success:  c.Status == console.StatusSuccess,
+        Step:     c.Step,
+        Before:   c.BeforeBin,
+        After:    c.AfterBin,
+        Duration: c.Duration,
     }
 }

@@ -26,6 +26,8 @@ type Scan struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
+	// 是否有效
+	Efficient bool `json:"efficient,omitempty"`
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
 	// 用户类别
@@ -70,6 +72,8 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case scan.FieldUserType:
 			values[i] = new(model.UserType)
+		case scan.FieldEfficient:
+			values[i] = new(sql.NullBool)
 		case scan.FieldCabinetID:
 			values[i] = new(sql.NullInt64)
 		case scan.FieldUserID, scan.FieldSerial:
@@ -116,6 +120,12 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field cabinet_id", values[i])
 			} else if value.Valid {
 				s.CabinetID = uint64(value.Int64)
+			}
+		case scan.FieldEfficient:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field efficient", values[i])
+			} else if value.Valid {
+				s.Efficient = value.Bool
 			}
 		case scan.FieldUserID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -184,6 +194,9 @@ func (s *Scan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("cabinet_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.CabinetID))
+	builder.WriteString(", ")
+	builder.WriteString("efficient=")
+	builder.WriteString(fmt.Sprintf("%v", s.Efficient))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(s.UserID)

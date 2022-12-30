@@ -141,9 +141,10 @@ var (
 	// ConsoleColumns holds the columns for the "console" table.
 	ConsoleColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
+		{Name: "operate", Type: field.TypeOther, Nullable: true, Comment: "操作", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜设备序列号"},
 		{Name: "uuid", Type: field.TypeUUID, Comment: "标识符"},
-		{Name: "type", Type: field.TypeEnum, Comment: "日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志", Enums: []string{"exchange", "control", "cabinet"}},
+		{Name: "type", Type: field.TypeEnum, Comment: "日志类别 exchange:换电控制 operate:手动操作 cabinet:电柜日志", Enums: []string{"exchange", "operate", "cabinet"}},
 		{Name: "user_id", Type: field.TypeString, Comment: "用户ID"},
 		{Name: "user_type", Type: field.TypeOther, Comment: "用户类别", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "step", Type: field.TypeOther, Nullable: true, Comment: "换电步骤", SchemaType: map[string]string{"postgres": "smallint"}},
@@ -165,13 +166,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "console_cabinet_cabinet",
-				Columns:    []*schema.Column{ConsoleColumns[14]},
+				Columns:    []*schema.Column{ConsoleColumns[15]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "console_bin_bin",
-				Columns:    []*schema.Column{ConsoleColumns[15]},
+				Columns:    []*schema.Column{ConsoleColumns[16]},
 				RefColumns: []*schema.Column{BinColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -180,42 +181,42 @@ var (
 			{
 				Name:    "console_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[14]},
+				Columns: []*schema.Column{ConsoleColumns[15]},
 			},
 			{
 				Name:    "console_bin_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[15]},
+				Columns: []*schema.Column{ConsoleColumns[16]},
 			},
 			{
 				Name:    "console_serial",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[1]},
+				Columns: []*schema.Column{ConsoleColumns[2]},
 			},
 			{
 				Name:    "console_uuid",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[2]},
+				Columns: []*schema.Column{ConsoleColumns[3]},
 			},
 			{
 				Name:    "console_user_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[4]},
+				Columns: []*schema.Column{ConsoleColumns[5]},
 			},
 			{
 				Name:    "console_user_type",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[5]},
+				Columns: []*schema.Column{ConsoleColumns[6]},
 			},
 			{
 				Name:    "console_start_at",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[11]},
+				Columns: []*schema.Column{ConsoleColumns[12]},
 			},
 			{
 				Name:    "console_stop_at",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[12]},
+				Columns: []*schema.Column{ConsoleColumns[13]},
 			},
 		},
 	}
@@ -224,6 +225,7 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "efficient", Type: field.TypeBool, Comment: "是否有效", Default: true},
 		{Name: "user_id", Type: field.TypeString, Comment: "用户ID"},
 		{Name: "user_type", Type: field.TypeOther, Comment: "用户类别", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜编号"},
@@ -238,7 +240,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "scan_cabinet_cabinet",
-				Columns:    []*schema.Column{ScanColumns[7]},
+				Columns:    []*schema.Column{ScanColumns[8]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -252,22 +254,22 @@ var (
 			{
 				Name:    "scan_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[7]},
+				Columns: []*schema.Column{ScanColumns[8]},
 			},
 			{
 				Name:    "scan_user_id",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[3]},
+				Columns: []*schema.Column{ScanColumns[4]},
 			},
 			{
 				Name:    "scan_user_type",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[4]},
+				Columns: []*schema.Column{ScanColumns[5]},
 			},
 			{
 				Name:    "scan_serial",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[5]},
+				Columns: []*schema.Column{ScanColumns[6]},
 			},
 		},
 	}

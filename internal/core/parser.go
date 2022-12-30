@@ -120,48 +120,55 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
             Update(func(u *ent.BinUpsert) {
                 // 健康状态
                 if item.Health != nil {
+                    fmt.Printf("%s health :-> %v\n", name, *item.Health)
                     u.SetHealth(*item.Health)
                 }
 
                 // 仓门状态
                 if item.Open != nil {
-                    fmt.Printf("%s open:->%v\n", name, *item.Open)
+                    fmt.Printf("%s open :-> %v\n", name, *item.Open)
                     u.SetOpen(*item.Open)
                 }
 
                 // 仓位启用状态
                 if item.Enable != nil {
+                    fmt.Printf("%s enable :-> %v\n", name, *item.Enable)
                     u.SetEnable(*item.Enable)
                 }
 
                 // 电压
                 if item.Voltage != nil {
+                    fmt.Printf("%s voltage :-> %v\n", name, *item.Voltage)
                     u.SetVoltage(*item.Voltage)
                 }
 
                 // 电流
                 if item.Current != nil {
+                    fmt.Printf("%s current :-> %v\n", name, *item.Current)
                     u.SetCurrent(*item.Current)
                 }
 
                 // 电量
                 if item.Soc != nil {
+                    fmt.Printf("%s soc :-> %v\n", name, *item.Soc)
                     u.SetSoc(*item.Soc)
                 }
 
                 // 健康
                 if item.Soh != nil {
+                    fmt.Printf("%s soh :-> %v\n", name, *item.Soh)
                     u.SetSoh(*item.Soh)
                 }
 
                 // 电池编号
                 if item.BatterySn != nil {
-                    fmt.Printf("%s battery:->%v\n", name, *item.BatterySn)
+                    fmt.Printf("%s battery :-> %v\n", name, *item.BatterySn)
                     u.SetBatterySn(*item.BatterySn)
                 }
 
                 // 电池在位
                 if item.BatteryExists != nil {
+                    fmt.Printf("%s battery exists :-> %v\n", name, *item.BatteryExists)
                     u.SetBatteryExists(*item.BatteryExists)
                     // TODO 电池不在位是否清除电池信息
                     // if !*item.BatteryExists {

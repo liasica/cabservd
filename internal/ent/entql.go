@@ -89,6 +89,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			console.FieldCabinetID: {Type: field.TypeUint64, Column: console.FieldCabinetID},
 			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
+			console.FieldOperate:   {Type: field.TypeOther, Column: console.FieldOperate},
 			console.FieldSerial:    {Type: field.TypeString, Column: console.FieldSerial},
 			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
 			console.FieldType:      {Type: field.TypeEnum, Column: console.FieldType},
@@ -118,6 +119,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			scan.FieldCreatedAt: {Type: field.TypeTime, Column: scan.FieldCreatedAt},
 			scan.FieldUpdatedAt: {Type: field.TypeTime, Column: scan.FieldUpdatedAt},
 			scan.FieldCabinetID: {Type: field.TypeUint64, Column: scan.FieldCabinetID},
+			scan.FieldEfficient: {Type: field.TypeBool, Column: scan.FieldEfficient},
 			scan.FieldUserID:    {Type: field.TypeString, Column: scan.FieldUserID},
 			scan.FieldUserType:  {Type: field.TypeOther, Column: scan.FieldUserType},
 			scan.FieldSerial:    {Type: field.TypeString, Column: scan.FieldSerial},
@@ -511,6 +513,11 @@ func (f *ConsoleFilter) WhereBinID(p entql.Uint64P) {
 	f.Where(p.Field(console.FieldBinID))
 }
 
+// WhereOperate applies the entql other predicate on the operate field.
+func (f *ConsoleFilter) WhereOperate(p entql.OtherP) {
+	f.Where(p.Field(console.FieldOperate))
+}
+
 // WhereSerial applies the entql string predicate on the serial field.
 func (f *ConsoleFilter) WhereSerial(p entql.StringP) {
 	f.Where(p.Field(console.FieldSerial))
@@ -657,6 +664,11 @@ func (f *ScanFilter) WhereUpdatedAt(p entql.TimeP) {
 // WhereCabinetID applies the entql uint64 predicate on the cabinet_id field.
 func (f *ScanFilter) WhereCabinetID(p entql.Uint64P) {
 	f.Where(p.Field(scan.FieldCabinetID))
+}
+
+// WhereEfficient applies the entql bool predicate on the efficient field.
+func (f *ScanFilter) WhereEfficient(p entql.BoolP) {
+	f.Where(p.Field(scan.FieldEfficient))
 }
 
 // WhereUserID applies the entql string predicate on the user_id field.

@@ -25,11 +25,13 @@ type Console struct {
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// BinID holds the value of the "bin_id" field.
 	BinID uint64 `json:"bin_id,omitempty"`
+	// 操作
+	Operate *model.Operator `json:"operate,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 标识符
 	UUID uuid.UUID `json:"uuid,omitempty"`
-	// 日志类别 exchange:换电控制 control:后台控制 cabinet:电柜日志
+	// 日志类别 exchange:换电控制 operate:手动操作 cabinet:电柜日志
 	Type console.Type `json:"type,omitempty"`
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
@@ -100,6 +102,8 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case console.FieldStep:
 			values[i] = &sql.NullScanner{S: new(model.ExchangeStep)}
+		case console.FieldOperate:
+			values[i] = &sql.NullScanner{S: new(model.Operator)}
 		case console.FieldBeforeBin, console.FieldAfterBin:
 			values[i] = new([]byte)
 		case console.FieldUserType:
@@ -146,6 +150,13 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field bin_id", values[i])
 			} else if value.Valid {
 				c.BinID = uint64(value.Int64)
+			}
+		case console.FieldOperate:
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field operate", values[i])
+			} else if value.Valid {
+				c.Operate = new(model.Operator)
+				*c.Operate = *value.S.(*model.Operator)
 			}
 		case console.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -277,6 +288,11 @@ func (c *Console) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("bin_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.BinID))
+	builder.WriteString(", ")
+	if v := c.Operate; v != nil {
+		builder.WriteString("operate=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(c.Serial)

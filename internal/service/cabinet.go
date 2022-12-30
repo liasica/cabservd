@@ -1,26 +1,26 @@
 // Copyright (C) liasica. 2022-present.
 //
-// Created at 2022-12-03
+// Created at 2022-12-30
 // Based on cabservd by liasica, magicrolan@qq.com.
 
 package service
 
 import (
-    "context"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
 )
 
 type cabinetService struct {
-    ctx context.Context
+    *BaseService
+
     orm *ent.CabinetClient
 }
 
-func NewCabinet() *cabinetService {
+func NewCabinet(params ...any) *cabinetService {
     return &cabinetService{
-        ctx: context.Background(),
-        orm: ent.Database.Cabinet,
+        BaseService: newService(params...),
+        orm:         ent.Database.Cabinet,
     }
 }
 
@@ -28,17 +28,23 @@ func (s *cabinetService) Query(id uint64) (*ent.Cabinet, error) {
     return s.orm.Query().Where(cabinet.ID(id)).First(s.ctx)
 }
 
-func (s *cabinetService) QueryCabinet(serial string) (*ent.Cabinet, error) {
+func (s *cabinetService) QueryWithBin(id uint64) (*ent.Cabinet, error) {
+    return s.orm.Query().Where(cabinet.ID(id)).WithBins(func(query *ent.BinQuery) {
+        query.Order(ent.Asc(bin.FieldOrdinal))
+    }).First(s.ctx)
+}
+
+func (s *cabinetService) QuerySerial(serial string) (*ent.Cabinet, error) {
     return s.orm.Query().Where(cabinet.Serial(serial)).First(s.ctx)
 }
 
-func (s *cabinetService) QueryCabinetWithBin(serial string) (*ent.Cabinet, error) {
+func (s *cabinetService) QuerySerialWithBin(serial string) (*ent.Cabinet, error) {
     return s.orm.Query().Where(cabinet.Serial(serial)).WithBins(func(query *ent.BinQuery) {
         query.Order(ent.Asc(bin.FieldOrdinal))
     }).First(s.ctx)
 }
 
-func (s *cabinetService) QueryAllCabinetWithBin() ent.Cabinets {
+func (s *cabinetService) QuerySerialWithBinAll() ent.Cabinets {
     items, _ := s.orm.Query().WithBins(func(query *ent.BinQuery) {
         query.Order(ent.Asc(bin.FieldOrdinal))
     }).All(s.ctx)

@@ -12,8 +12,9 @@ import (
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
-    "github.com/auroraride/cabservd/internal/types"
+    "github.com/auroraride/cabservd/internal/notice"
     log "github.com/sirupsen/logrus"
+    "time"
 )
 
 type binService struct {
@@ -31,51 +32,6 @@ func NewBin(params ...any) *binService {
     }
 }
 
-// func NewBin(cab *ent.Cabinet, ordinal int) *binService {
-//     s := &binService{
-//         cabinet: cab,
-//         ordinal: ordinal,
-//         ctx:     context.WithValue(context.Background(), "cabinet", cab),
-//     }
-//
-//     ctx := context.Background()
-//     cb, _ := ent.Database.Bin.Query().Where(bin.Serial(cab.Serial), bin.Brand(cab.Brand), bin.Ordinal(ordinal)).First(ctx)
-//     ctx = context.WithValue(ctx, "bin", cb)
-//
-//     s.ctx = ctx
-//     s.bin = cb
-//     return s
-// }
-//
-// // Enable 控制仓位启用/禁用
-// func (s *binService) Enable(enable bool) error {
-//     var t types.ControlType
-//
-//     switch enable {
-//     case true:
-//         t = types.ControlTypeBinEnable
-//     case false:
-//         t = types.ControlTypeBinDisable
-//     default:
-//         return errs.CabinetControlParamError
-//     }
-//
-//     return core.Hub.Control(&types.ControlRequest{
-//         Type:    t,
-//         Serial:  s.bin.Serial,
-//         Ordinal: silk.Int(s.bin.Ordinal),
-//     })
-// }
-//
-// // Open 打开仓门
-// func (s *binService) Open() error {
-//     return core.Hub.Control(&types.ControlRequest{
-//         Type:    types.ControlTypeBinOpen,
-//         Serial:  s.bin.Serial,
-//         Ordinal: silk.Int(s.bin.Ordinal),
-//     })
-// }
-
 func (s *binService) QueryAllBin() ent.Bins {
     items, _ := s.orm.Query().All(s.ctx)
     return items
@@ -85,8 +41,12 @@ func (s *binService) Query(id uint64) (*ent.Bin, error) {
     return s.orm.Query().Where(bin.ID(id)).First(s.ctx)
 }
 
+func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, error) {
+    return s.orm.Query().Where(bin.Serial(serial), bin.Ordinal(ordinal)).First(s.ctx)
+}
+
 func (s *binService) OpenDoor(serial string, ordinal int) (err error) {
-    err = core.Hub.Bean.SendControl(serial, types.ControlTypeBinOpen, ordinal)
+    err = core.Hub.Bean.SendControl(serial, model.OperatorBinOpen, ordinal)
     message := "成功"
     if err != nil {
         message = fmt.Sprintf("失败, %v", err)
@@ -94,6 +54,82 @@ func (s *binService) OpenDoor(serial string, ordinal int) (err error) {
     log.Infof("[BIN] [%s - %d, %s] 开门请求: %s", serial, ordinal, s.User, message)
 
     return
+}
+
+// Operate 控制仓位
+func (s *binService) Operate(req *model.OperateRequest) (err error) {
+    // TODO 操作的时候验证当前状态, 操作值 = 当前状态时返回报错信息
+
+    // 记录日志
+    var (
+        ec *ent.Console
+        b  *ent.Bin
+        ch chan notice.IDSerialGetter
+    )
+    ec, b, err = NewConsole(s.User).Operate(req)
+    if err != nil {
+        err = errs.InternalServerError
+        return
+    }
+
+    // 退出时更新日志
+    defer func() {
+        NewConsole(s.User).Update(ec, err)
+        notice.Postgres.DeleteListener(ch)
+    }()
+
+    // 查找电柜
+    var cab *ent.Cabinet
+    cab, err = NewCabinet(s.User).QuerySerial(req.Serial)
+    if err != nil {
+        err = errs.CabinetNotFound
+        return
+    }
+
+    if !cab.Online {
+        err = errs.CabinetOffline
+        return
+    }
+
+    // 监听状态改动
+    ch = make(chan notice.IDSerialGetter)
+    notice.Postgres.SetListener(notice.PostgresChannelBin, b.ID, ch)
+
+    // 操作仓门
+    err = core.Hub.Control(req)
+    if err != nil {
+        log.Errorf("[OPERATE] (%s) %v, 失败: %v", s.User, req, err)
+        return
+    }
+
+    // 定义超时时间
+    timeout := time.After(60 * time.Second)
+
+    for {
+        select {
+        case x := <-ch:
+            nb := x.(*ent.Bin)
+            switch req.Type {
+            case model.OperatorBinOpen:
+                if nb.Open {
+                    return
+                }
+            case model.OperatorBinEnable:
+                if nb.Enable {
+                    return
+                }
+            case model.OperatorBinDisable:
+                if !nb.Enable {
+                    return
+                }
+            }
+
+        case <-timeout:
+            // 超时
+            err = errs.OperateTimeout
+            return
+        }
+    }
 }
 
 // DetectUsable 检查仓位是否可用

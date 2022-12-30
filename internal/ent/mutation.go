@@ -3027,6 +3027,7 @@ type ConsoleMutation struct {
 	op             Op
 	typ            string
 	id             *uint64
+	operate        *model.Operator
 	serial         *string
 	uuid           *uuid.UUID
 	_type          *console.Type
@@ -3219,6 +3220,55 @@ func (m *ConsoleMutation) OldBinID(ctx context.Context) (v uint64, err error) {
 // ResetBinID resets all changes to the "bin_id" field.
 func (m *ConsoleMutation) ResetBinID() {
 	m.bin = nil
+}
+
+// SetOperate sets the "operate" field.
+func (m *ConsoleMutation) SetOperate(mt model.Operator) {
+	m.operate = &mt
+}
+
+// Operate returns the value of the "operate" field in the mutation.
+func (m *ConsoleMutation) Operate() (r model.Operator, exists bool) {
+	v := m.operate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOperate returns the old "operate" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldOperate(ctx context.Context) (v *model.Operator, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOperate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOperate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOperate: %w", err)
+	}
+	return oldValue.Operate, nil
+}
+
+// ClearOperate clears the value of the "operate" field.
+func (m *ConsoleMutation) ClearOperate() {
+	m.operate = nil
+	m.clearedFields[console.FieldOperate] = struct{}{}
+}
+
+// OperateCleared returns if the "operate" field was cleared in this mutation.
+func (m *ConsoleMutation) OperateCleared() bool {
+	_, ok := m.clearedFields[console.FieldOperate]
+	return ok
+}
+
+// ResetOperate resets all changes to the "operate" field.
+func (m *ConsoleMutation) ResetOperate() {
+	m.operate = nil
+	delete(m.clearedFields, console.FieldOperate)
 }
 
 // SetSerial sets the "serial" field.
@@ -3887,12 +3937,15 @@ func (m *ConsoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConsoleMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 16)
 	if m.cabinet != nil {
 		fields = append(fields, console.FieldCabinetID)
 	}
 	if m.bin != nil {
 		fields = append(fields, console.FieldBinID)
+	}
+	if m.operate != nil {
+		fields = append(fields, console.FieldOperate)
 	}
 	if m.serial != nil {
 		fields = append(fields, console.FieldSerial)
@@ -3945,6 +3998,8 @@ func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
 		return m.CabinetID()
 	case console.FieldBinID:
 		return m.BinID()
+	case console.FieldOperate:
+		return m.Operate()
 	case console.FieldSerial:
 		return m.Serial()
 	case console.FieldUUID:
@@ -3984,6 +4039,8 @@ func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldCabinetID(ctx)
 	case console.FieldBinID:
 		return m.OldBinID(ctx)
+	case console.FieldOperate:
+		return m.OldOperate(ctx)
 	case console.FieldSerial:
 		return m.OldSerial(ctx)
 	case console.FieldUUID:
@@ -4032,6 +4089,13 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBinID(v)
+		return nil
+	case console.FieldOperate:
+		v, ok := value.(model.Operator)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOperate(v)
 		return nil
 	case console.FieldSerial:
 		v, ok := value.(string)
@@ -4169,6 +4233,9 @@ func (m *ConsoleMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ConsoleMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(console.FieldOperate) {
+		fields = append(fields, console.FieldOperate)
+	}
 	if m.FieldCleared(console.FieldStep) {
 		fields = append(fields, console.FieldStep)
 	}
@@ -4204,6 +4271,9 @@ func (m *ConsoleMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ConsoleMutation) ClearField(name string) error {
 	switch name {
+	case console.FieldOperate:
+		m.ClearOperate()
+		return nil
 	case console.FieldStep:
 		m.ClearStep()
 		return nil
@@ -4238,6 +4308,9 @@ func (m *ConsoleMutation) ResetField(name string) error {
 		return nil
 	case console.FieldBinID:
 		m.ResetBinID()
+		return nil
+	case console.FieldOperate:
+		m.ResetOperate()
 		return nil
 	case console.FieldSerial:
 		m.ResetSerial()
@@ -4382,6 +4455,7 @@ type ScanMutation struct {
 	id             *uuid.UUID
 	created_at     *time.Time
 	updated_at     *time.Time
+	efficient      *bool
 	user_id        *string
 	user_type      *model.UserType
 	serial         *string
@@ -4606,6 +4680,42 @@ func (m *ScanMutation) ResetCabinetID() {
 	m.cabinet = nil
 }
 
+// SetEfficient sets the "efficient" field.
+func (m *ScanMutation) SetEfficient(b bool) {
+	m.efficient = &b
+}
+
+// Efficient returns the value of the "efficient" field in the mutation.
+func (m *ScanMutation) Efficient() (r bool, exists bool) {
+	v := m.efficient
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEfficient returns the old "efficient" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldEfficient(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEfficient is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEfficient requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEfficient: %w", err)
+	}
+	return oldValue.Efficient, nil
+}
+
+// ResetEfficient resets all changes to the "efficient" field.
+func (m *ScanMutation) ResetEfficient() {
+	m.efficient = nil
+}
+
 // SetUserID sets the "user_id" field.
 func (m *ScanMutation) SetUserID(s string) {
 	m.user_id = &s
@@ -4823,7 +4933,7 @@ func (m *ScanMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ScanMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.created_at != nil {
 		fields = append(fields, scan.FieldCreatedAt)
 	}
@@ -4832,6 +4942,9 @@ func (m *ScanMutation) Fields() []string {
 	}
 	if m.cabinet != nil {
 		fields = append(fields, scan.FieldCabinetID)
+	}
+	if m.efficient != nil {
+		fields = append(fields, scan.FieldEfficient)
 	}
 	if m.user_id != nil {
 		fields = append(fields, scan.FieldUserID)
@@ -4859,6 +4972,8 @@ func (m *ScanMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case scan.FieldCabinetID:
 		return m.CabinetID()
+	case scan.FieldEfficient:
+		return m.Efficient()
 	case scan.FieldUserID:
 		return m.UserID()
 	case scan.FieldUserType:
@@ -4882,6 +4997,8 @@ func (m *ScanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case scan.FieldCabinetID:
 		return m.OldCabinetID(ctx)
+	case scan.FieldEfficient:
+		return m.OldEfficient(ctx)
 	case scan.FieldUserID:
 		return m.OldUserID(ctx)
 	case scan.FieldUserType:
@@ -4919,6 +5036,13 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCabinetID(v)
+		return nil
+	case scan.FieldEfficient:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEfficient(v)
 		return nil
 	case scan.FieldUserID:
 		v, ok := value.(string)
@@ -5017,6 +5141,9 @@ func (m *ScanMutation) ResetField(name string) error {
 		return nil
 	case scan.FieldCabinetID:
 		m.ResetCabinetID()
+		return nil
+	case scan.FieldEfficient:
+		m.ResetEfficient()
 		return nil
 	case scan.FieldUserID:
 		m.ResetUserID()

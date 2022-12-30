@@ -6,6 +6,7 @@
 package router
 
 import (
+    errs "github.com/auroraride/adapter/errors"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
@@ -23,6 +24,10 @@ func Start() {
         _ = app.Context(c).SendResponse(http.StatusInternalServerError, err)
     }
 
+    echo.NotFoundHandler = func(c echo.Context) error {
+        return app.Context(c).SendResponse(http.StatusNotFound, errs.NotFound)
+    }
+
     r.Validator = app.NewValidator()
 
     r.Use(
@@ -35,6 +40,9 @@ func Start() {
         }),
         // TODO body dump middleware
     )
+
+    r.POST("/operate/bin", api.Bin.Operate)
+
     r.POST("/exchange/usable", api.Exchange.Usable)
     r.POST("/exchange/do", api.Exchange.Do)
 

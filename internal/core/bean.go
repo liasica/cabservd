@@ -5,7 +5,9 @@
 
 package core
 
-import "github.com/auroraride/cabservd/internal/types"
+import (
+    "github.com/auroraride/adapter/model"
+)
 
 type (
     Hook interface {
@@ -16,7 +18,7 @@ type (
         OnMessage(b []byte, client *Client) (err error)
 
         // SendControl 发送控制
-        SendControl(serial string, typ types.ControlType, ordinal int) error
+        SendControl(serial string, typ model.Operator, ordinal int) error
 
         // GetEmptyDeviation 获取空仓最大电压和电流
         // 空仓的时候有可能会有一定的电压和电流
@@ -34,7 +36,7 @@ func (h *Bean) OnMessage(_ []byte, _ *Client) (err error) {
     return
 }
 
-func (h *Bean) SendControl(serial string, typ types.ControlType, ordinal int) (err error) {
+func (h *Bean) SendControl(serial string, typ model.Operator, ordinal int) (err error) {
     return
 }
 

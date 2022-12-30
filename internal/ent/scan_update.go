@@ -43,6 +43,20 @@ func (su *ScanUpdate) SetCabinetID(u uint64) *ScanUpdate {
 	return su
 }
 
+// SetEfficient sets the "efficient" field.
+func (su *ScanUpdate) SetEfficient(b bool) *ScanUpdate {
+	su.mutation.SetEfficient(b)
+	return su
+}
+
+// SetNillableEfficient sets the "efficient" field if the given value is not nil.
+func (su *ScanUpdate) SetNillableEfficient(b *bool) *ScanUpdate {
+	if b != nil {
+		su.SetEfficient(*b)
+	}
+	return su
+}
+
 // SetUserID sets the "user_id" field.
 func (su *ScanUpdate) SetUserID(s string) *ScanUpdate {
 	su.mutation.SetUserID(s)
@@ -163,6 +177,9 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.UpdatedAt(); ok {
 		_spec.SetField(scan.FieldUpdatedAt, field.TypeTime, value)
 	}
+	if value, ok := su.mutation.Efficient(); ok {
+		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
+	}
 	if value, ok := su.mutation.UserID(); ok {
 		_spec.SetField(scan.FieldUserID, field.TypeString, value)
 	}
@@ -244,6 +261,20 @@ func (suo *ScanUpdateOne) SetUpdatedAt(t time.Time) *ScanUpdateOne {
 // SetCabinetID sets the "cabinet_id" field.
 func (suo *ScanUpdateOne) SetCabinetID(u uint64) *ScanUpdateOne {
 	suo.mutation.SetCabinetID(u)
+	return suo
+}
+
+// SetEfficient sets the "efficient" field.
+func (suo *ScanUpdateOne) SetEfficient(b bool) *ScanUpdateOne {
+	suo.mutation.SetEfficient(b)
+	return suo
+}
+
+// SetNillableEfficient sets the "efficient" field if the given value is not nil.
+func (suo *ScanUpdateOne) SetNillableEfficient(b *bool) *ScanUpdateOne {
+	if b != nil {
+		suo.SetEfficient(*b)
+	}
 	return suo
 }
 
@@ -390,6 +421,9 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 	}
 	if value, ok := suo.mutation.UpdatedAt(); ok {
 		_spec.SetField(scan.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := suo.mutation.Efficient(); ok {
+		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
 	}
 	if value, ok := suo.mutation.UserID(); ok {
 		_spec.SetField(scan.FieldUserID, field.TypeString, value)

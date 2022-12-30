@@ -67,6 +67,11 @@ func BinID(v uint64) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldBinID, v))
 }
 
+// Operate applies equality check predicate on the "operate" field. It's identical to OperateEQ.
+func Operate(v model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldOperate, v))
+}
+
 // Serial applies equality check predicate on the "serial" field. It's identical to SerialEQ.
 func Serial(v string) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldSerial, v))
@@ -150,6 +155,56 @@ func BinIDIn(vs ...uint64) predicate.Console {
 // BinIDNotIn applies the NotIn predicate on the "bin_id" field.
 func BinIDNotIn(vs ...uint64) predicate.Console {
 	return predicate.Console(sql.FieldNotIn(FieldBinID, vs...))
+}
+
+// OperateEQ applies the EQ predicate on the "operate" field.
+func OperateEQ(v model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldOperate, v))
+}
+
+// OperateNEQ applies the NEQ predicate on the "operate" field.
+func OperateNEQ(v model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldNEQ(FieldOperate, v))
+}
+
+// OperateIn applies the In predicate on the "operate" field.
+func OperateIn(vs ...model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldIn(FieldOperate, vs...))
+}
+
+// OperateNotIn applies the NotIn predicate on the "operate" field.
+func OperateNotIn(vs ...model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldNotIn(FieldOperate, vs...))
+}
+
+// OperateGT applies the GT predicate on the "operate" field.
+func OperateGT(v model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldGT(FieldOperate, v))
+}
+
+// OperateGTE applies the GTE predicate on the "operate" field.
+func OperateGTE(v model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldGTE(FieldOperate, v))
+}
+
+// OperateLT applies the LT predicate on the "operate" field.
+func OperateLT(v model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldLT(FieldOperate, v))
+}
+
+// OperateLTE applies the LTE predicate on the "operate" field.
+func OperateLTE(v model.Operator) predicate.Console {
+	return predicate.Console(sql.FieldLTE(FieldOperate, v))
+}
+
+// OperateIsNil applies the IsNil predicate on the "operate" field.
+func OperateIsNil() predicate.Console {
+	return predicate.Console(sql.FieldIsNull(FieldOperate))
+}
+
+// OperateNotNil applies the NotNil predicate on the "operate" field.
+func OperateNotNil() predicate.Console {
+	return predicate.Console(sql.FieldNotNull(FieldOperate))
 }
 
 // SerialEQ applies the EQ predicate on the "serial" field.

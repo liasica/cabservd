@@ -9,11 +9,11 @@ import (
     "context"
     "fmt"
     errs "github.com/auroraride/adapter/errors"
+    "github.com/auroraride/adapter/model"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/auroraride/cabservd/internal/types"
     "github.com/gin-gonic/gin"
     log "github.com/sirupsen/logrus"
     "net/http"
@@ -45,9 +45,9 @@ var Demo = new(demo)
 
 func (*demo) Control(c *gin.Context) {
     var req struct {
-        Serial  string            `form:"serial" json:"serial"`
-        Type    types.ControlType `json:"type" form:"type"`
-        Ordinal int               `json:"ordinal" form:"ordinal"`
+        Serial  string         `form:"serial" json:"serial"`
+        Type    model.Operator `json:"type" form:"type"`
+        Ordinal int            `json:"ordinal" form:"ordinal"`
     }
     err := c.Bind(&req)
     if err == nil {
@@ -315,7 +315,7 @@ func (t *task) run() {
 }
 
 func (t *task) doorOpen(target *ent.Bin) (err error) {
-    err = core.Hub.Bean.SendControl(t.serial, types.ControlTypeBinOpen, target.Ordinal)
+    err = core.Hub.Bean.SendControl(t.serial, model.OperatorBinOpen, target.Ordinal)
     if err != nil {
         return
     }

@@ -7,11 +7,12 @@ package core
 
 import (
     errs "github.com/auroraride/adapter/errors"
+    "github.com/auroraride/adapter/model"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/types"
 )
 
-func (h *hub) Control(req *types.ControlRequest) (err error) {
+func (h *hub) Control(req *model.OperateRequest) (err error) {
     if req.Serial == "" {
         return errs.CabinetSerialRequired
     }

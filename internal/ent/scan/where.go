@@ -72,6 +72,11 @@ func CabinetID(v uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldCabinetID, v))
 }
 
+// Efficient applies equality check predicate on the "efficient" field. It's identical to EfficientEQ.
+func Efficient(v bool) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldEfficient, v))
+}
+
 // UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
 func UserID(v string) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldUserID, v))
@@ -185,6 +190,16 @@ func CabinetIDIn(vs ...uint64) predicate.Scan {
 // CabinetIDNotIn applies the NotIn predicate on the "cabinet_id" field.
 func CabinetIDNotIn(vs ...uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldNotIn(FieldCabinetID, vs...))
+}
+
+// EfficientEQ applies the EQ predicate on the "efficient" field.
+func EfficientEQ(v bool) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldEfficient, v))
+}
+
+// EfficientNEQ applies the NEQ predicate on the "efficient" field.
+func EfficientNEQ(v bool) predicate.Scan {
+	return predicate.Scan(sql.FieldNEQ(FieldEfficient, v))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.

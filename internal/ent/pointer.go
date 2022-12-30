@@ -50,8 +50,9 @@ type CabinetPointer struct {
 type ConsolePointers []*ConsolePointer
 type ConsolePointer struct {
 	CabinetID *uint64             `json:"cabinet_id,omitempty"`
-	BinID     *uint64             `json:"bin_id,omitempty"`
-	Serial    *string             `json:"serial,omitempty"`
+	BinID     *uint64         `json:"bin_id,omitempty"`
+	Operate   *model.Operator `json:"operate,omitempty"`
+	Serial    *string         `json:"serial,omitempty"`
 	UUID      *uuid.UUID          `json:"uuid,omitempty"`
 	Type      *console.Type       `json:"type,omitempty"`
 	UserID    *string             `json:"user_id,omitempty"`
@@ -69,6 +70,7 @@ type ConsolePointer struct {
 type ScanPointers []*ScanPointer
 type ScanPointer struct {
 	CabinetID *uint64                        `json:"cabinet_id,omitempty"`
+	Efficient *bool                          `json:"efficient,omitempty"`
 	UserID    *string                        `json:"user_id,omitempty"`
 	UserType  *model.UserType                `json:"user_type,omitempty"`
 	Serial    *string                        `json:"serial,omitempty"`

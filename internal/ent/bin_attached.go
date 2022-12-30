@@ -71,3 +71,11 @@ func (b *Bin) Info() *model.BinInfo {
         BatteryExists: b.BatteryExists,
     }
 }
+
+func (b *Bin) GetID() uint64 {
+    return b.ID
+}
+
+func (b *Bin) GetSerial() string {
+    return b.Serial
+}

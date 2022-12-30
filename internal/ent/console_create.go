@@ -38,6 +38,20 @@ func (cc *ConsoleCreate) SetBinID(u uint64) *ConsoleCreate {
 	return cc
 }
 
+// SetOperate sets the "operate" field.
+func (cc *ConsoleCreate) SetOperate(mt model.Operator) *ConsoleCreate {
+	cc.mutation.SetOperate(mt)
+	return cc
+}
+
+// SetNillableOperate sets the "operate" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableOperate(mt *model.Operator) *ConsoleCreate {
+	if mt != nil {
+		cc.SetOperate(*mt)
+	}
+	return cc
+}
+
 // SetSerial sets the "serial" field.
 func (cc *ConsoleCreate) SetSerial(s string) *ConsoleCreate {
 	cc.mutation.SetSerial(s)
@@ -273,6 +287,10 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 		}
 	)
 	_spec.OnConflict = cc.conflict
+	if value, ok := cc.mutation.Operate(); ok {
+		_spec.SetField(console.FieldOperate, field.TypeOther, value)
+		_node.Operate = &value
+	}
 	if value, ok := cc.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
 		_node.Serial = value
@@ -438,6 +456,24 @@ func (u *ConsoleUpsert) SetBinID(v uint64) *ConsoleUpsert {
 // UpdateBinID sets the "bin_id" field to the value that was provided on create.
 func (u *ConsoleUpsert) UpdateBinID() *ConsoleUpsert {
 	u.SetExcluded(console.FieldBinID)
+	return u
+}
+
+// SetOperate sets the "operate" field.
+func (u *ConsoleUpsert) SetOperate(v model.Operator) *ConsoleUpsert {
+	u.Set(console.FieldOperate, v)
+	return u
+}
+
+// UpdateOperate sets the "operate" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateOperate() *ConsoleUpsert {
+	u.SetExcluded(console.FieldOperate)
+	return u
+}
+
+// ClearOperate clears the value of the "operate" field.
+func (u *ConsoleUpsert) ClearOperate() *ConsoleUpsert {
+	u.SetNull(console.FieldOperate)
 	return u
 }
 
@@ -703,6 +739,27 @@ func (u *ConsoleUpsertOne) SetBinID(v uint64) *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) UpdateBinID() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateBinID()
+	})
+}
+
+// SetOperate sets the "operate" field.
+func (u *ConsoleUpsertOne) SetOperate(v model.Operator) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetOperate(v)
+	})
+}
+
+// UpdateOperate sets the "operate" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateOperate() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateOperate()
+	})
+}
+
+// ClearOperate clears the value of the "operate" field.
+func (u *ConsoleUpsertOne) ClearOperate() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearOperate()
 	})
 }
 
@@ -1169,6 +1226,27 @@ func (u *ConsoleUpsertBulk) SetBinID(v uint64) *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) UpdateBinID() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateBinID()
+	})
+}
+
+// SetOperate sets the "operate" field.
+func (u *ConsoleUpsertBulk) SetOperate(v model.Operator) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetOperate(v)
+	})
+}
+
+// UpdateOperate sets the "operate" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateOperate() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateOperate()
+	})
+}
+
+// ClearOperate clears the value of the "operate" field.
+func (u *ConsoleUpsertBulk) ClearOperate() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearOperate()
 	})
 }
 

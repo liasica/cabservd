@@ -31,11 +31,11 @@ func (c *aurservdHook) CabinetFullUpdate() {
         query.Order(ent.Asc(bin.FieldOrdinal))
     }).All(context.Background())
     for _, cab := range cabs {
-        SendCabinet(cab.Serial, cab, cab.Edges.Bins)
+        SendCabinet(true, cab.Serial, cab, cab.Edges.Bins)
     }
 }
 
-func (c *aurservdHook) CabinetWrapData(serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.Data[*model.CabinetSyncData]) {
+func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.Data[*model.CabinetSyncData]) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
@@ -46,6 +46,7 @@ func (c *aurservdHook) CabinetWrapData(serial string, cab *ent.Cabinet, bins ent
         Type: model.DataTypeCabinetSync,
         Value: &model.CabinetSyncData{
             Serial: serial,
+            Full:   full,
         },
     }
 
@@ -90,8 +91,8 @@ func (c *aurservdHook) CabinetWrapData(serial string, cab *ent.Cabinet, bins ent
     return
 }
 
-func SendCabinet(serial string, cab *ent.Cabinet, bins ent.Bins) {
-    Aurservd.Sender <- Aurservd.CabinetWrapData(serial, cab, bins)
+func SendCabinet(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) {
+    Aurservd.Sender <- Aurservd.CabinetWrapData(full, serial, cab, bins)
 }
 
 func (*aurservdHook) Start() {

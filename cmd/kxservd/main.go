@@ -11,6 +11,7 @@ import (
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
+    "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/mem"
     "github.com/auroraride/cabservd/internal/notice"
@@ -22,8 +23,8 @@ func main() {
     // core boot
     internal.Boot()
 
-    // 标记所有电柜为离线
-    _ = ent.Database.Cabinet.Update().SetOnline(false).Exec(context.Background())
+    // 标记所有电柜为离线和空闲
+    _ = ent.Database.Cabinet.Update().SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(context.Background())
 
     // TODO 缓存数据?
     // cache()
@@ -46,12 +47,12 @@ func main() {
 }
 
 func cache() {
-    cabs := service.NewCabinet().QueryAllCabinetWithBin()
+    cabs := service.NewCabinet(service.PermissionNotRequired).QuerySerialWithBinAll()
     for _, cab := range cabs {
         mem.SetCabinet(cab)
     }
 
-    bins := service.NewBin().QueryAllBin()
+    bins := service.NewBin(service.PermissionNotRequired).QueryAllBin()
     for _, b := range bins {
         mem.SetBin(b)
     }
