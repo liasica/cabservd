@@ -89,7 +89,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     for {
         b, err = h.codec.Decode(c)
 
-        if err == adapter.IncompletePacket {
+        if err == adapter.ErrorIncompletePacket {
             break
         }
 

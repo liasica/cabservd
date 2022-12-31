@@ -72,13 +72,13 @@ func (s *consoleService) StartExchangeStep(sc *ent.Scan, step adapter.ExchangeSt
 
 func (s *consoleService) Operate(req *adapter.OperateRequest) (ec *ent.Console, b *ent.Bin, err error) {
     if req.Ordinal == nil {
-        app.Panic(adapter.CabinetBinOrdinalRequired)
+        app.Panic(adapter.ErrorCabinetBinOrdinalRequired)
     }
 
     // 查询仓位信息
     b, err = NewBin(s.User).QuerySerialOrdinal(req.Serial, *req.Ordinal)
     if err != nil {
-        err = adapter.CabinetBinNotFound
+        err = adapter.ErrorCabinetBinNotFound
         return
     }
 

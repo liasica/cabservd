@@ -8,6 +8,7 @@ package main
 import (
     "context"
     "github.com/auroraride/adapter/codec"
+    "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
@@ -18,33 +19,38 @@ import (
     "github.com/auroraride/cabservd/internal/notice"
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/service"
+    log "github.com/sirupsen/logrus"
 )
 
 func main() {
-    // core boot
-    internal.Boot()
+    snag.WithPanic(func() {
 
-    // 标记所有电柜为离线和空闲
-    _ = ent.Database.Cabinet.Update().SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(context.Background())
+        // core boot
+        internal.Boot()
 
-    // TODO 缓存数据?
-    // cache()
+        // 标记所有电柜为离线和空闲
+        _ = ent.Database.Cabinet.Update().SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(context.Background())
 
-    // 加载hooks
-    notice.Start()
+        // TODO 缓存数据?
+        // cache()
 
-    // 启动 http server
-    go router.Start()
+        // 加载hooks
+        notice.Start()
 
-    // 启动socket hub
-    go core.Start(
-        g.Config.Tcp.Bind,
-        g.Config.Brand,
-        kaixin.New(),
-        &codec.HeaderLength{},
-    )
+        // 启动 http server
+        go router.Start()
 
-    select {}
+        // 启动socket hub
+        go core.Start(
+            g.Config.Tcp.Bind,
+            g.Config.Brand,
+            kaixin.New(),
+            &codec.HeaderLength{},
+        )
+
+        select {}
+
+    }, log.StandardLogger())
 }
 
 func cache() {

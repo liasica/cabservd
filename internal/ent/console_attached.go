@@ -10,8 +10,8 @@ import (
     "github.com/auroraride/cabservd/internal/ent/console"
 )
 
-func (c *Console) StepResult() (res *adapter.ExchangeStepResult) {
-    res = &adapter.ExchangeStepResult{
+func (c *Console) StepResult() (res *adapter.ExchangeStepMessage) {
+    res = &adapter.ExchangeStepMessage{
         UUID:    c.UUID.String(),
         StartAt: c.StartAt,
         StopAt:  c.StopAt,

@@ -25,7 +25,7 @@ func Start() {
     }
 
     echo.NotFoundHandler = func(c echo.Context) error {
-        return app.Context(c).SendResponse(http.StatusNotFound, adapter.NotFound)
+        return app.Context(c).SendResponse(http.StatusNotFound, adapter.ErrorNotFound)
     }
 
     r.Validator = app.NewValidator()

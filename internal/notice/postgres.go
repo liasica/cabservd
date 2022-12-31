@@ -62,28 +62,6 @@ func (h *PostgresHook) DeleteListener(ch chan IDSerialGetter) {
     h.listeners.Delete(ch)
 }
 
-// func (h *PostgresHook) SetCabinetListener(id uint64, ch chan *ent.Cabinet) {
-//     h.cabinets.Store(id, ch)
-// }
-
-// func (h *PostgresHook) DeleteCabinetListener(id uint64) {
-//     v, ok := h.cabinets.LoadAndDelete(id)
-//     if ok {
-//         close(v.(chan *ent.Cabinet))
-//     }
-// }
-
-// func (h *PostgresHook) SetBinListener(id uint64, ch chan *ent.Bin) {
-//     h.bins.Store(id, ch)
-// }
-
-// func (h *PostgresHook) DeleteBinListener(id uint64) {
-//     v, ok := h.bins.LoadAndDelete(id)
-//     if ok {
-//         close(v.(chan *ent.Bin))
-//     }
-// }
-
 func NewPostgres() *PostgresHook {
     return &PostgresHook{}
 }
@@ -111,8 +89,8 @@ func (h *PostgresHook) Start() {
     }
 
     l := pq.NewListener(dsn, 10*time.Second, time.Minute, reportProblem)
-    _ = l.Listen("bin")
-    _ = l.Listen("cabinet")
+    _ = l.Listen(PostgresChannelBin.String())
+    _ = l.Listen(PostgresChannelCabinet.String())
 
     log.Println("[EVENTS] 开始监听PostgreSQL变化...")
 

@@ -23,7 +23,7 @@ func User() echo.MiddlewareFunc {
                 Type: adapter.UserType(header.Get(adapter.HeaderUserType)),
             }
             if user.ID == "" || user.Type == "" {
-                app.Panic(http.StatusUnauthorized, adapter.UserRequired)
+                app.Panic(http.StatusUnauthorized, adapter.ErrorUserRequired)
             }
             ctx.User = user
             return next(ctx)

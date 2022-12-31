@@ -9,7 +9,7 @@ import "github.com/auroraride/adapter"
 
 func (c *Cabinet) DetectOnline() (err error) {
     if !c.Online {
-        err = adapter.CabinetOffline
+        err = adapter.ErrorCabinetOffline
     }
     return
 }

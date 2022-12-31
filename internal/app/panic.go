@@ -19,9 +19,9 @@ func Panic(params ...any) {
     if r.Message == "" {
         switch r.Code {
         case http.StatusBadRequest:
-            r.Message = adapter.BadRequest.Error()
+            r.Message = adapter.ErrorBadRequest.Error()
         default:
-            r.Message = adapter.InternalServerError.Error()
+            r.Message = adapter.ErrorInternalServer.Error()
         }
     }
 

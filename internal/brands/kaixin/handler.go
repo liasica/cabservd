@@ -58,7 +58,7 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
 // LoginHandle 登录请求
 func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     if req.DevID == "" {
-        return adapter.CabinetSerialRequired
+        return adapter.ErrorCabinetSerialRequired
     }
 
     // // 清除仓位电池信息
@@ -79,7 +79,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 // ReportHandle 状态上报请求
 func (h *Hander) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
-        return adapter.CabinetSerialRequired
+        return adapter.ErrorCabinetSerialRequired
     }
     core.UpdateCabinet(adapter.BrandKaixin, req.DevID, req)
     return

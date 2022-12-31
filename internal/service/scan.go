@@ -41,7 +41,7 @@ func (s *scanService) Create(serial string, cab *ent.Cabinet, data *adapter.Exch
 func (s *scanService) Query(str string) (*ent.Scan, error) {
     id, err := uuid.Parse(str)
     if err != nil {
-        app.Panic(http.StatusBadRequest, adapter.BadRequest)
+        app.Panic(http.StatusBadRequest, adapter.ErrorBadRequest)
     }
     return s.orm.Query().Where(scan.ID(id)).First(s.ctx)
 }
@@ -50,7 +50,7 @@ func (s *scanService) Query(str string) (*ent.Scan, error) {
 func (s *scanService) CensorX(req *adapter.ExchangeRequest) (sc *ent.Scan) {
     sc, _ = s.Query(req.UUID)
     if sc == nil || sc.Data == nil {
-        app.Panic(http.StatusBadRequest, adapter.ExchangeTaskNotExist)
+        app.Panic(http.StatusBadRequest, adapter.ErrorExchangeTaskNotExist)
     }
 
     // 后续是否有该电柜扫码记录
@@ -61,20 +61,20 @@ func (s *scanService) CensorX(req *adapter.ExchangeRequest) (sc *ent.Scan) {
 
     // 超时判定
     if es || ec || !sc.Efficient || time.Now().After(sc.CreatedAt.Add(time.Duration(req.Expires)*time.Second)) {
-        app.Panic(http.StatusBadRequest, adapter.ExchangeExpired)
+        app.Panic(http.StatusBadRequest, adapter.ErrorExchangeExpired)
     }
 
     // 再次检查仓位是否正确
     data := sc.Data
     bins, _ := ent.Database.Bin.Query().Where(bin.IDIn(data.Fully.ID, data.Empty.ID)).All(s.ctx)
     if len(bins) != 2 {
-        app.Panic(http.StatusBadRequest, adapter.ExchangeExpired)
+        app.Panic(http.StatusBadRequest, adapter.ErrorExchangeExpired)
     }
 
     fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
     for _, b := range bins {
         if !b.ExchangePossible(b.ID == data.Fully.ID, fakevoltage, fakecurrent, req.Minsoc) {
-            app.Panic(http.StatusBadRequest, adapter.ExchangeCannot)
+            app.Panic(http.StatusBadRequest, adapter.ErrorExchangeCannot)
         }
     }
 

@@ -103,7 +103,7 @@ func GetClient(devId string) (c *Client, err error) {
         return true
     })
     if c == nil {
-        err = adapter.CabinetClientNotFound
+        err = adapter.ErrorCabinetClientNotFound
     }
     return
 }

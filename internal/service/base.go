@@ -38,7 +38,7 @@ func newService(params ...any) *BaseService {
         }
     }
     if s.User == nil && nq {
-        app.Panic(http.StatusUnauthorized, adapter.UserRequired)
+        app.Panic(http.StatusUnauthorized, adapter.ErrorUserRequired)
     }
     return s
 }

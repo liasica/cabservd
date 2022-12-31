@@ -67,7 +67,7 @@ func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
     )
     ec, b, err = NewConsole(s.User).Operate(req)
     if err != nil {
-        err = adapter.InternalServerError
+        err = adapter.ErrorInternalServer
         return
     }
 
@@ -81,12 +81,12 @@ func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
     var cab *ent.Cabinet
     cab, err = NewCabinet(s.User).QuerySerial(req.Serial)
     if err != nil {
-        err = adapter.CabinetNotFound
+        err = adapter.ErrorCabinetNotFound
         return
     }
 
     if !cab.Online {
-        err = adapter.CabinetOffline
+        err = adapter.ErrorCabinetOffline
         return
     }
 
@@ -125,7 +125,7 @@ func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
 
         case <-timeout:
             // 超时
-            err = adapter.OperateTimeout
+            err = adapter.ErrorOperateTimeout
             return
         }
     }
@@ -158,7 +158,7 @@ func (s *binService) DetectDoor(b *ent.Bin, d adapter.DetectDoor) (ok adapter.Bo
     usable, message := s.DetectUsable(b)
 
     if !usable {
-        err = adapter.CabinetBinNotUsable
+        err = adapter.ErrorCabinetBinNotUsable
     }
 
     log.Infof("[BIN] [%s - %d, %s] 仓门%s检测: %s, %s", b.Serial, b.Ordinal, s.User, d, ok, message)
@@ -185,7 +185,7 @@ func (s *binService) DetectBattery(b *ent.Bin, d adapter.DetectBattery) (ok adap
     usable, message := s.DetectUsable(b)
 
     if !usable {
-        err = adapter.CabinetBinNotUsable
+        err = adapter.ErrorCabinetBinNotUsable
     }
 
     log.Infof("[BIN] [%s - %d, %s] 电池%s检测: %s, %s", b.Serial, b.Ordinal, s.User, d, ok, message)

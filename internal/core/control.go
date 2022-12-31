@@ -12,15 +12,15 @@ import (
 
 func (h *hub) Control(req *adapter.OperateRequest) (err error) {
     if req.Serial == "" {
-        return adapter.CabinetSerialRequired
+        return adapter.ErrorCabinetSerialRequired
     }
 
     if req.Type == "" {
-        return adapter.CabinetControlParamError
+        return adapter.ErrorCabinetControlParam
     }
 
     if req.Ordinal == nil {
-        return adapter.CabinetBinOrdinalRequired
+        return adapter.ErrorCabinetBinOrdinalRequired
     }
 
     switch g.Config.Brand {

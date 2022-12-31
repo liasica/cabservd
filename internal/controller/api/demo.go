@@ -101,7 +101,7 @@ func (d *demo) Start(c *gin.Context) {
     }
     err := c.Bind(&req)
     if err != nil {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.ParamValidateFailed.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorParamValidateFailed.Error()})
         return
     }
 
@@ -109,25 +109,25 @@ func (d *demo) Start(c *gin.Context) {
     // 查询电柜信息
     cab, _ := ent.Database.Cabinet.Query().Where(cabinet.Serial(req.SN)).First(context.Background())
     if cab == nil {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetNotFound.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorCabinetNotFound.Error()})
         return
     }
     if cab.Status == cabinet.StatusInitializing {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetInitializing.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorCabinetInitializing.Error()})
         return
     }
     if cab.Status == cabinet.StatusAbnormal {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetAbnormal.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorCabinetAbnormal.Error()})
         return
     }
     if !cab.Online {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetOffline.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorCabinetOffline.Error()})
         return
     }
 
     // 是否有正在执行的任务
     if d.isBusy(req.SN) {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetBusy.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorCabinetBusy.Error()})
         return
     }
 
@@ -170,13 +170,13 @@ func (d *demo) Start(c *gin.Context) {
 
     // 如果无满电
     if fully == nil {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetNoFully.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorCabinetNoFully.Error()})
         return
     }
 
     // 如果无空仓
     if empty == nil {
-        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetNoEmpty.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ErrorCabinetNoEmpty.Error()})
         return
     }
 
@@ -236,7 +236,7 @@ func (*demo) Status(c *gin.Context) {
     res.Step = req.Step
     t, ok := tasks.Load(req.SN)
     if !ok {
-        err = adapter.ExchangeTaskNotExist
+        err = adapter.ErrorExchangeTaskNotExist
         return
     }
     s := t.(*task).steps[req.Step]
@@ -352,7 +352,7 @@ func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err e
 
         // 超时
         if time.Now().Sub(startAt).Seconds() > maxtime {
-            err = adapter.ExchangeTimeOut
+            err = adapter.ErrorExchangeTimeOut
             return
         }
 
@@ -381,7 +381,7 @@ func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err e
                 // 未检测到电池, 继续轮询
                 // 超时
                 if time.Now().Sub(statusTime).Seconds() > batteryCheckMaxtime {
-                    err = adapter.ExchangeBatteryLost
+                    err = adapter.ErrorExchangeBatteryLost
                     // 返回错误
                     return
                 }
@@ -390,7 +390,7 @@ func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err e
                 // 检查电池是否取出
                 // TODO: 是否取走, 重复弹开
                 if !item.IsStrictHasBattery(fakevoltage) {
-                    return adapter.ExchangeBatteryExist
+                    return adapter.ErrorExchangeBatteryExist
                 }
             }
             return

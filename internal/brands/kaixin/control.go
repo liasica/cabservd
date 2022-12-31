@@ -40,7 +40,7 @@ var (
 func (h *Hander) SendControl(serial string, typ adapter.Operator, ordinal int) (err error) {
     v, ok := controlValueMap[typ]
     if !ok {
-        return adapter.CabinetControlParamError
+        return adapter.ErrorCabinetControlParam
     }
 
     msg := &Request{

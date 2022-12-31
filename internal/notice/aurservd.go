@@ -35,23 +35,20 @@ func (c *aurservdHook) CabinetFullUpdate() {
     }
 }
 
-func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (data *adapter.Data[adapter.CabinetSyncData]) {
+func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *adapter.CabinetMessage) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
         return
     }
 
-    data = &adapter.Data[adapter.CabinetSyncData]{
-        Type: adapter.DataTypeCabinetSync,
-        Value: &adapter.CabinetSyncData{
-            Serial: serial,
-            Full:   full,
-        },
+    message = &adapter.CabinetMessage{
+        Serial: serial,
+        Full:   full,
     }
 
     if cab != nil {
-        data.Value.Cabinet = &adapter.Cabinet{
+        message.Cabinet = &adapter.Cabinet{
             ID:          cab.ID,
             Online:      cab.Online,
             Brand:       cab.Brand,
@@ -69,7 +66,7 @@ func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabine
     }
 
     for _, b := range bins {
-        data.Value.Bins = append(data.Value.Bins, &adapter.Bin{
+        message.Bins = append(message.Bins, &adapter.Bin{
             ID:            b.ID,
             Brand:         b.Brand,
             Serial:        b.Serial,
@@ -95,7 +92,7 @@ func (c *aurservdHook) SendCabinet(full bool, serial string, cab *ent.Cabinet, b
     Aurservd.Sender <- Aurservd.CabinetWrapData(full, serial, cab, bins)
 }
 
-func (c *aurservdHook) SendData(data any) {
+func (c *aurservdHook) SendData(data adapter.Messenger) {
     Aurservd.Sender <- data
 }
 
