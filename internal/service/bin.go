@@ -46,7 +46,7 @@ func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, e
 }
 
 func (s *binService) OpenDoor(serial string, ordinal int) (err error) {
-    err = core.Hub.Bean.SendControl(serial, adapter.OperatorBinOpen, ordinal)
+    err = core.Hub.Bean.SendControl(serial, adapter.OperateBinOpen, ordinal)
     message := "成功"
     if err != nil {
         message = fmt.Sprintf("失败, %v", err)
@@ -58,8 +58,6 @@ func (s *binService) OpenDoor(serial string, ordinal int) (err error) {
 
 // Operate 控制仓位
 func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
-    // TODO 操作的时候验证当前状态, 操作值 = 当前状态时返回报错信息
-
     // 记录日志
     var (
         ec *ent.Console
@@ -77,6 +75,24 @@ func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
         NewConsole(s.User).Update(ec, err)
         notice.Postgres.DeleteListener(ch)
     }()
+
+    // TODO 操作的时候验证当前状态, 操作值 = 当前状态时返回报错信息
+    switch req.Type {
+    case adapter.OperateUnknown:
+        return adapter.ErrorOperate
+    case adapter.OperateBinOpen:
+        if b.Open {
+            return adapter.ErrorBinOpened
+        }
+    case adapter.OperateBinDisable:
+        if !b.Enable {
+            return adapter.ErrorBinDisabled
+        }
+    case adapter.OperateBinEnable:
+        if b.Enable {
+            return adapter.ErrorBinEnabled
+        }
+    }
 
     // 查找电柜
     var cab *ent.Cabinet
@@ -110,15 +126,15 @@ func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
         case x := <-ch:
             nb := x.(*ent.Bin)
             switch req.Type {
-            case adapter.OperatorBinOpen:
+            case adapter.OperateBinOpen:
                 if nb.Open {
                     return
                 }
-            case adapter.OperatorBinEnable:
+            case adapter.OperateBinEnable:
                 if nb.Enable {
                     return
                 }
-            case adapter.OperatorBinDisable:
+            case adapter.OperateBinDisable:
                 if !nb.Enable {
                     return
                 }
@@ -191,4 +207,8 @@ func (s *binService) DetectBattery(b *ent.Bin, d adapter.DetectBattery) (ok adap
 
     log.Infof("[BIN] [%s - %d, %s] 电池%s检测: %s, %s", b.Serial, b.Ordinal, s.User, d, ok, message)
     return
+}
+
+func (s *binService) Business(req *adapter.BusinessOperate) *adapter.BusinessOperateResponse {
+    return nil
 }

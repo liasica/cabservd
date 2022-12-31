@@ -6,7 +6,6 @@
 package service
 
 import (
-    "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/pn"
     "github.com/auroraride/cabservd/internal/app"
@@ -216,7 +215,7 @@ func (s *exchangeService) step(req *adapter.ExchangeRequest, sc *ent.Scan, conf 
     )
 
     // 创建换电步骤
-    ec, eb, err = cs.StartExchangeStep(sc, conf.Step, open)
+    ec, eb, err = cs.StartExchangeStep(sc, conf)
     if err != nil {
         return
     }
@@ -272,9 +271,6 @@ func (s *exchangeService) step(req *adapter.ExchangeRequest, sc *ent.Scan, conf 
             }
 
             // 检查放入电池是否匹配
-            if b.BatterySn != "" {
-                fmt.Printf("->>>>>>>>>>>>电池编号: %v, batteryOk: %v, conf: %v, riderBattery: %v", b.BatterySn, batteryOk, conf.Battery, req.Battery)
-            }
             if batteryOk && conf.Battery == adapter.DetectBatteryPutin && b.BatterySn != req.Battery {
                 err = adapter.ErrorBatteryPutin
                 return

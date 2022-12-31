@@ -35,6 +35,8 @@ func newService(params ...any) *BaseService {
             s.User = v
         case Permission:
             nq = v
+        case context.Context:
+            s.ctx = v
         }
     }
     if s.User == nil && nq {

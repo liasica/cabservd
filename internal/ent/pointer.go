@@ -51,7 +51,7 @@ type ConsolePointers []*ConsolePointer
 type ConsolePointer struct {
 	CabinetID *uint64               `json:"cabinet_id,omitempty"`
 	BinID     *uint64               `json:"bin_id,omitempty"`
-	Operate   *adapter.Operator     `json:"operate,omitempty"`
+	Operate   *adapter.Operate      `json:"operate,omitempty"`
 	Serial    *string               `json:"serial,omitempty"`
 	UUID      *uuid.UUID            `json:"uuid,omitempty"`
 	Type      *console.Type         `json:"type,omitempty"`

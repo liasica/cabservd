@@ -30,14 +30,14 @@ const (
 )
 
 var (
-    controlValueMap = map[adapter.Operator]ControlValue{
-        adapter.OperatorBinOpen:    ControlOpenDoor,
-        adapter.OperatorBinDisable: ControlBinDisable,
-        adapter.OperatorBinEnable:  ControlBinEnable,
+    controlValueMap = map[adapter.Operate]ControlValue{
+        adapter.OperateBinOpen:    ControlOpenDoor,
+        adapter.OperateBinDisable: ControlBinDisable,
+        adapter.OperateBinEnable:  ControlBinEnable,
     }
 )
 
-func (h *Hander) SendControl(serial string, typ adapter.Operator, ordinal int) (err error) {
+func (h *Hander) SendControl(serial string, typ adapter.Operate, ordinal int) (err error) {
     v, ok := controlValueMap[typ]
     if !ok {
         return adapter.ErrorCabinetControlParam

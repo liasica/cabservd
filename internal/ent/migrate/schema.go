@@ -141,7 +141,7 @@ var (
 	// ConsoleColumns holds the columns for the "console" table.
 	ConsoleColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
-		{Name: "operate", Type: field.TypeOther, Nullable: true, Comment: "操作", SchemaType: map[string]string{"postgres": "varchar"}},
+		{Name: "operate", Type: field.TypeOther, Comment: "操作", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜设备序列号"},
 		{Name: "uuid", Type: field.TypeUUID, Comment: "标识符"},
 		{Name: "type", Type: field.TypeEnum, Comment: "日志类别 exchange:换电控制 operate:手动操作 cabinet:电柜日志", Enums: []string{"exchange", "operate", "cabinet"}},

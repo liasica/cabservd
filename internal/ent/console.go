@@ -26,7 +26,7 @@ type Console struct {
 	// BinID holds the value of the "bin_id" field.
 	BinID uint64 `json:"bin_id,omitempty"`
 	// 操作
-	Operate *adapter.Operator `json:"operate,omitempty"`
+	Operate adapter.Operate `json:"operate,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 标识符
@@ -102,10 +102,10 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case console.FieldStep:
 			values[i] = &sql.NullScanner{S: new(adapter.ExchangeStep)}
-		case console.FieldOperate:
-			values[i] = &sql.NullScanner{S: new(adapter.Operator)}
 		case console.FieldBeforeBin, console.FieldAfterBin:
 			values[i] = new([]byte)
+		case console.FieldOperate:
+			values[i] = new(adapter.Operate)
 		case console.FieldUserType:
 			values[i] = new(adapter.UserType)
 		case console.FieldDuration:
@@ -152,11 +152,10 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				c.BinID = uint64(value.Int64)
 			}
 		case console.FieldOperate:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+			if value, ok := values[i].(*adapter.Operate); !ok {
 				return fmt.Errorf("unexpected type %T for field operate", values[i])
-			} else if value.Valid {
-				c.Operate = new(adapter.Operator)
-				*c.Operate = *value.S.(*adapter.Operator)
+			} else if value != nil {
+				c.Operate = *value
 			}
 		case console.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -289,10 +288,8 @@ func (c *Console) String() string {
 	builder.WriteString("bin_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.BinID))
 	builder.WriteString(", ")
-	if v := c.Operate; v != nil {
-		builder.WriteString("operate=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("operate=")
+	builder.WriteString(fmt.Sprintf("%v", c.Operate))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(c.Serial)

@@ -3027,7 +3027,7 @@ type ConsoleMutation struct {
 	op             Op
 	typ            string
 	id             *uint64
-	operate        *adapter.Operator
+	operate        *adapter.Operate
 	serial         *string
 	uuid           *uuid.UUID
 	_type          *console.Type
@@ -3223,12 +3223,12 @@ func (m *ConsoleMutation) ResetBinID() {
 }
 
 // SetOperate sets the "operate" field.
-func (m *ConsoleMutation) SetOperate(a adapter.Operator) {
+func (m *ConsoleMutation) SetOperate(a adapter.Operate) {
 	m.operate = &a
 }
 
 // Operate returns the value of the "operate" field in the mutation.
-func (m *ConsoleMutation) Operate() (r adapter.Operator, exists bool) {
+func (m *ConsoleMutation) Operate() (r adapter.Operate, exists bool) {
 	v := m.operate
 	if v == nil {
 		return
@@ -3239,7 +3239,7 @@ func (m *ConsoleMutation) Operate() (r adapter.Operator, exists bool) {
 // OldOperate returns the old "operate" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldOperate(ctx context.Context) (v *adapter.Operator, err error) {
+func (m *ConsoleMutation) OldOperate(ctx context.Context) (v adapter.Operate, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOperate is only allowed on UpdateOne operations")
 	}
@@ -3253,22 +3253,9 @@ func (m *ConsoleMutation) OldOperate(ctx context.Context) (v *adapter.Operator, 
 	return oldValue.Operate, nil
 }
 
-// ClearOperate clears the value of the "operate" field.
-func (m *ConsoleMutation) ClearOperate() {
-	m.operate = nil
-	m.clearedFields[console.FieldOperate] = struct{}{}
-}
-
-// OperateCleared returns if the "operate" field was cleared in this mutation.
-func (m *ConsoleMutation) OperateCleared() bool {
-	_, ok := m.clearedFields[console.FieldOperate]
-	return ok
-}
-
 // ResetOperate resets all changes to the "operate" field.
 func (m *ConsoleMutation) ResetOperate() {
 	m.operate = nil
-	delete(m.clearedFields, console.FieldOperate)
 }
 
 // SetSerial sets the "serial" field.
@@ -4091,7 +4078,7 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		m.SetBinID(v)
 		return nil
 	case console.FieldOperate:
-		v, ok := value.(adapter.Operator)
+		v, ok := value.(adapter.Operate)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4233,9 +4220,6 @@ func (m *ConsoleMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ConsoleMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(console.FieldOperate) {
-		fields = append(fields, console.FieldOperate)
-	}
 	if m.FieldCleared(console.FieldStep) {
 		fields = append(fields, console.FieldStep)
 	}
@@ -4271,9 +4255,6 @@ func (m *ConsoleMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ConsoleMutation) ClearField(name string) error {
 	switch name {
-	case console.FieldOperate:
-		m.ClearOperate()
-		return nil
 	case console.FieldStep:
 		m.ClearStep()
 		return nil

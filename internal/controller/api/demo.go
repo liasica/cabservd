@@ -44,9 +44,9 @@ var Demo = new(demo)
 
 func (*demo) Control(c *gin.Context) {
     var req struct {
-        Serial  string           `form:"serial" json:"serial"`
-        Type    adapter.Operator `json:"type" form:"type"`
-        Ordinal int              `json:"ordinal" form:"ordinal"`
+        Serial  string          `form:"serial" json:"serial"`
+        Type    adapter.Operate `json:"type" form:"type"`
+        Ordinal int             `json:"ordinal" form:"ordinal"`
     }
     err := c.Bind(&req)
     if err == nil {
@@ -314,7 +314,7 @@ func (t *task) run() {
 }
 
 func (t *task) doorOpen(target *ent.Bin) (err error) {
-    err = core.Hub.Bean.SendControl(t.serial, adapter.OperatorBinOpen, target.Ordinal)
+    err = core.Hub.Bean.SendControl(t.serial, adapter.OperateBinOpen, target.Ordinal)
     if err != nil {
         return
     }

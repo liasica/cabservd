@@ -11,7 +11,6 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/google/uuid"
-    "github.com/liasica/go-helpers/silk"
     "time"
 )
 
@@ -29,13 +28,13 @@ func NewConsole(params ...any) *consoleService {
 }
 
 // StartExchangeStep 开始换电步骤
-func (s *consoleService) StartExchangeStep(sc *ent.Scan, step adapter.ExchangeStep, open bool) (ec *ent.Console, b *ent.Bin, err error) {
+func (s *consoleService) StartExchangeStep(sc *ent.Scan, conf adapter.ExchangeStepConfigure) (ec *ent.Console, b *ent.Bin, err error) {
     var (
         bid uint64
-        op  *adapter.Operator
+        op  adapter.Operate
     )
 
-    switch step {
+    switch conf.Step {
     case adapter.ExchangeStepFirst, adapter.ExchangeStepSecond:
         bid = sc.Data.Empty.ID
     case adapter.ExchangeStepThird, adapter.ExchangeStepFourth:
@@ -48,12 +47,16 @@ func (s *consoleService) StartExchangeStep(sc *ent.Scan, step adapter.ExchangeSt
         return
     }
 
-    if open {
-        op = silk.Pointer(adapter.OperatorBinOpen)
+    if conf.Door == adapter.DetectDoorOpen {
+        op = adapter.OperateBinOpen
+    }
+
+    if conf.Battery != adapter.DetectBatteryIgnore {
+        op = adapter.OperateBinDetect
     }
 
     ec, err = s.orm.Create().
-        SetNillableOperate(op).
+        SetOperate(op).
         SetCabinetID(sc.CabinetID).
         SetSerial(sc.Serial).
         SetBinID(b.ID).
@@ -61,7 +64,7 @@ func (s *consoleService) StartExchangeStep(sc *ent.Scan, step adapter.ExchangeSt
         SetType(console.TypeExchange).
         SetUserID(sc.UserID).
         SetUserType(sc.UserType).
-        SetStep(step).
+        SetStep(conf.Step).
         SetStatus(console.StatusRunning).
         SetBeforeBin(b.Info()).
         SetStartAt(time.Now()).

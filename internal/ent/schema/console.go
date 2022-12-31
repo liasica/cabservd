@@ -61,7 +61,7 @@ func (Console) Annotations() []schema.Annotation {
 // Fields of the Console.
 func (Console) Fields() []ent.Field {
     return []ent.Field{
-        field.Other("operate", adapter.OperatorUnknown).Optional().Nillable().SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("操作"),
+        field.Other("operate", adapter.OperateUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("操作"),
 
         field.String("serial").Comment("电柜设备序列号"),
         field.UUID("uuid", uuid.UUID{}).Immutable().Comment("标识符"),

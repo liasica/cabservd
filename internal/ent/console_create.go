@@ -39,16 +39,8 @@ func (cc *ConsoleCreate) SetBinID(u uint64) *ConsoleCreate {
 }
 
 // SetOperate sets the "operate" field.
-func (cc *ConsoleCreate) SetOperate(a adapter.Operator) *ConsoleCreate {
+func (cc *ConsoleCreate) SetOperate(a adapter.Operate) *ConsoleCreate {
 	cc.mutation.SetOperate(a)
-	return cc
-}
-
-// SetNillableOperate sets the "operate" field if the given value is not nil.
-func (cc *ConsoleCreate) SetNillableOperate(a *adapter.Operator) *ConsoleCreate {
-	if a != nil {
-		cc.SetOperate(*a)
-	}
 	return cc
 }
 
@@ -220,6 +212,9 @@ func (cc *ConsoleCreate) check() error {
 	if _, ok := cc.mutation.BinID(); !ok {
 		return &ValidationError{Name: "bin_id", err: errors.New(`ent: missing required field "Console.bin_id"`)}
 	}
+	if _, ok := cc.mutation.Operate(); !ok {
+		return &ValidationError{Name: "operate", err: errors.New(`ent: missing required field "Console.operate"`)}
+	}
 	if _, ok := cc.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Console.serial"`)}
 	}
@@ -289,7 +284,7 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	_spec.OnConflict = cc.conflict
 	if value, ok := cc.mutation.Operate(); ok {
 		_spec.SetField(console.FieldOperate, field.TypeOther, value)
-		_node.Operate = &value
+		_node.Operate = value
 	}
 	if value, ok := cc.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
@@ -460,7 +455,7 @@ func (u *ConsoleUpsert) UpdateBinID() *ConsoleUpsert {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsert) SetOperate(v adapter.Operator) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetOperate(v adapter.Operate) *ConsoleUpsert {
 	u.Set(console.FieldOperate, v)
 	return u
 }
@@ -468,12 +463,6 @@ func (u *ConsoleUpsert) SetOperate(v adapter.Operator) *ConsoleUpsert {
 // UpdateOperate sets the "operate" field to the value that was provided on create.
 func (u *ConsoleUpsert) UpdateOperate() *ConsoleUpsert {
 	u.SetExcluded(console.FieldOperate)
-	return u
-}
-
-// ClearOperate clears the value of the "operate" field.
-func (u *ConsoleUpsert) ClearOperate() *ConsoleUpsert {
-	u.SetNull(console.FieldOperate)
 	return u
 }
 
@@ -743,7 +732,7 @@ func (u *ConsoleUpsertOne) UpdateBinID() *ConsoleUpsertOne {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsertOne) SetOperate(v adapter.Operator) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetOperate(v adapter.Operate) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetOperate(v)
 	})
@@ -753,13 +742,6 @@ func (u *ConsoleUpsertOne) SetOperate(v adapter.Operator) *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) UpdateOperate() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateOperate()
-	})
-}
-
-// ClearOperate clears the value of the "operate" field.
-func (u *ConsoleUpsertOne) ClearOperate() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearOperate()
 	})
 }
 
@@ -1230,7 +1212,7 @@ func (u *ConsoleUpsertBulk) UpdateBinID() *ConsoleUpsertBulk {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsertBulk) SetOperate(v adapter.Operator) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetOperate(v adapter.Operate) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetOperate(v)
 	})
@@ -1240,13 +1222,6 @@ func (u *ConsoleUpsertBulk) SetOperate(v adapter.Operator) *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) UpdateOperate() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateOperate()
-	})
-}
-
-// ClearOperate clears the value of the "operate" field.
-func (u *ConsoleUpsertBulk) ClearOperate() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearOperate()
 	})
 }
 

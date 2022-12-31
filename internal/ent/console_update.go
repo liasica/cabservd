@@ -45,22 +45,8 @@ func (cu *ConsoleUpdate) SetBinID(u uint64) *ConsoleUpdate {
 }
 
 // SetOperate sets the "operate" field.
-func (cu *ConsoleUpdate) SetOperate(a adapter.Operator) *ConsoleUpdate {
+func (cu *ConsoleUpdate) SetOperate(a adapter.Operate) *ConsoleUpdate {
 	cu.mutation.SetOperate(a)
-	return cu
-}
-
-// SetNillableOperate sets the "operate" field if the given value is not nil.
-func (cu *ConsoleUpdate) SetNillableOperate(a *adapter.Operator) *ConsoleUpdate {
-	if a != nil {
-		cu.SetOperate(*a)
-	}
-	return cu
-}
-
-// ClearOperate clears the value of the "operate" field.
-func (cu *ConsoleUpdate) ClearOperate() *ConsoleUpdate {
-	cu.mutation.ClearOperate()
 	return cu
 }
 
@@ -330,9 +316,6 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Operate(); ok {
 		_spec.SetField(console.FieldOperate, field.TypeOther, value)
 	}
-	if cu.mutation.OperateCleared() {
-		_spec.ClearField(console.FieldOperate, field.TypeOther)
-	}
 	if value, ok := cu.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
 	}
@@ -498,22 +481,8 @@ func (cuo *ConsoleUpdateOne) SetBinID(u uint64) *ConsoleUpdateOne {
 }
 
 // SetOperate sets the "operate" field.
-func (cuo *ConsoleUpdateOne) SetOperate(a adapter.Operator) *ConsoleUpdateOne {
+func (cuo *ConsoleUpdateOne) SetOperate(a adapter.Operate) *ConsoleUpdateOne {
 	cuo.mutation.SetOperate(a)
-	return cuo
-}
-
-// SetNillableOperate sets the "operate" field if the given value is not nil.
-func (cuo *ConsoleUpdateOne) SetNillableOperate(a *adapter.Operator) *ConsoleUpdateOne {
-	if a != nil {
-		cuo.SetOperate(*a)
-	}
-	return cuo
-}
-
-// ClearOperate clears the value of the "operate" field.
-func (cuo *ConsoleUpdateOne) ClearOperate() *ConsoleUpdateOne {
-	cuo.mutation.ClearOperate()
 	return cuo
 }
 
@@ -806,9 +775,6 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	}
 	if value, ok := cuo.mutation.Operate(); ok {
 		_spec.SetField(console.FieldOperate, field.TypeOther, value)
-	}
-	if cuo.mutation.OperateCleared() {
-		_spec.ClearField(console.FieldOperate, field.TypeOther)
 	}
 	if value, ok := cuo.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
