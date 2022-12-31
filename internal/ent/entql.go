@@ -33,7 +33,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldUpdatedAt:     {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
 			bin.FieldUUID:          {Type: field.TypeString, Column: bin.FieldUUID},
 			bin.FieldCabinetID:     {Type: field.TypeUint64, Column: bin.FieldCabinetID},
-			bin.FieldBrand:         {Type: field.TypeString, Column: bin.FieldBrand},
+			bin.FieldBrand:         {Type: field.TypeOther, Column: bin.FieldBrand},
 			bin.FieldSerial:        {Type: field.TypeString, Column: bin.FieldSerial},
 			bin.FieldName:          {Type: field.TypeString, Column: bin.FieldName},
 			bin.FieldOrdinal:       {Type: field.TypeInt, Column: bin.FieldOrdinal},
@@ -63,7 +63,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			cabinet.FieldCreatedAt:   {Type: field.TypeTime, Column: cabinet.FieldCreatedAt},
 			cabinet.FieldUpdatedAt:   {Type: field.TypeTime, Column: cabinet.FieldUpdatedAt},
 			cabinet.FieldOnline:      {Type: field.TypeBool, Column: cabinet.FieldOnline},
-			cabinet.FieldBrand:       {Type: field.TypeString, Column: cabinet.FieldBrand},
+			cabinet.FieldBrand:       {Type: field.TypeOther, Column: cabinet.FieldBrand},
 			cabinet.FieldSerial:      {Type: field.TypeString, Column: cabinet.FieldSerial},
 			cabinet.FieldStatus:      {Type: field.TypeEnum, Column: cabinet.FieldStatus},
 			cabinet.FieldEnable:      {Type: field.TypeBool, Column: cabinet.FieldEnable},
@@ -255,8 +255,8 @@ func (f *BinFilter) WhereCabinetID(p entql.Uint64P) {
 	f.Where(p.Field(bin.FieldCabinetID))
 }
 
-// WhereBrand applies the entql string predicate on the brand field.
-func (f *BinFilter) WhereBrand(p entql.StringP) {
+// WhereBrand applies the entql other predicate on the brand field.
+func (f *BinFilter) WhereBrand(p entql.OtherP) {
 	f.Where(p.Field(bin.FieldBrand))
 }
 
@@ -394,8 +394,8 @@ func (f *CabinetFilter) WhereOnline(p entql.BoolP) {
 	f.Where(p.Field(cabinet.FieldOnline))
 }
 
-// WhereBrand applies the entql string predicate on the brand field.
-func (f *CabinetFilter) WhereBrand(p entql.StringP) {
+// WhereBrand applies the entql other predicate on the brand field.
+func (f *CabinetFilter) WhereBrand(p entql.OtherP) {
 	f.Where(p.Field(cabinet.FieldBrand))
 }
 

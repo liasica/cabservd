@@ -7,8 +7,7 @@ package kaixin
 
 import (
     "fmt"
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/core"
     "time"
 )
@@ -31,17 +30,17 @@ const (
 )
 
 var (
-    controlValueMap = map[model.Operator]ControlValue{
-        model.OperatorBinOpen:    ControlOpenDoor,
-        model.OperatorBinDisable: ControlBinDisable,
-        model.OperatorBinEnable:  ControlBinEnable,
+    controlValueMap = map[adapter.Operator]ControlValue{
+        adapter.OperatorBinOpen:    ControlOpenDoor,
+        adapter.OperatorBinDisable: ControlBinDisable,
+        adapter.OperatorBinEnable:  ControlBinEnable,
     }
 )
 
-func (h *Hander) SendControl(serial string, typ model.Operator, ordinal int) (err error) {
+func (h *Hander) SendControl(serial string, typ adapter.Operator, ordinal int) (err error) {
     v, ok := controlValueMap[typ]
     if !ok {
-        return errs.CabinetControlParamError
+        return adapter.CabinetControlParamError
     }
 
     msg := &Request{

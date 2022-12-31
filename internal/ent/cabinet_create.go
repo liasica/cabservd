@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -66,8 +67,8 @@ func (cc *CabinetCreate) SetNillableOnline(b *bool) *CabinetCreate {
 }
 
 // SetBrand sets the "brand" field.
-func (cc *CabinetCreate) SetBrand(s string) *CabinetCreate {
-	cc.mutation.SetBrand(s)
+func (cc *CabinetCreate) SetBrand(a adapter.Brand) *CabinetCreate {
+	cc.mutation.SetBrand(a)
 	return cc
 }
 
@@ -349,7 +350,7 @@ func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 		_node.Online = value
 	}
 	if value, ok := cc.mutation.Brand(); ok {
-		_spec.SetField(cabinet.FieldBrand, field.TypeString, value)
+		_spec.SetField(cabinet.FieldBrand, field.TypeOther, value)
 		_node.Brand = value
 	}
 	if value, ok := cc.mutation.Serial(); ok {
@@ -488,7 +489,7 @@ func (u *CabinetUpsert) UpdateOnline() *CabinetUpsert {
 }
 
 // SetBrand sets the "brand" field.
-func (u *CabinetUpsert) SetBrand(v string) *CabinetUpsert {
+func (u *CabinetUpsert) SetBrand(v adapter.Brand) *CabinetUpsert {
 	u.Set(cabinet.FieldBrand, v)
 	return u
 }
@@ -777,7 +778,7 @@ func (u *CabinetUpsertOne) UpdateOnline() *CabinetUpsertOne {
 }
 
 // SetBrand sets the "brand" field.
-func (u *CabinetUpsertOne) SetBrand(v string) *CabinetUpsertOne {
+func (u *CabinetUpsertOne) SetBrand(v adapter.Brand) *CabinetUpsertOne {
 	return u.Update(func(s *CabinetUpsert) {
 		s.SetBrand(v)
 	})
@@ -1272,7 +1273,7 @@ func (u *CabinetUpsertBulk) UpdateOnline() *CabinetUpsertBulk {
 }
 
 // SetBrand sets the "brand" field.
-func (u *CabinetUpsertBulk) SetBrand(v string) *CabinetUpsertBulk {
+func (u *CabinetUpsertBulk) SetBrand(v adapter.Brand) *CabinetUpsertBulk {
 	return u.Update(func(s *CabinetUpsert) {
 		s.SetBrand(v)
 	})

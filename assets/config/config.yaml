@@ -11,6 +11,7 @@ adapter:
 
 postgres:
   dsn: host=localhost user=postgres password= dbname=cabinet port=5432 sslmode=disable TimeZone=Asia/Shanghai
+  debug: false
 
 redis:
   username: ''

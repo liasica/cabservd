@@ -7,8 +7,7 @@ package service
 
 import (
     "context"
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "net/http"
 )
@@ -21,7 +20,7 @@ const (
 )
 
 type BaseService struct {
-    User *model.User
+    User *adapter.User
     ctx  context.Context
 }
 
@@ -32,14 +31,14 @@ func newService(params ...any) *BaseService {
     }
     for _, param := range params {
         switch v := param.(type) {
-        case *model.User:
+        case *adapter.User:
             s.User = v
         case Permission:
             nq = v
         }
     }
     if s.User == nil && nq {
-        app.Panic(http.StatusUnauthorized, errs.UserRequired)
+        app.Panic(http.StatusUnauthorized, adapter.UserRequired)
     }
     return s
 }

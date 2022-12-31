@@ -6,7 +6,7 @@
 package router
 
 import (
-    errs "github.com/auroraride/adapter/errors"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
@@ -25,7 +25,7 @@ func Start() {
     }
 
     echo.NotFoundHandler = func(c echo.Context) error {
-        return app.Context(c).SendResponse(http.StatusNotFound, errs.NotFound)
+        return app.Context(c).SendResponse(http.StatusNotFound, adapter.NotFound)
     }
 
     r.Validator = app.NewValidator()

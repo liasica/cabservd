@@ -7,8 +7,8 @@ package notice
 
 import (
     "context"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/codec"
-    "github.com/auroraride/adapter/model"
     "github.com/auroraride/adapter/tcp"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -31,32 +31,32 @@ func (c *aurservdHook) CabinetFullUpdate() {
         query.Order(ent.Asc(bin.FieldOrdinal))
     }).All(context.Background())
     for _, cab := range cabs {
-        SendCabinet(true, cab.Serial, cab, cab.Edges.Bins)
+        Aurservd.SendCabinet(true, cab.Serial, cab, cab.Edges.Bins)
     }
 }
 
-func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (data *model.Data[*model.CabinetSyncData]) {
+func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (data *adapter.Data[adapter.CabinetSyncData]) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
         return
     }
 
-    data = &model.Data[*model.CabinetSyncData]{
-        Type: model.DataTypeCabinetSync,
-        Value: &model.CabinetSyncData{
+    data = &adapter.Data[adapter.CabinetSyncData]{
+        Type: adapter.DataTypeCabinetSync,
+        Value: &adapter.CabinetSyncData{
             Serial: serial,
             Full:   full,
         },
     }
 
     if cab != nil {
-        data.Value.Cabinet = &model.Cabinet{
+        data.Value.Cabinet = &adapter.Cabinet{
             ID:          cab.ID,
             Online:      cab.Online,
             Brand:       cab.Brand,
             Serial:      cab.Serial,
-            Status:      model.CabinetStatus(cab.Status),
+            Status:      adapter.CabinetStatus(cab.Status),
             Enable:      cab.Enable,
             Lng:         cab.Lng,
             Lat:         cab.Lat,
@@ -69,7 +69,7 @@ func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabine
     }
 
     for _, b := range bins {
-        data.Value.Bins = append(data.Value.Bins, &model.Bin{
+        data.Value.Bins = append(data.Value.Bins, &adapter.Bin{
             ID:            b.ID,
             Brand:         b.Brand,
             Serial:        b.Serial,
@@ -91,8 +91,12 @@ func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabine
     return
 }
 
-func SendCabinet(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) {
+func (c *aurservdHook) SendCabinet(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) {
     Aurservd.Sender <- Aurservd.CabinetWrapData(full, serial, cab, bins)
+}
+
+func (c *aurservdHook) SendData(data any) {
+    Aurservd.Sender <- data
 }
 
 func (*aurservdHook) Start() {

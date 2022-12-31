@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
@@ -31,11 +31,11 @@ type Scan struct {
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
 	// 用户类别
-	UserType model.UserType `json:"user_type,omitempty"`
+	UserType adapter.UserType `json:"user_type,omitempty"`
 	// 电柜编号
 	Serial string `json:"serial,omitempty"`
 	// 换电信息
-	Data *model.ExchangeUsableResponse `json:"data,omitempty"`
+	Data *adapter.ExchangeUsableResponse `json:"data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScanQuery when eager-loading is set.
 	Edges ScanEdges `json:"edges"`
@@ -71,7 +71,7 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 		case scan.FieldData:
 			values[i] = new([]byte)
 		case scan.FieldUserType:
-			values[i] = new(model.UserType)
+			values[i] = new(adapter.UserType)
 		case scan.FieldEfficient:
 			values[i] = new(sql.NullBool)
 		case scan.FieldCabinetID:
@@ -134,7 +134,7 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 				s.UserID = value.String
 			}
 		case scan.FieldUserType:
-			if value, ok := values[i].(*model.UserType); !ok {
+			if value, ok := values[i].(*adapter.UserType); !ok {
 				return fmt.Errorf("unexpected type %T for field user_type", values[i])
 			} else if value != nil {
 				s.UserType = *value

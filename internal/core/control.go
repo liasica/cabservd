@@ -6,27 +6,25 @@
 package core
 
 import (
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/g"
-    "github.com/auroraride/cabservd/internal/types"
 )
 
-func (h *hub) Control(req *model.OperateRequest) (err error) {
+func (h *hub) Control(req *adapter.OperateRequest) (err error) {
     if req.Serial == "" {
-        return errs.CabinetSerialRequired
+        return adapter.CabinetSerialRequired
     }
 
     if req.Type == "" {
-        return errs.CabinetControlParamError
+        return adapter.CabinetControlParamError
     }
 
     if req.Ordinal == nil {
-        return errs.CabinetBinOrdinalRequired
+        return adapter.CabinetBinOrdinalRequired
     }
 
     switch g.Config.Brand {
-    case types.BrandKaixin:
+    case adapter.BrandKaixin:
         err = h.Bean.SendControl(req.Serial, req.Type, *req.Ordinal)
     }
 

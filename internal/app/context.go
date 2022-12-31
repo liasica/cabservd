@@ -6,14 +6,14 @@
 package app
 
 import (
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/labstack/echo/v4"
     "net/http"
 )
 
 type BaseContext struct {
     echo.Context
-    User *model.User
+    User *adapter.User
 }
 
 func NewBaseContext(c echo.Context) *BaseContext {

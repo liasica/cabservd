@@ -7,6 +7,7 @@ package main
 
 import (
     "context"
+    "github.com/auroraride/adapter/codec"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
@@ -40,7 +41,7 @@ func main() {
         g.Config.Tcp.Bind,
         g.Config.Brand,
         kaixin.New(),
-        new(core.HeaderLength),
+        &codec.HeaderLength{},
     )
 
     select {}

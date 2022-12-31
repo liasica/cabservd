@@ -6,9 +6,9 @@
 package kaixin
 
 import (
-    errs "github.com/auroraride/adapter/errors"
+    "context"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/auroraride/cabservd/internal/types"
     "github.com/goccy/go-json"
 )
 
@@ -58,7 +58,7 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
 // LoginHandle 登录请求
 func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     if req.DevID == "" {
-        return errs.CabinetSerialRequired
+        return adapter.CabinetSerialRequired
     }
 
     // // 清除仓位电池信息
@@ -70,6 +70,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 
     // 保存设备识别码
     client.SetSerial(req.DevID)
+    core.LoadOrStoreCabinet(context.Background(), adapter.BrandKaixin, req.DevID)
 
     // TODO: 保存其他信息
     return
@@ -78,9 +79,9 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 // ReportHandle 状态上报请求
 func (h *Hander) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
-        return errs.CabinetSerialRequired
+        return adapter.CabinetSerialRequired
     }
-    core.UpdateCabinet(types.BrandKaixin, req.DevID, req)
+    core.UpdateCabinet(adapter.BrandKaixin, req.DevID, req)
     return
 }
 

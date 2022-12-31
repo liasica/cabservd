@@ -6,7 +6,7 @@
 package core
 
 import (
-    errs "github.com/auroraride/adapter/errors"
+    "github.com/auroraride/adapter"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
     "sync"
@@ -23,7 +23,7 @@ type hub struct {
     addr string
 
     // 电柜品牌
-    brand string
+    brand adapter.Brand
 
     // 电柜协议
     Bean Hook
@@ -89,7 +89,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     for {
         b, err = h.codec.Decode(c)
 
-        if err == errs.IncompletePacket {
+        if err == adapter.IncompletePacket {
             break
         }
 

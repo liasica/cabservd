@@ -7,7 +7,7 @@ package app
 
 import (
     "bytes"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/goccy/go-json"
     "net/http"
 )
@@ -17,8 +17,8 @@ import (
 // error: message
 // string: message
 // 其他: data
-func CreateResponse(params ...any) *model.Response {
-    r := &model.Response{
+func CreateResponse(params ...any) *adapter.Response {
+    r := &adapter.Response{
         Code: http.StatusOK,
     }
     for _, param := range params {

@@ -10,7 +10,7 @@ import (
     "entgo.io/ent/schema/field"
     "entgo.io/ent/schema/index"
     "entgo.io/ent/schema/mixin"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/google/uuid"
 )
 
@@ -61,20 +61,20 @@ func (Console) Annotations() []schema.Annotation {
 // Fields of the Console.
 func (Console) Fields() []ent.Field {
     return []ent.Field{
-        field.Other("operate", model.OperatorUnknown).Optional().Nillable().SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("操作"),
+        field.Other("operate", adapter.OperatorUnknown).Optional().Nillable().SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("操作"),
 
         field.String("serial").Comment("电柜设备序列号"),
         field.UUID("uuid", uuid.UUID{}).Immutable().Comment("标识符"),
         field.Enum("type").Values("exchange", "operate", "cabinet").Comment("日志类别 exchange:换电控制 operate:手动操作 cabinet:电柜日志"),
 
         field.String("user_id").Comment("用户ID"),
-        field.Other("user_type", model.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("用户类别"),
+        field.Other("user_type", adapter.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("用户类别"),
 
-        field.Other("step", model.ExchangeStepFirst).SchemaType(map[string]string{dialect.Postgres: postgres.TypeSmallInt}).Optional().Nillable().Comment("换电步骤"),
+        field.Other("step", adapter.ExchangeStepFirst).SchemaType(map[string]string{dialect.Postgres: postgres.TypeSmallInt}).Optional().Nillable().Comment("换电步骤"),
 
         field.Enum("status").Values("invalid", "pending", "running", "success", "failed").Comment("状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败"),
-        field.JSON("before_bin", &model.BinInfo{}).Optional().Comment("变化前仓位信息"),
-        field.JSON("after_bin", &model.BinInfo{}).Optional().Comment("变化后仓位信息"),
+        field.JSON("before_bin", &adapter.BinInfo{}).Optional().Comment("变化前仓位信息"),
+        field.JSON("after_bin", &adapter.BinInfo{}).Optional().Comment("变化后仓位信息"),
 
         field.String("message").Optional().Nillable().Comment("消息"),
         field.Time("startAt").Optional().Nillable().Comment("开始时间"),

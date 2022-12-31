@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/ent/scan"
@@ -64,8 +64,8 @@ func (su *ScanUpdate) SetUserID(s string) *ScanUpdate {
 }
 
 // SetUserType sets the "user_type" field.
-func (su *ScanUpdate) SetUserType(mt model.UserType) *ScanUpdate {
-	su.mutation.SetUserType(mt)
+func (su *ScanUpdate) SetUserType(at adapter.UserType) *ScanUpdate {
+	su.mutation.SetUserType(at)
 	return su
 }
 
@@ -76,8 +76,8 @@ func (su *ScanUpdate) SetSerial(s string) *ScanUpdate {
 }
 
 // SetData sets the "data" field.
-func (su *ScanUpdate) SetData(mur *model.ExchangeUsableResponse) *ScanUpdate {
-	su.mutation.SetData(mur)
+func (su *ScanUpdate) SetData(aur *adapter.ExchangeUsableResponse) *ScanUpdate {
+	su.mutation.SetData(aur)
 	return su
 }
 
@@ -285,8 +285,8 @@ func (suo *ScanUpdateOne) SetUserID(s string) *ScanUpdateOne {
 }
 
 // SetUserType sets the "user_type" field.
-func (suo *ScanUpdateOne) SetUserType(mt model.UserType) *ScanUpdateOne {
-	suo.mutation.SetUserType(mt)
+func (suo *ScanUpdateOne) SetUserType(at adapter.UserType) *ScanUpdateOne {
+	suo.mutation.SetUserType(at)
 	return suo
 }
 
@@ -297,8 +297,8 @@ func (suo *ScanUpdateOne) SetSerial(s string) *ScanUpdateOne {
 }
 
 // SetData sets the "data" field.
-func (suo *ScanUpdateOne) SetData(mur *model.ExchangeUsableResponse) *ScanUpdateOne {
-	suo.mutation.SetData(mur)
+func (suo *ScanUpdateOne) SetData(aur *adapter.ExchangeUsableResponse) *ScanUpdateOne {
+	suo.mutation.SetData(aur)
 	return suo
 }
 

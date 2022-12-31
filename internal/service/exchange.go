@@ -6,8 +6,7 @@
 package service
 
 import (
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
@@ -31,30 +30,30 @@ func NewExchange(params ...any) *exchangeService {
 
 func (s *exchangeService) DetectCabinet(cab *ent.Cabinet) error {
     if cab == nil {
-        return errs.CabinetNotFound
+        return adapter.CabinetNotFound
     }
 
     if cab.Status != cabinet.StatusIdle {
-        return errs.CabinetBusy
+        return adapter.CabinetBusy
     }
 
     if !cab.Online {
-        return errs.CabinetOffline
+        return adapter.CabinetOffline
     }
 
     if len(cab.Edges.Bins) < 2 {
-        return errs.CabinetNoEmpty
+        return adapter.CabinetNoEmpty
     }
 
     return nil
 }
 
 // Usable 获取电柜待换电信息
-func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.ExchangeUsableResponse) {
-    res = &model.ExchangeUsableResponse{
-        Cabinet: new(model.Cabinet),
-        Fully:   new(model.Bin),
-        Empty:   new(model.Bin),
+func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapter.ExchangeUsableResponse) {
+    res = &adapter.ExchangeUsableResponse{
+        Cabinet: new(adapter.Cabinet),
+        Fully:   new(adapter.Bin),
+        Empty:   new(adapter.Bin),
     }
 
     // defer func() {
@@ -78,7 +77,7 @@ func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.E
         scan.CreatedAtGT(time.Now().Add(-time.Duration(req.Lock)*time.Second)),
     ).Exist(s.ctx)
     if exists {
-        app.Panic(http.StatusBadRequest, errs.CabinetBusy)
+        app.Panic(http.StatusBadRequest, adapter.CabinetBusy)
     }
 
     // TODO 查询是否有正在执行的任务?
@@ -95,7 +94,7 @@ func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.E
             continue
         } else if item.Open {
             // 有正常未关闭的仓门直接报错
-            app.Panic(http.StatusBadRequest, errs.CabinetDoorOpened)
+            app.Panic(http.StatusBadRequest, adapter.CabinetDoorOpened)
         }
         // 宽松判定是否有电池
         if item.IsLooseHasBattery(fakevoltage, fakecurrent) {
@@ -119,12 +118,12 @@ func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.E
 
     // 如果无满电
     if fully == nil {
-        app.Panic(http.StatusBadRequest, errs.CabinetNoFully)
+        app.Panic(http.StatusBadRequest, adapter.CabinetNoFully)
     }
 
     // 如果无空仓
     if empty == nil {
-        app.Panic(http.StatusBadRequest, errs.CabinetNoEmpty)
+        app.Panic(http.StatusBadRequest, adapter.CabinetNoEmpty)
     }
 
     // 拷贝属性
@@ -139,23 +138,35 @@ func (s *exchangeService) Usable(req *model.ExchangeUsableRequest) (res *model.E
     return
 }
 
-func (s *exchangeService) Do(req *model.ExchangeRequest) (res *model.ExchangeResponse) {
+func (s *exchangeService) Do(req *adapter.ExchangeRequest) (res *adapter.ExchangeResponse) {
     // 查询扫码记录
     sc := NewScan(s.User).CensorX(req)
 
     // 开始同步换电流程
     results, err := s.start(req, sc)
 
-    if err != nil {
-        app.Panic(err)
-    }
-
-    return &model.ExchangeResponse{
+    res = &adapter.ExchangeResponse{
         Results: results,
     }
+
+    for _, result := range results {
+        if result.Step == adapter.ExchangeStepFourth && result.Success {
+            res.Success = true
+            res.AfterBattery = sc.Data.Fully.BatterySn
+        }
+        if result.Step == adapter.ExchangeStepSecond && result.Success {
+            res.BeforeBattery = result.After.BatterySN
+        }
+    }
+
+    if err != nil {
+        res.Error = err.Error()
+    }
+
+    return
 }
 
-func (s *exchangeService) start(req *model.ExchangeRequest, sc *ent.Scan) (results []*model.ExchangeStepResult, err error) {
+func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (results []*adapter.ExchangeStepResult, err error) {
     cab, _ := NewCabinet(s.User).QueryWithBin(sc.CabinetID)
 
     // 检查电柜是否可换电
@@ -177,8 +188,8 @@ func (s *exchangeService) start(req *model.ExchangeRequest, sc *ent.Scan) (resul
         // TODO 任务标记???
     }()
 
-    for _, conf := range model.ExchangeStepConfigures {
-        var result *model.ExchangeStepResult
+    for _, conf := range adapter.ExchangeStepConfigures {
+        var result *adapter.ExchangeStepResult
         result, err = s.step(req.TimeOut, sc, conf)
         if err != nil {
             return
@@ -189,13 +200,13 @@ func (s *exchangeService) start(req *model.ExchangeRequest, sc *ent.Scan) (resul
     return
 }
 
-func (s *exchangeService) step(sec int64, sc *ent.Scan, conf model.ExchangeStepConfigure) (result *model.ExchangeStepResult, err error) {
+func (s *exchangeService) step(sec int64, sc *ent.Scan, conf adapter.ExchangeStepConfigure) (result *adapter.ExchangeStepResult, err error) {
     var (
         ec   *ent.Console
         eb   *ent.Bin
         bs   = NewBin(s.User)
         cs   = NewConsole(s.User)
-        open = conf.Door == model.DetectDoorOpen
+        open = conf.Door == adapter.DetectDoorOpen
     )
 
     // 创建换电步骤
@@ -214,7 +225,14 @@ func (s *exchangeService) step(sec int64, sc *ent.Scan, conf model.ExchangeStepC
         // 更新记录
         ec, eb = cs.Update(ec, err)
 
+        // 获取result
         result = ec.StepResult()
+
+        // 发送result
+        notice.Aurservd.SendData(&adapter.Data[adapter.ExchangeStepResult]{
+            Type:  adapter.DataTypeExchangeStep,
+            Value: result,
+        })
     }()
 
     // 如果需要开仓
@@ -228,7 +246,7 @@ func (s *exchangeService) step(sec int64, sc *ent.Scan, conf model.ExchangeStepC
 
     // TODO: 开仓失败后是否重复弹开逻辑???
 
-    var batteryOk, doorOk model.Bool
+    var batteryOk, doorOk adapter.Bool
 
     // 定义超时时间
     timeout := time.After(time.Duration(sec) * time.Second)
@@ -258,7 +276,7 @@ func (s *exchangeService) step(sec int64, sc *ent.Scan, conf model.ExchangeStepC
 
         case <-timeout:
             // 超时
-            err = errs.ExchangeTimeOut
+            err = adapter.ExchangeTimeOut
             return
         }
     }

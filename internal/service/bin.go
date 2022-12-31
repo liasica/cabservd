@@ -7,8 +7,7 @@ package service
 
 import (
     "fmt"
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -46,7 +45,7 @@ func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, e
 }
 
 func (s *binService) OpenDoor(serial string, ordinal int) (err error) {
-    err = core.Hub.Bean.SendControl(serial, model.OperatorBinOpen, ordinal)
+    err = core.Hub.Bean.SendControl(serial, adapter.OperatorBinOpen, ordinal)
     message := "成功"
     if err != nil {
         message = fmt.Sprintf("失败, %v", err)
@@ -57,7 +56,7 @@ func (s *binService) OpenDoor(serial string, ordinal int) (err error) {
 }
 
 // Operate 控制仓位
-func (s *binService) Operate(req *model.OperateRequest) (err error) {
+func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
     // TODO 操作的时候验证当前状态, 操作值 = 当前状态时返回报错信息
 
     // 记录日志
@@ -68,7 +67,7 @@ func (s *binService) Operate(req *model.OperateRequest) (err error) {
     )
     ec, b, err = NewConsole(s.User).Operate(req)
     if err != nil {
-        err = errs.InternalServerError
+        err = adapter.InternalServerError
         return
     }
 
@@ -82,12 +81,12 @@ func (s *binService) Operate(req *model.OperateRequest) (err error) {
     var cab *ent.Cabinet
     cab, err = NewCabinet(s.User).QuerySerial(req.Serial)
     if err != nil {
-        err = errs.CabinetNotFound
+        err = adapter.CabinetNotFound
         return
     }
 
     if !cab.Online {
-        err = errs.CabinetOffline
+        err = adapter.CabinetOffline
         return
     }
 
@@ -110,15 +109,15 @@ func (s *binService) Operate(req *model.OperateRequest) (err error) {
         case x := <-ch:
             nb := x.(*ent.Bin)
             switch req.Type {
-            case model.OperatorBinOpen:
+            case adapter.OperatorBinOpen:
                 if nb.Open {
                     return
                 }
-            case model.OperatorBinEnable:
+            case adapter.OperatorBinEnable:
                 if nb.Enable {
                     return
                 }
-            case model.OperatorBinDisable:
+            case adapter.OperatorBinDisable:
                 if !nb.Enable {
                     return
                 }
@@ -126,15 +125,15 @@ func (s *binService) Operate(req *model.OperateRequest) (err error) {
 
         case <-timeout:
             // 超时
-            err = errs.OperateTimeout
+            err = adapter.OperateTimeout
             return
         }
     }
 }
 
 // DetectUsable 检查仓位是否可用
-func (s *binService) DetectUsable(b *ent.Bin) (ok model.Bool, message string) {
-    ok = model.Bool(b.IsUsable())
+func (s *binService) DetectUsable(b *ent.Bin) (ok adapter.Bool, message string) {
+    ok = adapter.Bool(b.IsUsable())
     if ok {
         message = fmt.Sprintf("仓位可用")
     } else {
@@ -144,22 +143,22 @@ func (s *binService) DetectUsable(b *ent.Bin) (ok model.Bool, message string) {
 }
 
 // DetectDoor 识别仓门开关状态
-func (s *binService) DetectDoor(b *ent.Bin, d model.DetectDoor) (ok model.Bool, err error) {
+func (s *binService) DetectDoor(b *ent.Bin, d adapter.DetectDoor) (ok adapter.Bool, err error) {
     switch d {
-    case model.DetectDoorOpen:
-        ok = model.Bool(b.Open)
-    case model.DetectDoorClose:
-        ok = model.Bool(!b.Open)
+    case adapter.DetectDoorOpen:
+        ok = adapter.Bool(b.Open)
+    case adapter.DetectDoorClose:
+        ok = adapter.Bool(!b.Open)
     default:
         // 忽略
-        ok = model.True
+        ok = adapter.True
         return
     }
 
     usable, message := s.DetectUsable(b)
 
     if !usable {
-        err = errs.CabinetBinNotUsable
+        err = adapter.CabinetBinNotUsable
     }
 
     log.Infof("[BIN] [%s - %d, %s] 仓门%s检测: %s, %s", b.Serial, b.Ordinal, s.User, d, ok, message)
@@ -167,26 +166,26 @@ func (s *binService) DetectDoor(b *ent.Bin, d model.DetectDoor) (ok model.Bool, 
 }
 
 // DetectBattery 识别电池
-func (s *binService) DetectBattery(b *ent.Bin, d model.DetectBattery) (ok model.Bool, err error) {
+func (s *binService) DetectBattery(b *ent.Bin, d adapter.DetectBattery) (ok adapter.Bool, err error) {
     fakevoltage, _ := core.Hub.Bean.GetEmptyDeviation()
 
     switch d {
-    case model.DetectBatteryPutin:
+    case adapter.DetectBatteryPutin:
         // 检测放入
-        ok = model.Bool(b.IsStrictHasBattery(fakevoltage))
-    case model.DetectBatteryPutout:
+        ok = adapter.Bool(b.IsStrictHasBattery(fakevoltage))
+    case adapter.DetectBatteryPutout:
         // 检测取出
-        ok = model.Bool(!b.IsStrictHasBattery(fakevoltage))
+        ok = adapter.Bool(!b.IsStrictHasBattery(fakevoltage))
     default:
         // 忽略
-        ok = model.True
+        ok = adapter.True
         return
     }
 
     usable, message := s.DetectUsable(b)
 
     if !usable {
-        err = errs.CabinetBinNotUsable
+        err = adapter.CabinetBinNotUsable
     }
 
     log.Infof("[BIN] [%s - %d, %s] 电池%s检测: %s, %s", b.Serial, b.Ordinal, s.User, d, ok, message)

@@ -6,11 +6,12 @@
 package core
 
 import (
+    "github.com/auroraride/adapter"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
 )
 
-func Start(addr, brand string, bean Hook, codec Codec) {
+func Start(addr string, brand adapter.Brand, bean Hook, codec Codec) {
     Hub = &hub{
         addr:       addr,
         Bean:       bean,

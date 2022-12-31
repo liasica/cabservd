@@ -9,7 +9,7 @@ import (
     "bufio"
     "bytes"
     "encoding/binary"
-    errs "github.com/auroraride/adapter/errors"
+    "github.com/auroraride/adapter"
     "github.com/panjf2000/gnet/v2"
 )
 
@@ -48,13 +48,13 @@ type HeaderLength struct{}
 func (codec *HeaderLength) Decode(c gnet.Conn) ([]byte, error) {
     buf, _ := c.Peek(bodySize)
     if len(buf) < bodySize {
-        return nil, errs.IncompletePacket
+        return nil, adapter.IncompletePacket
     }
 
     bodyLen := binary.BigEndian.Uint32(buf[:bodySize])
     msgLen := bodySize + int(bodyLen)
     if c.InboundBuffered() < msgLen {
-        return nil, errs.IncompletePacket
+        return nil, adapter.IncompletePacket
     }
     buf, _ = c.Peek(msgLen)
     _, _ = c.Discard(msgLen)

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
 
@@ -23,7 +24,7 @@ type Cabinet struct {
 	// 是否在线
 	Online bool `json:"online,omitempty"`
 	// 品牌
-	Brand string `json:"brand,omitempty"`
+	Brand adapter.Brand `json:"brand,omitempty"`
 	// 电柜编号
 	Serial string `json:"serial,omitempty"`
 	// 状态
@@ -72,13 +73,15 @@ func (*Cabinet) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case cabinet.FieldBrand:
+			values[i] = new(adapter.Brand)
 		case cabinet.FieldOnline, cabinet.FieldEnable:
 			values[i] = new(sql.NullBool)
 		case cabinet.FieldLng, cabinet.FieldLat, cabinet.FieldGsm, cabinet.FieldVoltage, cabinet.FieldCurrent, cabinet.FieldTemperature, cabinet.FieldElectricity:
 			values[i] = new(sql.NullFloat64)
 		case cabinet.FieldID:
 			values[i] = new(sql.NullInt64)
-		case cabinet.FieldBrand, cabinet.FieldSerial, cabinet.FieldStatus:
+		case cabinet.FieldSerial, cabinet.FieldStatus:
 			values[i] = new(sql.NullString)
 		case cabinet.FieldCreatedAt, cabinet.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -122,10 +125,10 @@ func (c *Cabinet) assignValues(columns []string, values []any) error {
 				c.Online = value.Bool
 			}
 		case cabinet.FieldBrand:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*adapter.Brand); !ok {
 				return fmt.Errorf("unexpected type %T for field brand", values[i])
-			} else if value.Valid {
-				c.Brand = value.String
+			} else if value != nil {
+				c.Brand = *value
 			}
 		case cabinet.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -237,7 +240,7 @@ func (c *Cabinet) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.Online))
 	builder.WriteString(", ")
 	builder.WriteString("brand=")
-	builder.WriteString(c.Brand)
+	builder.WriteString(fmt.Sprintf("%v", c.Brand))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(c.Serial)

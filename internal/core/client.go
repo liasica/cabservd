@@ -7,7 +7,7 @@ package core
 
 import (
     "context"
-    errs "github.com/auroraride/adapter/errors"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/goccy/go-json"
@@ -103,7 +103,7 @@ func GetClient(devId string) (c *Client, err error) {
         return true
     })
     if c == nil {
-        err = errs.CabinetClientNotFound
+        err = adapter.CabinetClientNotFound
     }
     return
 }

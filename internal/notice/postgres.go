@@ -163,7 +163,7 @@ func (h *PostgresHook) Start() {
             }
 
             go h.SendNotice(cn, target)
-            go SendCabinet(false, target.GetSerial(), cab, bins)
+            go Aurservd.SendCabinet(false, target.GetSerial(), cab, bins)
 
         case <-timeout:
             // log.Info("[EVENTS] 超过90s未检测到PostgreSQL变化, 检查连接...")

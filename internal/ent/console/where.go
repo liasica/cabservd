@@ -7,7 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -68,7 +68,7 @@ func BinID(v uint64) predicate.Console {
 }
 
 // Operate applies equality check predicate on the "operate" field. It's identical to OperateEQ.
-func Operate(v model.Operator) predicate.Console {
+func Operate(v adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldOperate, v))
 }
 
@@ -88,12 +88,12 @@ func UserID(v string) predicate.Console {
 }
 
 // UserType applies equality check predicate on the "user_type" field. It's identical to UserTypeEQ.
-func UserType(v model.UserType) predicate.Console {
+func UserType(v adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldUserType, v))
 }
 
 // Step applies equality check predicate on the "step" field. It's identical to StepEQ.
-func Step(v model.ExchangeStep) predicate.Console {
+func Step(v adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldStep, v))
 }
 
@@ -158,42 +158,42 @@ func BinIDNotIn(vs ...uint64) predicate.Console {
 }
 
 // OperateEQ applies the EQ predicate on the "operate" field.
-func OperateEQ(v model.Operator) predicate.Console {
+func OperateEQ(v adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldOperate, v))
 }
 
 // OperateNEQ applies the NEQ predicate on the "operate" field.
-func OperateNEQ(v model.Operator) predicate.Console {
+func OperateNEQ(v adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldNEQ(FieldOperate, v))
 }
 
 // OperateIn applies the In predicate on the "operate" field.
-func OperateIn(vs ...model.Operator) predicate.Console {
+func OperateIn(vs ...adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldIn(FieldOperate, vs...))
 }
 
 // OperateNotIn applies the NotIn predicate on the "operate" field.
-func OperateNotIn(vs ...model.Operator) predicate.Console {
+func OperateNotIn(vs ...adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldNotIn(FieldOperate, vs...))
 }
 
 // OperateGT applies the GT predicate on the "operate" field.
-func OperateGT(v model.Operator) predicate.Console {
+func OperateGT(v adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldGT(FieldOperate, v))
 }
 
 // OperateGTE applies the GTE predicate on the "operate" field.
-func OperateGTE(v model.Operator) predicate.Console {
+func OperateGTE(v adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldGTE(FieldOperate, v))
 }
 
 // OperateLT applies the LT predicate on the "operate" field.
-func OperateLT(v model.Operator) predicate.Console {
+func OperateLT(v adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldLT(FieldOperate, v))
 }
 
 // OperateLTE applies the LTE predicate on the "operate" field.
-func OperateLTE(v model.Operator) predicate.Console {
+func OperateLTE(v adapter.Operator) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldOperate, v))
 }
 
@@ -398,82 +398,82 @@ func UserIDContainsFold(v string) predicate.Console {
 }
 
 // UserTypeEQ applies the EQ predicate on the "user_type" field.
-func UserTypeEQ(v model.UserType) predicate.Console {
+func UserTypeEQ(v adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldUserType, v))
 }
 
 // UserTypeNEQ applies the NEQ predicate on the "user_type" field.
-func UserTypeNEQ(v model.UserType) predicate.Console {
+func UserTypeNEQ(v adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldNEQ(FieldUserType, v))
 }
 
 // UserTypeIn applies the In predicate on the "user_type" field.
-func UserTypeIn(vs ...model.UserType) predicate.Console {
+func UserTypeIn(vs ...adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldIn(FieldUserType, vs...))
 }
 
 // UserTypeNotIn applies the NotIn predicate on the "user_type" field.
-func UserTypeNotIn(vs ...model.UserType) predicate.Console {
+func UserTypeNotIn(vs ...adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldNotIn(FieldUserType, vs...))
 }
 
 // UserTypeGT applies the GT predicate on the "user_type" field.
-func UserTypeGT(v model.UserType) predicate.Console {
+func UserTypeGT(v adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldGT(FieldUserType, v))
 }
 
 // UserTypeGTE applies the GTE predicate on the "user_type" field.
-func UserTypeGTE(v model.UserType) predicate.Console {
+func UserTypeGTE(v adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldGTE(FieldUserType, v))
 }
 
 // UserTypeLT applies the LT predicate on the "user_type" field.
-func UserTypeLT(v model.UserType) predicate.Console {
+func UserTypeLT(v adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldLT(FieldUserType, v))
 }
 
 // UserTypeLTE applies the LTE predicate on the "user_type" field.
-func UserTypeLTE(v model.UserType) predicate.Console {
+func UserTypeLTE(v adapter.UserType) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldUserType, v))
 }
 
 // StepEQ applies the EQ predicate on the "step" field.
-func StepEQ(v model.ExchangeStep) predicate.Console {
+func StepEQ(v adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldStep, v))
 }
 
 // StepNEQ applies the NEQ predicate on the "step" field.
-func StepNEQ(v model.ExchangeStep) predicate.Console {
+func StepNEQ(v adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldNEQ(FieldStep, v))
 }
 
 // StepIn applies the In predicate on the "step" field.
-func StepIn(vs ...model.ExchangeStep) predicate.Console {
+func StepIn(vs ...adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldIn(FieldStep, vs...))
 }
 
 // StepNotIn applies the NotIn predicate on the "step" field.
-func StepNotIn(vs ...model.ExchangeStep) predicate.Console {
+func StepNotIn(vs ...adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldNotIn(FieldStep, vs...))
 }
 
 // StepGT applies the GT predicate on the "step" field.
-func StepGT(v model.ExchangeStep) predicate.Console {
+func StepGT(v adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldGT(FieldStep, v))
 }
 
 // StepGTE applies the GTE predicate on the "step" field.
-func StepGTE(v model.ExchangeStep) predicate.Console {
+func StepGTE(v adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldGTE(FieldStep, v))
 }
 
 // StepLT applies the LT predicate on the "step" field.
-func StepLT(v model.ExchangeStep) predicate.Console {
+func StepLT(v adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldLT(FieldStep, v))
 }
 
 // StepLTE applies the LTE predicate on the "step" field.
-func StepLTE(v model.ExchangeStep) predicate.Console {
+func StepLTE(v adapter.ExchangeStep) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldStep, v))
 }
 

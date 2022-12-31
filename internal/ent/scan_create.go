@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
@@ -81,8 +81,8 @@ func (sc *ScanCreate) SetUserID(s string) *ScanCreate {
 }
 
 // SetUserType sets the "user_type" field.
-func (sc *ScanCreate) SetUserType(mt model.UserType) *ScanCreate {
-	sc.mutation.SetUserType(mt)
+func (sc *ScanCreate) SetUserType(at adapter.UserType) *ScanCreate {
+	sc.mutation.SetUserType(at)
 	return sc
 }
 
@@ -93,8 +93,8 @@ func (sc *ScanCreate) SetSerial(s string) *ScanCreate {
 }
 
 // SetData sets the "data" field.
-func (sc *ScanCreate) SetData(mur *model.ExchangeUsableResponse) *ScanCreate {
-	sc.mutation.SetData(mur)
+func (sc *ScanCreate) SetData(aur *adapter.ExchangeUsableResponse) *ScanCreate {
+	sc.mutation.SetData(aur)
 	return sc
 }
 
@@ -387,7 +387,7 @@ func (u *ScanUpsert) UpdateUserID() *ScanUpsert {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *ScanUpsert) SetUserType(v model.UserType) *ScanUpsert {
+func (u *ScanUpsert) SetUserType(v adapter.UserType) *ScanUpsert {
 	u.Set(scan.FieldUserType, v)
 	return u
 }
@@ -411,7 +411,7 @@ func (u *ScanUpsert) UpdateSerial() *ScanUpsert {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsert) SetData(v *model.ExchangeUsableResponse) *ScanUpsert {
+func (u *ScanUpsert) SetData(v *adapter.ExchangeUsableResponse) *ScanUpsert {
 	u.Set(scan.FieldData, v)
 	return u
 }
@@ -536,7 +536,7 @@ func (u *ScanUpsertOne) UpdateUserID() *ScanUpsertOne {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *ScanUpsertOne) SetUserType(v model.UserType) *ScanUpsertOne {
+func (u *ScanUpsertOne) SetUserType(v adapter.UserType) *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetUserType(v)
 	})
@@ -564,7 +564,7 @@ func (u *ScanUpsertOne) UpdateSerial() *ScanUpsertOne {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsertOne) SetData(v *model.ExchangeUsableResponse) *ScanUpsertOne {
+func (u *ScanUpsertOne) SetData(v *adapter.ExchangeUsableResponse) *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetData(v)
 	})
@@ -863,7 +863,7 @@ func (u *ScanUpsertBulk) UpdateUserID() *ScanUpsertBulk {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *ScanUpsertBulk) SetUserType(v model.UserType) *ScanUpsertBulk {
+func (u *ScanUpsertBulk) SetUserType(v adapter.UserType) *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetUserType(v)
 	})
@@ -891,7 +891,7 @@ func (u *ScanUpsertBulk) UpdateSerial() *ScanUpsertBulk {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsertBulk) SetData(v *model.ExchangeUsableResponse) *ScanUpsertBulk {
+func (u *ScanUpsertBulk) SetData(v *adapter.ExchangeUsableResponse) *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetData(v)
 	})

@@ -5,7 +5,7 @@
 
 package ent
 
-import "github.com/auroraride/adapter/model"
+import "github.com/auroraride/adapter"
 
 // ResetBattery 无电池的时候清除电池信息
 // TODO: 是否有必要?
@@ -57,8 +57,8 @@ func (b *Bin) ExchangePossible(isFull bool, fakevoltage, fakecurrent, minsoc flo
     }
 }
 
-func (b *Bin) Info() *model.BinInfo {
-    return &model.BinInfo{
+func (b *Bin) Info() *adapter.BinInfo {
+    return &adapter.BinInfo{
         Ordinal:       b.Ordinal,
         BatterySN:     b.BatterySn,
         Voltage:       b.Voltage,

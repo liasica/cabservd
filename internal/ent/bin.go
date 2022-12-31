@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -26,7 +27,7 @@ type Bin struct {
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// 品牌
-	Brand string `json:"brand,omitempty"`
+	Brand adapter.Brand `json:"brand,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 仓位名称(N号仓)
@@ -85,13 +86,15 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case bin.FieldBrand:
+			values[i] = new(adapter.Brand)
 		case bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists:
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
 		case bin.FieldID, bin.FieldCabinetID, bin.FieldOrdinal:
 			values[i] = new(sql.NullInt64)
-		case bin.FieldUUID, bin.FieldBrand, bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
+		case bin.FieldUUID, bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
 			values[i] = new(sql.NullString)
 		case bin.FieldCreatedAt, bin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -141,10 +144,10 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				b.CabinetID = uint64(value.Int64)
 			}
 		case bin.FieldBrand:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*adapter.Brand); !ok {
 				return fmt.Errorf("unexpected type %T for field brand", values[i])
-			} else if value.Valid {
-				b.Brand = value.String
+			} else if value != nil {
+				b.Brand = *value
 			}
 		case bin.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -271,7 +274,7 @@ func (b *Bin) String() string {
 	builder.WriteString(fmt.Sprintf("%v", b.CabinetID))
 	builder.WriteString(", ")
 	builder.WriteString("brand=")
-	builder.WriteString(b.Brand)
+	builder.WriteString(fmt.Sprintf("%v", b.Brand))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(b.Serial)

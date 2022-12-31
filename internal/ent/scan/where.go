@@ -7,7 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/google/uuid"
 )
@@ -83,7 +83,7 @@ func UserID(v string) predicate.Scan {
 }
 
 // UserType applies equality check predicate on the "user_type" field. It's identical to UserTypeEQ.
-func UserType(v model.UserType) predicate.Scan {
+func UserType(v adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldUserType, v))
 }
 
@@ -268,42 +268,42 @@ func UserIDContainsFold(v string) predicate.Scan {
 }
 
 // UserTypeEQ applies the EQ predicate on the "user_type" field.
-func UserTypeEQ(v model.UserType) predicate.Scan {
+func UserTypeEQ(v adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldUserType, v))
 }
 
 // UserTypeNEQ applies the NEQ predicate on the "user_type" field.
-func UserTypeNEQ(v model.UserType) predicate.Scan {
+func UserTypeNEQ(v adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldNEQ(FieldUserType, v))
 }
 
 // UserTypeIn applies the In predicate on the "user_type" field.
-func UserTypeIn(vs ...model.UserType) predicate.Scan {
+func UserTypeIn(vs ...adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldIn(FieldUserType, vs...))
 }
 
 // UserTypeNotIn applies the NotIn predicate on the "user_type" field.
-func UserTypeNotIn(vs ...model.UserType) predicate.Scan {
+func UserTypeNotIn(vs ...adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldNotIn(FieldUserType, vs...))
 }
 
 // UserTypeGT applies the GT predicate on the "user_type" field.
-func UserTypeGT(v model.UserType) predicate.Scan {
+func UserTypeGT(v adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldGT(FieldUserType, v))
 }
 
 // UserTypeGTE applies the GTE predicate on the "user_type" field.
-func UserTypeGTE(v model.UserType) predicate.Scan {
+func UserTypeGTE(v adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldGTE(FieldUserType, v))
 }
 
 // UserTypeLT applies the LT predicate on the "user_type" field.
-func UserTypeLT(v model.UserType) predicate.Scan {
+func UserTypeLT(v adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldLT(FieldUserType, v))
 }
 
 // UserTypeLTE applies the LTE predicate on the "user_type" field.
-func UserTypeLTE(v model.UserType) predicate.Scan {
+func UserTypeLTE(v adapter.UserType) predicate.Scan {
 	return predicate.Scan(sql.FieldLTE(FieldUserType, v))
 }
 

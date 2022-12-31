@@ -6,7 +6,7 @@
 package api
 
 import (
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/service"
     "github.com/labstack/echo/v4"
@@ -17,6 +17,6 @@ type binApi struct{}
 var Bin = new(binApi)
 
 func (*binApi) Operate(c echo.Context) (err error) {
-    ctx, req := app.ContextAndBinding[model.OperateRequest](c)
+    ctx, req := app.ContextAndBinding[adapter.OperateRequest](c)
     return ctx.SendResponse(service.NewBin(ctx.User).Operate(req))
 }

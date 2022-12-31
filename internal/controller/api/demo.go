@@ -8,8 +8,7 @@ package api
 import (
     "context"
     "fmt"
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -45,9 +44,9 @@ var Demo = new(demo)
 
 func (*demo) Control(c *gin.Context) {
     var req struct {
-        Serial  string         `form:"serial" json:"serial"`
-        Type    model.Operator `json:"type" form:"type"`
-        Ordinal int            `json:"ordinal" form:"ordinal"`
+        Serial  string           `form:"serial" json:"serial"`
+        Type    adapter.Operator `json:"type" form:"type"`
+        Ordinal int              `json:"ordinal" form:"ordinal"`
     }
     err := c.Bind(&req)
     if err == nil {
@@ -102,7 +101,7 @@ func (d *demo) Start(c *gin.Context) {
     }
     err := c.Bind(&req)
     if err != nil {
-        c.JSON(http.StatusOK, gin.H{"error": errs.ParamValidateFailed.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.ParamValidateFailed.Error()})
         return
     }
 
@@ -110,25 +109,25 @@ func (d *demo) Start(c *gin.Context) {
     // 查询电柜信息
     cab, _ := ent.Database.Cabinet.Query().Where(cabinet.Serial(req.SN)).First(context.Background())
     if cab == nil {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNotFound.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetNotFound.Error()})
         return
     }
     if cab.Status == cabinet.StatusInitializing {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetInitializing.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetInitializing.Error()})
         return
     }
     if cab.Status == cabinet.StatusAbnormal {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetAbnormal.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetAbnormal.Error()})
         return
     }
     if !cab.Online {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetOffline.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetOffline.Error()})
         return
     }
 
     // 是否有正在执行的任务
     if d.isBusy(req.SN) {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetBusy.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetBusy.Error()})
         return
     }
 
@@ -171,13 +170,13 @@ func (d *demo) Start(c *gin.Context) {
 
     // 如果无满电
     if fully == nil {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoFully.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetNoFully.Error()})
         return
     }
 
     // 如果无空仓
     if empty == nil {
-        c.JSON(http.StatusOK, gin.H{"error": errs.CabinetNoEmpty.Error()})
+        c.JSON(http.StatusOK, gin.H{"error": adapter.CabinetNoEmpty.Error()})
         return
     }
 
@@ -237,7 +236,7 @@ func (*demo) Status(c *gin.Context) {
     res.Step = req.Step
     t, ok := tasks.Load(req.SN)
     if !ok {
-        err = errs.ExchangeTaskNotExist
+        err = adapter.ExchangeTaskNotExist
         return
     }
     s := t.(*task).steps[req.Step]
@@ -315,7 +314,7 @@ func (t *task) run() {
 }
 
 func (t *task) doorOpen(target *ent.Bin) (err error) {
-    err = core.Hub.Bean.SendControl(t.serial, model.OperatorBinOpen, target.Ordinal)
+    err = core.Hub.Bean.SendControl(t.serial, adapter.OperatorBinOpen, target.Ordinal)
     if err != nil {
         return
     }
@@ -353,7 +352,7 @@ func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err e
 
         // 超时
         if time.Now().Sub(startAt).Seconds() > maxtime {
-            err = errs.ExchangeTimeOut
+            err = adapter.ExchangeTimeOut
             return
         }
 
@@ -382,7 +381,7 @@ func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err e
                 // 未检测到电池, 继续轮询
                 // 超时
                 if time.Now().Sub(statusTime).Seconds() > batteryCheckMaxtime {
-                    err = errs.ExchangeBatteryLost
+                    err = adapter.ExchangeBatteryLost
                     // 返回错误
                     return
                 }
@@ -391,7 +390,7 @@ func (t *task) doorOpenStatus(target *ent.Bin, status bool, battery uint) (err e
                 // 检查电池是否取出
                 // TODO: 是否取走, 重复弹开
                 if !item.IsStrictHasBattery(fakevoltage) {
-                    return errs.ExchangeBatteryExist
+                    return adapter.ExchangeBatteryExist
                 }
             }
             return

@@ -6,8 +6,7 @@
 package service
 
 import (
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/console"
@@ -30,16 +29,16 @@ func NewConsole(params ...any) *consoleService {
 }
 
 // StartExchangeStep 开始换电步骤
-func (s *consoleService) StartExchangeStep(sc *ent.Scan, step model.ExchangeStep, open bool) (ec *ent.Console, b *ent.Bin, err error) {
+func (s *consoleService) StartExchangeStep(sc *ent.Scan, step adapter.ExchangeStep, open bool) (ec *ent.Console, b *ent.Bin, err error) {
     var (
         bid uint64
-        op  *model.Operator
+        op  *adapter.Operator
     )
 
     switch step {
-    case model.ExchangeStepFirst, model.ExchangeStepSecond:
+    case adapter.ExchangeStepFirst, adapter.ExchangeStepSecond:
         bid = sc.Data.Empty.ID
-    case model.ExchangeStepThird, model.ExchangeStepFourth:
+    case adapter.ExchangeStepThird, adapter.ExchangeStepFourth:
         bid = sc.Data.Fully.ID
     }
 
@@ -50,7 +49,7 @@ func (s *consoleService) StartExchangeStep(sc *ent.Scan, step model.ExchangeStep
     }
 
     if open {
-        op = silk.Pointer(model.OperatorBinOpen)
+        op = silk.Pointer(adapter.OperatorBinOpen)
     }
 
     ec, err = s.orm.Create().
@@ -71,15 +70,15 @@ func (s *consoleService) StartExchangeStep(sc *ent.Scan, step model.ExchangeStep
     return
 }
 
-func (s *consoleService) Operate(req *model.OperateRequest) (ec *ent.Console, b *ent.Bin, err error) {
+func (s *consoleService) Operate(req *adapter.OperateRequest) (ec *ent.Console, b *ent.Bin, err error) {
     if req.Ordinal == nil {
-        app.Panic(errs.CabinetBinOrdinalRequired)
+        app.Panic(adapter.CabinetBinOrdinalRequired)
     }
 
     // 查询仓位信息
     b, err = NewBin(s.User).QuerySerialOrdinal(req.Serial, *req.Ordinal)
     if err != nil {
-        err = errs.CabinetBinNotFound
+        err = adapter.CabinetBinNotFound
         return
     }
 

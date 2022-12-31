@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -26,7 +26,7 @@ type Console struct {
 	// BinID holds the value of the "bin_id" field.
 	BinID uint64 `json:"bin_id,omitempty"`
 	// 操作
-	Operate *model.Operator `json:"operate,omitempty"`
+	Operate *adapter.Operator `json:"operate,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 标识符
@@ -36,15 +36,15 @@ type Console struct {
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
 	// 用户类别
-	UserType model.UserType `json:"user_type,omitempty"`
+	UserType adapter.UserType `json:"user_type,omitempty"`
 	// 换电步骤
-	Step *model.ExchangeStep `json:"step,omitempty"`
+	Step *adapter.ExchangeStep `json:"step,omitempty"`
 	// 状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败
 	Status console.Status `json:"status,omitempty"`
 	// 变化前仓位信息
-	BeforeBin *model.BinInfo `json:"before_bin,omitempty"`
+	BeforeBin *adapter.BinInfo `json:"before_bin,omitempty"`
 	// 变化后仓位信息
-	AfterBin *model.BinInfo `json:"after_bin,omitempty"`
+	AfterBin *adapter.BinInfo `json:"after_bin,omitempty"`
 	// 消息
 	Message *string `json:"message,omitempty"`
 	// 开始时间
@@ -101,13 +101,13 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case console.FieldStep:
-			values[i] = &sql.NullScanner{S: new(model.ExchangeStep)}
+			values[i] = &sql.NullScanner{S: new(adapter.ExchangeStep)}
 		case console.FieldOperate:
-			values[i] = &sql.NullScanner{S: new(model.Operator)}
+			values[i] = &sql.NullScanner{S: new(adapter.Operator)}
 		case console.FieldBeforeBin, console.FieldAfterBin:
 			values[i] = new([]byte)
 		case console.FieldUserType:
-			values[i] = new(model.UserType)
+			values[i] = new(adapter.UserType)
 		case console.FieldDuration:
 			values[i] = new(sql.NullFloat64)
 		case console.FieldID, console.FieldCabinetID, console.FieldBinID:
@@ -155,8 +155,8 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field operate", values[i])
 			} else if value.Valid {
-				c.Operate = new(model.Operator)
-				*c.Operate = *value.S.(*model.Operator)
+				c.Operate = new(adapter.Operator)
+				*c.Operate = *value.S.(*adapter.Operator)
 			}
 		case console.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -183,7 +183,7 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				c.UserID = value.String
 			}
 		case console.FieldUserType:
-			if value, ok := values[i].(*model.UserType); !ok {
+			if value, ok := values[i].(*adapter.UserType); !ok {
 				return fmt.Errorf("unexpected type %T for field user_type", values[i])
 			} else if value != nil {
 				c.UserType = *value
@@ -192,8 +192,8 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullScanner); !ok {
 				return fmt.Errorf("unexpected type %T for field step", values[i])
 			} else if value.Valid {
-				c.Step = new(model.ExchangeStep)
-				*c.Step = *value.S.(*model.ExchangeStep)
+				c.Step = new(adapter.ExchangeStep)
+				*c.Step = *value.S.(*adapter.ExchangeStep)
 			}
 		case console.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {

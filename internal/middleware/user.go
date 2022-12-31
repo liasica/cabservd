@@ -6,8 +6,7 @@
 package middleware
 
 import (
-    errs "github.com/auroraride/adapter/errors"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/labstack/echo/v4"
     "net/http"
@@ -19,12 +18,12 @@ func User() echo.MiddlewareFunc {
             ctx := app.Context(c)
             header := c.Request().Header
             // 获取user信息
-            user := &model.User{
-                ID:   header.Get(model.HeaderUserID),
-                Type: model.UserType(header.Get(model.HeaderUserType)),
+            user := &adapter.User{
+                ID:   header.Get(adapter.HeaderUserID),
+                Type: adapter.UserType(header.Get(adapter.HeaderUserType)),
             }
             if user.ID == "" || user.Type == "" {
-                app.Panic(http.StatusUnauthorized, errs.UserRequired)
+                app.Panic(http.StatusUnauthorized, adapter.UserRequired)
             }
             ctx.User = user
             return next(ctx)

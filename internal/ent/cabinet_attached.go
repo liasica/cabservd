@@ -5,13 +5,11 @@
 
 package ent
 
-import (
-    errs "github.com/auroraride/adapter/errors"
-)
+import "github.com/auroraride/adapter"
 
 func (c *Cabinet) DetectOnline() (err error) {
     if !c.Online {
-        err = errs.CabinetOffline
+        err = adapter.CabinetOffline
     }
     return
 }

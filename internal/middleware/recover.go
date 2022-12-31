@@ -7,7 +7,7 @@ package middleware
 
 import (
     "fmt"
-    "github.com/auroraride/adapter/model"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/labstack/echo/v4"
     log "github.com/sirupsen/logrus"
@@ -23,7 +23,7 @@ func Recover() echo.MiddlewareFunc {
             defer func() {
                 if r := recover(); r != nil {
                     switch v := r.(type) {
-                    case *model.Response:
+                    case *adapter.Response:
                         _ = ctx.SendResponse(v.Code, v.Message, v.Data)
                     default:
                         err := fmt.Errorf("%v", r)

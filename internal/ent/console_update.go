@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -45,15 +45,15 @@ func (cu *ConsoleUpdate) SetBinID(u uint64) *ConsoleUpdate {
 }
 
 // SetOperate sets the "operate" field.
-func (cu *ConsoleUpdate) SetOperate(mt model.Operator) *ConsoleUpdate {
-	cu.mutation.SetOperate(mt)
+func (cu *ConsoleUpdate) SetOperate(a adapter.Operator) *ConsoleUpdate {
+	cu.mutation.SetOperate(a)
 	return cu
 }
 
 // SetNillableOperate sets the "operate" field if the given value is not nil.
-func (cu *ConsoleUpdate) SetNillableOperate(mt *model.Operator) *ConsoleUpdate {
-	if mt != nil {
-		cu.SetOperate(*mt)
+func (cu *ConsoleUpdate) SetNillableOperate(a *adapter.Operator) *ConsoleUpdate {
+	if a != nil {
+		cu.SetOperate(*a)
 	}
 	return cu
 }
@@ -83,21 +83,21 @@ func (cu *ConsoleUpdate) SetUserID(s string) *ConsoleUpdate {
 }
 
 // SetUserType sets the "user_type" field.
-func (cu *ConsoleUpdate) SetUserType(mt model.UserType) *ConsoleUpdate {
-	cu.mutation.SetUserType(mt)
+func (cu *ConsoleUpdate) SetUserType(at adapter.UserType) *ConsoleUpdate {
+	cu.mutation.SetUserType(at)
 	return cu
 }
 
 // SetStep sets the "step" field.
-func (cu *ConsoleUpdate) SetStep(ms model.ExchangeStep) *ConsoleUpdate {
-	cu.mutation.SetStep(ms)
+func (cu *ConsoleUpdate) SetStep(as adapter.ExchangeStep) *ConsoleUpdate {
+	cu.mutation.SetStep(as)
 	return cu
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cu *ConsoleUpdate) SetNillableStep(ms *model.ExchangeStep) *ConsoleUpdate {
-	if ms != nil {
-		cu.SetStep(*ms)
+func (cu *ConsoleUpdate) SetNillableStep(as *adapter.ExchangeStep) *ConsoleUpdate {
+	if as != nil {
+		cu.SetStep(*as)
 	}
 	return cu
 }
@@ -115,8 +115,8 @@ func (cu *ConsoleUpdate) SetStatus(c console.Status) *ConsoleUpdate {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cu *ConsoleUpdate) SetBeforeBin(mi *model.BinInfo) *ConsoleUpdate {
-	cu.mutation.SetBeforeBin(mi)
+func (cu *ConsoleUpdate) SetBeforeBin(ai *adapter.BinInfo) *ConsoleUpdate {
+	cu.mutation.SetBeforeBin(ai)
 	return cu
 }
 
@@ -127,8 +127,8 @@ func (cu *ConsoleUpdate) ClearBeforeBin() *ConsoleUpdate {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cu *ConsoleUpdate) SetAfterBin(mi *model.BinInfo) *ConsoleUpdate {
-	cu.mutation.SetAfterBin(mi)
+func (cu *ConsoleUpdate) SetAfterBin(ai *adapter.BinInfo) *ConsoleUpdate {
+	cu.mutation.SetAfterBin(ai)
 	return cu
 }
 
@@ -498,15 +498,15 @@ func (cuo *ConsoleUpdateOne) SetBinID(u uint64) *ConsoleUpdateOne {
 }
 
 // SetOperate sets the "operate" field.
-func (cuo *ConsoleUpdateOne) SetOperate(mt model.Operator) *ConsoleUpdateOne {
-	cuo.mutation.SetOperate(mt)
+func (cuo *ConsoleUpdateOne) SetOperate(a adapter.Operator) *ConsoleUpdateOne {
+	cuo.mutation.SetOperate(a)
 	return cuo
 }
 
 // SetNillableOperate sets the "operate" field if the given value is not nil.
-func (cuo *ConsoleUpdateOne) SetNillableOperate(mt *model.Operator) *ConsoleUpdateOne {
-	if mt != nil {
-		cuo.SetOperate(*mt)
+func (cuo *ConsoleUpdateOne) SetNillableOperate(a *adapter.Operator) *ConsoleUpdateOne {
+	if a != nil {
+		cuo.SetOperate(*a)
 	}
 	return cuo
 }
@@ -536,21 +536,21 @@ func (cuo *ConsoleUpdateOne) SetUserID(s string) *ConsoleUpdateOne {
 }
 
 // SetUserType sets the "user_type" field.
-func (cuo *ConsoleUpdateOne) SetUserType(mt model.UserType) *ConsoleUpdateOne {
-	cuo.mutation.SetUserType(mt)
+func (cuo *ConsoleUpdateOne) SetUserType(at adapter.UserType) *ConsoleUpdateOne {
+	cuo.mutation.SetUserType(at)
 	return cuo
 }
 
 // SetStep sets the "step" field.
-func (cuo *ConsoleUpdateOne) SetStep(ms model.ExchangeStep) *ConsoleUpdateOne {
-	cuo.mutation.SetStep(ms)
+func (cuo *ConsoleUpdateOne) SetStep(as adapter.ExchangeStep) *ConsoleUpdateOne {
+	cuo.mutation.SetStep(as)
 	return cuo
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cuo *ConsoleUpdateOne) SetNillableStep(ms *model.ExchangeStep) *ConsoleUpdateOne {
-	if ms != nil {
-		cuo.SetStep(*ms)
+func (cuo *ConsoleUpdateOne) SetNillableStep(as *adapter.ExchangeStep) *ConsoleUpdateOne {
+	if as != nil {
+		cuo.SetStep(*as)
 	}
 	return cuo
 }
@@ -568,8 +568,8 @@ func (cuo *ConsoleUpdateOne) SetStatus(c console.Status) *ConsoleUpdateOne {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cuo *ConsoleUpdateOne) SetBeforeBin(mi *model.BinInfo) *ConsoleUpdateOne {
-	cuo.mutation.SetBeforeBin(mi)
+func (cuo *ConsoleUpdateOne) SetBeforeBin(ai *adapter.BinInfo) *ConsoleUpdateOne {
+	cuo.mutation.SetBeforeBin(ai)
 	return cuo
 }
 
@@ -580,8 +580,8 @@ func (cuo *ConsoleUpdateOne) ClearBeforeBin() *ConsoleUpdateOne {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cuo *ConsoleUpdateOne) SetAfterBin(mi *model.BinInfo) *ConsoleUpdateOne {
-	cuo.mutation.SetAfterBin(mi)
+func (cuo *ConsoleUpdateOne) SetAfterBin(ai *adapter.BinInfo) *ConsoleUpdateOne {
+	cuo.mutation.SetAfterBin(ai)
 	return cuo
 }
 

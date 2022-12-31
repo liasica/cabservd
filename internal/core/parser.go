@@ -8,6 +8,7 @@ package core
 import (
     "context"
     "fmt"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -21,19 +22,33 @@ type Parser interface {
     Cabinet() (*ent.CabinetPointer, bool)
 }
 
-func UpdateCabinet(brand, serial string, p Parser) {
+func UpdateCabinet(brand adapter.Brand, serial string, p Parser) {
     ctx := context.Background()
 
     cab, exists := p.Cabinet()
     if exists {
-        SaveCabinetContext(ctx, brand, serial, cab)
+        SaveCabinet(ctx, brand, serial, cab)
     }
 
     bins := p.Bins()
-    SaveBinsContext(ctx, brand, serial, bins)
+    SaveBins(ctx, brand, serial, bins)
 }
 
-func SaveCabinetContext(ctx context.Context, brand, serial string, item *ent.CabinetPointer) {
+func LoadOrStoreCabinet(ctx context.Context, brand adapter.Brand, serial string) (cab *ent.Cabinet) {
+    client := ent.Database.Cabinet
+    cab, _ = client.Query().Where(cabinet.Serial(serial)).First(ctx)
+    if cab != nil {
+        return
+    }
+    var err error
+    cab, err = client.Create().SetSerial(serial).SetBrand(brand).Save(ctx)
+    if err != nil {
+        log.Errorf("电柜保存失败: %v", err)
+    }
+    return
+}
+
+func SaveCabinet(ctx context.Context, brand adapter.Brand, serial string, item *ent.CabinetPointer) {
     err := ent.Database.Cabinet.Create().
         SetBrand(brand).
         SetSerial(serial).
@@ -88,19 +103,20 @@ func SaveCabinetContext(ctx context.Context, brand, serial string, item *ent.Cab
             if item.Electricity != nil {
                 u.SetElectricity(*item.Electricity)
             }
-        }).Exec(ctx)
+        }).
+        Exec(ctx)
     if err != nil {
         b, _ := json.Marshal(item)
         log.Errorf("电柜保存失败, %s: %v", string(b), err)
     }
 }
 
-func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPointers) {
+func SaveBins(ctx context.Context, brand adapter.Brand, serial string, items ent.BinPointers) {
     if len(items) == 0 {
         return
     }
 
-    cab, _ := ent.Database.Cabinet.Query().Where(cabinet.Serial(serial)).First(ctx)
+    cab := LoadOrStoreCabinet(ctx, brand, serial)
     if cab == nil {
         log.Error("仓位保存失败: 未找到电柜信息")
         return
@@ -118,6 +134,7 @@ func SaveBinsContext(ctx context.Context, brand, serial string, items ent.BinPoi
             SetOrdinal(*item.Ordinal).
             OnConflictColumns(bin.FieldUUID).
             Update(func(u *ent.BinUpsert) {
+                u.SetCabinetID(cab.ID)
                 // 健康状态
                 if item.Health != nil {
                     fmt.Printf("%s health :-> %v\n", name, *item.Health)

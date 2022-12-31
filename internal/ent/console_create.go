@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter/model"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -39,15 +39,15 @@ func (cc *ConsoleCreate) SetBinID(u uint64) *ConsoleCreate {
 }
 
 // SetOperate sets the "operate" field.
-func (cc *ConsoleCreate) SetOperate(mt model.Operator) *ConsoleCreate {
-	cc.mutation.SetOperate(mt)
+func (cc *ConsoleCreate) SetOperate(a adapter.Operator) *ConsoleCreate {
+	cc.mutation.SetOperate(a)
 	return cc
 }
 
 // SetNillableOperate sets the "operate" field if the given value is not nil.
-func (cc *ConsoleCreate) SetNillableOperate(mt *model.Operator) *ConsoleCreate {
-	if mt != nil {
-		cc.SetOperate(*mt)
+func (cc *ConsoleCreate) SetNillableOperate(a *adapter.Operator) *ConsoleCreate {
+	if a != nil {
+		cc.SetOperate(*a)
 	}
 	return cc
 }
@@ -77,21 +77,21 @@ func (cc *ConsoleCreate) SetUserID(s string) *ConsoleCreate {
 }
 
 // SetUserType sets the "user_type" field.
-func (cc *ConsoleCreate) SetUserType(mt model.UserType) *ConsoleCreate {
-	cc.mutation.SetUserType(mt)
+func (cc *ConsoleCreate) SetUserType(at adapter.UserType) *ConsoleCreate {
+	cc.mutation.SetUserType(at)
 	return cc
 }
 
 // SetStep sets the "step" field.
-func (cc *ConsoleCreate) SetStep(ms model.ExchangeStep) *ConsoleCreate {
-	cc.mutation.SetStep(ms)
+func (cc *ConsoleCreate) SetStep(as adapter.ExchangeStep) *ConsoleCreate {
+	cc.mutation.SetStep(as)
 	return cc
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cc *ConsoleCreate) SetNillableStep(ms *model.ExchangeStep) *ConsoleCreate {
-	if ms != nil {
-		cc.SetStep(*ms)
+func (cc *ConsoleCreate) SetNillableStep(as *adapter.ExchangeStep) *ConsoleCreate {
+	if as != nil {
+		cc.SetStep(*as)
 	}
 	return cc
 }
@@ -103,14 +103,14 @@ func (cc *ConsoleCreate) SetStatus(c console.Status) *ConsoleCreate {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cc *ConsoleCreate) SetBeforeBin(mi *model.BinInfo) *ConsoleCreate {
-	cc.mutation.SetBeforeBin(mi)
+func (cc *ConsoleCreate) SetBeforeBin(ai *adapter.BinInfo) *ConsoleCreate {
+	cc.mutation.SetBeforeBin(ai)
 	return cc
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cc *ConsoleCreate) SetAfterBin(mi *model.BinInfo) *ConsoleCreate {
-	cc.mutation.SetAfterBin(mi)
+func (cc *ConsoleCreate) SetAfterBin(ai *adapter.BinInfo) *ConsoleCreate {
+	cc.mutation.SetAfterBin(ai)
 	return cc
 }
 
@@ -460,7 +460,7 @@ func (u *ConsoleUpsert) UpdateBinID() *ConsoleUpsert {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsert) SetOperate(v model.Operator) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetOperate(v adapter.Operator) *ConsoleUpsert {
 	u.Set(console.FieldOperate, v)
 	return u
 }
@@ -514,7 +514,7 @@ func (u *ConsoleUpsert) UpdateUserID() *ConsoleUpsert {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *ConsoleUpsert) SetUserType(v model.UserType) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetUserType(v adapter.UserType) *ConsoleUpsert {
 	u.Set(console.FieldUserType, v)
 	return u
 }
@@ -526,7 +526,7 @@ func (u *ConsoleUpsert) UpdateUserType() *ConsoleUpsert {
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsert) SetStep(v model.ExchangeStep) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetStep(v adapter.ExchangeStep) *ConsoleUpsert {
 	u.Set(console.FieldStep, v)
 	return u
 }
@@ -556,7 +556,7 @@ func (u *ConsoleUpsert) UpdateStatus() *ConsoleUpsert {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsert) SetBeforeBin(v *model.BinInfo) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetBeforeBin(v *adapter.BinInfo) *ConsoleUpsert {
 	u.Set(console.FieldBeforeBin, v)
 	return u
 }
@@ -574,7 +574,7 @@ func (u *ConsoleUpsert) ClearBeforeBin() *ConsoleUpsert {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsert) SetAfterBin(v *model.BinInfo) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetAfterBin(v *adapter.BinInfo) *ConsoleUpsert {
 	u.Set(console.FieldAfterBin, v)
 	return u
 }
@@ -743,7 +743,7 @@ func (u *ConsoleUpsertOne) UpdateBinID() *ConsoleUpsertOne {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsertOne) SetOperate(v model.Operator) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetOperate(v adapter.Operator) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetOperate(v)
 	})
@@ -806,7 +806,7 @@ func (u *ConsoleUpsertOne) UpdateUserID() *ConsoleUpsertOne {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *ConsoleUpsertOne) SetUserType(v model.UserType) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetUserType(v adapter.UserType) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetUserType(v)
 	})
@@ -820,7 +820,7 @@ func (u *ConsoleUpsertOne) UpdateUserType() *ConsoleUpsertOne {
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsertOne) SetStep(v model.ExchangeStep) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetStep(v adapter.ExchangeStep) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetStep(v)
 	})
@@ -855,7 +855,7 @@ func (u *ConsoleUpsertOne) UpdateStatus() *ConsoleUpsertOne {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsertOne) SetBeforeBin(v *model.BinInfo) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetBeforeBin(v *adapter.BinInfo) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBeforeBin(v)
 	})
@@ -876,7 +876,7 @@ func (u *ConsoleUpsertOne) ClearBeforeBin() *ConsoleUpsertOne {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsertOne) SetAfterBin(v *model.BinInfo) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetAfterBin(v *adapter.BinInfo) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetAfterBin(v)
 	})
@@ -1230,7 +1230,7 @@ func (u *ConsoleUpsertBulk) UpdateBinID() *ConsoleUpsertBulk {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsertBulk) SetOperate(v model.Operator) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetOperate(v adapter.Operator) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetOperate(v)
 	})
@@ -1293,7 +1293,7 @@ func (u *ConsoleUpsertBulk) UpdateUserID() *ConsoleUpsertBulk {
 }
 
 // SetUserType sets the "user_type" field.
-func (u *ConsoleUpsertBulk) SetUserType(v model.UserType) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetUserType(v adapter.UserType) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetUserType(v)
 	})
@@ -1307,7 +1307,7 @@ func (u *ConsoleUpsertBulk) UpdateUserType() *ConsoleUpsertBulk {
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsertBulk) SetStep(v model.ExchangeStep) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetStep(v adapter.ExchangeStep) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetStep(v)
 	})
@@ -1342,7 +1342,7 @@ func (u *ConsoleUpsertBulk) UpdateStatus() *ConsoleUpsertBulk {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsertBulk) SetBeforeBin(v *model.BinInfo) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetBeforeBin(v *adapter.BinInfo) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBeforeBin(v)
 	})
@@ -1363,7 +1363,7 @@ func (u *ConsoleUpsertBulk) ClearBeforeBin() *ConsoleUpsertBulk {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsertBulk) SetAfterBin(v *model.BinInfo) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetAfterBin(v *adapter.BinInfo) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetAfterBin(v)
 	})
