@@ -7,7 +7,6 @@ package service
 
 import (
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/pn"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
@@ -15,6 +14,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/scan"
     "github.com/auroraride/cabservd/internal/notice"
     "github.com/jinzhu/copier"
+    "github.com/liasica/go-helpers/silk"
     "net/http"
     "time"
 )
@@ -206,86 +206,34 @@ func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (res
 }
 
 func (s *exchangeService) step(req *adapter.ExchangeRequest, sc *ent.Scan, conf adapter.ExchangeStepConfigure) (result *adapter.ExchangeStepMessage, err error) {
-    var (
-        ec   *ent.Console
-        eb   *ent.Bin
-        bs   = NewBin(s.User)
-        cs   = NewConsole(s.User)
-        open = conf.Door == adapter.DetectDoorOpen
-    )
+    var ordinal int
 
-    // 创建换电步骤
-    ec, eb, err = cs.StartExchangeStep(sc, conf)
+    switch conf.Step {
+    case adapter.ExchangeStepFirst, adapter.ExchangeStepSecond:
+        ordinal = sc.Data.Empty.Ordinal
+    case adapter.ExchangeStepThird, adapter.ExchangeStepFourth:
+        ordinal = sc.Data.Fully.Ordinal
+    }
+
+    var ec *ent.Console
+    ec, err = NewBin(s.User).Operate(&adapter.OperateRequest{
+        UUID:               sc.UUID,
+        Serial:             sc.Serial,
+        Ordinal:            silk.Pointer(ordinal),
+        Operate:            conf.Operate,
+        Step:               silk.Pointer(conf.Step),
+        Timeout:            req.TimeOut,
+        VerifyPutinBattery: req.Battery,
+    })
+
     if err != nil {
         return
     }
 
-    ch := make(chan any)
-    notice.Postgres.SetListener(pn.ChannelBin, eb.ID, ch)
+    result = ec.StepResult()
 
-    defer func() {
-        // 删除监听
-        notice.Postgres.DeleteListener(ch)
+    // 异步发送结果
+    go notice.Aurservd.SendData(result)
 
-        // 更新记录
-        ec, eb = cs.Update(ec, err)
-
-        // 获取result
-        result = ec.StepResult()
-
-        // 发送result
-        notice.Aurservd.SendData(result)
-    }()
-
-    // 如果需要开仓
-    if open {
-        // 开仓
-        err = bs.OpenDoor(sc.Serial, eb.Ordinal)
-        if err != nil {
-            return
-        }
-    }
-
-    // TODO: 开仓失败后是否重复弹开逻辑???
-
-    var batteryOk, doorOk adapter.Bool
-
-    // 定义超时时间
-    timeout := time.After(time.Duration(req.TimeOut) * time.Second)
-
-    for {
-        select {
-        case x := <-ch:
-            b := x.(*ent.Bin)
-
-            // 检查仓位是否满足条件
-            doorOk, err = bs.DetectDoor(b, conf.Door)
-            if err != nil {
-                return
-            }
-
-            // 检查电池是否满足条件
-            batteryOk, err = bs.DetectBattery(b, conf.Battery)
-            if err != nil {
-                return
-            }
-
-            // 检查放入电池是否匹配
-            if batteryOk && conf.Battery == adapter.DetectBatteryPutin && b.BatterySn != req.Battery {
-                err = adapter.ErrorBatteryPutin
-                return
-            }
-
-            if doorOk && batteryOk {
-                // 更新仓位信息
-                *eb = *b
-                return
-            }
-
-        case <-timeout:
-            // 超时
-            err = adapter.ErrorExchangeTimeOut
-            return
-        }
-    }
+    return
 }

@@ -31,7 +31,7 @@ const (
 
 var (
     controlValueMap = map[adapter.Operate]ControlValue{
-        adapter.OperateBinOpen:    ControlOpenDoor,
+        adapter.OperateDoorOpen:   ControlOpenDoor,
         adapter.OperateBinDisable: ControlBinDisable,
         adapter.OperateBinEnable:  ControlBinEnable,
     }

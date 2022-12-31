@@ -14,11 +14,9 @@ func (u *BinUpsert) ResetBattery() *BinUpsert {
     return u
 }
 
-// IsLooseHasBattery 是否有电池
-// 宽松检测, 任意一项满足即判定为有电池, 常用在换电第一步判定仓位是否为空
-// fakevoltage 指定电压
-// fakecurrent 指定电流
-// 在位 或 编码不为空 或 电压大于指定值 或 电流大于指定值 或 容量大于0
+// IsLooseHasBattery 宽松检测有电池
+// 任意一项满足即判定为有电池
+// 常用于: ?
 func (b *Bin) IsLooseHasBattery(fakevoltage, fakecurrent float64) bool {
     return b.BatteryExists || // 在位
         b.BatterySn != "" || // 编码不为空
@@ -27,15 +25,36 @@ func (b *Bin) IsLooseHasBattery(fakevoltage, fakecurrent float64) bool {
         b.Soc > 0 // 容量大于0
 }
 
-// IsStrictHasBattery 是否有电池
-// 严格检测, 所有选项都满足才判定为有电池, 常用在换电第三步检测电池是否放入
-// 在位 并且 电池编码不为空 并且 电压大于指定电压 并且 容量大于0
+// IsStrictNoBattery 严格检测无电池
+// 所有项都满足才视为空仓, 防止误开仓导致电池丢失
+// 常用于: 检测仓位是否为无电池仓位
+func (b *Bin) IsStrictNoBattery(fakevoltage, fakecurrent float64) bool {
+    return !b.BatteryExists && // 不在位
+        b.BatterySn == "" && // 编码为空
+        b.Voltage <= fakevoltage && // 电压小于等于指定值
+        b.Current <= fakecurrent && // 电流小于等于指定值
+        b.Soc <= 0 // 容量小于等于0
+}
+
+// IsStrictHasBattery 严格检测有电池
+// 所有项都满足才判定为有电池
+// 常用于: 检测用户电池是否放入
 func (b *Bin) IsStrictHasBattery(fakevoltage float64) (has bool) {
-    has = b.BatteryExists &&
-        b.BatterySn != "" &&
-        b.Voltage > fakevoltage &&
-        b.Soc > 0
+    has = b.BatteryExists && // 在位
+        b.BatterySn != "" && // 电池编码不为空
+        b.Voltage > fakevoltage && // 电压大于指定值
+        b.Soc > 0 // 容量不为0
     return
+}
+
+// IsLooseNoBattery 宽松检测无电池
+// 任意一项满足即视为无电池
+// 常用于: 检测电池是否取走
+func (b *Bin) IsLooseNoBattery(fakevoltage float64) bool {
+    return !b.BatteryExists || // 不在位
+        b.BatterySn == "" || // 电池编号为空
+        b.Voltage <= fakevoltage || // 电压小于等于指定值
+        b.Soc <= 0 // 容量小于等于0
 }
 
 // IsUsable 检查仓位是否可用
@@ -52,8 +71,8 @@ func (b *Bin) ExchangePossible(isFull bool, fakevoltage, fakecurrent, minsoc flo
         // 满仓严格检查是否有电池并且电量高于指定电量
         return b.IsStrictHasBattery(fakevoltage) && b.Soc >= minsoc
     } else {
-        // 空仓宽松检查是否有电池
-        return !b.IsLooseHasBattery(fakevoltage, fakecurrent)
+        // 严格检查是否为空仓
+        return b.IsStrictNoBattery(fakevoltage, fakecurrent)
     }
 }
 

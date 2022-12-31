@@ -18,9 +18,9 @@ func NewOperate(params ...any) *operateService {
 }
 
 func (s *operateService) Do(req *adapter.OperateRequest) error {
-    switch req.Type {
-    case adapter.OperateBinOpen, adapter.OperateBinEnable, adapter.OperateBinDisable:
-        return NewBin(s.ctx, s.User).Operate(req)
+    switch req.Operate {
+    default:
+        _, err := NewBin(s.ctx, s.User).Operate(req)
+        return err
     }
-    return adapter.ErrorBadRequest
 }

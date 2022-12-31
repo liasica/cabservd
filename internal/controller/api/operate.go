@@ -20,8 +20,3 @@ func (*operate) Do(c echo.Context) (err error) {
     ctx, req := app.ContextAndBinding[adapter.OperateRequest](c)
     return ctx.SendResponse(service.NewOperate(ctx.User).Do(req))
 }
-
-func (*operate) Bin(c echo.Context) (err error) {
-    ctx, req := app.ContextAndBinding[adapter.BusinessOperate](c)
-    return ctx.SendResponse(service.NewBin(ctx.User).Business(req))
-}

@@ -42,7 +42,6 @@ func Start() {
     )
 
     r.POST("/operate/do", api.Operate.Do)
-    r.POST("/operate/bin", api.Operate.Bin)
 
     r.POST("/exchange/usable", api.Exchange.Usable)
     r.POST("/exchange/do", api.Exchange.Do)
