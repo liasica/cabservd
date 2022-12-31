@@ -62,7 +62,7 @@ func (Scan) Annotations() []schema.Annotation {
 // Fields of the Scan.
 func (Scan) Fields() []ent.Field {
     return []ent.Field{
-        field.UUID("id", uuid.UUID{}).Default(uuid.New),
+        field.UUID("uuid", uuid.UUID{}).Unique().Default(uuid.New),
         field.Bool("efficient").Default(true).Comment("是否有效"),
         field.String("user_id").Comment("用户ID"),
         field.Other("user_type", adapter.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("用户类别"),

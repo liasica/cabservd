@@ -13,47 +13,47 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id uuid.UUID) predicate.Scan {
+func ID(id uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id uuid.UUID) predicate.Scan {
+func IDEQ(id uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id uuid.UUID) predicate.Scan {
+func IDNEQ(id uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...uuid.UUID) predicate.Scan {
+func IDIn(ids ...uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...uuid.UUID) predicate.Scan {
+func IDNotIn(ids ...uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id uuid.UUID) predicate.Scan {
+func IDGT(id uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id uuid.UUID) predicate.Scan {
+func IDGTE(id uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id uuid.UUID) predicate.Scan {
+func IDLT(id uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id uuid.UUID) predicate.Scan {
+func IDLTE(id uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldLTE(FieldID, id))
 }
 
@@ -70,6 +70,11 @@ func UpdatedAt(v time.Time) predicate.Scan {
 // CabinetID applies equality check predicate on the "cabinet_id" field. It's identical to CabinetIDEQ.
 func CabinetID(v uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldCabinetID, v))
+}
+
+// UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
+func UUID(v uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldUUID, v))
 }
 
 // Efficient applies equality check predicate on the "efficient" field. It's identical to EfficientEQ.
@@ -190,6 +195,46 @@ func CabinetIDIn(vs ...uint64) predicate.Scan {
 // CabinetIDNotIn applies the NotIn predicate on the "cabinet_id" field.
 func CabinetIDNotIn(vs ...uint64) predicate.Scan {
 	return predicate.Scan(sql.FieldNotIn(FieldCabinetID, vs...))
+}
+
+// UUIDEQ applies the EQ predicate on the "uuid" field.
+func UUIDEQ(v uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldUUID, v))
+}
+
+// UUIDNEQ applies the NEQ predicate on the "uuid" field.
+func UUIDNEQ(v uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldNEQ(FieldUUID, v))
+}
+
+// UUIDIn applies the In predicate on the "uuid" field.
+func UUIDIn(vs ...uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldIn(FieldUUID, vs...))
+}
+
+// UUIDNotIn applies the NotIn predicate on the "uuid" field.
+func UUIDNotIn(vs ...uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldNotIn(FieldUUID, vs...))
+}
+
+// UUIDGT applies the GT predicate on the "uuid" field.
+func UUIDGT(v uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldGT(FieldUUID, v))
+}
+
+// UUIDGTE applies the GTE predicate on the "uuid" field.
+func UUIDGTE(v uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldGTE(FieldUUID, v))
+}
+
+// UUIDLT applies the LT predicate on the "uuid" field.
+func UUIDLT(v uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldLT(FieldUUID, v))
+}
+
+// UUIDLTE applies the LTE predicate on the "uuid" field.
+func UUIDLTE(v uuid.UUID) predicate.Scan {
+	return predicate.Scan(sql.FieldLTE(FieldUUID, v))
 }
 
 // EfficientEQ applies the EQ predicate on the "efficient" field.

@@ -19,13 +19,15 @@ import (
 type Scan struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID uuid.UUID `json:"id,omitempty"`
+	ID uint64 `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
+	// UUID holds the value of the "uuid" field.
+	UUID uuid.UUID `json:"uuid,omitempty"`
 	// 是否有效
 	Efficient bool `json:"efficient,omitempty"`
 	// 用户ID
@@ -74,13 +76,13 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 			values[i] = new(adapter.UserType)
 		case scan.FieldEfficient:
 			values[i] = new(sql.NullBool)
-		case scan.FieldCabinetID:
+		case scan.FieldID, scan.FieldCabinetID:
 			values[i] = new(sql.NullInt64)
 		case scan.FieldUserID, scan.FieldSerial:
 			values[i] = new(sql.NullString)
 		case scan.FieldCreatedAt, scan.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case scan.FieldID:
+		case scan.FieldUUID:
 			values[i] = new(uuid.UUID)
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Scan", columns[i])
@@ -98,11 +100,11 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case scan.FieldID:
-			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
-			} else if value != nil {
-				s.ID = *value
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
 			}
+			s.ID = uint64(value.Int64)
 		case scan.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -120,6 +122,12 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field cabinet_id", values[i])
 			} else if value.Valid {
 				s.CabinetID = uint64(value.Int64)
+			}
+		case scan.FieldUUID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value != nil {
+				s.UUID = *value
 			}
 		case scan.FieldEfficient:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -194,6 +202,9 @@ func (s *Scan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("cabinet_id=")
 	builder.WriteString(fmt.Sprintf("%v", s.CabinetID))
+	builder.WriteString(", ")
+	builder.WriteString("uuid=")
+	builder.WriteString(fmt.Sprintf("%v", s.UUID))
 	builder.WriteString(", ")
 	builder.WriteString("efficient=")
 	builder.WriteString(fmt.Sprintf("%v", s.Efficient))

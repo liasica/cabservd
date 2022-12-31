@@ -13,7 +13,6 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/ent/scan"
-	"github.com/google/uuid"
 )
 
 // ScanQuery is the builder for querying Scan entities.
@@ -110,8 +109,8 @@ func (sq *ScanQuery) FirstX(ctx context.Context) *Scan {
 
 // FirstID returns the first Scan ID from the query.
 // Returns a *NotFoundError when no Scan ID was found.
-func (sq *ScanQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (sq *ScanQuery) FirstID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = sq.Limit(1).IDs(newQueryContext(ctx, TypeScan, "FirstID")); err != nil {
 		return
 	}
@@ -123,7 +122,7 @@ func (sq *ScanQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *ScanQuery) FirstIDX(ctx context.Context) uuid.UUID {
+func (sq *ScanQuery) FirstIDX(ctx context.Context) uint64 {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +160,8 @@ func (sq *ScanQuery) OnlyX(ctx context.Context) *Scan {
 // OnlyID is like Only, but returns the only Scan ID in the query.
 // Returns a *NotSingularError when more than one Scan ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *ScanQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
-	var ids []uuid.UUID
+func (sq *ScanQuery) OnlyID(ctx context.Context) (id uint64, err error) {
+	var ids []uint64
 	if ids, err = sq.Limit(2).IDs(newQueryContext(ctx, TypeScan, "OnlyID")); err != nil {
 		return
 	}
@@ -178,7 +177,7 @@ func (sq *ScanQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *ScanQuery) OnlyIDX(ctx context.Context) uuid.UUID {
+func (sq *ScanQuery) OnlyIDX(ctx context.Context) uint64 {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -206,8 +205,8 @@ func (sq *ScanQuery) AllX(ctx context.Context) []*Scan {
 }
 
 // IDs executes the query and returns a list of Scan IDs.
-func (sq *ScanQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
-	var ids []uuid.UUID
+func (sq *ScanQuery) IDs(ctx context.Context) ([]uint64, error) {
+	var ids []uint64
 	ctx = newQueryContext(ctx, TypeScan, "IDs")
 	if err := sq.Select(scan.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
@@ -216,7 +215,7 @@ func (sq *ScanQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *ScanQuery) IDsX(ctx context.Context) []uuid.UUID {
+func (sq *ScanQuery) IDsX(ctx context.Context) []uint64 {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -452,7 +451,7 @@ func (sq *ScanQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   scan.Table,
 			Columns: scan.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint64,
 				Column: scan.FieldID,
 			},
 		},

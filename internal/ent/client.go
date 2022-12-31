@@ -9,7 +9,6 @@ import (
 	"log"
 
 	"github.com/auroraride/cabservd/internal/ent/migrate"
-	"github.com/google/uuid"
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -631,7 +630,7 @@ func (c *ScanClient) UpdateOne(s *Scan) *ScanUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ScanClient) UpdateOneID(id uuid.UUID) *ScanUpdateOne {
+func (c *ScanClient) UpdateOneID(id uint64) *ScanUpdateOne {
 	mutation := newScanMutation(c.config, OpUpdateOne, withScanID(id))
 	return &ScanUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -648,7 +647,7 @@ func (c *ScanClient) DeleteOne(s *Scan) *ScanDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ScanClient) DeleteOneID(id uuid.UUID) *ScanDeleteOne {
+func (c *ScanClient) DeleteOneID(id uint64) *ScanDeleteOne {
 	builder := c.Delete().Where(scan.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -664,12 +663,12 @@ func (c *ScanClient) Query() *ScanQuery {
 }
 
 // Get returns a Scan entity by its id.
-func (c *ScanClient) Get(ctx context.Context, id uuid.UUID) (*Scan, error) {
+func (c *ScanClient) Get(ctx context.Context, id uint64) (*Scan, error) {
 	return c.Query().Where(scan.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ScanClient) GetX(ctx context.Context, id uuid.UUID) *Scan {
+func (c *ScanClient) GetX(ctx context.Context, id uint64) *Scan {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)

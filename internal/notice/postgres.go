@@ -7,25 +7,14 @@ package notice
 
 import (
     "fmt"
+    "github.com/auroraride/adapter/pn"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
-    "github.com/goccy/go-json"
     "github.com/lib/pq"
     log "github.com/sirupsen/logrus"
     "sync"
     "time"
 )
-
-const (
-    PostgresChannelCabinet PostgresChannel = "cabinet"
-    PostgresChannelBin     PostgresChannel = "bin"
-)
-
-type PostgresChannel string
-
-func (c PostgresChannel) String() string {
-    return string(c)
-}
 
 type PostgresHook struct {
     // 需要监听的电柜信息
@@ -38,19 +27,23 @@ type PostgresHook struct {
     listeners sync.Map
 }
 
-func (h *PostgresHook) GetListenerKey(channel PostgresChannel, id uint64) string {
+func NewPostgres() *PostgresHook {
+    return &PostgresHook{}
+}
+
+func (h *PostgresHook) GetListenerKey(channel pn.Channel, id uint64) string {
     return fmt.Sprintf("%s-%d", channel, id)
 }
 
-func (h *PostgresHook) SetListener(channel PostgresChannel, id uint64, l chan IDSerialGetter) {
+func (h *PostgresHook) SetListener(channel pn.Channel, id uint64, l chan any) {
     h.listeners.Store(l, h.GetListenerKey(channel, id))
 }
 
-func (h *PostgresHook) GetListener(channel PostgresChannel, id uint64) (ch chan IDSerialGetter) {
+func (h *PostgresHook) GetListener(channel pn.Channel, id uint64) (ch chan any) {
     key := h.GetListenerKey(channel, id)
     h.listeners.Range(func(v, k any) bool {
         if k == key {
-            ch = v.(chan IDSerialGetter)
+            ch = v.(chan any)
             return false
         }
         return true
@@ -58,23 +51,61 @@ func (h *PostgresHook) GetListener(channel PostgresChannel, id uint64) (ch chan 
     return
 }
 
-func (h *PostgresHook) DeleteListener(ch chan IDSerialGetter) {
+func (h *PostgresHook) DeleteListener(ch chan any) {
     h.listeners.Delete(ch)
 }
 
-func NewPostgres() *PostgresHook {
-    return &PostgresHook{}
+func (*PostgresHook) ParseData(n *pq.Notification) (channel pn.Channel, data any, err error) {
+    channel = pn.Channel(n.Channel)
+    err = channel.Validate()
+    if err != nil {
+        return
+    }
+
+    b := []byte(n.Extra)
+
+    switch channel {
+    case pn.ChannelCabinet:
+        var cab *ent.Cabinet
+        cab, err = pn.ParseData[*ent.Cabinet](b)
+        data = cab
+    case pn.ChannelBin:
+        var eb *ent.Bin
+        eb, err = pn.ParseData[*ent.Bin](b)
+        data = eb
+    }
+    return
 }
 
-type IDSerialGetter interface {
-    GetID() uint64
-    GetSerial() string
+func (h *PostgresHook) parseNotice(n *pq.Notification) {
+    channel, data, err := h.ParseData(n)
+    if err != nil {
+        log.Errorf("[EVENTS] 消息解析失败: %v", err)
+        return
+    }
+
+    var id uint64
+
+    switch target := data.(type) {
+    case *ent.Cabinet:
+        id = target.ID
+        go Aurservd.SendCabinet(false, target.Serial, target, nil)
+    case *ent.Bin:
+        id = target.ID
+        go Aurservd.SendCabinet(false, target.Serial, nil, ent.Bins{target})
+        if target.BatterySn != "" {
+            go Aurservd.SendBattery(target.BatterySn, target.Serial)
+        }
+    }
+
+    go h.TrySendNotice(id, channel, data)
 }
 
-type PostgresNoticeData[T IDSerialGetter] struct {
-    Table  string `json:"table"`
-    Action string `json:"action"`
-    Data   T      `json:"data"`
+func (h *PostgresHook) TrySendNotice(id uint64, channel pn.Channel, target any) {
+    ch := h.GetListener(channel, id)
+    if ch != nil {
+        ch <- target
+    }
 }
 
 func (h *PostgresHook) Start() {
@@ -89,8 +120,8 @@ func (h *PostgresHook) Start() {
     }
 
     l := pq.NewListener(dsn, 10*time.Second, time.Minute, reportProblem)
-    _ = l.Listen(PostgresChannelBin.String())
-    _ = l.Listen(PostgresChannelCabinet.String())
+    _ = l.Listen(pn.ChannelBin.String())
+    _ = l.Listen(pn.ChannelCabinet.String())
 
     log.Println("[EVENTS] 开始监听PostgreSQL变化...")
 
@@ -106,42 +137,7 @@ func (h *PostgresHook) Start() {
             // _ = json.Indent(&prettyJSON, []byte(n.Extra), "", "  ")
             // fmt.Println(string(prettyJSON.Bytes()))
 
-            var (
-                cab    *ent.Cabinet
-                bins   ent.Bins
-                cn     = PostgresChannel(n.Channel)
-                target IDSerialGetter
-            )
-
-            switch cn {
-            case PostgresChannelCabinet:
-                v := new(PostgresNoticeData[*ent.Cabinet])
-                err := json.Unmarshal([]byte(n.Extra), v)
-                if err != nil {
-                    log.Errorf("[EVENTS] 消息解析失败: %v", err)
-                    continue
-                }
-
-                target = v.Data
-                cab = v.Data
-
-            case PostgresChannelBin:
-                v := new(PostgresNoticeData[*ent.Bin])
-                err := json.Unmarshal([]byte(n.Extra), v)
-                if err != nil {
-                    log.Errorf("[EVENTS] 消息解析失败: %v", err)
-                    continue
-                }
-
-                target = v.Data
-                bins = ent.Bins{v.Data}
-
-            default:
-                return
-            }
-
-            go h.SendNotice(cn, target)
-            go Aurservd.SendCabinet(false, target.GetSerial(), cab, bins)
+            go h.parseNotice(n)
 
         case <-timeout:
             // log.Info("[EVENTS] 超过90s未检测到PostgreSQL变化, 检查连接...")
@@ -149,13 +145,5 @@ func (h *PostgresHook) Start() {
                 _ = l.Ping()
             }()
         }
-    }
-}
-
-func (h *PostgresHook) SendNotice(channel PostgresChannel, target IDSerialGetter) {
-    id := target.GetID()
-    ch := h.GetListener(channel, id)
-    if ch != nil {
-        ch <- target
     }
 }

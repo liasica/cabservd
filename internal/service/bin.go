@@ -8,6 +8,7 @@ package service
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/pn"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -63,7 +64,7 @@ func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
     var (
         ec *ent.Console
         b  *ent.Bin
-        ch chan notice.IDSerialGetter
+        ch chan any
     )
     ec, b, err = NewConsole(s.User).Operate(req)
     if err != nil {
@@ -91,8 +92,8 @@ func (s *binService) Operate(req *adapter.OperateRequest) (err error) {
     }
 
     // 监听状态改动
-    ch = make(chan notice.IDSerialGetter)
-    notice.Postgres.SetListener(notice.PostgresChannelBin, b.ID, ch)
+    ch = make(chan any)
+    notice.Postgres.SetListener(pn.ChannelBin, b.ID, ch)
 
     // 操作仓门
     err = core.Hub.Control(req)

@@ -70,6 +70,7 @@ type ConsolePointer struct {
 type ScanPointers []*ScanPointer
 type ScanPointer struct {
 	CabinetID *uint64                          `json:"cabinet_id,omitempty"`
+	UUID      *uuid.UUID                       `json:"uuid,omitempty"`
 	Efficient *bool                            `json:"efficient,omitempty"`
 	UserID    *string                          `json:"user_id,omitempty"`
 	UserType  *adapter.UserType                `json:"user_type,omitempty"`

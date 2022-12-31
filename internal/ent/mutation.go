@@ -4452,9 +4452,10 @@ type ScanMutation struct {
 	config
 	op             Op
 	typ            string
-	id             *uuid.UUID
+	id             *uint64
 	created_at     *time.Time
 	updated_at     *time.Time
+	uuid           *uuid.UUID
 	efficient      *bool
 	user_id        *string
 	user_type      *adapter.UserType
@@ -4488,7 +4489,7 @@ func newScanMutation(c config, op Op, opts ...scanOption) *ScanMutation {
 }
 
 // withScanID sets the ID field of the mutation.
-func withScanID(id uuid.UUID) scanOption {
+func withScanID(id uint64) scanOption {
 	return func(m *ScanMutation) {
 		var (
 			err   error
@@ -4538,15 +4539,9 @@ func (m ScanMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
-// SetID sets the value of the id field. Note that this
-// operation is only accepted on creation of Scan entities.
-func (m *ScanMutation) SetID(id uuid.UUID) {
-	m.id = &id
-}
-
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ScanMutation) ID() (id uuid.UUID, exists bool) {
+func (m *ScanMutation) ID() (id uint64, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -4557,12 +4552,12 @@ func (m *ScanMutation) ID() (id uuid.UUID, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ScanMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+func (m *ScanMutation) IDs(ctx context.Context) ([]uint64, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []uuid.UUID{id}, nil
+			return []uint64{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -4678,6 +4673,42 @@ func (m *ScanMutation) OldCabinetID(ctx context.Context) (v uint64, err error) {
 // ResetCabinetID resets all changes to the "cabinet_id" field.
 func (m *ScanMutation) ResetCabinetID() {
 	m.cabinet = nil
+}
+
+// SetUUID sets the "uuid" field.
+func (m *ScanMutation) SetUUID(u uuid.UUID) {
+	m.uuid = &u
+}
+
+// UUID returns the value of the "uuid" field in the mutation.
+func (m *ScanMutation) UUID() (r uuid.UUID, exists bool) {
+	v := m.uuid
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUUID returns the old "uuid" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldUUID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUUID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUUID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
+	}
+	return oldValue.UUID, nil
+}
+
+// ResetUUID resets all changes to the "uuid" field.
+func (m *ScanMutation) ResetUUID() {
+	m.uuid = nil
 }
 
 // SetEfficient sets the "efficient" field.
@@ -4933,7 +4964,7 @@ func (m *ScanMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ScanMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 9)
 	if m.created_at != nil {
 		fields = append(fields, scan.FieldCreatedAt)
 	}
@@ -4942,6 +4973,9 @@ func (m *ScanMutation) Fields() []string {
 	}
 	if m.cabinet != nil {
 		fields = append(fields, scan.FieldCabinetID)
+	}
+	if m.uuid != nil {
+		fields = append(fields, scan.FieldUUID)
 	}
 	if m.efficient != nil {
 		fields = append(fields, scan.FieldEfficient)
@@ -4972,6 +5006,8 @@ func (m *ScanMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case scan.FieldCabinetID:
 		return m.CabinetID()
+	case scan.FieldUUID:
+		return m.UUID()
 	case scan.FieldEfficient:
 		return m.Efficient()
 	case scan.FieldUserID:
@@ -4997,6 +5033,8 @@ func (m *ScanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldUpdatedAt(ctx)
 	case scan.FieldCabinetID:
 		return m.OldCabinetID(ctx)
+	case scan.FieldUUID:
+		return m.OldUUID(ctx)
 	case scan.FieldEfficient:
 		return m.OldEfficient(ctx)
 	case scan.FieldUserID:
@@ -5036,6 +5074,13 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCabinetID(v)
+		return nil
+	case scan.FieldUUID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUUID(v)
 		return nil
 	case scan.FieldEfficient:
 		v, ok := value.(bool)
@@ -5141,6 +5186,9 @@ func (m *ScanMutation) ResetField(name string) error {
 		return nil
 	case scan.FieldCabinetID:
 		m.ResetCabinetID()
+		return nil
+	case scan.FieldUUID:
+		m.ResetUUID()
 		return nil
 	case scan.FieldEfficient:
 		m.ResetEfficient()

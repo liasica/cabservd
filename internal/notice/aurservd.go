@@ -26,7 +26,7 @@ func NewAurservd() *aurservdHook {
     }
 }
 
-func (c *aurservdHook) CabinetFullUpdate() {
+func (*aurservdHook) CabinetFullUpdate() {
     cabs, _ := ent.Database.Cabinet.Query().WithBins(func(query *ent.BinQuery) {
         query.Order(ent.Asc(bin.FieldOrdinal))
     }).All(context.Background())
@@ -35,7 +35,7 @@ func (c *aurservdHook) CabinetFullUpdate() {
     }
 }
 
-func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *adapter.CabinetMessage) {
+func (*aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *adapter.CabinetMessage) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
@@ -88,23 +88,30 @@ func (c *aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabine
     return
 }
 
-func (c *aurservdHook) SendCabinet(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) {
-    Aurservd.Sender <- Aurservd.CabinetWrapData(full, serial, cab, bins)
+func (h *aurservdHook) SendBattery(sn, serial string) {
+    h.Sender <- &adapter.BatteryMessage{
+        Battery: adapter.ParseBatterySN(sn),
+        Cabinet: serial,
+    }
 }
 
-func (c *aurservdHook) SendData(data adapter.Messenger) {
-    Aurservd.Sender <- data
+func (h *aurservdHook) SendCabinet(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) {
+    h.Sender <- Aurservd.CabinetWrapData(full, serial, cab, bins)
 }
 
-func (*aurservdHook) Start() {
-    Aurservd.Hooks.Start = func() {
+func (h *aurservdHook) SendData(data adapter.Messenger) {
+    h.Sender <- data
+}
+
+func (h *aurservdHook) Start() {
+    h.Hooks.Start = func() {
         worker.Add(1)
     }
 
-    Aurservd.Hooks.Connect = func() {
-        Aurservd.CabinetFullUpdate()
+    h.Hooks.Connect = func() {
+        h.CabinetFullUpdate()
         worker.Done()
     }
 
-    Aurservd.Run()
+    h.Run()
 }

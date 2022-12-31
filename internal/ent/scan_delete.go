@@ -44,7 +44,7 @@ func (sd *ScanDelete) sqlExec(ctx context.Context) (int, error) {
 		Node: &sqlgraph.NodeSpec{
 			Table: scan.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint64,
 				Column: scan.FieldID,
 			},
 		},

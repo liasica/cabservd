@@ -57,7 +57,7 @@ func (s *consoleService) StartExchangeStep(sc *ent.Scan, step adapter.ExchangeSt
         SetCabinetID(sc.CabinetID).
         SetSerial(sc.Serial).
         SetBinID(b.ID).
-        SetUUID(sc.ID).
+        SetUUID(sc.UUID).
         SetType(console.TypeExchange).
         SetUserID(sc.UserID).
         SetUserType(sc.UserType).

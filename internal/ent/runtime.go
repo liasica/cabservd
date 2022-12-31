@@ -109,12 +109,12 @@ func init() {
 	scan.DefaultUpdatedAt = scanDescUpdatedAt.Default.(func() time.Time)
 	// scan.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	scan.UpdateDefaultUpdatedAt = scanDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// scanDescUUID is the schema descriptor for uuid field.
+	scanDescUUID := scanFields[0].Descriptor()
+	// scan.DefaultUUID holds the default value on creation for the uuid field.
+	scan.DefaultUUID = scanDescUUID.Default.(func() uuid.UUID)
 	// scanDescEfficient is the schema descriptor for efficient field.
 	scanDescEfficient := scanFields[1].Descriptor()
 	// scan.DefaultEfficient holds the default value on creation for the efficient field.
 	scan.DefaultEfficient = scanDescEfficient.Default.(bool)
-	// scanDescID is the schema descriptor for id field.
-	scanDescID := scanFields[0].Descriptor()
-	// scan.DefaultID holds the default value on creation for the id field.
-	scan.DefaultID = scanDescID.Default.(func() uuid.UUID)
 }

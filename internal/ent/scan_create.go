@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"time"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -60,6 +59,20 @@ func (sc *ScanCreate) SetCabinetID(u uint64) *ScanCreate {
 	return sc
 }
 
+// SetUUID sets the "uuid" field.
+func (sc *ScanCreate) SetUUID(u uuid.UUID) *ScanCreate {
+	sc.mutation.SetUUID(u)
+	return sc
+}
+
+// SetNillableUUID sets the "uuid" field if the given value is not nil.
+func (sc *ScanCreate) SetNillableUUID(u *uuid.UUID) *ScanCreate {
+	if u != nil {
+		sc.SetUUID(*u)
+	}
+	return sc
+}
+
 // SetEfficient sets the "efficient" field.
 func (sc *ScanCreate) SetEfficient(b bool) *ScanCreate {
 	sc.mutation.SetEfficient(b)
@@ -95,20 +108,6 @@ func (sc *ScanCreate) SetSerial(s string) *ScanCreate {
 // SetData sets the "data" field.
 func (sc *ScanCreate) SetData(aur *adapter.ExchangeUsableResponse) *ScanCreate {
 	sc.mutation.SetData(aur)
-	return sc
-}
-
-// SetID sets the "id" field.
-func (sc *ScanCreate) SetID(u uuid.UUID) *ScanCreate {
-	sc.mutation.SetID(u)
-	return sc
-}
-
-// SetNillableID sets the "id" field if the given value is not nil.
-func (sc *ScanCreate) SetNillableID(u *uuid.UUID) *ScanCreate {
-	if u != nil {
-		sc.SetID(*u)
-	}
 	return sc
 }
 
@@ -160,13 +159,13 @@ func (sc *ScanCreate) defaults() {
 		v := scan.DefaultUpdatedAt()
 		sc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := sc.mutation.UUID(); !ok {
+		v := scan.DefaultUUID()
+		sc.mutation.SetUUID(v)
+	}
 	if _, ok := sc.mutation.Efficient(); !ok {
 		v := scan.DefaultEfficient
 		sc.mutation.SetEfficient(v)
-	}
-	if _, ok := sc.mutation.ID(); !ok {
-		v := scan.DefaultID()
-		sc.mutation.SetID(v)
 	}
 }
 
@@ -180,6 +179,9 @@ func (sc *ScanCreate) check() error {
 	}
 	if _, ok := sc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet_id", err: errors.New(`ent: missing required field "Scan.cabinet_id"`)}
+	}
+	if _, ok := sc.mutation.UUID(); !ok {
+		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "Scan.uuid"`)}
 	}
 	if _, ok := sc.mutation.Efficient(); !ok {
 		return &ValidationError{Name: "efficient", err: errors.New(`ent: missing required field "Scan.efficient"`)}
@@ -210,13 +212,8 @@ func (sc *ScanCreate) sqlSave(ctx context.Context) (*Scan, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
-			_node.ID = *id
-		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
-			return nil, err
-		}
-	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = uint64(id)
 	sc.mutation.id = &_node.ID
 	sc.mutation.done = true
 	return _node, nil
@@ -228,16 +225,12 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: scan.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint64,
 				Column: scan.FieldID,
 			},
 		}
 	)
 	_spec.OnConflict = sc.conflict
-	if id, ok := sc.mutation.ID(); ok {
-		_node.ID = id
-		_spec.ID.Value = &id
-	}
 	if value, ok := sc.mutation.CreatedAt(); ok {
 		_spec.SetField(scan.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
@@ -245,6 +238,10 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.UpdatedAt(); ok {
 		_spec.SetField(scan.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := sc.mutation.UUID(); ok {
+		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
+		_node.UUID = value
 	}
 	if value, ok := sc.mutation.Efficient(); ok {
 		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
@@ -362,6 +359,18 @@ func (u *ScanUpsert) UpdateCabinetID() *ScanUpsert {
 	return u
 }
 
+// SetUUID sets the "uuid" field.
+func (u *ScanUpsert) SetUUID(v uuid.UUID) *ScanUpsert {
+	u.Set(scan.FieldUUID, v)
+	return u
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *ScanUpsert) UpdateUUID() *ScanUpsert {
+	u.SetExcluded(scan.FieldUUID)
+	return u
+}
+
 // SetEfficient sets the "efficient" field.
 func (u *ScanUpsert) SetEfficient(v bool) *ScanUpsert {
 	u.Set(scan.FieldEfficient, v)
@@ -428,23 +437,17 @@ func (u *ScanUpsert) ClearData() *ScanUpsert {
 	return u
 }
 
-// UpdateNewValues updates the mutable fields using the new values that were set on create except the ID field.
+// UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
 //	client.Scan.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
-//			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(scan.FieldID)
-//			}),
 //		).
 //		Exec(ctx)
 func (u *ScanUpsertOne) UpdateNewValues() *ScanUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
-		if _, exists := u.create.mutation.ID(); exists {
-			s.SetIgnore(scan.FieldID)
-		}
 		if _, exists := u.create.mutation.CreatedAt(); exists {
 			s.SetIgnore(scan.FieldCreatedAt)
 		}
@@ -504,6 +507,20 @@ func (u *ScanUpsertOne) SetCabinetID(v uint64) *ScanUpsertOne {
 func (u *ScanUpsertOne) UpdateCabinetID() *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateCabinetID()
+	})
+}
+
+// SetUUID sets the "uuid" field.
+func (u *ScanUpsertOne) SetUUID(v uuid.UUID) *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetUUID(v)
+	})
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *ScanUpsertOne) UpdateUUID() *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateUUID()
 	})
 }
 
@@ -600,12 +617,7 @@ func (u *ScanUpsertOne) ExecX(ctx context.Context) {
 }
 
 // Exec executes the UPSERT query and returns the inserted/updated ID.
-func (u *ScanUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
-	if u.create.driver.Dialect() == dialect.MySQL {
-		// In case of "ON CONFLICT", there is no way to get back non-numeric ID
-		// fields from the database since MySQL does not support the RETURNING clause.
-		return id, errors.New("ent: ScanUpsertOne.ID is not supported by MySQL driver. Use ScanUpsertOne.Exec instead")
-	}
+func (u *ScanUpsertOne) ID(ctx context.Context) (id uint64, err error) {
 	node, err := u.create.Save(ctx)
 	if err != nil {
 		return id, err
@@ -614,7 +626,7 @@ func (u *ScanUpsertOne) ID(ctx context.Context) (id uuid.UUID, err error) {
 }
 
 // IDX is like ID, but panics if an error occurs.
-func (u *ScanUpsertOne) IDX(ctx context.Context) uuid.UUID {
+func (u *ScanUpsertOne) IDX(ctx context.Context) uint64 {
 	id, err := u.ID(ctx)
 	if err != nil {
 		panic(err)
@@ -673,6 +685,10 @@ func (scb *ScanCreateBulk) Save(ctx context.Context) ([]*Scan, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = uint64(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})
@@ -759,18 +775,12 @@ type ScanUpsertBulk struct {
 //	client.Scan.Create().
 //		OnConflict(
 //			sql.ResolveWithNewValues(),
-//			sql.ResolveWith(func(u *sql.UpdateSet) {
-//				u.SetIgnore(scan.FieldID)
-//			}),
 //		).
 //		Exec(ctx)
 func (u *ScanUpsertBulk) UpdateNewValues() *ScanUpsertBulk {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWithNewValues())
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		for _, b := range u.create.builders {
-			if _, exists := b.mutation.ID(); exists {
-				s.SetIgnore(scan.FieldID)
-			}
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(scan.FieldCreatedAt)
 			}
@@ -831,6 +841,20 @@ func (u *ScanUpsertBulk) SetCabinetID(v uint64) *ScanUpsertBulk {
 func (u *ScanUpsertBulk) UpdateCabinetID() *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.UpdateCabinetID()
+	})
+}
+
+// SetUUID sets the "uuid" field.
+func (u *ScanUpsertBulk) SetUUID(v uuid.UUID) *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetUUID(v)
+	})
+}
+
+// UpdateUUID sets the "uuid" field to the value that was provided on create.
+func (u *ScanUpsertBulk) UpdateUUID() *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateUUID()
 	})
 }
 

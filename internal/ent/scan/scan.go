@@ -19,6 +19,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldCabinetID holds the string denoting the cabinet_id field in the database.
 	FieldCabinetID = "cabinet_id"
+	// FieldUUID holds the string denoting the uuid field in the database.
+	FieldUUID = "uuid"
 	// FieldEfficient holds the string denoting the efficient field in the database.
 	FieldEfficient = "efficient"
 	// FieldUserID holds the string denoting the user_id field in the database.
@@ -48,6 +50,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldCabinetID,
+	FieldUUID,
 	FieldEfficient,
 	FieldUserID,
 	FieldUserType,
@@ -72,8 +75,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultUUID holds the default value on creation for the "uuid" field.
+	DefaultUUID func() uuid.UUID
 	// DefaultEfficient holds the default value on creation for the "efficient" field.
 	DefaultEfficient bool
-	// DefaultID holds the default value on creation for the "id" field.
-	DefaultID func() uuid.UUID
 )

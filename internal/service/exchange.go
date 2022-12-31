@@ -6,7 +6,9 @@
 package service
 
 import (
+    "fmt"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/pn"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
@@ -133,7 +135,7 @@ func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapt
 
     // 存储扫码记录
     sm := NewScan(s.User).Create(req.Serial, cab, res)
-    res.UUID = sm.ID.String()
+    res.UUID = sm.UUID.String()
 
     return
 }
@@ -150,12 +152,16 @@ func (s *exchangeService) Do(req *adapter.ExchangeRequest) (res *adapter.Exchang
     }
 
     for _, result := range results {
-        if result.Step == adapter.ExchangeStepFourth && result.Success {
-            res.Success = true
-            res.AfterBattery = sc.Data.Fully.BatterySn
+        res.Success = result.Step == adapter.ExchangeStepFourth && result.Success
+
+        // 取出的电池
+        if result.Step == adapter.ExchangeStepThird && result.Success {
+            res.PutoutBattery = sc.Data.Fully.BatterySn
         }
-        if result.Step == adapter.ExchangeStepSecond && result.Success {
-            res.BeforeBattery = result.After.BatterySN
+
+        // 放入的电池
+        if result.Step <= adapter.ExchangeStepSecond && result.After.BatterySN != "" {
+            res.PutinBattery = result.After.BatterySN
         }
     }
 
@@ -215,8 +221,8 @@ func (s *exchangeService) step(req *adapter.ExchangeRequest, sc *ent.Scan, conf 
         return
     }
 
-    ch := make(chan notice.IDSerialGetter)
-    notice.Postgres.SetListener(notice.PostgresChannelBin, eb.ID, ch)
+    ch := make(chan any)
+    notice.Postgres.SetListener(pn.ChannelBin, eb.ID, ch)
 
     defer func() {
         // 删除监听
@@ -262,6 +268,15 @@ func (s *exchangeService) step(req *adapter.ExchangeRequest, sc *ent.Scan, conf 
             // 检查电池是否满足条件
             batteryOk, err = bs.DetectBattery(b, conf.Battery)
             if err != nil {
+                return
+            }
+
+            // 检查放入电池是否匹配
+            if b.BatterySn != "" {
+                fmt.Printf("->>>>>>>>>>>>电池编号: %v, batteryOk: %v, conf: %v, riderBattery: %v", b.BatterySn, batteryOk, conf.Battery, req.Battery)
+            }
+            if batteryOk && conf.Battery == adapter.DetectBatteryPutin && b.BatterySn != req.Battery {
+                err = adapter.ErrorBatteryPutin
                 return
             }
 

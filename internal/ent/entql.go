@@ -110,7 +110,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Table:   scan.Table,
 			Columns: scan.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint64,
 				Column: scan.FieldID,
 			},
 		},
@@ -119,6 +119,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			scan.FieldCreatedAt: {Type: field.TypeTime, Column: scan.FieldCreatedAt},
 			scan.FieldUpdatedAt: {Type: field.TypeTime, Column: scan.FieldUpdatedAt},
 			scan.FieldCabinetID: {Type: field.TypeUint64, Column: scan.FieldCabinetID},
+			scan.FieldUUID:      {Type: field.TypeUUID, Column: scan.FieldUUID},
 			scan.FieldEfficient: {Type: field.TypeBool, Column: scan.FieldEfficient},
 			scan.FieldUserID:    {Type: field.TypeString, Column: scan.FieldUserID},
 			scan.FieldUserType:  {Type: field.TypeOther, Column: scan.FieldUserType},
@@ -646,8 +647,8 @@ func (f *ScanFilter) Where(p entql.P) {
 	})
 }
 
-// WhereID applies the entql [16]byte predicate on the id field.
-func (f *ScanFilter) WhereID(p entql.ValueP) {
+// WhereID applies the entql uint64 predicate on the id field.
+func (f *ScanFilter) WhereID(p entql.Uint64P) {
 	f.Where(p.Field(scan.FieldID))
 }
 
@@ -664,6 +665,11 @@ func (f *ScanFilter) WhereUpdatedAt(p entql.TimeP) {
 // WhereCabinetID applies the entql uint64 predicate on the cabinet_id field.
 func (f *ScanFilter) WhereCabinetID(p entql.Uint64P) {
 	f.Where(p.Field(scan.FieldCabinetID))
+}
+
+// WhereUUID applies the entql [16]byte predicate on the uuid field.
+func (f *ScanFilter) WhereUUID(p entql.ValueP) {
+	f.Where(p.Field(scan.FieldUUID))
 }
 
 // WhereEfficient applies the entql bool predicate on the efficient field.

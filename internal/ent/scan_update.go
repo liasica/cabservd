@@ -15,6 +15,7 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/ent/scan"
+	"github.com/google/uuid"
 )
 
 // ScanUpdate is the builder for updating Scan entities.
@@ -40,6 +41,20 @@ func (su *ScanUpdate) SetUpdatedAt(t time.Time) *ScanUpdate {
 // SetCabinetID sets the "cabinet_id" field.
 func (su *ScanUpdate) SetCabinetID(u uint64) *ScanUpdate {
 	su.mutation.SetCabinetID(u)
+	return su
+}
+
+// SetUUID sets the "uuid" field.
+func (su *ScanUpdate) SetUUID(u uuid.UUID) *ScanUpdate {
+	su.mutation.SetUUID(u)
+	return su
+}
+
+// SetNillableUUID sets the "uuid" field if the given value is not nil.
+func (su *ScanUpdate) SetNillableUUID(u *uuid.UUID) *ScanUpdate {
+	if u != nil {
+		su.SetUUID(*u)
+	}
 	return su
 }
 
@@ -162,7 +177,7 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   scan.Table,
 			Columns: scan.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint64,
 				Column: scan.FieldID,
 			},
 		},
@@ -176,6 +191,9 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.UpdatedAt(); ok {
 		_spec.SetField(scan.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := su.mutation.UUID(); ok {
+		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
 	}
 	if value, ok := su.mutation.Efficient(); ok {
 		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
@@ -261,6 +279,20 @@ func (suo *ScanUpdateOne) SetUpdatedAt(t time.Time) *ScanUpdateOne {
 // SetCabinetID sets the "cabinet_id" field.
 func (suo *ScanUpdateOne) SetCabinetID(u uint64) *ScanUpdateOne {
 	suo.mutation.SetCabinetID(u)
+	return suo
+}
+
+// SetUUID sets the "uuid" field.
+func (suo *ScanUpdateOne) SetUUID(u uuid.UUID) *ScanUpdateOne {
+	suo.mutation.SetUUID(u)
+	return suo
+}
+
+// SetNillableUUID sets the "uuid" field if the given value is not nil.
+func (suo *ScanUpdateOne) SetNillableUUID(u *uuid.UUID) *ScanUpdateOne {
+	if u != nil {
+		suo.SetUUID(*u)
+	}
 	return suo
 }
 
@@ -390,7 +422,7 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 			Table:   scan.Table,
 			Columns: scan.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUUID,
+				Type:   field.TypeUint64,
 				Column: scan.FieldID,
 			},
 		},
@@ -421,6 +453,9 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 	}
 	if value, ok := suo.mutation.UpdatedAt(); ok {
 		_spec.SetField(scan.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := suo.mutation.UUID(); ok {
+		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
 	}
 	if value, ok := suo.mutation.Efficient(); ok {
 		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
