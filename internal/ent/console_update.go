@@ -44,6 +44,20 @@ func (cu *ConsoleUpdate) SetBinID(u uint64) *ConsoleUpdate {
 	return cu
 }
 
+// SetNillableBinID sets the "bin_id" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableBinID(u *uint64) *ConsoleUpdate {
+	if u != nil {
+		cu.SetBinID(*u)
+	}
+	return cu
+}
+
+// ClearBinID clears the value of the "bin_id" field.
+func (cu *ConsoleUpdate) ClearBinID() *ConsoleUpdate {
+	cu.mutation.ClearBinID()
+	return cu
+}
+
 // SetOperate sets the "operate" field.
 func (cu *ConsoleUpdate) SetOperate(a adapter.Operate) *ConsoleUpdate {
 	cu.mutation.SetOperate(a)
@@ -56,9 +70,9 @@ func (cu *ConsoleUpdate) SetSerial(s string) *ConsoleUpdate {
 	return cu
 }
 
-// SetType sets the "type" field.
-func (cu *ConsoleUpdate) SetType(c console.Type) *ConsoleUpdate {
-	cu.mutation.SetType(c)
+// SetBusiness sets the "business" field.
+func (cu *ConsoleUpdate) SetBusiness(a adapter.Business) *ConsoleUpdate {
+	cu.mutation.SetBusiness(a)
 	return cu
 }
 
@@ -75,22 +89,23 @@ func (cu *ConsoleUpdate) SetUserType(at adapter.UserType) *ConsoleUpdate {
 }
 
 // SetStep sets the "step" field.
-func (cu *ConsoleUpdate) SetStep(as adapter.ExchangeStep) *ConsoleUpdate {
-	cu.mutation.SetStep(as)
+func (cu *ConsoleUpdate) SetStep(i int) *ConsoleUpdate {
+	cu.mutation.ResetStep()
+	cu.mutation.SetStep(i)
 	return cu
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cu *ConsoleUpdate) SetNillableStep(as *adapter.ExchangeStep) *ConsoleUpdate {
-	if as != nil {
-		cu.SetStep(*as)
+func (cu *ConsoleUpdate) SetNillableStep(i *int) *ConsoleUpdate {
+	if i != nil {
+		cu.SetStep(*i)
 	}
 	return cu
 }
 
-// ClearStep clears the value of the "step" field.
-func (cu *ConsoleUpdate) ClearStep() *ConsoleUpdate {
-	cu.mutation.ClearStep()
+// AddStep adds i to the "step" field.
+func (cu *ConsoleUpdate) AddStep(i int) *ConsoleUpdate {
+	cu.mutation.AddStep(i)
 	return cu
 }
 
@@ -267,9 +282,9 @@ func (cu *ConsoleUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *ConsoleUpdate) check() error {
-	if v, ok := cu.mutation.GetType(); ok {
-		if err := console.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Console.type": %w`, err)}
+	if v, ok := cu.mutation.Business(); ok {
+		if err := console.BusinessValidator(v); err != nil {
+			return &ValidationError{Name: "business", err: fmt.Errorf(`ent: validator failed for field "Console.business": %w`, err)}
 		}
 	}
 	if v, ok := cu.mutation.Status(); ok {
@@ -279,9 +294,6 @@ func (cu *ConsoleUpdate) check() error {
 	}
 	if _, ok := cu.mutation.CabinetID(); cu.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Console.cabinet"`)
-	}
-	if _, ok := cu.mutation.BinID(); cu.mutation.BinCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Console.bin"`)
 	}
 	return nil
 }
@@ -319,8 +331,8 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.GetType(); ok {
-		_spec.SetField(console.FieldType, field.TypeEnum, value)
+	if value, ok := cu.mutation.Business(); ok {
+		_spec.SetField(console.FieldBusiness, field.TypeEnum, value)
 	}
 	if value, ok := cu.mutation.UserID(); ok {
 		_spec.SetField(console.FieldUserID, field.TypeString, value)
@@ -329,10 +341,10 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(console.FieldUserType, field.TypeOther, value)
 	}
 	if value, ok := cu.mutation.Step(); ok {
-		_spec.SetField(console.FieldStep, field.TypeOther, value)
+		_spec.SetField(console.FieldStep, field.TypeInt, value)
 	}
-	if cu.mutation.StepCleared() {
-		_spec.ClearField(console.FieldStep, field.TypeOther)
+	if value, ok := cu.mutation.AddedStep(); ok {
+		_spec.AddField(console.FieldStep, field.TypeInt, value)
 	}
 	if value, ok := cu.mutation.Status(); ok {
 		_spec.SetField(console.FieldStatus, field.TypeEnum, value)
@@ -480,6 +492,20 @@ func (cuo *ConsoleUpdateOne) SetBinID(u uint64) *ConsoleUpdateOne {
 	return cuo
 }
 
+// SetNillableBinID sets the "bin_id" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableBinID(u *uint64) *ConsoleUpdateOne {
+	if u != nil {
+		cuo.SetBinID(*u)
+	}
+	return cuo
+}
+
+// ClearBinID clears the value of the "bin_id" field.
+func (cuo *ConsoleUpdateOne) ClearBinID() *ConsoleUpdateOne {
+	cuo.mutation.ClearBinID()
+	return cuo
+}
+
 // SetOperate sets the "operate" field.
 func (cuo *ConsoleUpdateOne) SetOperate(a adapter.Operate) *ConsoleUpdateOne {
 	cuo.mutation.SetOperate(a)
@@ -492,9 +518,9 @@ func (cuo *ConsoleUpdateOne) SetSerial(s string) *ConsoleUpdateOne {
 	return cuo
 }
 
-// SetType sets the "type" field.
-func (cuo *ConsoleUpdateOne) SetType(c console.Type) *ConsoleUpdateOne {
-	cuo.mutation.SetType(c)
+// SetBusiness sets the "business" field.
+func (cuo *ConsoleUpdateOne) SetBusiness(a adapter.Business) *ConsoleUpdateOne {
+	cuo.mutation.SetBusiness(a)
 	return cuo
 }
 
@@ -511,22 +537,23 @@ func (cuo *ConsoleUpdateOne) SetUserType(at adapter.UserType) *ConsoleUpdateOne 
 }
 
 // SetStep sets the "step" field.
-func (cuo *ConsoleUpdateOne) SetStep(as adapter.ExchangeStep) *ConsoleUpdateOne {
-	cuo.mutation.SetStep(as)
+func (cuo *ConsoleUpdateOne) SetStep(i int) *ConsoleUpdateOne {
+	cuo.mutation.ResetStep()
+	cuo.mutation.SetStep(i)
 	return cuo
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cuo *ConsoleUpdateOne) SetNillableStep(as *adapter.ExchangeStep) *ConsoleUpdateOne {
-	if as != nil {
-		cuo.SetStep(*as)
+func (cuo *ConsoleUpdateOne) SetNillableStep(i *int) *ConsoleUpdateOne {
+	if i != nil {
+		cuo.SetStep(*i)
 	}
 	return cuo
 }
 
-// ClearStep clears the value of the "step" field.
-func (cuo *ConsoleUpdateOne) ClearStep() *ConsoleUpdateOne {
-	cuo.mutation.ClearStep()
+// AddStep adds i to the "step" field.
+func (cuo *ConsoleUpdateOne) AddStep(i int) *ConsoleUpdateOne {
+	cuo.mutation.AddStep(i)
 	return cuo
 }
 
@@ -710,9 +737,9 @@ func (cuo *ConsoleUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *ConsoleUpdateOne) check() error {
-	if v, ok := cuo.mutation.GetType(); ok {
-		if err := console.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Console.type": %w`, err)}
+	if v, ok := cuo.mutation.Business(); ok {
+		if err := console.BusinessValidator(v); err != nil {
+			return &ValidationError{Name: "business", err: fmt.Errorf(`ent: validator failed for field "Console.business": %w`, err)}
 		}
 	}
 	if v, ok := cuo.mutation.Status(); ok {
@@ -722,9 +749,6 @@ func (cuo *ConsoleUpdateOne) check() error {
 	}
 	if _, ok := cuo.mutation.CabinetID(); cuo.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Console.cabinet"`)
-	}
-	if _, ok := cuo.mutation.BinID(); cuo.mutation.BinCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "Console.bin"`)
 	}
 	return nil
 }
@@ -779,8 +803,8 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	if value, ok := cuo.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.GetType(); ok {
-		_spec.SetField(console.FieldType, field.TypeEnum, value)
+	if value, ok := cuo.mutation.Business(); ok {
+		_spec.SetField(console.FieldBusiness, field.TypeEnum, value)
 	}
 	if value, ok := cuo.mutation.UserID(); ok {
 		_spec.SetField(console.FieldUserID, field.TypeString, value)
@@ -789,10 +813,10 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 		_spec.SetField(console.FieldUserType, field.TypeOther, value)
 	}
 	if value, ok := cuo.mutation.Step(); ok {
-		_spec.SetField(console.FieldStep, field.TypeOther, value)
+		_spec.SetField(console.FieldStep, field.TypeInt, value)
 	}
-	if cuo.mutation.StepCleared() {
-		_spec.ClearField(console.FieldStep, field.TypeOther)
+	if value, ok := cuo.mutation.AddedStep(); ok {
+		_spec.AddField(console.FieldStep, field.TypeInt, value)
 	}
 	if value, ok := cuo.mutation.Status(); ok {
 		_spec.SetField(console.FieldStatus, field.TypeEnum, value)

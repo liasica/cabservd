@@ -65,12 +65,13 @@ func (Console) Fields() []ent.Field {
 
         field.String("serial").Comment("电柜设备序列号"),
         field.UUID("uuid", uuid.UUID{}).Immutable().Comment("标识符"),
-        field.Enum("type").Values("exchange", "operate", "cabinet").Comment("日志类别 exchange:换电控制 operate:手动操作 cabinet:电柜日志"),
+        field.Enum("business").GoType(adapter.Business("")).Comment("业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订"),
 
         field.String("user_id").Comment("用户ID"),
         field.Other("user_type", adapter.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("用户类别"),
 
-        field.Other("step", adapter.ExchangeStepFirst).SchemaType(map[string]string{dialect.Postgres: postgres.TypeSmallInt}).Optional().Nillable().Comment("换电步骤"),
+        // field.Other("step", adapter.ExchangeStepFirst).SchemaType(map[string]string{dialect.Postgres: postgres.TypeSmallInt}).Optional().Nillable().Comment("换电步骤"),
+        field.Int("step").Default(1).Comment("步骤"),
 
         field.Enum("status").Values("invalid", "pending", "running", "success", "failed").Comment("状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败"),
         field.JSON("before_bin", &adapter.BinInfo{}).Optional().Comment("变化前仓位信息"),
@@ -91,7 +92,7 @@ func (Console) Edges() []ent.Edge {
 func (Console) Mixin() []ent.Mixin {
     return []ent.Mixin{
         CabinetMixin{},
-        BinMixin{},
+        BinMixin{Optional: true},
     }
 }
 

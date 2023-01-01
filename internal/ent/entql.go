@@ -92,10 +92,10 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldOperate:   {Type: field.TypeOther, Column: console.FieldOperate},
 			console.FieldSerial:    {Type: field.TypeString, Column: console.FieldSerial},
 			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
-			console.FieldType:      {Type: field.TypeEnum, Column: console.FieldType},
+			console.FieldBusiness:  {Type: field.TypeEnum, Column: console.FieldBusiness},
 			console.FieldUserID:    {Type: field.TypeString, Column: console.FieldUserID},
 			console.FieldUserType:  {Type: field.TypeOther, Column: console.FieldUserType},
-			console.FieldStep:      {Type: field.TypeOther, Column: console.FieldStep},
+			console.FieldStep:      {Type: field.TypeInt, Column: console.FieldStep},
 			console.FieldStatus:    {Type: field.TypeEnum, Column: console.FieldStatus},
 			console.FieldBeforeBin: {Type: field.TypeJSON, Column: console.FieldBeforeBin},
 			console.FieldAfterBin:  {Type: field.TypeJSON, Column: console.FieldAfterBin},
@@ -529,9 +529,9 @@ func (f *ConsoleFilter) WhereUUID(p entql.ValueP) {
 	f.Where(p.Field(console.FieldUUID))
 }
 
-// WhereType applies the entql string predicate on the type field.
-func (f *ConsoleFilter) WhereType(p entql.StringP) {
-	f.Where(p.Field(console.FieldType))
+// WhereBusiness applies the entql string predicate on the business field.
+func (f *ConsoleFilter) WhereBusiness(p entql.StringP) {
+	f.Where(p.Field(console.FieldBusiness))
 }
 
 // WhereUserID applies the entql string predicate on the user_id field.
@@ -544,8 +544,8 @@ func (f *ConsoleFilter) WhereUserType(p entql.OtherP) {
 	f.Where(p.Field(console.FieldUserType))
 }
 
-// WhereStep applies the entql other predicate on the step field.
-func (f *ConsoleFilter) WhereStep(p entql.OtherP) {
+// WhereStep applies the entql int predicate on the step field.
+func (f *ConsoleFilter) WhereStep(p entql.IntP) {
 	f.Where(p.Field(console.FieldStep))
 }
 

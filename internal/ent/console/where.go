@@ -93,7 +93,7 @@ func UserType(v adapter.UserType) predicate.Console {
 }
 
 // Step applies equality check predicate on the "step" field. It's identical to StepEQ.
-func Step(v adapter.ExchangeStep) predicate.Console {
+func Step(v int) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldStep, v))
 }
 
@@ -155,6 +155,16 @@ func BinIDIn(vs ...uint64) predicate.Console {
 // BinIDNotIn applies the NotIn predicate on the "bin_id" field.
 func BinIDNotIn(vs ...uint64) predicate.Console {
 	return predicate.Console(sql.FieldNotIn(FieldBinID, vs...))
+}
+
+// BinIDIsNil applies the IsNil predicate on the "bin_id" field.
+func BinIDIsNil() predicate.Console {
+	return predicate.Console(sql.FieldIsNull(FieldBinID))
+}
+
+// BinIDNotNil applies the NotNil predicate on the "bin_id" field.
+func BinIDNotNil() predicate.Console {
+	return predicate.Console(sql.FieldNotNull(FieldBinID))
 }
 
 // OperateEQ applies the EQ predicate on the "operate" field.
@@ -302,24 +312,24 @@ func UUIDLTE(v uuid.UUID) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldUUID, v))
 }
 
-// TypeEQ applies the EQ predicate on the "type" field.
-func TypeEQ(v Type) predicate.Console {
-	return predicate.Console(sql.FieldEQ(FieldType, v))
+// BusinessEQ applies the EQ predicate on the "business" field.
+func BusinessEQ(v adapter.Business) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldBusiness, v))
 }
 
-// TypeNEQ applies the NEQ predicate on the "type" field.
-func TypeNEQ(v Type) predicate.Console {
-	return predicate.Console(sql.FieldNEQ(FieldType, v))
+// BusinessNEQ applies the NEQ predicate on the "business" field.
+func BusinessNEQ(v adapter.Business) predicate.Console {
+	return predicate.Console(sql.FieldNEQ(FieldBusiness, v))
 }
 
-// TypeIn applies the In predicate on the "type" field.
-func TypeIn(vs ...Type) predicate.Console {
-	return predicate.Console(sql.FieldIn(FieldType, vs...))
+// BusinessIn applies the In predicate on the "business" field.
+func BusinessIn(vs ...adapter.Business) predicate.Console {
+	return predicate.Console(sql.FieldIn(FieldBusiness, vs...))
 }
 
-// TypeNotIn applies the NotIn predicate on the "type" field.
-func TypeNotIn(vs ...Type) predicate.Console {
-	return predicate.Console(sql.FieldNotIn(FieldType, vs...))
+// BusinessNotIn applies the NotIn predicate on the "business" field.
+func BusinessNotIn(vs ...adapter.Business) predicate.Console {
+	return predicate.Console(sql.FieldNotIn(FieldBusiness, vs...))
 }
 
 // UserIDEQ applies the EQ predicate on the "user_id" field.
@@ -428,53 +438,43 @@ func UserTypeLTE(v adapter.UserType) predicate.Console {
 }
 
 // StepEQ applies the EQ predicate on the "step" field.
-func StepEQ(v adapter.ExchangeStep) predicate.Console {
+func StepEQ(v int) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldStep, v))
 }
 
 // StepNEQ applies the NEQ predicate on the "step" field.
-func StepNEQ(v adapter.ExchangeStep) predicate.Console {
+func StepNEQ(v int) predicate.Console {
 	return predicate.Console(sql.FieldNEQ(FieldStep, v))
 }
 
 // StepIn applies the In predicate on the "step" field.
-func StepIn(vs ...adapter.ExchangeStep) predicate.Console {
+func StepIn(vs ...int) predicate.Console {
 	return predicate.Console(sql.FieldIn(FieldStep, vs...))
 }
 
 // StepNotIn applies the NotIn predicate on the "step" field.
-func StepNotIn(vs ...adapter.ExchangeStep) predicate.Console {
+func StepNotIn(vs ...int) predicate.Console {
 	return predicate.Console(sql.FieldNotIn(FieldStep, vs...))
 }
 
 // StepGT applies the GT predicate on the "step" field.
-func StepGT(v adapter.ExchangeStep) predicate.Console {
+func StepGT(v int) predicate.Console {
 	return predicate.Console(sql.FieldGT(FieldStep, v))
 }
 
 // StepGTE applies the GTE predicate on the "step" field.
-func StepGTE(v adapter.ExchangeStep) predicate.Console {
+func StepGTE(v int) predicate.Console {
 	return predicate.Console(sql.FieldGTE(FieldStep, v))
 }
 
 // StepLT applies the LT predicate on the "step" field.
-func StepLT(v adapter.ExchangeStep) predicate.Console {
+func StepLT(v int) predicate.Console {
 	return predicate.Console(sql.FieldLT(FieldStep, v))
 }
 
 // StepLTE applies the LTE predicate on the "step" field.
-func StepLTE(v adapter.ExchangeStep) predicate.Console {
+func StepLTE(v int) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldStep, v))
-}
-
-// StepIsNil applies the IsNil predicate on the "step" field.
-func StepIsNil() predicate.Console {
-	return predicate.Console(sql.FieldIsNull(FieldStep))
-}
-
-// StepNotNil applies the NotNil predicate on the "step" field.
-func StepNotNil() predicate.Console {
-	return predicate.Console(sql.FieldNotNull(FieldStep))
 }
 
 // StatusEQ applies the EQ predicate on the "status" field.

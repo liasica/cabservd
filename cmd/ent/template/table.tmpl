@@ -1,0 +1,27 @@
+{{/*
+Copyright (C) liasica. 2021-present.
+
+Created at 2022-05-15
+Based on ent by liasica, magicrolan@qq.com.
+*/}}
+
+{{/* gotype: entgo.io/ent/entc/gen.Graph */}}
+
+{{ define "table" }}
+
+{{ template "header" $ }}
+
+{{ range $n := $.Nodes }}
+
+{{ if ne $n.Name "Permission" }}
+
+{{ $receiver := $n.Receiver }}
+
+// GetTableName returns table name for {{ $n.Name }}.
+func ({{ $receiver }} *{{ $n.Name }}) GetTableName() string {
+    return "{{ $n.Table }}"
+}
+
+{{ end }}
+{{ end }}
+{{ end }}

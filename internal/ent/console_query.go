@@ -479,7 +479,10 @@ func (cq *ConsoleQuery) loadBin(ctx context.Context, query *BinQuery, nodes []*C
 	ids := make([]uint64, 0, len(nodes))
 	nodeids := make(map[uint64][]*Console)
 	for i := range nodes {
-		fk := nodes[i].BinID
+		if nodes[i].BinID == nil {
+			continue
+		}
+		fk := *nodes[i].BinID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}

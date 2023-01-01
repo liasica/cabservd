@@ -7,6 +7,7 @@ import (
 
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/auroraride/cabservd/internal/ent/schema"
 	"github.com/google/uuid"
@@ -94,6 +95,12 @@ func init() {
 	cabinetDescEnable := cabinetFields[4].Descriptor()
 	// cabinet.DefaultEnable holds the default value on creation for the enable field.
 	cabinet.DefaultEnable = cabinetDescEnable.Default.(bool)
+	consoleFields := schema.Console{}.Fields()
+	_ = consoleFields
+	// consoleDescStep is the schema descriptor for step field.
+	consoleDescStep := consoleFields[6].Descriptor()
+	// console.DefaultStep holds the default value on creation for the step field.
+	console.DefaultStep = consoleDescStep.Default.(int)
 	scanMixin := schema.Scan{}.Mixin()
 	scanMixinFields0 := scanMixin[0].Fields()
 	_ = scanMixinFields0

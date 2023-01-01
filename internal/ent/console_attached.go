@@ -10,14 +10,17 @@ import (
     "github.com/auroraride/cabservd/internal/ent/console"
 )
 
-func (c *Console) OperateResult() (res *adapter.OperateResult) {
-    res = &adapter.OperateResult{
-        UUID:    c.UUID.String(),
-        StartAt: c.StartAt,
-        StopAt:  c.StopAt,
-        Success: c.Status == console.StatusSuccess,
-        Before:  c.BeforeBin,
-        After:   c.AfterBin,
+func (c *Console) OperateResult() (res *adapter.OperateStepResult) {
+    res = &adapter.OperateStepResult{
+        UUID:     c.UUID.String(),
+        Operate:  c.Operate,
+        Step:     c.Step,
+        Business: c.Business,
+        StartAt:  c.StartAt,
+        StopAt:   c.StopAt,
+        Success:  c.Status == console.StatusSuccess,
+        Before:   c.BeforeBin,
+        After:    c.AfterBin,
     }
 
     if c.Duration != nil {
@@ -28,16 +31,9 @@ func (c *Console) OperateResult() (res *adapter.OperateResult) {
         res.Message = *c.Message
     }
 
-    return
-}
-
-func (c *Console) StepResult() (res *adapter.ExchangeStepMessage) {
-    res = &adapter.ExchangeStepMessage{
-        OperateResult: c.OperateResult(),
+    if c.AfterBin != nil {
+        res.BatterySN = c.AfterBin.BatterySN
     }
 
-    if c.Step != nil {
-        res.Step = *c.Step
-    }
     return
 }

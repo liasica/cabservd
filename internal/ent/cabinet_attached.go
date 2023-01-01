@@ -5,7 +5,10 @@
 
 package ent
 
-import "github.com/auroraride/adapter"
+import (
+    "fmt"
+    "github.com/auroraride/adapter"
+)
 
 func (c *Cabinet) DetectOnline() (err error) {
     if !c.Online {
@@ -28,4 +31,8 @@ func (c *Cabinet) GetID() uint64 {
 
 func (c *Cabinet) GetSerial() string {
     return c.Serial
+}
+
+func (c *Cabinet) GetListenerKey() string {
+    return fmt.Sprintf("%s-%d", c.GetTableName(), c.ID)
 }

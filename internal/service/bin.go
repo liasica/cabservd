@@ -6,12 +6,15 @@
 package service
 
 import (
+    "fmt"
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/pn"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
+    "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/notice"
+    "github.com/auroraride/cabservd/internal/operate"
+    "github.com/google/uuid"
     log "github.com/sirupsen/logrus"
     "time"
 )
@@ -44,124 +47,184 @@ func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, e
     return s.orm.Query().Where(bin.Serial(serial), bin.Ordinal(ordinal)).First(s.ctx)
 }
 
-func (s *binService) Operate(req *adapter.OperateRequest) (ec *ent.Console, err error) {
-    if req.Ordinal == nil {
-        err = adapter.ErrorCabinetBinOrdinalRequired
-        return
+// Operate 按步骤操作某个仓位
+func (s *binService) Operate(bo *operate.Bin) (err error) {
+    if bo.StepCallback == nil {
+        return adapter.ErrorBadRequest
+    }
+    // // 操作之前验证当前状态, 操作值 等于 当前状态时直接返回成功
+    // // TODO 是否有必要?
+    // // TODO 其他详细日志
+    // switch req.Operate {
+    // case adapter.OperateDoorOpen:
+    //     oc = req.Operate
+    //     door = adapter.DetectDoorOpen
+    // case adapter.OperatePutin:
+    //     oc = adapter.OperateDoorOpen
+    //     door = adapter.DetectDoorClose
+    // case adapter.OperatePutout:
+    //     oc = adapter.OperateDoorOpen
+    //     door = adapter.DetectDoorClose
+    // case adapter.OperateBinDisable, adapter.OperateBinEnable:
+    //     oc = req.Operate
+    // default:
+    //     err = adapter.ErrorOperateCommand
+    //     return
+    // }
+
+    // 查询仓位
+    eb, _ := NewBin(s.User).QuerySerialOrdinal(bo.Serial, bo.Ordinal)
+
+    fakevoltage, _ := core.Hub.Bean.GetEmptyDeviation()
+
+    // 开始监听
+    timeout := time.After(time.Duration(bo.Timeout) * time.Second)
+
+    // 监听数据库变动
+    ch := make(chan *ent.Bin)
+    notice.Bin.SetListener(eb, ch)
+
+    stepper := make(chan *operate.BinResult)
+
+    defer func() {
+        // 退出时删除监听
+        notice.Bin.RemoveListener(ch)
+        close(stepper)
+    }()
+
+    // 开启监听
+    go func() {
+        for {
+            select {
+            case <-timeout:
+                err = adapter.ErrorExchangeTimeOut
+                stepper <- operate.NewBinResult(nil, err)
+                return
+            case x := <-ch:
+                // 如果通道关闭直接返回
+                if x == nil {
+                    return
+                }
+
+                // fmt.Printf("->>>>> [BIN]: %v <<<<<-\n", x)
+                *eb = *x
+
+                var doorOk, batteryOk bool
+
+                step := bo.Current()
+
+                switch step.Door {
+                case adapter.DetectDoorIgnore:
+                    // 忽略仓门检测
+                    doorOk = true
+                case adapter.DetectDoorOpen:
+                    // 检测仓门是否开启
+                    doorOk = x.Open
+                case adapter.DetectDoorClose:
+                    // 检测仓门是否关闭
+                    doorOk = !x.Open
+                }
+
+                switch step.Battery {
+                case adapter.DetectBatteryIgnore:
+                    // 忽略电池检测
+                    batteryOk = true
+                case adapter.DetectBatteryPutin:
+                    // 严格检测电池是否放入
+                    batteryOk = x.IsStrictHasBattery(fakevoltage)
+                case adapter.DetectBatteryPutout:
+                    // 检测电池是否取出
+                    batteryOk = x.IsLooseNoBattery(fakevoltage)
+                }
+
+                if !x.IsUsable() {
+                    stepper <- operate.NewBinResult(eb, adapter.ErrorCabinetBinNotUsable)
+                    return
+                }
+
+                if batteryOk && doorOk {
+
+                    // 检查放入电池编号是否匹配
+                    if step.Battery == adapter.DetectBatteryPutin && bo.Battery != "" && eb.BatterySn != bo.Battery {
+                        err = adapter.ErrorBatteryPutin
+                    }
+
+                    stepper <- operate.NewBinResult(eb, err)
+
+                    // 如果有错误, 终止
+                    if err != nil {
+                        return
+                    }
+
+                    // 尝试开启下次任务, 如果没有下次任务, 终止
+                    if !bo.Next() {
+                        return
+                    }
+                }
+            }
+        }
+    }()
+
+    for _, step := range bo.Steps {
+        err = s.doOperateStep(bo.UUID, bo.Business, eb, step, stepper, bo.StepCallback)
+
+        // 遇到错误, 直接返回
+        if err != nil {
+            return
+        }
     }
 
-    var (
-        eb *ent.Bin
-        cs = NewConsole(s.User)
-    )
+    return
+}
 
+func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, eb *ent.Bin, step *operate.BinStep, stepper chan *operate.BinResult, scb operate.StepCallback) (err error) {
     // 创建记录
-    ec, eb, err = cs.Create(req)
+    var co *ent.Console
+    co, err = ent.Database.Console.Create().
+        SetOperate(step.Operate).
+        SetCabinetID(eb.CabinetID).
+        SetBinID(eb.ID).
+        SetSerial(eb.Serial).
+        SetUserID(s.User.ID).
+        SetUserType(s.User.Type).
+        SetStatus(console.StatusRunning).
+        SetStartAt(time.Now()).
+        SetBeforeBin(eb.Info()).
+        SetStep(step.Step).
+        SetBusiness(business).
+        SetUUID(uid).
+        Save(s.ctx)
     if err != nil {
         return
     }
 
-    ch := make(chan any)
-    notice.Postgres.SetListener(pn.ChannelBin, eb.ID, ch)
-
     defer func() {
-        // 删除监听
-        notice.Postgres.DeleteListener(ch)
+        res := NewConsole(s.User).Update(co, eb, err).OperateResult()
+        log.Infof("<%s> [电柜: %s, 仓门: %d] { %s } 执行%v", s.User, eb.Serial, eb.Ordinal, step, adapter.Or[any](err == nil, "成功", fmt.Errorf("失败: %v", err)))
 
-        // 更新记录
-        ec = cs.Update(ec, eb, err)
+        go scb(res)
     }()
 
-    // 是否跳过发送仓控指令, 例如: 检查电池是否放入
-    var skipSend bool
+    if step.Operate.IsCommand() {
+        // 电柜控制
+        err = core.Hub.Bean.SendControl(eb.Serial, step.Operate, eb.Ordinal)
 
-    // 操作之前验证当前状态, 操作值 等于 当前状态时直接返回成功
-    // TODO 是否有必要?
-    // TODO 其他详细日志
-    switch req.Operate {
-    default:
-        err = adapter.ErrorOperate
-        skipSend = true
-        return
-    case adapter.OperateDoorOpen:
-        if eb.Open {
-            log.Info(adapter.ErrorBinOpened)
-            return
-        }
-    case adapter.OperateBinDisable:
-        if !eb.Enable {
-            log.Info(adapter.ErrorBinDisabled)
-            return
-        }
-    case adapter.OperateBinEnable:
-        if eb.Enable {
-            log.Info(adapter.ErrorBinEnabled)
-            return
-        }
-    }
-
-    if !skipSend {
-        err = core.Hub.Bean.SendControl(req.Serial, req.Operate, *req.Ordinal)
         // TODO: 开仓失败后是否重复弹开逻辑???
-    }
-
-    fakevoltage, _ := core.Hub.Bean.GetEmptyDeviation()
-
-    // 定义超时时间
-    timeout := time.After(time.Duration(req.Timeout) * time.Second)
-
-    for {
-        select {
-        case x := <-ch:
-            // 更新仓位信息
-            *eb = *x.(*ent.Bin)
-
-            var (
-                ok    adapter.Bool
-                check bool // 是否检查仓位是否可用
-            )
-
-            // 检查是否成功
-            switch req.Operate {
-            case adapter.OperateDoorOpen:
-                // 检查仓门是否开启
-                ok = adapter.Bool(eb.Open)
-            case adapter.OperateBinEnable:
-                // 检查仓位是否启用, 不进行后续仓位健康检查
-                ok = adapter.Bool(eb.Enable)
-                check = false
-            case adapter.OperateBinDisable:
-                // 检查仓位是否禁用, 不进行后续仓位健康检查
-                ok = adapter.Bool(!eb.Enable)
-                ok = adapter.Bool(eb.Enable)
-            case adapter.OperatePutin:
-                // 检测放入, 仓内有电池并且仓门关闭
-                ok = adapter.Bool(eb.IsStrictHasBattery(fakevoltage) && !eb.Open)
-            case adapter.OperatePutout:
-                // 检测取出, 仓内无电池且仓门关闭
-                ok = adapter.Bool(eb.IsLooseNoBattery(fakevoltage) && !eb.Open)
-            }
-
-            log.Infof("{ %s } 结果: %v", req.String(), ok)
-
-            // 检查仓位可用状态
-            if check && !eb.IsUsable() {
-                err = adapter.ErrorCabinetBinNotUsable
-                return
-            }
-
-            if ok {
-                // 检查放入电池是否匹配
-                if req.Operate == adapter.OperatePutin && eb.BatterySn != req.VerifyPutinBattery {
-                    err = adapter.ErrorBatteryPutin
-                }
-                return
-            }
-
-        case <-timeout:
-            // 超时
-            err = adapter.ErrorExchangeTimeOut
+        // TODO: 详细失败日志???
+        if err != nil {
+            log.Infof("[%s - %d] %s 失败: %v", eb.Serial, eb.Ordinal, step.Operate, err)
             return
         }
     }
+
+    r := <-stepper
+    var b *ent.Bin
+    b, err = r.Result()
+
+    if b != nil {
+        // 更新仓位信息
+        *eb = *b
+    }
+
+    return
 }

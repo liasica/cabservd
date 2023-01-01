@@ -38,6 +38,14 @@ func (cc *ConsoleCreate) SetBinID(u uint64) *ConsoleCreate {
 	return cc
 }
 
+// SetNillableBinID sets the "bin_id" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableBinID(u *uint64) *ConsoleCreate {
+	if u != nil {
+		cc.SetBinID(*u)
+	}
+	return cc
+}
+
 // SetOperate sets the "operate" field.
 func (cc *ConsoleCreate) SetOperate(a adapter.Operate) *ConsoleCreate {
 	cc.mutation.SetOperate(a)
@@ -56,9 +64,9 @@ func (cc *ConsoleCreate) SetUUID(u uuid.UUID) *ConsoleCreate {
 	return cc
 }
 
-// SetType sets the "type" field.
-func (cc *ConsoleCreate) SetType(c console.Type) *ConsoleCreate {
-	cc.mutation.SetType(c)
+// SetBusiness sets the "business" field.
+func (cc *ConsoleCreate) SetBusiness(a adapter.Business) *ConsoleCreate {
+	cc.mutation.SetBusiness(a)
 	return cc
 }
 
@@ -75,15 +83,15 @@ func (cc *ConsoleCreate) SetUserType(at adapter.UserType) *ConsoleCreate {
 }
 
 // SetStep sets the "step" field.
-func (cc *ConsoleCreate) SetStep(as adapter.ExchangeStep) *ConsoleCreate {
-	cc.mutation.SetStep(as)
+func (cc *ConsoleCreate) SetStep(i int) *ConsoleCreate {
+	cc.mutation.SetStep(i)
 	return cc
 }
 
 // SetNillableStep sets the "step" field if the given value is not nil.
-func (cc *ConsoleCreate) SetNillableStep(as *adapter.ExchangeStep) *ConsoleCreate {
-	if as != nil {
-		cc.SetStep(*as)
+func (cc *ConsoleCreate) SetNillableStep(i *int) *ConsoleCreate {
+	if i != nil {
+		cc.SetStep(*i)
 	}
 	return cc
 }
@@ -179,6 +187,7 @@ func (cc *ConsoleCreate) Mutation() *ConsoleMutation {
 
 // Save creates the Console in the database.
 func (cc *ConsoleCreate) Save(ctx context.Context) (*Console, error) {
+	cc.defaults()
 	return withHooks[*Console, ConsoleMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
@@ -204,13 +213,18 @@ func (cc *ConsoleCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cc *ConsoleCreate) defaults() {
+	if _, ok := cc.mutation.Step(); !ok {
+		v := console.DefaultStep
+		cc.mutation.SetStep(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cc *ConsoleCreate) check() error {
 	if _, ok := cc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet_id", err: errors.New(`ent: missing required field "Console.cabinet_id"`)}
-	}
-	if _, ok := cc.mutation.BinID(); !ok {
-		return &ValidationError{Name: "bin_id", err: errors.New(`ent: missing required field "Console.bin_id"`)}
 	}
 	if _, ok := cc.mutation.Operate(); !ok {
 		return &ValidationError{Name: "operate", err: errors.New(`ent: missing required field "Console.operate"`)}
@@ -221,12 +235,12 @@ func (cc *ConsoleCreate) check() error {
 	if _, ok := cc.mutation.UUID(); !ok {
 		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "Console.uuid"`)}
 	}
-	if _, ok := cc.mutation.GetType(); !ok {
-		return &ValidationError{Name: "type", err: errors.New(`ent: missing required field "Console.type"`)}
+	if _, ok := cc.mutation.Business(); !ok {
+		return &ValidationError{Name: "business", err: errors.New(`ent: missing required field "Console.business"`)}
 	}
-	if v, ok := cc.mutation.GetType(); ok {
-		if err := console.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Console.type": %w`, err)}
+	if v, ok := cc.mutation.Business(); ok {
+		if err := console.BusinessValidator(v); err != nil {
+			return &ValidationError{Name: "business", err: fmt.Errorf(`ent: validator failed for field "Console.business": %w`, err)}
 		}
 	}
 	if _, ok := cc.mutation.UserID(); !ok {
@@ -234,6 +248,9 @@ func (cc *ConsoleCreate) check() error {
 	}
 	if _, ok := cc.mutation.UserType(); !ok {
 		return &ValidationError{Name: "user_type", err: errors.New(`ent: missing required field "Console.user_type"`)}
+	}
+	if _, ok := cc.mutation.Step(); !ok {
+		return &ValidationError{Name: "step", err: errors.New(`ent: missing required field "Console.step"`)}
 	}
 	if _, ok := cc.mutation.Status(); !ok {
 		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "Console.status"`)}
@@ -245,9 +262,6 @@ func (cc *ConsoleCreate) check() error {
 	}
 	if _, ok := cc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet", err: errors.New(`ent: missing required edge "Console.cabinet"`)}
-	}
-	if _, ok := cc.mutation.BinID(); !ok {
-		return &ValidationError{Name: "bin", err: errors.New(`ent: missing required edge "Console.bin"`)}
 	}
 	return nil
 }
@@ -294,9 +308,9 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 		_spec.SetField(console.FieldUUID, field.TypeUUID, value)
 		_node.UUID = value
 	}
-	if value, ok := cc.mutation.GetType(); ok {
-		_spec.SetField(console.FieldType, field.TypeEnum, value)
-		_node.Type = value
+	if value, ok := cc.mutation.Business(); ok {
+		_spec.SetField(console.FieldBusiness, field.TypeEnum, value)
+		_node.Business = value
 	}
 	if value, ok := cc.mutation.UserID(); ok {
 		_spec.SetField(console.FieldUserID, field.TypeString, value)
@@ -307,8 +321,8 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 		_node.UserType = value
 	}
 	if value, ok := cc.mutation.Step(); ok {
-		_spec.SetField(console.FieldStep, field.TypeOther, value)
-		_node.Step = &value
+		_spec.SetField(console.FieldStep, field.TypeInt, value)
+		_node.Step = value
 	}
 	if value, ok := cc.mutation.Status(); ok {
 		_spec.SetField(console.FieldStatus, field.TypeEnum, value)
@@ -375,7 +389,7 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.BinID = nodes[0]
+		_node.BinID = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -454,6 +468,12 @@ func (u *ConsoleUpsert) UpdateBinID() *ConsoleUpsert {
 	return u
 }
 
+// ClearBinID clears the value of the "bin_id" field.
+func (u *ConsoleUpsert) ClearBinID() *ConsoleUpsert {
+	u.SetNull(console.FieldBinID)
+	return u
+}
+
 // SetOperate sets the "operate" field.
 func (u *ConsoleUpsert) SetOperate(v adapter.Operate) *ConsoleUpsert {
 	u.Set(console.FieldOperate, v)
@@ -478,15 +498,15 @@ func (u *ConsoleUpsert) UpdateSerial() *ConsoleUpsert {
 	return u
 }
 
-// SetType sets the "type" field.
-func (u *ConsoleUpsert) SetType(v console.Type) *ConsoleUpsert {
-	u.Set(console.FieldType, v)
+// SetBusiness sets the "business" field.
+func (u *ConsoleUpsert) SetBusiness(v adapter.Business) *ConsoleUpsert {
+	u.Set(console.FieldBusiness, v)
 	return u
 }
 
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *ConsoleUpsert) UpdateType() *ConsoleUpsert {
-	u.SetExcluded(console.FieldType)
+// UpdateBusiness sets the "business" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateBusiness() *ConsoleUpsert {
+	u.SetExcluded(console.FieldBusiness)
 	return u
 }
 
@@ -515,7 +535,7 @@ func (u *ConsoleUpsert) UpdateUserType() *ConsoleUpsert {
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsert) SetStep(v adapter.ExchangeStep) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetStep(v int) *ConsoleUpsert {
 	u.Set(console.FieldStep, v)
 	return u
 }
@@ -526,9 +546,9 @@ func (u *ConsoleUpsert) UpdateStep() *ConsoleUpsert {
 	return u
 }
 
-// ClearStep clears the value of the "step" field.
-func (u *ConsoleUpsert) ClearStep() *ConsoleUpsert {
-	u.SetNull(console.FieldStep)
+// AddStep adds v to the "step" field.
+func (u *ConsoleUpsert) AddStep(v int) *ConsoleUpsert {
+	u.Add(console.FieldStep, v)
 	return u
 }
 
@@ -731,6 +751,13 @@ func (u *ConsoleUpsertOne) UpdateBinID() *ConsoleUpsertOne {
 	})
 }
 
+// ClearBinID clears the value of the "bin_id" field.
+func (u *ConsoleUpsertOne) ClearBinID() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearBinID()
+	})
+}
+
 // SetOperate sets the "operate" field.
 func (u *ConsoleUpsertOne) SetOperate(v adapter.Operate) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -759,17 +786,17 @@ func (u *ConsoleUpsertOne) UpdateSerial() *ConsoleUpsertOne {
 	})
 }
 
-// SetType sets the "type" field.
-func (u *ConsoleUpsertOne) SetType(v console.Type) *ConsoleUpsertOne {
+// SetBusiness sets the "business" field.
+func (u *ConsoleUpsertOne) SetBusiness(v adapter.Business) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.SetType(v)
+		s.SetBusiness(v)
 	})
 }
 
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *ConsoleUpsertOne) UpdateType() *ConsoleUpsertOne {
+// UpdateBusiness sets the "business" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateBusiness() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateType()
+		s.UpdateBusiness()
 	})
 }
 
@@ -802,9 +829,16 @@ func (u *ConsoleUpsertOne) UpdateUserType() *ConsoleUpsertOne {
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsertOne) SetStep(v adapter.ExchangeStep) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetStep(v int) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetStep(v)
+	})
+}
+
+// AddStep adds v to the "step" field.
+func (u *ConsoleUpsertOne) AddStep(v int) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.AddStep(v)
 	})
 }
 
@@ -812,13 +846,6 @@ func (u *ConsoleUpsertOne) SetStep(v adapter.ExchangeStep) *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) UpdateStep() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateStep()
-	})
-}
-
-// ClearStep clears the value of the "step" field.
-func (u *ConsoleUpsertOne) ClearStep() *ConsoleUpsertOne {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearStep()
 	})
 }
 
@@ -1025,6 +1052,7 @@ func (ccb *ConsoleCreateBulk) Save(ctx context.Context) ([]*Console, error) {
 	for i := range ccb.builders {
 		func(i int, root context.Context) {
 			builder := ccb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ConsoleMutation)
 				if !ok {
@@ -1211,6 +1239,13 @@ func (u *ConsoleUpsertBulk) UpdateBinID() *ConsoleUpsertBulk {
 	})
 }
 
+// ClearBinID clears the value of the "bin_id" field.
+func (u *ConsoleUpsertBulk) ClearBinID() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearBinID()
+	})
+}
+
 // SetOperate sets the "operate" field.
 func (u *ConsoleUpsertBulk) SetOperate(v adapter.Operate) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
@@ -1239,17 +1274,17 @@ func (u *ConsoleUpsertBulk) UpdateSerial() *ConsoleUpsertBulk {
 	})
 }
 
-// SetType sets the "type" field.
-func (u *ConsoleUpsertBulk) SetType(v console.Type) *ConsoleUpsertBulk {
+// SetBusiness sets the "business" field.
+func (u *ConsoleUpsertBulk) SetBusiness(v adapter.Business) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.SetType(v)
+		s.SetBusiness(v)
 	})
 }
 
-// UpdateType sets the "type" field to the value that was provided on create.
-func (u *ConsoleUpsertBulk) UpdateType() *ConsoleUpsertBulk {
+// UpdateBusiness sets the "business" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateBusiness() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
-		s.UpdateType()
+		s.UpdateBusiness()
 	})
 }
 
@@ -1282,9 +1317,16 @@ func (u *ConsoleUpsertBulk) UpdateUserType() *ConsoleUpsertBulk {
 }
 
 // SetStep sets the "step" field.
-func (u *ConsoleUpsertBulk) SetStep(v adapter.ExchangeStep) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetStep(v int) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetStep(v)
+	})
+}
+
+// AddStep adds v to the "step" field.
+func (u *ConsoleUpsertBulk) AddStep(v int) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.AddStep(v)
 	})
 }
 
@@ -1292,13 +1334,6 @@ func (u *ConsoleUpsertBulk) SetStep(v adapter.ExchangeStep) *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) UpdateStep() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateStep()
-	})
-}
-
-// ClearStep clears the value of the "step" field.
-func (u *ConsoleUpsertBulk) ClearStep() *ConsoleUpsertBulk {
-	return u.Update(func(s *ConsoleUpsert) {
-		s.ClearStep()
 	})
 }
 

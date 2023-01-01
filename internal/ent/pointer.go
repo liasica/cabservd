@@ -49,22 +49,22 @@ type CabinetPointer struct {
 
 type ConsolePointers []*ConsolePointer
 type ConsolePointer struct {
-	CabinetID *uint64               `json:"cabinet_id,omitempty"`
-	BinID     *uint64               `json:"bin_id,omitempty"`
-	Operate   *adapter.Operate      `json:"operate,omitempty"`
-	Serial    *string               `json:"serial,omitempty"`
-	UUID      *uuid.UUID            `json:"uuid,omitempty"`
-	Type      *console.Type         `json:"type,omitempty"`
-	UserID    *string               `json:"user_id,omitempty"`
-	UserType  *adapter.UserType     `json:"user_type,omitempty"`
-	Step      *adapter.ExchangeStep `json:"step,omitempty"`
-	Status    *console.Status       `json:"status,omitempty"`
-	BeforeBin **adapter.BinInfo     `json:"before_bin,omitempty"`
-	AfterBin  **adapter.BinInfo     `json:"after_bin,omitempty"`
-	Message   *string               `json:"message,omitempty"`
-	StartAt   *time.Time            `json:"startAt,omitempty"`
-	StopAt    *time.Time            `json:"stopAt,omitempty"`
-	Duration  *float64              `json:"duration,omitempty"`
+	CabinetID *uint64           `json:"cabinet_id,omitempty"`
+	BinID     *uint64           `json:"bin_id,omitempty"`
+	Operate   *adapter.Operate  `json:"operate,omitempty"`
+	Serial    *string           `json:"serial,omitempty"`
+	UUID      *uuid.UUID        `json:"uuid,omitempty"`
+	Business  *adapter.Business `json:"business,omitempty"`
+	UserID    *string           `json:"user_id,omitempty"`
+	UserType  *adapter.UserType `json:"user_type,omitempty"`
+	Step      *int              `json:"step,omitempty"`
+	Status    *console.Status   `json:"status,omitempty"`
+	BeforeBin **adapter.BinInfo `json:"before_bin,omitempty"`
+	AfterBin  **adapter.BinInfo `json:"after_bin,omitempty"`
+	Message   *string           `json:"message,omitempty"`
+	StartAt   *time.Time        `json:"startAt,omitempty"`
+	StopAt    *time.Time        `json:"stopAt,omitempty"`
+	Duration  *float64          `json:"duration,omitempty"`
 }
 
 type ScanPointers []*ScanPointer

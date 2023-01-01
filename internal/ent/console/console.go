@@ -4,6 +4,8 @@ package console
 
 import (
 	"fmt"
+
+	"github.com/auroraride/adapter"
 )
 
 const (
@@ -21,8 +23,8 @@ const (
 	FieldSerial = "serial"
 	// FieldUUID holds the string denoting the uuid field in the database.
 	FieldUUID = "uuid"
-	// FieldType holds the string denoting the type field in the database.
-	FieldType = "type"
+	// FieldBusiness holds the string denoting the business field in the database.
+	FieldBusiness = "business"
 	// FieldUserID holds the string denoting the user_id field in the database.
 	FieldUserID = "user_id"
 	// FieldUserType holds the string denoting the user_type field in the database.
@@ -73,7 +75,7 @@ var Columns = []string{
 	FieldOperate,
 	FieldSerial,
 	FieldUUID,
-	FieldType,
+	FieldBusiness,
 	FieldUserID,
 	FieldUserType,
 	FieldStep,
@@ -96,27 +98,18 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-// Type defines the type for the "type" enum field.
-type Type string
-
-// Type values.
-const (
-	TypeExchange Type = "exchange"
-	TypeOperate  Type = "operate"
-	TypeCabinet  Type = "cabinet"
+var (
+	// DefaultStep holds the default value on creation for the "step" field.
+	DefaultStep int
 )
 
-func (_type Type) String() string {
-	return string(_type)
-}
-
-// TypeValidator is a validator for the "type" field enum values. It is called by the builders before save.
-func TypeValidator(_type Type) error {
-	switch _type {
-	case TypeExchange, TypeOperate, TypeCabinet:
+// BusinessValidator is a validator for the "business" field enum values. It is called by the builders before save.
+func BusinessValidator(b adapter.Business) error {
+	switch b.String() {
+	case "operate", "exchange", "active", "pause", "continue", "unsubscribe":
 		return nil
 	default:
-		return fmt.Errorf("console: invalid enum value for type field: %q", _type)
+		return fmt.Errorf("console: invalid enum value for business field: %q", b)
 	}
 }
 

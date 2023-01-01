@@ -144,10 +144,10 @@ var (
 		{Name: "operate", Type: field.TypeOther, Comment: "操作", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜设备序列号"},
 		{Name: "uuid", Type: field.TypeUUID, Comment: "标识符"},
-		{Name: "type", Type: field.TypeEnum, Comment: "日志类别 exchange:换电控制 operate:手动操作 cabinet:电柜日志", Enums: []string{"exchange", "operate", "cabinet"}},
+		{Name: "business", Type: field.TypeEnum, Comment: "业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订", Enums: []string{"operate", "exchange", "active", "pause", "continue", "unsubscribe"}},
 		{Name: "user_id", Type: field.TypeString, Comment: "用户ID"},
 		{Name: "user_type", Type: field.TypeOther, Comment: "用户类别", SchemaType: map[string]string{"postgres": "varchar"}},
-		{Name: "step", Type: field.TypeOther, Nullable: true, Comment: "换电步骤", SchemaType: map[string]string{"postgres": "smallint"}},
+		{Name: "step", Type: field.TypeInt, Comment: "步骤", Default: 1},
 		{Name: "status", Type: field.TypeEnum, Comment: "状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败", Enums: []string{"invalid", "pending", "running", "success", "failed"}},
 		{Name: "before_bin", Type: field.TypeJSON, Nullable: true, Comment: "变化前仓位信息"},
 		{Name: "after_bin", Type: field.TypeJSON, Nullable: true, Comment: "变化后仓位信息"},
@@ -156,7 +156,7 @@ var (
 		{Name: "stop_at", Type: field.TypeTime, Nullable: true, Comment: "结束时间"},
 		{Name: "duration", Type: field.TypeFloat64, Nullable: true, Comment: "耗时"},
 		{Name: "cabinet_id", Type: field.TypeUint64},
-		{Name: "bin_id", Type: field.TypeUint64},
+		{Name: "bin_id", Type: field.TypeUint64, Nullable: true},
 	}
 	// ConsoleTable holds the schema information for the "console" table.
 	ConsoleTable = &schema.Table{
@@ -174,7 +174,7 @@ var (
 				Symbol:     "console_bin_bin",
 				Columns:    []*schema.Column{ConsoleColumns[16]},
 				RefColumns: []*schema.Column{BinColumns[0]},
-				OnDelete:   schema.NoAction,
+				OnDelete:   schema.SetNull,
 			},
 		},
 		Indexes: []*schema.Index{

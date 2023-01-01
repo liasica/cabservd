@@ -13,6 +13,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/scan"
     "github.com/auroraride/cabservd/internal/notice"
+    "github.com/auroraride/cabservd/internal/operate"
     "github.com/jinzhu/copier"
     "github.com/liasica/go-helpers/silk"
     "net/http"
@@ -151,16 +152,16 @@ func (s *exchangeService) Do(req *adapter.ExchangeRequest) (res *adapter.Exchang
     }
 
     for _, result := range results {
-        res.Success = result.Step == adapter.ExchangeStepFourth && result.Success
+        res.Success = result.Step == 4 && result.Success
 
-        // 取出的电池
-        if result.Step == adapter.ExchangeStepThird && result.Success {
+        // 取出的电池 (第三步成功即视为取走电池)
+        if result.Step == 3 && result.Success {
             res.PutoutBattery = sc.Data.Fully.BatterySn
         }
 
-        // 放入的电池
-        if result.Step <= adapter.ExchangeStepSecond && result.After.BatterySN != "" {
-            res.PutinBattery = result.After.BatterySN
+        // 放入的电池, 第二步成功且有电池视为放入电池
+        if result.Step <= 2 && result.BatterySN != "" {
+            res.PutinBattery = result.BatterySN
         }
     }
 
@@ -171,7 +172,7 @@ func (s *exchangeService) Do(req *adapter.ExchangeRequest) (res *adapter.Exchang
     return
 }
 
-func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (results []*adapter.ExchangeStepMessage, err error) {
+func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (res []*adapter.ExchangeStepMessage, err error) {
     cab, _ := NewCabinet(s.User).QueryWithBin(sc.CabinetID)
 
     // 检查电柜是否可换电
@@ -193,47 +194,37 @@ func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (res
         // TODO 任务标记???
     }()
 
-    for _, conf := range adapter.ExchangeStepConfigures {
-        var result *adapter.ExchangeStepMessage
-        result, err = s.step(req, sc, conf)
+    bins := []*adapter.Bin{
+        sc.Data.Empty,
+        sc.Data.Fully,
+    }
+
+    cb := func(r *adapter.OperateStepResult) {
+        data := silk.Pointer(adapter.ExchangeStepMessage(*r))
+        res = append(res, data)
+        // 异步发送结果
+        go notice.Aurservd.SendMessage(data)
+    }
+
+    for i, conf := range operate.ExchangeConfigure {
+        b := bins[i]
+
+        err = NewBin(s.User).Operate(&operate.Bin{
+            Timeout:      req.Timeout,
+            Serial:       sc.Serial,
+            UUID:         req.UUID,
+            Ordinal:      b.Ordinal,
+            Business:     adapter.BusinessExchange,
+            Steps:        conf,
+            Battery:      req.Battery,
+            StepCallback: cb,
+        })
+
         if err != nil {
             return
         }
-        results = append(results, result)
+
     }
-
-    return
-}
-
-func (s *exchangeService) step(req *adapter.ExchangeRequest, sc *ent.Scan, conf adapter.ExchangeStepConfigure) (result *adapter.ExchangeStepMessage, err error) {
-    var ordinal int
-
-    switch conf.Step {
-    case adapter.ExchangeStepFirst, adapter.ExchangeStepSecond:
-        ordinal = sc.Data.Empty.Ordinal
-    case adapter.ExchangeStepThird, adapter.ExchangeStepFourth:
-        ordinal = sc.Data.Fully.Ordinal
-    }
-
-    var ec *ent.Console
-    ec, err = NewBin(s.User).Operate(&adapter.OperateRequest{
-        UUID:               sc.UUID,
-        Serial:             sc.Serial,
-        Ordinal:            silk.Pointer(ordinal),
-        Operate:            conf.Operate,
-        Step:               silk.Pointer(conf.Step),
-        Timeout:            req.TimeOut,
-        VerifyPutinBattery: req.Battery,
-    })
-
-    if err != nil {
-        return
-    }
-
-    result = ec.StepResult()
-
-    // 异步发送结果
-    go notice.Aurservd.SendData(result)
 
     return
 }

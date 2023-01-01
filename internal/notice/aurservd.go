@@ -16,26 +16,26 @@ import (
     log "github.com/sirupsen/logrus"
 )
 
-type aurservdHook struct {
+type aurservd struct {
     *tcp.Client
 }
 
-func NewAurservd() *aurservdHook {
-    return &aurservdHook{
+func newAurservd() *aurservd {
+    return &aurservd{
         Client: tcp.NewClient(g.Config.Adapter.Aurservd, log.StandardLogger(), &codec.HeaderLength{}),
     }
 }
 
-func (*aurservdHook) CabinetFullUpdate() {
+func (h *aurservd) CabinetFullUpdate() {
     cabs, _ := ent.Database.Cabinet.Query().WithBins(func(query *ent.BinQuery) {
         query.Order(ent.Asc(bin.FieldOrdinal))
     }).All(context.Background())
     for _, cab := range cabs {
-        Aurservd.SendCabinet(true, cab.Serial, cab, cab.Edges.Bins)
+        h.SendFulldata(cab.Serial, cab, cab.Edges.Bins)
     }
 }
 
-func (*aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *adapter.CabinetMessage) {
+func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *adapter.CabinetMessage) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
@@ -88,29 +88,37 @@ func (*aurservdHook) CabinetWrapData(full bool, serial string, cab *ent.Cabinet,
     return
 }
 
-func (h *aurservdHook) SendBattery(sn, serial string) {
-    h.Sender <- &adapter.BatteryMessage{
+func (h *aurservd) SendBattery(sn, serial string) {
+    h.SendMessage(&adapter.BatteryMessage{
         Battery: adapter.ParseBatterySN(sn),
         Cabinet: serial,
-    }
+    })
 }
 
-func (h *aurservdHook) SendCabinet(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) {
-    h.Sender <- Aurservd.CabinetWrapData(full, serial, cab, bins)
+func (h *aurservd) SendCabinet(serial string, cab *ent.Cabinet) {
+    h.SendMessage(WrapCabinetMessage(false, serial, cab, nil))
 }
 
-func (h *aurservdHook) SendData(data adapter.Messenger) {
+func (h *aurservd) SendBin(serial string, b *ent.Bin) {
+    h.SendMessage(WrapCabinetMessage(false, serial, nil, ent.Bins{b}))
+}
+
+func (h *aurservd) SendFulldata(serial string, cab *ent.Cabinet, bins ent.Bins) {
+    h.SendMessage(WrapCabinetMessage(true, serial, cab, bins))
+}
+
+func (h *aurservd) SendMessage(data adapter.Messenger) {
     h.Sender <- data
 }
 
-func (h *aurservdHook) Start() {
+func (h *aurservd) start() {
     h.Hooks.Start = func() {
-        worker.Add(1)
+        wg.Add(1)
     }
 
     h.Hooks.Connect = func() {
         h.CabinetFullUpdate()
-        worker.Done()
+        wg.Done()
     }
 
     h.Run()

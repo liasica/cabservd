@@ -5,7 +5,10 @@
 
 package ent
 
-import "github.com/auroraride/adapter"
+import (
+    "fmt"
+    "github.com/auroraride/adapter"
+)
 
 // ResetBattery 无电池的时候清除电池信息
 // TODO: 是否有必要?
@@ -97,4 +100,8 @@ func (b *Bin) GetID() uint64 {
 
 func (b *Bin) GetSerial() string {
     return b.Serial
+}
+
+func (b *Bin) GetListenerKey() string {
+    return fmt.Sprintf("%s-%d", b.GetTableName(), b.ID)
 }

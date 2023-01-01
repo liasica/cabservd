@@ -24,21 +24,21 @@ type Console struct {
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// BinID holds the value of the "bin_id" field.
-	BinID uint64 `json:"bin_id,omitempty"`
+	BinID *uint64 `json:"bin_id,omitempty"`
 	// 操作
 	Operate adapter.Operate `json:"operate,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 标识符
 	UUID uuid.UUID `json:"uuid,omitempty"`
-	// 日志类别 exchange:换电控制 operate:手动操作 cabinet:电柜日志
-	Type console.Type `json:"type,omitempty"`
+	// 业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订
+	Business adapter.Business `json:"business,omitempty"`
 	// 用户ID
 	UserID string `json:"user_id,omitempty"`
 	// 用户类别
 	UserType adapter.UserType `json:"user_type,omitempty"`
-	// 换电步骤
-	Step *adapter.ExchangeStep `json:"step,omitempty"`
+	// 步骤
+	Step int `json:"step,omitempty"`
 	// 状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败
 	Status console.Status `json:"status,omitempty"`
 	// 变化前仓位信息
@@ -100,19 +100,19 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case console.FieldStep:
-			values[i] = &sql.NullScanner{S: new(adapter.ExchangeStep)}
 		case console.FieldBeforeBin, console.FieldAfterBin:
 			values[i] = new([]byte)
+		case console.FieldBusiness:
+			values[i] = new(adapter.Business)
 		case console.FieldOperate:
 			values[i] = new(adapter.Operate)
 		case console.FieldUserType:
 			values[i] = new(adapter.UserType)
 		case console.FieldDuration:
 			values[i] = new(sql.NullFloat64)
-		case console.FieldID, console.FieldCabinetID, console.FieldBinID:
+		case console.FieldID, console.FieldCabinetID, console.FieldBinID, console.FieldStep:
 			values[i] = new(sql.NullInt64)
-		case console.FieldSerial, console.FieldType, console.FieldUserID, console.FieldStatus, console.FieldMessage:
+		case console.FieldSerial, console.FieldUserID, console.FieldStatus, console.FieldMessage:
 			values[i] = new(sql.NullString)
 		case console.FieldStartAt, console.FieldStopAt:
 			values[i] = new(sql.NullTime)
@@ -149,7 +149,8 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field bin_id", values[i])
 			} else if value.Valid {
-				c.BinID = uint64(value.Int64)
+				c.BinID = new(uint64)
+				*c.BinID = uint64(value.Int64)
 			}
 		case console.FieldOperate:
 			if value, ok := values[i].(*adapter.Operate); !ok {
@@ -169,11 +170,11 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			} else if value != nil {
 				c.UUID = *value
 			}
-		case console.FieldType:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field type", values[i])
-			} else if value.Valid {
-				c.Type = console.Type(value.String)
+		case console.FieldBusiness:
+			if value, ok := values[i].(*adapter.Business); !ok {
+				return fmt.Errorf("unexpected type %T for field business", values[i])
+			} else if value != nil {
+				c.Business = *value
 			}
 		case console.FieldUserID:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -188,11 +189,10 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				c.UserType = *value
 			}
 		case console.FieldStep:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field step", values[i])
 			} else if value.Valid {
-				c.Step = new(adapter.ExchangeStep)
-				*c.Step = *value.S.(*adapter.ExchangeStep)
+				c.Step = int(value.Int64)
 			}
 		case console.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -285,8 +285,10 @@ func (c *Console) String() string {
 	builder.WriteString("cabinet_id=")
 	builder.WriteString(fmt.Sprintf("%v", c.CabinetID))
 	builder.WriteString(", ")
-	builder.WriteString("bin_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.BinID))
+	if v := c.BinID; v != nil {
+		builder.WriteString("bin_id=")
+		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
 	builder.WriteString(", ")
 	builder.WriteString("operate=")
 	builder.WriteString(fmt.Sprintf("%v", c.Operate))
@@ -297,8 +299,8 @@ func (c *Console) String() string {
 	builder.WriteString("uuid=")
 	builder.WriteString(fmt.Sprintf("%v", c.UUID))
 	builder.WriteString(", ")
-	builder.WriteString("type=")
-	builder.WriteString(fmt.Sprintf("%v", c.Type))
+	builder.WriteString("business=")
+	builder.WriteString(fmt.Sprintf("%v", c.Business))
 	builder.WriteString(", ")
 	builder.WriteString("user_id=")
 	builder.WriteString(c.UserID)
@@ -306,10 +308,8 @@ func (c *Console) String() string {
 	builder.WriteString("user_type=")
 	builder.WriteString(fmt.Sprintf("%v", c.UserType))
 	builder.WriteString(", ")
-	if v := c.Step; v != nil {
-		builder.WriteString("step=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("step=")
+	builder.WriteString(fmt.Sprintf("%v", c.Step))
 	builder.WriteString(", ")
 	builder.WriteString("status=")
 	builder.WriteString(fmt.Sprintf("%v", c.Status))
