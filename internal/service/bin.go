@@ -100,7 +100,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
         for {
             select {
             case <-timeout:
-                err = adapter.ErrorOperateTimeOut
+                err = adapter.ErrorOperateTimeout
                 stepper <- types.NewBinResult(nil, err)
                 return
             case x := <-ch:
