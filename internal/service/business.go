@@ -65,7 +65,7 @@ func (s *businessService) Usable(req *adapter.BusinuessUsableRequest) (res *adap
 
     // 获取可办理业务的仓位
     var fully, empty, target *ent.Bin
-    fully, empty, err = cs.BusinessInfo(cab, req.Minsoc, minbatteries, minemptybins)
+    fully, empty, err = cs.BusinessInfo(req.Model, cab, req.Minsoc, minbatteries, minemptybins)
     if err != nil {
         app.Panic(http.StatusBadRequest, err)
     }

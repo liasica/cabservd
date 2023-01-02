@@ -62,7 +62,7 @@ func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapt
 
     // 获取空仓和满电仓位
     var fully, empty *ent.Bin
-    fully, empty, err = cs.BusinessInfo(cab, req.Minsoc, 1, 1)
+    fully, empty, err = cs.BusinessInfo(req.Model, cab, req.Minsoc, 1, 1)
 
     if err != nil {
         app.Panic(http.StatusBadRequest, err)

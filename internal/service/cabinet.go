@@ -11,6 +11,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "strings"
 )
 
 type cabinetService struct {
@@ -91,7 +92,7 @@ func (s *cabinetService) DetectCabinet(cab *ent.Cabinet) error {
 // minsoc 指定最小电量 TODO 是否需要判定最小电量?
 // minfull 指定最小满电仓位
 // minempty 指定最小空仓位
-func (s *cabinetService) BusinessInfo(cab *ent.Cabinet, minsoc float64, minbattery, minempty int) (fully, empty *ent.Bin, err error) {
+func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float64, minbattery, minempty int) (fully, empty *ent.Bin, err error) {
     fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
 
     var batteries, emptynum int
@@ -107,6 +108,12 @@ func (s *cabinetService) BusinessInfo(cab *ent.Cabinet, minsoc float64, minbatte
         }
         // 宽松判定是否有电池
         if item.IsLooseHasBattery(fakevoltage, fakecurrent) {
+            // 判定电池型号是否满足业务需求
+            bat := adapter.ParseBatterySN(item.BatterySn)
+            if strings.ToUpper(bat.Model) != bm {
+                continue
+            }
+
             batteries += 1
             // 若有电池
             // 获取满电仓位
