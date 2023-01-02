@@ -237,6 +237,26 @@ func UUIDLTE(v uuid.UUID) predicate.Scan {
 	return predicate.Scan(sql.FieldLTE(FieldUUID, v))
 }
 
+// BusinessEQ applies the EQ predicate on the "business" field.
+func BusinessEQ(v adapter.Business) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldBusiness, v))
+}
+
+// BusinessNEQ applies the NEQ predicate on the "business" field.
+func BusinessNEQ(v adapter.Business) predicate.Scan {
+	return predicate.Scan(sql.FieldNEQ(FieldBusiness, v))
+}
+
+// BusinessIn applies the In predicate on the "business" field.
+func BusinessIn(vs ...adapter.Business) predicate.Scan {
+	return predicate.Scan(sql.FieldIn(FieldBusiness, vs...))
+}
+
+// BusinessNotIn applies the NotIn predicate on the "business" field.
+func BusinessNotIn(vs ...adapter.Business) predicate.Scan {
+	return predicate.Scan(sql.FieldNotIn(FieldBusiness, vs...))
+}
+
 // EfficientEQ applies the EQ predicate on the "efficient" field.
 func EfficientEQ(v bool) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldEfficient, v))

@@ -58,6 +58,12 @@ func (su *ScanUpdate) SetNillableUUID(u *uuid.UUID) *ScanUpdate {
 	return su
 }
 
+// SetBusiness sets the "business" field.
+func (su *ScanUpdate) SetBusiness(a adapter.Business) *ScanUpdate {
+	su.mutation.SetBusiness(a)
+	return su
+}
+
 // SetEfficient sets the "efficient" field.
 func (su *ScanUpdate) SetEfficient(b bool) *ScanUpdate {
 	su.mutation.SetEfficient(b)
@@ -91,8 +97,8 @@ func (su *ScanUpdate) SetSerial(s string) *ScanUpdate {
 }
 
 // SetData sets the "data" field.
-func (su *ScanUpdate) SetData(aur *adapter.ExchangeUsableResponse) *ScanUpdate {
-	su.mutation.SetData(aur)
+func (su *ScanUpdate) SetData(abur *adapter.CabinetBinUsableResponse) *ScanUpdate {
+	su.mutation.SetData(abur)
 	return su
 }
 
@@ -156,6 +162,11 @@ func (su *ScanUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (su *ScanUpdate) check() error {
+	if v, ok := su.mutation.Business(); ok {
+		if err := scan.BusinessValidator(v); err != nil {
+			return &ValidationError{Name: "business", err: fmt.Errorf(`ent: validator failed for field "Scan.business": %w`, err)}
+		}
+	}
 	if _, ok := su.mutation.CabinetID(); su.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Scan.cabinet"`)
 	}
@@ -194,6 +205,9 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.UUID(); ok {
 		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
+	}
+	if value, ok := su.mutation.Business(); ok {
+		_spec.SetField(scan.FieldBusiness, field.TypeEnum, value)
 	}
 	if value, ok := su.mutation.Efficient(); ok {
 		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
@@ -296,6 +310,12 @@ func (suo *ScanUpdateOne) SetNillableUUID(u *uuid.UUID) *ScanUpdateOne {
 	return suo
 }
 
+// SetBusiness sets the "business" field.
+func (suo *ScanUpdateOne) SetBusiness(a adapter.Business) *ScanUpdateOne {
+	suo.mutation.SetBusiness(a)
+	return suo
+}
+
 // SetEfficient sets the "efficient" field.
 func (suo *ScanUpdateOne) SetEfficient(b bool) *ScanUpdateOne {
 	suo.mutation.SetEfficient(b)
@@ -329,8 +349,8 @@ func (suo *ScanUpdateOne) SetSerial(s string) *ScanUpdateOne {
 }
 
 // SetData sets the "data" field.
-func (suo *ScanUpdateOne) SetData(aur *adapter.ExchangeUsableResponse) *ScanUpdateOne {
-	suo.mutation.SetData(aur)
+func (suo *ScanUpdateOne) SetData(abur *adapter.CabinetBinUsableResponse) *ScanUpdateOne {
+	suo.mutation.SetData(abur)
 	return suo
 }
 
@@ -401,6 +421,11 @@ func (suo *ScanUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (suo *ScanUpdateOne) check() error {
+	if v, ok := suo.mutation.Business(); ok {
+		if err := scan.BusinessValidator(v); err != nil {
+			return &ValidationError{Name: "business", err: fmt.Errorf(`ent: validator failed for field "Scan.business": %w`, err)}
+		}
+	}
 	if _, ok := suo.mutation.CabinetID(); suo.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Scan.cabinet"`)
 	}
@@ -456,6 +481,9 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 	}
 	if value, ok := suo.mutation.UUID(); ok {
 		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
+	}
+	if value, ok := suo.mutation.Business(); ok {
+		_spec.SetField(scan.FieldBusiness, field.TypeEnum, value)
 	}
 	if value, ok := suo.mutation.Efficient(); ok {
 		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)

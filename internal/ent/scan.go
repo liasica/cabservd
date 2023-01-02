@@ -28,6 +28,8 @@ type Scan struct {
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// UUID holds the value of the "uuid" field.
 	UUID uuid.UUID `json:"uuid,omitempty"`
+	// 业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订
+	Business adapter.Business `json:"business,omitempty"`
 	// 是否有效
 	Efficient bool `json:"efficient,omitempty"`
 	// 用户ID
@@ -37,7 +39,7 @@ type Scan struct {
 	// 电柜编号
 	Serial string `json:"serial,omitempty"`
 	// 换电信息
-	Data *adapter.ExchangeUsableResponse `json:"data,omitempty"`
+	Data *adapter.CabinetBinUsableResponse `json:"data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScanQuery when eager-loading is set.
 	Edges ScanEdges `json:"edges"`
@@ -72,6 +74,8 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case scan.FieldData:
 			values[i] = new([]byte)
+		case scan.FieldBusiness:
+			values[i] = new(adapter.Business)
 		case scan.FieldUserType:
 			values[i] = new(adapter.UserType)
 		case scan.FieldEfficient:
@@ -128,6 +132,12 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
 			} else if value != nil {
 				s.UUID = *value
+			}
+		case scan.FieldBusiness:
+			if value, ok := values[i].(*adapter.Business); !ok {
+				return fmt.Errorf("unexpected type %T for field business", values[i])
+			} else if value != nil {
+				s.Business = *value
 			}
 		case scan.FieldEfficient:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -205,6 +215,9 @@ func (s *Scan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("uuid=")
 	builder.WriteString(fmt.Sprintf("%v", s.UUID))
+	builder.WriteString(", ")
+	builder.WriteString("business=")
+	builder.WriteString(fmt.Sprintf("%v", s.Business))
 	builder.WriteString(", ")
 	builder.WriteString("efficient=")
 	builder.WriteString(fmt.Sprintf("%v", s.Efficient))

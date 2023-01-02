@@ -6,6 +6,7 @@
 package router
 
 import (
+    "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
@@ -21,11 +22,29 @@ func Start() {
     r := echo.New()
 
     r.HTTPErrorHandler = func(err error, c echo.Context) {
-        _ = app.Context(c).SendResponse(http.StatusInternalServerError, err)
+        ctx := app.Context(c)
+        message := err
+        code := http.StatusInternalServerError
+        var data any
+        switch err.(type) {
+        case *echo.HTTPError:
+            target := err.(*echo.HTTPError)
+            message = fmt.Errorf("%v", target.Message)
+            break
+        }
+        _ = ctx.SendResponse(code, message, data)
     }
 
     echo.NotFoundHandler = func(c echo.Context) error {
         return app.Context(c).SendResponse(http.StatusNotFound, adapter.ErrorNotFound)
+    }
+
+    echo.MethodNotAllowedHandler = func(c echo.Context) error {
+        routerAllowMethods, ok := c.Get(echo.ContextKeyHeaderAllow).(string)
+        if ok && routerAllowMethods != "" {
+            c.Response().Header().Set(echo.HeaderAllow, routerAllowMethods)
+        }
+        return app.Context(c).SendResponse(http.StatusBadRequest, fmt.Errorf("%v", echo.ErrMethodNotAllowed.Message))
     }
 
     r.Validator = app.NewValidator()
@@ -41,7 +60,10 @@ func Start() {
         // TODO body dump middleware
     )
 
-    r.POST("/operate/do", api.Operate.Do)
+    r.POST("/operate/bin", api.Operate.Bin)
+
+    r.POST("/business/usable", api.Business.Usable)
+    r.POST("/business/do", api.Business.Do)
 
     r.POST("/exchange/usable", api.Exchange.Usable)
     r.POST("/exchange/do", api.Exchange.Do)

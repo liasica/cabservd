@@ -6,6 +6,8 @@
 package service
 
 import (
+    "github.com/auroraride/adapter"
+    "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -59,4 +61,76 @@ func (s *cabinetService) QueryAllCabinet() ent.Cabinets {
 // UpdateStatus 更新电柜状态
 func (s *cabinetService) UpdateStatus(serial string, status cabinet.Status) error {
     return s.orm.Update().Where(cabinet.Serial(serial)).SetStatus(status).Exec(s.ctx)
+}
+
+// DetectCabinet 验证电柜是否满足基本业务需求
+func (s *cabinetService) DetectCabinet(cab *ent.Cabinet) error {
+    if cab == nil {
+        return adapter.ErrorCabinetNotFound
+    }
+
+    // 电柜需要空闲
+    if cab.Status != cabinet.StatusIdle {
+        return adapter.ErrorCabinetBusy
+    }
+
+    // 电柜需要在线
+    if !cab.Online {
+        return adapter.ErrorCabinetOffline
+    }
+
+    // 可办理业务的仓位至少有两个
+    if len(cab.Edges.Bins) < 2 {
+        return adapter.ErrorBinNotEnough
+    }
+
+    return nil
+}
+
+// BusinessInfo 获取业务仓位信息
+// minsoc 指定最小电量 TODO 是否需要判定最小电量?
+// minfull 指定最小满电仓位
+// minempty 指定最小空仓位
+func (s *cabinetService) BusinessInfo(cab *ent.Cabinet, minsoc float64, minbattery, minempty int) (fully, empty *ent.Bin, err error) {
+    fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
+
+    var batteries, emptynum int
+
+    for _, item := range cab.Edges.Bins {
+        // 如果仓位未启用或仓位不健康直接跳过
+        if !item.Enable || !item.Health {
+            continue
+        } else if item.Open {
+            // 有正常未关闭的仓门直接报错
+            err = adapter.ErrorCabinetDoorOpened
+            return
+        }
+        // 宽松判定是否有电池
+        if item.IsLooseHasBattery(fakevoltage, fakecurrent) {
+            batteries += 1
+            // 若有电池
+            // 获取满电仓位
+            if fully == nil || fully.Soc < item.Soc {
+                // 该仓位电量小于最小电量
+                if item.Soc < minsoc {
+                    continue
+                }
+                // 标定满仓
+                fully = item
+            }
+        } else {
+            emptynum += 1
+            // 若无电池
+            if empty == nil {
+                empty = item
+            }
+        }
+    }
+
+    if batteries < minbattery || emptynum < minempty {
+        err = adapter.ErrorBinNotEnough
+        return
+    }
+
+    return
 }

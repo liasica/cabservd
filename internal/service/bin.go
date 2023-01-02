@@ -13,7 +13,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/notice"
-    "github.com/auroraride/cabservd/internal/operate"
+    "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
     log "github.com/sirupsen/logrus"
     "time"
@@ -48,7 +48,7 @@ func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, e
 }
 
 // Operate 按步骤操作某个仓位
-func (s *binService) Operate(bo *operate.Bin) (err error) {
+func (s *binService) Operate(bo *types.Bin) (err error) {
     if bo.StepCallback == nil {
         return adapter.ErrorBadRequest
     }
@@ -74,6 +74,9 @@ func (s *binService) Operate(bo *operate.Bin) (err error) {
 
     // 查询仓位
     eb, _ := NewBin(s.User).QuerySerialOrdinal(bo.Serial, bo.Ordinal)
+    if eb == nil {
+        return adapter.ErrorBinNotFound
+    }
 
     fakevoltage, _ := core.Hub.Bean.GetEmptyDeviation()
 
@@ -84,7 +87,7 @@ func (s *binService) Operate(bo *operate.Bin) (err error) {
     ch := make(chan *ent.Bin)
     notice.Bin.SetListener(eb, ch)
 
-    stepper := make(chan *operate.BinResult)
+    stepper := make(chan *types.BinResult)
 
     defer func() {
         // 退出时删除监听
@@ -98,7 +101,7 @@ func (s *binService) Operate(bo *operate.Bin) (err error) {
             select {
             case <-timeout:
                 err = adapter.ErrorExchangeTimeOut
-                stepper <- operate.NewBinResult(nil, err)
+                stepper <- types.NewBinResult(nil, err)
                 return
             case x := <-ch:
                 // 如果通道关闭直接返回
@@ -138,7 +141,7 @@ func (s *binService) Operate(bo *operate.Bin) (err error) {
                 }
 
                 if !x.IsUsable() {
-                    stepper <- operate.NewBinResult(eb, adapter.ErrorCabinetBinNotUsable)
+                    stepper <- types.NewBinResult(eb, adapter.ErrorBinNotUsable)
                     return
                 }
 
@@ -149,7 +152,7 @@ func (s *binService) Operate(bo *operate.Bin) (err error) {
                         err = adapter.ErrorBatteryPutin
                     }
 
-                    stepper <- operate.NewBinResult(eb, err)
+                    stepper <- types.NewBinResult(eb, err)
 
                     // 如果有错误, 终止
                     if err != nil {
@@ -177,7 +180,7 @@ func (s *binService) Operate(bo *operate.Bin) (err error) {
     return
 }
 
-func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, eb *ent.Bin, step *operate.BinStep, stepper chan *operate.BinResult, scb operate.StepCallback) (err error) {
+func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, scb types.StepCallback) (err error) {
     // 创建记录
     var co *ent.Console
     co, err = ent.Database.Console.Create().
@@ -200,9 +203,10 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, eb 
 
     defer func() {
         res := NewConsole(s.User).Update(co, eb, err).OperateResult()
-        log.Infof("<%s> [电柜: %s, 仓门: %d] { %s } 执行%v", s.User, eb.Serial, eb.Ordinal, step, adapter.Or[any](err == nil, "成功", fmt.Errorf("失败: %v", err)))
+        log.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.User, eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Errorf("失败: %v", err)))
 
-        go scb(res)
+        // 同步回调结果
+        scb(res)
     }()
 
     if step.Operate.IsCommand() {

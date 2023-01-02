@@ -121,7 +121,7 @@ func init() {
 	// scan.DefaultUUID holds the default value on creation for the uuid field.
 	scan.DefaultUUID = scanDescUUID.Default.(func() uuid.UUID)
 	// scanDescEfficient is the schema descriptor for efficient field.
-	scanDescEfficient := scanFields[1].Descriptor()
+	scanDescEfficient := scanFields[2].Descriptor()
 	// scan.DefaultEfficient holds the default value on creation for the efficient field.
 	scan.DefaultEfficient = scanDescEfficient.Default.(bool)
 }

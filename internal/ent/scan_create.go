@@ -73,6 +73,12 @@ func (sc *ScanCreate) SetNillableUUID(u *uuid.UUID) *ScanCreate {
 	return sc
 }
 
+// SetBusiness sets the "business" field.
+func (sc *ScanCreate) SetBusiness(a adapter.Business) *ScanCreate {
+	sc.mutation.SetBusiness(a)
+	return sc
+}
+
 // SetEfficient sets the "efficient" field.
 func (sc *ScanCreate) SetEfficient(b bool) *ScanCreate {
 	sc.mutation.SetEfficient(b)
@@ -106,8 +112,8 @@ func (sc *ScanCreate) SetSerial(s string) *ScanCreate {
 }
 
 // SetData sets the "data" field.
-func (sc *ScanCreate) SetData(aur *adapter.ExchangeUsableResponse) *ScanCreate {
-	sc.mutation.SetData(aur)
+func (sc *ScanCreate) SetData(abur *adapter.CabinetBinUsableResponse) *ScanCreate {
+	sc.mutation.SetData(abur)
 	return sc
 }
 
@@ -183,6 +189,14 @@ func (sc *ScanCreate) check() error {
 	if _, ok := sc.mutation.UUID(); !ok {
 		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "Scan.uuid"`)}
 	}
+	if _, ok := sc.mutation.Business(); !ok {
+		return &ValidationError{Name: "business", err: errors.New(`ent: missing required field "Scan.business"`)}
+	}
+	if v, ok := sc.mutation.Business(); ok {
+		if err := scan.BusinessValidator(v); err != nil {
+			return &ValidationError{Name: "business", err: fmt.Errorf(`ent: validator failed for field "Scan.business": %w`, err)}
+		}
+	}
 	if _, ok := sc.mutation.Efficient(); !ok {
 		return &ValidationError{Name: "efficient", err: errors.New(`ent: missing required field "Scan.efficient"`)}
 	}
@@ -242,6 +256,10 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.UUID(); ok {
 		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
 		_node.UUID = value
+	}
+	if value, ok := sc.mutation.Business(); ok {
+		_spec.SetField(scan.FieldBusiness, field.TypeEnum, value)
+		_node.Business = value
 	}
 	if value, ok := sc.mutation.Efficient(); ok {
 		_spec.SetField(scan.FieldEfficient, field.TypeBool, value)
@@ -371,6 +389,18 @@ func (u *ScanUpsert) UpdateUUID() *ScanUpsert {
 	return u
 }
 
+// SetBusiness sets the "business" field.
+func (u *ScanUpsert) SetBusiness(v adapter.Business) *ScanUpsert {
+	u.Set(scan.FieldBusiness, v)
+	return u
+}
+
+// UpdateBusiness sets the "business" field to the value that was provided on create.
+func (u *ScanUpsert) UpdateBusiness() *ScanUpsert {
+	u.SetExcluded(scan.FieldBusiness)
+	return u
+}
+
 // SetEfficient sets the "efficient" field.
 func (u *ScanUpsert) SetEfficient(v bool) *ScanUpsert {
 	u.Set(scan.FieldEfficient, v)
@@ -420,7 +450,7 @@ func (u *ScanUpsert) UpdateSerial() *ScanUpsert {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsert) SetData(v *adapter.ExchangeUsableResponse) *ScanUpsert {
+func (u *ScanUpsert) SetData(v *adapter.CabinetBinUsableResponse) *ScanUpsert {
 	u.Set(scan.FieldData, v)
 	return u
 }
@@ -524,6 +554,20 @@ func (u *ScanUpsertOne) UpdateUUID() *ScanUpsertOne {
 	})
 }
 
+// SetBusiness sets the "business" field.
+func (u *ScanUpsertOne) SetBusiness(v adapter.Business) *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetBusiness(v)
+	})
+}
+
+// UpdateBusiness sets the "business" field to the value that was provided on create.
+func (u *ScanUpsertOne) UpdateBusiness() *ScanUpsertOne {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateBusiness()
+	})
+}
+
 // SetEfficient sets the "efficient" field.
 func (u *ScanUpsertOne) SetEfficient(v bool) *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
@@ -581,7 +625,7 @@ func (u *ScanUpsertOne) UpdateSerial() *ScanUpsertOne {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsertOne) SetData(v *adapter.ExchangeUsableResponse) *ScanUpsertOne {
+func (u *ScanUpsertOne) SetData(v *adapter.CabinetBinUsableResponse) *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetData(v)
 	})
@@ -858,6 +902,20 @@ func (u *ScanUpsertBulk) UpdateUUID() *ScanUpsertBulk {
 	})
 }
 
+// SetBusiness sets the "business" field.
+func (u *ScanUpsertBulk) SetBusiness(v adapter.Business) *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.SetBusiness(v)
+	})
+}
+
+// UpdateBusiness sets the "business" field to the value that was provided on create.
+func (u *ScanUpsertBulk) UpdateBusiness() *ScanUpsertBulk {
+	return u.Update(func(s *ScanUpsert) {
+		s.UpdateBusiness()
+	})
+}
+
 // SetEfficient sets the "efficient" field.
 func (u *ScanUpsertBulk) SetEfficient(v bool) *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
@@ -915,7 +973,7 @@ func (u *ScanUpsertBulk) UpdateSerial() *ScanUpsertBulk {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsertBulk) SetData(v *adapter.ExchangeUsableResponse) *ScanUpsertBulk {
+func (u *ScanUpsertBulk) SetData(v *adapter.CabinetBinUsableResponse) *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetData(v)
 	})

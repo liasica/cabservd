@@ -3,7 +3,7 @@
 // Created at 2023-01-01
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package operate
+package types
 
 import "github.com/auroraride/adapter"
 

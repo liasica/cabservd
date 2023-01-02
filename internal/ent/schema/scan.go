@@ -63,11 +63,12 @@ func (Scan) Annotations() []schema.Annotation {
 func (Scan) Fields() []ent.Field {
     return []ent.Field{
         field.UUID("uuid", uuid.UUID{}).Unique().Default(uuid.New),
+        field.Enum("business").GoType(adapter.Business("")).Comment("业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订"),
         field.Bool("efficient").Default(true).Comment("是否有效"),
         field.String("user_id").Comment("用户ID"),
         field.Other("user_type", adapter.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("用户类别"),
         field.String("serial").Comment("电柜编号"),
-        field.JSON("data", &adapter.ExchangeUsableResponse{}).Optional().Comment("换电信息"),
+        field.JSON("data", &adapter.CabinetBinUsableResponse{}).Optional().Comment("换电信息"),
     }
 }
 

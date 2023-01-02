@@ -3,8 +3,10 @@
 package scan
 
 import (
+	"fmt"
 	"time"
 
+	"github.com/auroraride/adapter"
 	"github.com/google/uuid"
 )
 
@@ -21,6 +23,8 @@ const (
 	FieldCabinetID = "cabinet_id"
 	// FieldUUID holds the string denoting the uuid field in the database.
 	FieldUUID = "uuid"
+	// FieldBusiness holds the string denoting the business field in the database.
+	FieldBusiness = "business"
 	// FieldEfficient holds the string denoting the efficient field in the database.
 	FieldEfficient = "efficient"
 	// FieldUserID holds the string denoting the user_id field in the database.
@@ -51,6 +55,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldCabinetID,
 	FieldUUID,
+	FieldBusiness,
 	FieldEfficient,
 	FieldUserID,
 	FieldUserType,
@@ -80,3 +85,13 @@ var (
 	// DefaultEfficient holds the default value on creation for the "efficient" field.
 	DefaultEfficient bool
 )
+
+// BusinessValidator is a validator for the "business" field enum values. It is called by the builders before save.
+func BusinessValidator(b adapter.Business) error {
+	switch b.String() {
+	case "operate", "exchange", "active", "pause", "continue", "unsubscribe":
+		return nil
+	default:
+		return fmt.Errorf("scan: invalid enum value for business field: %q", b)
+	}
+}

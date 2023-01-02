@@ -4470,11 +4470,12 @@ type ScanMutation struct {
 	created_at     *time.Time
 	updated_at     *time.Time
 	uuid           *uuid.UUID
+	business       *adapter.Business
 	efficient      *bool
 	user_id        *string
 	user_type      *adapter.UserType
 	serial         *string
-	data           **adapter.ExchangeUsableResponse
+	data           **adapter.CabinetBinUsableResponse
 	clearedFields  map[string]struct{}
 	cabinet        *uint64
 	clearedcabinet bool
@@ -4725,6 +4726,42 @@ func (m *ScanMutation) ResetUUID() {
 	m.uuid = nil
 }
 
+// SetBusiness sets the "business" field.
+func (m *ScanMutation) SetBusiness(a adapter.Business) {
+	m.business = &a
+}
+
+// Business returns the value of the "business" field in the mutation.
+func (m *ScanMutation) Business() (r adapter.Business, exists bool) {
+	v := m.business
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBusiness returns the old "business" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldBusiness(ctx context.Context) (v adapter.Business, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBusiness is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBusiness requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBusiness: %w", err)
+	}
+	return oldValue.Business, nil
+}
+
+// ResetBusiness resets all changes to the "business" field.
+func (m *ScanMutation) ResetBusiness() {
+	m.business = nil
+}
+
 // SetEfficient sets the "efficient" field.
 func (m *ScanMutation) SetEfficient(b bool) {
 	m.efficient = &b
@@ -4870,12 +4907,12 @@ func (m *ScanMutation) ResetSerial() {
 }
 
 // SetData sets the "data" field.
-func (m *ScanMutation) SetData(aur *adapter.ExchangeUsableResponse) {
-	m.data = &aur
+func (m *ScanMutation) SetData(abur *adapter.CabinetBinUsableResponse) {
+	m.data = &abur
 }
 
 // Data returns the value of the "data" field in the mutation.
-func (m *ScanMutation) Data() (r *adapter.ExchangeUsableResponse, exists bool) {
+func (m *ScanMutation) Data() (r *adapter.CabinetBinUsableResponse, exists bool) {
 	v := m.data
 	if v == nil {
 		return
@@ -4886,7 +4923,7 @@ func (m *ScanMutation) Data() (r *adapter.ExchangeUsableResponse, exists bool) {
 // OldData returns the old "data" field's value of the Scan entity.
 // If the Scan object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ScanMutation) OldData(ctx context.Context) (v *adapter.ExchangeUsableResponse, err error) {
+func (m *ScanMutation) OldData(ctx context.Context) (v *adapter.CabinetBinUsableResponse, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldData is only allowed on UpdateOne operations")
 	}
@@ -4978,7 +5015,7 @@ func (m *ScanMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ScanMutation) Fields() []string {
-	fields := make([]string, 0, 9)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, scan.FieldCreatedAt)
 	}
@@ -4990,6 +5027,9 @@ func (m *ScanMutation) Fields() []string {
 	}
 	if m.uuid != nil {
 		fields = append(fields, scan.FieldUUID)
+	}
+	if m.business != nil {
+		fields = append(fields, scan.FieldBusiness)
 	}
 	if m.efficient != nil {
 		fields = append(fields, scan.FieldEfficient)
@@ -5022,6 +5062,8 @@ func (m *ScanMutation) Field(name string) (ent.Value, bool) {
 		return m.CabinetID()
 	case scan.FieldUUID:
 		return m.UUID()
+	case scan.FieldBusiness:
+		return m.Business()
 	case scan.FieldEfficient:
 		return m.Efficient()
 	case scan.FieldUserID:
@@ -5049,6 +5091,8 @@ func (m *ScanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCabinetID(ctx)
 	case scan.FieldUUID:
 		return m.OldUUID(ctx)
+	case scan.FieldBusiness:
+		return m.OldBusiness(ctx)
 	case scan.FieldEfficient:
 		return m.OldEfficient(ctx)
 	case scan.FieldUserID:
@@ -5096,6 +5140,13 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUUID(v)
 		return nil
+	case scan.FieldBusiness:
+		v, ok := value.(adapter.Business)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBusiness(v)
+		return nil
 	case scan.FieldEfficient:
 		v, ok := value.(bool)
 		if !ok {
@@ -5125,7 +5176,7 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 		m.SetSerial(v)
 		return nil
 	case scan.FieldData:
-		v, ok := value.(*adapter.ExchangeUsableResponse)
+		v, ok := value.(*adapter.CabinetBinUsableResponse)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -5203,6 +5254,9 @@ func (m *ScanMutation) ResetField(name string) error {
 		return nil
 	case scan.FieldUUID:
 		m.ResetUUID()
+		return nil
+	case scan.FieldBusiness:
+		m.ResetBusiness()
 		return nil
 	case scan.FieldEfficient:
 		m.ResetEfficient()

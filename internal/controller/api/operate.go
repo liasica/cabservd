@@ -6,9 +6,7 @@
 package api
 
 import (
-    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
-    "github.com/auroraride/cabservd/internal/service"
     "github.com/labstack/echo/v4"
 )
 
@@ -16,8 +14,7 @@ type operate struct{}
 
 var Operate = new(operate)
 
-// Do 电柜操作
-func (*operate) Do(c echo.Context) (err error) {
-    ctx, req := app.ContextAndBinding[adapter.OperateRequest](c)
-    return ctx.SendResponse(service.NewOperate(ctx.User).Do(req))
+func (*operate) Bin(c echo.Context) (err error) {
+    ctx := app.Context(c)
+    return ctx.SendResponse()
 }

@@ -3,7 +3,7 @@
 // Created at 2023-01-01
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package operate
+package types
 
 import (
     "fmt"
@@ -13,7 +13,8 @@ import (
 )
 
 var (
-    ExchangeConfigure = [][]*BinStep{
+    // ExchangeConfigure 换电配置
+    ExchangeConfigure = []BinSteps{
         {
             {
                 Step:    1,
@@ -23,7 +24,7 @@ var (
             },
             {
                 Step:    2,
-                Operate: adapter.OperateUnknown,
+                Operate: adapter.OperateDetect,
                 Door:    adapter.DetectDoorClose,
                 Battery: adapter.DetectBatteryPutin,
             },
@@ -37,10 +38,42 @@ var (
             },
             {
                 Step:    4,
-                Operate: adapter.OperateDoorOpen,
+                Operate: adapter.OperateDetect,
                 Door:    adapter.DetectDoorClose,
                 Battery: adapter.DetectBatteryPutout,
             },
+        },
+    }
+
+    // PutinConfigure 电池放入配置
+    PutinConfigure = BinSteps{
+        {
+            Step:    1,
+            Operate: adapter.OperateDoorOpen,
+            Door:    adapter.DetectDoorOpen,
+            Battery: adapter.DetectBatteryIgnore,
+        },
+        {
+            Step:    2,
+            Operate: adapter.OperateDetect,
+            Door:    adapter.DetectDoorClose,
+            Battery: adapter.DetectBatteryPutin,
+        },
+    }
+
+    // PutoutConfigure 电池取出配置
+    PutoutConfigure = BinSteps{
+        {
+            Step:    1,
+            Operate: adapter.OperateDoorOpen,
+            Door:    adapter.DetectDoorOpen,
+            Battery: adapter.DetectBatteryIgnore,
+        },
+        {
+            Step:    2,
+            Operate: adapter.OperateDetect,
+            Door:    adapter.DetectDoorClose,
+            Battery: adapter.DetectBatteryPutout,
         },
     }
 )
@@ -60,6 +93,8 @@ func NewBinResult(eb *ent.Bin, err error) *BinResult {
         bin: eb,
     }
 }
+
+type BinSteps []*BinStep
 
 type BinStep struct {
     Step    int                   `json:"step"`    // 步骤序号
@@ -81,7 +116,7 @@ type Bin struct {
     UUID         uuid.UUID        // 任务ID
     Ordinal      int              // 仓位序号
     Business     adapter.Business // 业务类别
-    Steps        []*BinStep       // 规划步骤
+    Steps        BinSteps         // 规划步骤
     Battery      string           // 校验放入的电池编号
     StepCallback StepCallback     // 每一步的回调
 }

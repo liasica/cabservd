@@ -120,6 +120,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			scan.FieldUpdatedAt: {Type: field.TypeTime, Column: scan.FieldUpdatedAt},
 			scan.FieldCabinetID: {Type: field.TypeUint64, Column: scan.FieldCabinetID},
 			scan.FieldUUID:      {Type: field.TypeUUID, Column: scan.FieldUUID},
+			scan.FieldBusiness:  {Type: field.TypeEnum, Column: scan.FieldBusiness},
 			scan.FieldEfficient: {Type: field.TypeBool, Column: scan.FieldEfficient},
 			scan.FieldUserID:    {Type: field.TypeString, Column: scan.FieldUserID},
 			scan.FieldUserType:  {Type: field.TypeOther, Column: scan.FieldUserType},
@@ -670,6 +671,11 @@ func (f *ScanFilter) WhereCabinetID(p entql.Uint64P) {
 // WhereUUID applies the entql [16]byte predicate on the uuid field.
 func (f *ScanFilter) WhereUUID(p entql.ValueP) {
 	f.Where(p.Field(scan.FieldUUID))
+}
+
+// WhereBusiness applies the entql string predicate on the business field.
+func (f *ScanFilter) WhereBusiness(p entql.StringP) {
+	f.Where(p.Field(scan.FieldBusiness))
 }
 
 // WhereEfficient applies the entql bool predicate on the efficient field.

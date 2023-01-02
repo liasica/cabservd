@@ -8,12 +8,11 @@ package service
 import (
     "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/app"
-    "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/scan"
     "github.com/auroraride/cabservd/internal/notice"
-    "github.com/auroraride/cabservd/internal/operate"
+    "github.com/auroraride/cabservd/internal/types"
     "github.com/jinzhu/copier"
     "github.com/liasica/go-helpers/silk"
     "net/http"
@@ -30,44 +29,21 @@ func NewExchange(params ...any) *exchangeService {
     }
 }
 
-func (s *exchangeService) DetectCabinet(cab *ent.Cabinet) error {
-    if cab == nil {
-        return adapter.ErrorCabinetNotFound
-    }
-
-    if cab.Status != cabinet.StatusIdle {
-        return adapter.ErrorCabinetBusy
-    }
-
-    if !cab.Online {
-        return adapter.ErrorCabinetOffline
-    }
-
-    if len(cab.Edges.Bins) < 2 {
-        return adapter.ErrorCabinetNoEmpty
-    }
-
-    return nil
-}
-
 // Usable 获取电柜待换电信息
-func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapter.ExchangeUsableResponse) {
-    res = &adapter.ExchangeUsableResponse{
+func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapter.CabinetBinUsableResponse) {
+    res = &adapter.CabinetBinUsableResponse{
         Cabinet: new(adapter.Cabinet),
         Fully:   new(adapter.Bin),
         Empty:   new(adapter.Bin),
     }
 
-    // defer func() {
-    //     b, _ := json.Marshal(res)
-    //     log.Infof("[SCAN] %s", b)
-    // }()
+    cs := NewCabinet(s.User)
 
     // 获取电柜状态
-    cab, _ := NewCabinet(s.User).QuerySerialWithBin(req.Serial)
+    cab, _ := cs.QuerySerialWithBin(req.Serial)
 
     // 检查电柜是否可换电
-    err := s.DetectCabinet(cab)
+    err := cs.DetectCabinet(cab)
     if err != nil {
         app.Panic(http.StatusBadRequest, err)
     }
@@ -84,49 +60,23 @@ func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapt
 
     // TODO 查询是否有正在执行的任务?
 
-    // 获取仓位
-    var (
-        fully, empty *ent.Bin
-    )
+    // 获取空仓和满电仓位
+    var fully, empty *ent.Bin
+    fully, empty, err = cs.BusinessInfo(cab, req.Minsoc, 1, 1)
 
-    fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
-    for _, item := range cab.Edges.Bins {
-        // 如果仓位未启用或仓位不健康直接跳过
-        if !item.Enable || !item.Health {
-            continue
-        } else if item.Open {
-            // 有正常未关闭的仓门直接报错
-            app.Panic(http.StatusBadRequest, adapter.ErrorCabinetDoorOpened)
-        }
-        // 宽松判定是否有电池
-        if item.IsLooseHasBattery(fakevoltage, fakecurrent) {
-            // 若有电池
-            // 获取满电仓位
-            if fully == nil || fully.Soc < item.Soc {
-                // 该仓位电量小于最小电量
-                if item.Soc < req.Minsoc {
-                    continue
-                }
-                // 标定满仓
-                fully = item
-            }
-        } else {
-            // 若无电池
-            if empty == nil {
-                empty = item
-            }
-        }
+    if err != nil {
+        app.Panic(http.StatusBadRequest, err)
     }
 
-    // 如果无满电
-    if fully == nil {
-        app.Panic(http.StatusBadRequest, adapter.ErrorCabinetNoFully)
-    }
-
-    // 如果无空仓
-    if empty == nil {
-        app.Panic(http.StatusBadRequest, adapter.ErrorCabinetNoEmpty)
-    }
+    // // 如果无满电
+    // if fully == nil {
+    //     app.Panic(http.StatusBadRequest, adapter.ErrorCabinetNoFully)
+    // }
+    //
+    // // 如果无空仓
+    // if empty == nil {
+    //     app.Panic(http.StatusBadRequest, adapter.ErrorCabinetNoEmpty)
+    // }
 
     // 拷贝属性
     _ = copier.Copy(res.Cabinet, cab)
@@ -134,7 +84,7 @@ func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapt
     _ = copier.Copy(res.Empty, empty)
 
     // 存储扫码记录
-    sm := NewScan(s.User).Create(req.Serial, cab, res)
+    sm := NewScan(s.User).Create(adapter.BusinessExchange, req.Serial, cab, res)
     res.UUID = sm.UUID.String()
 
     return
@@ -142,7 +92,7 @@ func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapt
 
 func (s *exchangeService) Do(req *adapter.ExchangeRequest) (res *adapter.ExchangeResponse) {
     // 查询扫码记录
-    sc := NewScan(s.User).CensorX(req)
+    sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, req.Minsoc)
 
     // 开始同步换电流程
     results, err := s.start(req, sc)
@@ -176,7 +126,7 @@ func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (res
     cab, _ := NewCabinet(s.User).QueryWithBin(sc.CabinetID)
 
     // 检查电柜是否可换电
-    err = s.DetectCabinet(cab)
+    err = NewCabinet(s.User).DetectCabinet(cab)
     if err != nil {
         return
     }
@@ -206,10 +156,10 @@ func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (res
         go notice.Aurservd.SendMessage(data)
     }
 
-    for i, conf := range operate.ExchangeConfigure {
+    for i, conf := range types.ExchangeConfigure {
         b := bins[i]
 
-        err = NewBin(s.User).Operate(&operate.Bin{
+        err = NewBin(s.User).Operate(&types.Bin{
             Timeout:      req.Timeout,
             Serial:       sc.Serial,
             UUID:         req.UUID,
