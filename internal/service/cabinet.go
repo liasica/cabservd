@@ -134,7 +134,12 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
         }
     }
 
-    if batteries < minbattery || emptynum < minempty {
+    if batteries < minbattery {
+        err = adapter.ErrorBatteryNotEnough
+        return
+    }
+
+    if emptynum < minempty {
         err = adapter.ErrorBinNotEnough
         return
     }
