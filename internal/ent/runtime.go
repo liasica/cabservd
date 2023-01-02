@@ -91,8 +91,12 @@ func init() {
 	cabinetDescOnline := cabinetFields[0].Descriptor()
 	// cabinet.DefaultOnline holds the default value on creation for the online field.
 	cabinet.DefaultOnline = cabinetDescOnline.Default.(bool)
+	// cabinetDescPower is the schema descriptor for power field.
+	cabinetDescPower := cabinetFields[1].Descriptor()
+	// cabinet.DefaultPower holds the default value on creation for the power field.
+	cabinet.DefaultPower = cabinetDescPower.Default.(bool)
 	// cabinetDescEnable is the schema descriptor for enable field.
-	cabinetDescEnable := cabinetFields[4].Descriptor()
+	cabinetDescEnable := cabinetFields[5].Descriptor()
 	// cabinet.DefaultEnable holds the default value on creation for the enable field.
 	cabinet.DefaultEnable = cabinetDescEnable.Default.(bool)
 	consoleFields := schema.Console{}.Fields()

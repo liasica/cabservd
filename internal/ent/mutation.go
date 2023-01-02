@@ -1532,6 +1532,7 @@ type CabinetMutation struct {
 	created_at     *time.Time
 	updated_at     *time.Time
 	online         *bool
+	power          *bool
 	brand          *adapter.Brand
 	serial         *string
 	status         *cabinet.Status
@@ -1763,6 +1764,42 @@ func (m *CabinetMutation) OldOnline(ctx context.Context) (v bool, err error) {
 // ResetOnline resets all changes to the "online" field.
 func (m *CabinetMutation) ResetOnline() {
 	m.online = nil
+}
+
+// SetPower sets the "power" field.
+func (m *CabinetMutation) SetPower(b bool) {
+	m.power = &b
+}
+
+// Power returns the value of the "power" field in the mutation.
+func (m *CabinetMutation) Power() (r bool, exists bool) {
+	v := m.power
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPower returns the old "power" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldPower(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPower is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPower requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPower: %w", err)
+	}
+	return oldValue.Power, nil
+}
+
+// ResetPower resets all changes to the "power" field.
+func (m *CabinetMutation) ResetPower() {
+	m.power = nil
 }
 
 // SetBrand sets the "brand" field.
@@ -2487,7 +2524,7 @@ func (m *CabinetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CabinetMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, cabinet.FieldCreatedAt)
 	}
@@ -2496,6 +2533,9 @@ func (m *CabinetMutation) Fields() []string {
 	}
 	if m.online != nil {
 		fields = append(fields, cabinet.FieldOnline)
+	}
+	if m.power != nil {
+		fields = append(fields, cabinet.FieldPower)
 	}
 	if m.brand != nil {
 		fields = append(fields, cabinet.FieldBrand)
@@ -2544,6 +2584,8 @@ func (m *CabinetMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case cabinet.FieldOnline:
 		return m.Online()
+	case cabinet.FieldPower:
+		return m.Power()
 	case cabinet.FieldBrand:
 		return m.Brand()
 	case cabinet.FieldSerial:
@@ -2581,6 +2623,8 @@ func (m *CabinetMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldUpdatedAt(ctx)
 	case cabinet.FieldOnline:
 		return m.OldOnline(ctx)
+	case cabinet.FieldPower:
+		return m.OldPower(ctx)
 	case cabinet.FieldBrand:
 		return m.OldBrand(ctx)
 	case cabinet.FieldSerial:
@@ -2632,6 +2676,13 @@ func (m *CabinetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOnline(v)
+		return nil
+	case cabinet.FieldPower:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPower(v)
 		return nil
 	case cabinet.FieldBrand:
 		v, ok := value.(adapter.Brand)
@@ -2899,6 +2950,9 @@ func (m *CabinetMutation) ResetField(name string) error {
 		return nil
 	case cabinet.FieldOnline:
 		m.ResetOnline()
+		return nil
+	case cabinet.FieldPower:
+		m.ResetPower()
 		return nil
 	case cabinet.FieldBrand:
 		m.ResetBrand()

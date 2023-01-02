@@ -71,6 +71,11 @@ func Online(v bool) predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldEQ(FieldOnline, v))
 }
 
+// Power applies equality check predicate on the "power" field. It's identical to PowerEQ.
+func Power(v bool) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldEQ(FieldPower, v))
+}
+
 // Brand applies equality check predicate on the "brand" field. It's identical to BrandEQ.
 func Brand(v adapter.Brand) predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldEQ(FieldBrand, v))
@@ -209,6 +214,16 @@ func OnlineEQ(v bool) predicate.Cabinet {
 // OnlineNEQ applies the NEQ predicate on the "online" field.
 func OnlineNEQ(v bool) predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldNEQ(FieldOnline, v))
+}
+
+// PowerEQ applies the EQ predicate on the "power" field.
+func PowerEQ(v bool) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldEQ(FieldPower, v))
+}
+
+// PowerNEQ applies the NEQ predicate on the "power" field.
+func PowerNEQ(v bool) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldNEQ(FieldPower, v))
 }
 
 // BrandEQ applies the EQ predicate on the "brand" field.

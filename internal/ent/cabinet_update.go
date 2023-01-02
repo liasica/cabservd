@@ -51,6 +51,20 @@ func (cu *CabinetUpdate) SetNillableOnline(b *bool) *CabinetUpdate {
 	return cu
 }
 
+// SetPower sets the "power" field.
+func (cu *CabinetUpdate) SetPower(b bool) *CabinetUpdate {
+	cu.mutation.SetPower(b)
+	return cu
+}
+
+// SetNillablePower sets the "power" field if the given value is not nil.
+func (cu *CabinetUpdate) SetNillablePower(b *bool) *CabinetUpdate {
+	if b != nil {
+		cu.SetPower(*b)
+	}
+	return cu
+}
+
 // SetBrand sets the "brand" field.
 func (cu *CabinetUpdate) SetBrand(a adapter.Brand) *CabinetUpdate {
 	cu.mutation.SetBrand(a)
@@ -400,6 +414,9 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Online(); ok {
 		_spec.SetField(cabinet.FieldOnline, field.TypeBool, value)
 	}
+	if value, ok := cu.mutation.Power(); ok {
+		_spec.SetField(cabinet.FieldPower, field.TypeBool, value)
+	}
 	if value, ok := cu.mutation.Brand(); ok {
 		_spec.SetField(cabinet.FieldBrand, field.TypeOther, value)
 	}
@@ -567,6 +584,20 @@ func (cuo *CabinetUpdateOne) SetOnline(b bool) *CabinetUpdateOne {
 func (cuo *CabinetUpdateOne) SetNillableOnline(b *bool) *CabinetUpdateOne {
 	if b != nil {
 		cuo.SetOnline(*b)
+	}
+	return cuo
+}
+
+// SetPower sets the "power" field.
+func (cuo *CabinetUpdateOne) SetPower(b bool) *CabinetUpdateOne {
+	cuo.mutation.SetPower(b)
+	return cuo
+}
+
+// SetNillablePower sets the "power" field if the given value is not nil.
+func (cuo *CabinetUpdateOne) SetNillablePower(b *bool) *CabinetUpdateOne {
+	if b != nil {
+		cuo.SetPower(*b)
 	}
 	return cuo
 }
@@ -943,6 +974,9 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 	}
 	if value, ok := cuo.mutation.Online(); ok {
 		_spec.SetField(cabinet.FieldOnline, field.TypeBool, value)
+	}
+	if value, ok := cuo.mutation.Power(); ok {
+		_spec.SetField(cabinet.FieldPower, field.TypeBool, value)
 	}
 	if value, ok := cuo.mutation.Brand(); ok {
 		_spec.SetField(cabinet.FieldBrand, field.TypeOther, value)

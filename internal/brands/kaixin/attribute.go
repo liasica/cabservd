@@ -160,6 +160,8 @@ func (req ReportRequest) Cabinet() (cab *ent.CabinetPointer, exists bool) {
             cab.Enable = silk.Bool(v == "1")
         case SignalElectricity:
             cab.Electricity = silk.Float64(tools.StrToFloat64(v))
+        case SignalPower:
+            cab.Power = silk.Bool(v == "0")
         }
     }
     return

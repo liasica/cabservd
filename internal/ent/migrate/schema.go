@@ -88,6 +88,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "online", Type: field.TypeBool, Comment: "是否在线", Default: false},
+		{Name: "power", Type: field.TypeBool, Comment: "市电是否正常", Default: true},
 		{Name: "brand", Type: field.TypeOther, Comment: "品牌", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Unique: true, Comment: "电柜编号"},
 		{Name: "status", Type: field.TypeEnum, Comment: "状态", Enums: []string{"initializing", "idle", "busy", "exchange", "abnormal"}, Default: "initializing"},
@@ -114,27 +115,27 @@ var (
 			{
 				Name:    "cabinet_brand",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[4]},
+				Columns: []*schema.Column{CabinetColumns[5]},
 			},
 			{
 				Name:    "cabinet_status",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[6]},
+				Columns: []*schema.Column{CabinetColumns[7]},
 			},
 			{
 				Name:    "cabinet_enable",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[7]},
+				Columns: []*schema.Column{CabinetColumns[8]},
 			},
 			{
 				Name:    "cabinet_lng",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[8]},
+				Columns: []*schema.Column{CabinetColumns[9]},
 			},
 			{
 				Name:    "cabinet_lat",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[9]},
+				Columns: []*schema.Column{CabinetColumns[10]},
 			},
 		},
 	}

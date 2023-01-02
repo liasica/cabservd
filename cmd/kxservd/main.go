@@ -29,7 +29,7 @@ func main() {
         internal.Boot()
 
         // 标记所有电柜为离线和空闲
-        _ = ent.Database.Cabinet.Update().SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(context.Background())
+        _ = ent.Database.Cabinet.Update().Where(cabinet.Brand(g.Config.Brand)).SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(context.Background())
 
         // TODO 缓存数据?
         // cache()

@@ -15,6 +15,7 @@ import (
     "github.com/goccy/go-json"
     "github.com/liasica/go-helpers/tools"
     log "github.com/sirupsen/logrus"
+    "time"
 )
 
 type Parser interface {
@@ -54,6 +55,7 @@ func SaveCabinet(ctx context.Context, brand adapter.Brand, serial string, item *
         SetSerial(serial).
         OnConflictColumns(cabinet.FieldSerial).
         Update(func(u *ent.CabinetUpsert) {
+            u.SetUpdatedAt(time.Now())
             // 在线
             if item.Online != nil {
                 u.SetOnline(*item.Online)
@@ -134,7 +136,7 @@ func SaveBins(ctx context.Context, brand adapter.Brand, serial string, items ent
             SetOrdinal(*item.Ordinal).
             OnConflictColumns(bin.FieldUUID).
             Update(func(u *ent.BinUpsert) {
-                u.SetCabinetID(cab.ID)
+                u.SetUpdatedAt(time.Now()).SetCabinetID(cab.ID)
                 // 健康状态
                 if item.Health != nil {
                     fmt.Printf("%s health :-> %v\n", name, *item.Health)

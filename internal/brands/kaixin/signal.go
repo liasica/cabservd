@@ -47,6 +47,7 @@ const (
     SignalEnable         Signal = "02119001" // 柜体是否禁用 (0:禁用 1:启用)
     SignalElectricity    Signal = "02120001" // 柜子总用电量 (kwh)
     SignalCabinetControl Signal = "02301001" // 控制换电柜命令
+    SignalPower          Signal = "02019001" // 市电状态 0:正常 1:断电
 )
 
 var (

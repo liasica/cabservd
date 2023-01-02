@@ -66,6 +66,20 @@ func (cc *CabinetCreate) SetNillableOnline(b *bool) *CabinetCreate {
 	return cc
 }
 
+// SetPower sets the "power" field.
+func (cc *CabinetCreate) SetPower(b bool) *CabinetCreate {
+	cc.mutation.SetPower(b)
+	return cc
+}
+
+// SetNillablePower sets the "power" field if the given value is not nil.
+func (cc *CabinetCreate) SetNillablePower(b *bool) *CabinetCreate {
+	if b != nil {
+		cc.SetPower(*b)
+	}
+	return cc
+}
+
 // SetBrand sets the "brand" field.
 func (cc *CabinetCreate) SetBrand(a adapter.Brand) *CabinetCreate {
 	cc.mutation.SetBrand(a)
@@ -266,6 +280,10 @@ func (cc *CabinetCreate) defaults() {
 		v := cabinet.DefaultOnline
 		cc.mutation.SetOnline(v)
 	}
+	if _, ok := cc.mutation.Power(); !ok {
+		v := cabinet.DefaultPower
+		cc.mutation.SetPower(v)
+	}
 	if _, ok := cc.mutation.Status(); !ok {
 		v := cabinet.DefaultStatus
 		cc.mutation.SetStatus(v)
@@ -286,6 +304,9 @@ func (cc *CabinetCreate) check() error {
 	}
 	if _, ok := cc.mutation.Online(); !ok {
 		return &ValidationError{Name: "online", err: errors.New(`ent: missing required field "Cabinet.online"`)}
+	}
+	if _, ok := cc.mutation.Power(); !ok {
+		return &ValidationError{Name: "power", err: errors.New(`ent: missing required field "Cabinet.power"`)}
 	}
 	if _, ok := cc.mutation.Brand(); !ok {
 		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "Cabinet.brand"`)}
@@ -348,6 +369,10 @@ func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Online(); ok {
 		_spec.SetField(cabinet.FieldOnline, field.TypeBool, value)
 		_node.Online = value
+	}
+	if value, ok := cc.mutation.Power(); ok {
+		_spec.SetField(cabinet.FieldPower, field.TypeBool, value)
+		_node.Power = value
 	}
 	if value, ok := cc.mutation.Brand(); ok {
 		_spec.SetField(cabinet.FieldBrand, field.TypeOther, value)
@@ -485,6 +510,18 @@ func (u *CabinetUpsert) SetOnline(v bool) *CabinetUpsert {
 // UpdateOnline sets the "online" field to the value that was provided on create.
 func (u *CabinetUpsert) UpdateOnline() *CabinetUpsert {
 	u.SetExcluded(cabinet.FieldOnline)
+	return u
+}
+
+// SetPower sets the "power" field.
+func (u *CabinetUpsert) SetPower(v bool) *CabinetUpsert {
+	u.Set(cabinet.FieldPower, v)
+	return u
+}
+
+// UpdatePower sets the "power" field to the value that was provided on create.
+func (u *CabinetUpsert) UpdatePower() *CabinetUpsert {
+	u.SetExcluded(cabinet.FieldPower)
 	return u
 }
 
@@ -774,6 +811,20 @@ func (u *CabinetUpsertOne) SetOnline(v bool) *CabinetUpsertOne {
 func (u *CabinetUpsertOne) UpdateOnline() *CabinetUpsertOne {
 	return u.Update(func(s *CabinetUpsert) {
 		s.UpdateOnline()
+	})
+}
+
+// SetPower sets the "power" field.
+func (u *CabinetUpsertOne) SetPower(v bool) *CabinetUpsertOne {
+	return u.Update(func(s *CabinetUpsert) {
+		s.SetPower(v)
+	})
+}
+
+// UpdatePower sets the "power" field to the value that was provided on create.
+func (u *CabinetUpsertOne) UpdatePower() *CabinetUpsertOne {
+	return u.Update(func(s *CabinetUpsert) {
+		s.UpdatePower()
 	})
 }
 
@@ -1269,6 +1320,20 @@ func (u *CabinetUpsertBulk) SetOnline(v bool) *CabinetUpsertBulk {
 func (u *CabinetUpsertBulk) UpdateOnline() *CabinetUpsertBulk {
 	return u.Update(func(s *CabinetUpsert) {
 		s.UpdateOnline()
+	})
+}
+
+// SetPower sets the "power" field.
+func (u *CabinetUpsertBulk) SetPower(v bool) *CabinetUpsertBulk {
+	return u.Update(func(s *CabinetUpsert) {
+		s.SetPower(v)
+	})
+}
+
+// UpdatePower sets the "power" field to the value that was provided on create.
+func (u *CabinetUpsertBulk) UpdatePower() *CabinetUpsertBulk {
+	return u.Update(func(s *CabinetUpsert) {
+		s.UpdatePower()
 	})
 }
 

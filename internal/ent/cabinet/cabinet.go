@@ -18,6 +18,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldOnline holds the string denoting the online field in the database.
 	FieldOnline = "online"
+	// FieldPower holds the string denoting the power field in the database.
+	FieldPower = "power"
 	// FieldBrand holds the string denoting the brand field in the database.
 	FieldBrand = "brand"
 	// FieldSerial holds the string denoting the serial field in the database.
@@ -59,6 +61,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldOnline,
+	FieldPower,
 	FieldBrand,
 	FieldSerial,
 	FieldStatus,
@@ -91,6 +94,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// DefaultOnline holds the default value on creation for the "online" field.
 	DefaultOnline bool
+	// DefaultPower holds the default value on creation for the "power" field.
+	DefaultPower bool
 	// DefaultEnable holds the default value on creation for the "enable" field.
 	DefaultEnable bool
 )

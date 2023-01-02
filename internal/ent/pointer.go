@@ -34,6 +34,7 @@ type BinPointer struct {
 type CabinetPointers []*CabinetPointer
 type CabinetPointer struct {
 	Online      *bool           `json:"online,omitempty"`
+	Power       *bool           `json:"power,omitempty"`
 	Brand       *adapter.Brand  `json:"brand,omitempty"`
 	Serial      *string         `json:"serial,omitempty"`
 	Status      *cabinet.Status `json:"status,omitempty"`

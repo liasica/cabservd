@@ -63,6 +63,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			cabinet.FieldCreatedAt:   {Type: field.TypeTime, Column: cabinet.FieldCreatedAt},
 			cabinet.FieldUpdatedAt:   {Type: field.TypeTime, Column: cabinet.FieldUpdatedAt},
 			cabinet.FieldOnline:      {Type: field.TypeBool, Column: cabinet.FieldOnline},
+			cabinet.FieldPower:       {Type: field.TypeBool, Column: cabinet.FieldPower},
 			cabinet.FieldBrand:       {Type: field.TypeOther, Column: cabinet.FieldBrand},
 			cabinet.FieldSerial:      {Type: field.TypeString, Column: cabinet.FieldSerial},
 			cabinet.FieldStatus:      {Type: field.TypeEnum, Column: cabinet.FieldStatus},
@@ -394,6 +395,11 @@ func (f *CabinetFilter) WhereUpdatedAt(p entql.TimeP) {
 // WhereOnline applies the entql bool predicate on the online field.
 func (f *CabinetFilter) WhereOnline(p entql.BoolP) {
 	f.Where(p.Field(cabinet.FieldOnline))
+}
+
+// WherePower applies the entql bool predicate on the power field.
+func (f *CabinetFilter) WherePower(p entql.BoolP) {
+	f.Where(p.Field(cabinet.FieldPower))
 }
 
 // WhereBrand applies the entql other predicate on the brand field.
