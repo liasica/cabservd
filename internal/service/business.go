@@ -98,6 +98,11 @@ func (s *businessService) Do(req *adapter.BusinessRequest) (res adapter.Business
 
     sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, 0)
 
+    defer func() {
+        // 标记扫码失效
+        _ = sc.Update().SetEfficient(false).Exec(s.ctx)
+    }()
+
     cb := func(r *adapter.OperateStepResult) {
         res.Results = append(res.Results, r)
     }
