@@ -12,10 +12,22 @@ import (
     "net/http"
 )
 
+var (
+    userSkipper = map[string]bool{
+        "/oam/running": true,
+        "/oam/status":  true,
+    }
+)
+
 func User() echo.MiddlewareFunc {
     return func(next echo.HandlerFunc) echo.HandlerFunc {
         return func(c echo.Context) error {
             ctx := app.Context(c)
+            p := c.Path()
+            if userSkipper[p] {
+                return next(ctx)
+            }
+
             header := c.Request().Header
             // 获取user信息
             user := &adapter.User{
