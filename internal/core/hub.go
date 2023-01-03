@@ -112,6 +112,9 @@ func (h *hub) handleMessage(b []byte, client *Client) {
     // 记录日志
     log.Infof("[FD=%d / %s] 接收到消息, message: %s", client.Fd(), client.RemoteAddr(), b)
 
+    // 更新在线状态
+    go client.UpdateOnline()
+
     // 解析
     // TODO 未知的 Client
     err := h.Bean.OnMessage(b, client)

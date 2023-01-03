@@ -6,14 +6,9 @@
 package core
 
 import (
-    "context"
     "github.com/auroraride/adapter"
-    "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/auroraride/cabservd/internal/g"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
-    "time"
 )
 
 func Start(addr string, brand adapter.Brand, bean Hook, codec Codec) {
@@ -27,7 +22,7 @@ func Start(addr string, brand adapter.Brand, bean Hook, codec Codec) {
     }
 
     go Hub.run()
-    go Hub.deadCheck()
+    // go Hub.deadCheck()
 
     log.Fatal(gnet.Run(
         Hub,
@@ -55,17 +50,17 @@ func (h *hub) run() {
 // 每隔1分钟标记20分之前更新的电柜为离线
 // TODO 是否发送消息
 func (h *hub) deadCheck() {
-    ticker := time.NewTicker(time.Minute)
-    for {
-        select {
-        case t := <-ticker.C:
-            _ = ent.Database.Cabinet.Update().
-                Where(
-                    cabinet.Brand(g.Config.Brand),
-                    cabinet.UpdatedAtLT(t.Add(-20*time.Minute)),
-                ).
-                SetOnline(false).
-                Exec(context.Background())
-        }
-    }
+    // ticker := time.NewTicker(time.Minute)
+    // for {
+    //     select {
+    //     case t := <-ticker.C:
+    //         _ = ent.Database.Cabinet.Update().
+    //             Where(
+    //                 cabinet.Brand(g.Config.Brand),
+    //                 cabinet.UpdatedAtLT(t.Add(-20*time.Minute)),
+    //             ).
+    //             SetOnline(false).
+    //             Exec(context.Background())
+    //     }
+    // }
 }

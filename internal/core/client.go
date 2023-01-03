@@ -13,6 +13,7 @@ import (
     "github.com/goccy/go-json"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
+    "time"
 )
 
 type Client struct {
@@ -26,6 +27,9 @@ type Client struct {
 
     // 消息代理
     receiver chan *MessageProxy
+
+    // 上次接收消息时间
+    dead *time.Timer
 }
 
 type MessageProxy struct {
@@ -39,6 +43,9 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
         Hub:      h,
         receiver: make(chan *MessageProxy),
     }
+    c.dead = time.AfterFunc(20*time.Minute, func() {
+        c.Offline()
+    })
     go c.run()
     return c
 }
@@ -108,9 +115,24 @@ func GetClient(devId string) (c *Client, err error) {
     return
 }
 
+// Close 关闭电柜客户端
 func (c *Client) Close() {
     // 标记电柜为离线
     if c.Serial != "" {
-        _ = ent.Database.Cabinet.Update().Where(cabinet.Serial(c.Serial)).SetOnline(false).Exec(context.Background())
+        go c.Offline()
     }
+}
+
+// Offline 标记电柜离线
+func (c *Client) Offline() {
+    if c.Serial == "" {
+        return
+    }
+    // TODO 是否发送消息
+    _ = ent.Database.Cabinet.Update().Where(cabinet.Serial(c.Serial)).SetOnline(false).Exec(context.Background())
+}
+
+// UpdateOnline 更新电柜离线时间
+func (c *Client) UpdateOnline() {
+    c.dead.Reset(20 * time.Minute)
 }
