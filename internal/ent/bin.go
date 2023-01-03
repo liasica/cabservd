@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -27,7 +27,7 @@ type Bin struct {
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// 品牌
-	Brand adapter.Brand `json:"brand,omitempty"`
+	Brand cabdef.Brand `json:"brand,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 仓位名称(N号仓)
@@ -87,7 +87,7 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case bin.FieldBrand:
-			values[i] = new(adapter.Brand)
+			values[i] = new(cabdef.Brand)
 		case bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists:
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
@@ -144,7 +144,7 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				b.CabinetID = uint64(value.Int64)
 			}
 		case bin.FieldBrand:
-			if value, ok := values[i].(*adapter.Brand); !ok {
+			if value, ok := values[i].(*cabdef.Brand); !ok {
 				return fmt.Errorf("unexpected type %T for field brand", values[i])
 			} else if value != nil {
 				b.Brand = *value

@@ -8,6 +8,7 @@ package service
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -20,9 +21,6 @@ import (
 )
 
 type binService struct {
-    // ordinal int
-    // bin     *ent.Bin
-    // cabinet *ent.Cabinet
     *BaseService
     orm *ent.BinClient
 }
@@ -56,16 +54,16 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
     // // TODO 是否有必要?
     // // TODO 其他详细日志
     // switch req.Operate {
-    // case adapter.OperateDoorOpen:
+    // case cabdef.OperateDoorOpen:
     //     oc = req.Operate
-    //     door = adapter.DetectDoorOpen
-    // case adapter.OperatePutin:
-    //     oc = adapter.OperateDoorOpen
-    //     door = adapter.DetectDoorClose
-    // case adapter.OperatePutout:
-    //     oc = adapter.OperateDoorOpen
-    //     door = adapter.DetectDoorClose
-    // case adapter.OperateBinDisable, adapter.OperateBinEnable:
+    //     door = cabdef.DetectDoorOpen
+    // case cabdef.OperatePutin:
+    //     oc = cabdef.OperateDoorOpen
+    //     door = cabdef.DetectDoorClose
+    // case cabdef.OperatePutout:
+    //     oc = cabdef.OperateDoorOpen
+    //     door = cabdef.DetectDoorClose
+    // case cabdef.OperateBinDisable, cabdef.OperateBinEnable:
     //     oc = req.Operate
     // default:
     //     err = adapter.ErrorOperateCommand
@@ -117,25 +115,25 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                 step := bo.Current()
 
                 switch step.Door {
-                case adapter.DetectDoorIgnore:
+                case cabdef.DetectDoorIgnore:
                     // 忽略仓门检测
                     doorOk = true
-                case adapter.DetectDoorOpen:
+                case cabdef.DetectDoorOpen:
                     // 检测仓门是否开启
                     doorOk = x.Open
-                case adapter.DetectDoorClose:
+                case cabdef.DetectDoorClose:
                     // 检测仓门是否关闭
                     doorOk = !x.Open
                 }
 
                 switch step.Battery {
-                case adapter.DetectBatteryIgnore:
+                case cabdef.DetectBatteryIgnore:
                     // 忽略电池检测
                     batteryOk = true
-                case adapter.DetectBatteryPutin:
+                case cabdef.DetectBatteryPutin:
                     // 严格检测电池是否放入
                     batteryOk = x.IsStrictHasBattery(fakevoltage)
-                case adapter.DetectBatteryPutout:
+                case cabdef.DetectBatteryPutout:
                     // 检测电池是否取出
                     batteryOk = x.IsLooseNoBattery(fakevoltage)
                 }
@@ -148,7 +146,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                 if batteryOk && doorOk {
 
                     // 检查放入电池编号是否匹配
-                    if step.Battery == adapter.DetectBatteryPutin && bo.Battery != "" && eb.BatterySn != bo.Battery {
+                    if step.Battery == cabdef.DetectBatteryPutin && bo.Battery != "" && eb.BatterySn != bo.Battery {
                         err = adapter.ErrorBatteryPutin
                     }
 

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -45,7 +46,7 @@ type BinMutation struct {
 	created_at     *time.Time
 	updated_at     *time.Time
 	uuid           *string
-	brand          *adapter.Brand
+	brand          *cabdef.Brand
 	serial         *string
 	name           *string
 	ordinal        *int
@@ -315,12 +316,12 @@ func (m *BinMutation) ResetCabinetID() {
 }
 
 // SetBrand sets the "brand" field.
-func (m *BinMutation) SetBrand(a adapter.Brand) {
-	m.brand = &a
+func (m *BinMutation) SetBrand(c cabdef.Brand) {
+	m.brand = &c
 }
 
 // Brand returns the value of the "brand" field in the mutation.
-func (m *BinMutation) Brand() (r adapter.Brand, exists bool) {
+func (m *BinMutation) Brand() (r cabdef.Brand, exists bool) {
 	v := m.brand
 	if v == nil {
 		return
@@ -331,7 +332,7 @@ func (m *BinMutation) Brand() (r adapter.Brand, exists bool) {
 // OldBrand returns the old "brand" field's value of the Bin entity.
 // If the Bin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BinMutation) OldBrand(ctx context.Context) (v adapter.Brand, err error) {
+func (m *BinMutation) OldBrand(ctx context.Context) (v cabdef.Brand, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
 	}
@@ -1173,7 +1174,7 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		m.SetCabinetID(v)
 		return nil
 	case bin.FieldBrand:
-		v, ok := value.(adapter.Brand)
+		v, ok := value.(cabdef.Brand)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1533,7 +1534,7 @@ type CabinetMutation struct {
 	updated_at     *time.Time
 	online         *bool
 	power          *bool
-	brand          *adapter.Brand
+	brand          *cabdef.Brand
 	serial         *string
 	status         *cabinet.Status
 	enable         *bool
@@ -1803,12 +1804,12 @@ func (m *CabinetMutation) ResetPower() {
 }
 
 // SetBrand sets the "brand" field.
-func (m *CabinetMutation) SetBrand(a adapter.Brand) {
-	m.brand = &a
+func (m *CabinetMutation) SetBrand(c cabdef.Brand) {
+	m.brand = &c
 }
 
 // Brand returns the value of the "brand" field in the mutation.
-func (m *CabinetMutation) Brand() (r adapter.Brand, exists bool) {
+func (m *CabinetMutation) Brand() (r cabdef.Brand, exists bool) {
 	v := m.brand
 	if v == nil {
 		return
@@ -1819,7 +1820,7 @@ func (m *CabinetMutation) Brand() (r adapter.Brand, exists bool) {
 // OldBrand returns the old "brand" field's value of the Cabinet entity.
 // If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CabinetMutation) OldBrand(ctx context.Context) (v adapter.Brand, err error) {
+func (m *CabinetMutation) OldBrand(ctx context.Context) (v cabdef.Brand, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
 	}
@@ -2685,7 +2686,7 @@ func (m *CabinetMutation) SetField(name string, value ent.Value) error {
 		m.SetPower(v)
 		return nil
 	case cabinet.FieldBrand:
-		v, ok := value.(adapter.Brand)
+		v, ok := value.(cabdef.Brand)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3081,7 +3082,7 @@ type ConsoleMutation struct {
 	op             Op
 	typ            string
 	id             *uint64
-	operate        *adapter.Operate
+	operate        *cabdef.Operate
 	serial         *string
 	uuid           *uuid.UUID
 	business       *adapter.Business
@@ -3090,8 +3091,8 @@ type ConsoleMutation struct {
 	step           *int
 	addstep        *int
 	status         *console.Status
-	before_bin     **adapter.BinInfo
-	after_bin      **adapter.BinInfo
+	before_bin     **cabdef.BinInfo
+	after_bin      **cabdef.BinInfo
 	message        *string
 	startAt        *time.Time
 	stopAt         *time.Time
@@ -3291,12 +3292,12 @@ func (m *ConsoleMutation) ResetBinID() {
 }
 
 // SetOperate sets the "operate" field.
-func (m *ConsoleMutation) SetOperate(a adapter.Operate) {
-	m.operate = &a
+func (m *ConsoleMutation) SetOperate(c cabdef.Operate) {
+	m.operate = &c
 }
 
 // Operate returns the value of the "operate" field in the mutation.
-func (m *ConsoleMutation) Operate() (r adapter.Operate, exists bool) {
+func (m *ConsoleMutation) Operate() (r cabdef.Operate, exists bool) {
 	v := m.operate
 	if v == nil {
 		return
@@ -3307,7 +3308,7 @@ func (m *ConsoleMutation) Operate() (r adapter.Operate, exists bool) {
 // OldOperate returns the old "operate" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldOperate(ctx context.Context) (v adapter.Operate, err error) {
+func (m *ConsoleMutation) OldOperate(ctx context.Context) (v cabdef.Operate, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldOperate is only allowed on UpdateOne operations")
 	}
@@ -3599,12 +3600,12 @@ func (m *ConsoleMutation) ResetStatus() {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (m *ConsoleMutation) SetBeforeBin(ai *adapter.BinInfo) {
-	m.before_bin = &ai
+func (m *ConsoleMutation) SetBeforeBin(ci *cabdef.BinInfo) {
+	m.before_bin = &ci
 }
 
 // BeforeBin returns the value of the "before_bin" field in the mutation.
-func (m *ConsoleMutation) BeforeBin() (r *adapter.BinInfo, exists bool) {
+func (m *ConsoleMutation) BeforeBin() (r *cabdef.BinInfo, exists bool) {
 	v := m.before_bin
 	if v == nil {
 		return
@@ -3615,7 +3616,7 @@ func (m *ConsoleMutation) BeforeBin() (r *adapter.BinInfo, exists bool) {
 // OldBeforeBin returns the old "before_bin" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldBeforeBin(ctx context.Context) (v *adapter.BinInfo, err error) {
+func (m *ConsoleMutation) OldBeforeBin(ctx context.Context) (v *cabdef.BinInfo, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBeforeBin is only allowed on UpdateOne operations")
 	}
@@ -3648,12 +3649,12 @@ func (m *ConsoleMutation) ResetBeforeBin() {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (m *ConsoleMutation) SetAfterBin(ai *adapter.BinInfo) {
-	m.after_bin = &ai
+func (m *ConsoleMutation) SetAfterBin(ci *cabdef.BinInfo) {
+	m.after_bin = &ci
 }
 
 // AfterBin returns the value of the "after_bin" field in the mutation.
-func (m *ConsoleMutation) AfterBin() (r *adapter.BinInfo, exists bool) {
+func (m *ConsoleMutation) AfterBin() (r *cabdef.BinInfo, exists bool) {
 	v := m.after_bin
 	if v == nil {
 		return
@@ -3664,7 +3665,7 @@ func (m *ConsoleMutation) AfterBin() (r *adapter.BinInfo, exists bool) {
 // OldAfterBin returns the old "after_bin" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldAfterBin(ctx context.Context) (v *adapter.BinInfo, err error) {
+func (m *ConsoleMutation) OldAfterBin(ctx context.Context) (v *cabdef.BinInfo, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldAfterBin is only allowed on UpdateOne operations")
 	}
@@ -4153,7 +4154,7 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		m.SetBinID(v)
 		return nil
 	case console.FieldOperate:
-		v, ok := value.(adapter.Operate)
+		v, ok := value.(cabdef.Operate)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4209,14 +4210,14 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		m.SetStatus(v)
 		return nil
 	case console.FieldBeforeBin:
-		v, ok := value.(*adapter.BinInfo)
+		v, ok := value.(*cabdef.BinInfo)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetBeforeBin(v)
 		return nil
 	case console.FieldAfterBin:
-		v, ok := value.(*adapter.BinInfo)
+		v, ok := value.(*cabdef.BinInfo)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4529,7 +4530,7 @@ type ScanMutation struct {
 	user_id        *string
 	user_type      *adapter.UserType
 	serial         *string
-	data           **adapter.CabinetBinUsableResponse
+	data           **cabdef.CabinetBinUsableResponse
 	clearedFields  map[string]struct{}
 	cabinet        *uint64
 	clearedcabinet bool
@@ -4961,12 +4962,12 @@ func (m *ScanMutation) ResetSerial() {
 }
 
 // SetData sets the "data" field.
-func (m *ScanMutation) SetData(abur *adapter.CabinetBinUsableResponse) {
-	m.data = &abur
+func (m *ScanMutation) SetData(cbur *cabdef.CabinetBinUsableResponse) {
+	m.data = &cbur
 }
 
 // Data returns the value of the "data" field in the mutation.
-func (m *ScanMutation) Data() (r *adapter.CabinetBinUsableResponse, exists bool) {
+func (m *ScanMutation) Data() (r *cabdef.CabinetBinUsableResponse, exists bool) {
 	v := m.data
 	if v == nil {
 		return
@@ -4977,7 +4978,7 @@ func (m *ScanMutation) Data() (r *adapter.CabinetBinUsableResponse, exists bool)
 // OldData returns the old "data" field's value of the Scan entity.
 // If the Scan object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ScanMutation) OldData(ctx context.Context) (v *adapter.CabinetBinUsableResponse, err error) {
+func (m *ScanMutation) OldData(ctx context.Context) (v *cabdef.CabinetBinUsableResponse, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldData is only allowed on UpdateOne operations")
 	}
@@ -5230,7 +5231,7 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 		m.SetSerial(v)
 		return nil
 	case scan.FieldData:
-		v, ok := value.(*adapter.CabinetBinUsableResponse)
+		v, ok := value.(*cabdef.CabinetBinUsableResponse)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

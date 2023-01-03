@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -59,8 +60,8 @@ func (cu *ConsoleUpdate) ClearBinID() *ConsoleUpdate {
 }
 
 // SetOperate sets the "operate" field.
-func (cu *ConsoleUpdate) SetOperate(a adapter.Operate) *ConsoleUpdate {
-	cu.mutation.SetOperate(a)
+func (cu *ConsoleUpdate) SetOperate(c cabdef.Operate) *ConsoleUpdate {
+	cu.mutation.SetOperate(c)
 	return cu
 }
 
@@ -116,8 +117,8 @@ func (cu *ConsoleUpdate) SetStatus(c console.Status) *ConsoleUpdate {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cu *ConsoleUpdate) SetBeforeBin(ai *adapter.BinInfo) *ConsoleUpdate {
-	cu.mutation.SetBeforeBin(ai)
+func (cu *ConsoleUpdate) SetBeforeBin(ci *cabdef.BinInfo) *ConsoleUpdate {
+	cu.mutation.SetBeforeBin(ci)
 	return cu
 }
 
@@ -128,8 +129,8 @@ func (cu *ConsoleUpdate) ClearBeforeBin() *ConsoleUpdate {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cu *ConsoleUpdate) SetAfterBin(ai *adapter.BinInfo) *ConsoleUpdate {
-	cu.mutation.SetAfterBin(ai)
+func (cu *ConsoleUpdate) SetAfterBin(ci *cabdef.BinInfo) *ConsoleUpdate {
+	cu.mutation.SetAfterBin(ci)
 	return cu
 }
 
@@ -507,8 +508,8 @@ func (cuo *ConsoleUpdateOne) ClearBinID() *ConsoleUpdateOne {
 }
 
 // SetOperate sets the "operate" field.
-func (cuo *ConsoleUpdateOne) SetOperate(a adapter.Operate) *ConsoleUpdateOne {
-	cuo.mutation.SetOperate(a)
+func (cuo *ConsoleUpdateOne) SetOperate(c cabdef.Operate) *ConsoleUpdateOne {
+	cuo.mutation.SetOperate(c)
 	return cuo
 }
 
@@ -564,8 +565,8 @@ func (cuo *ConsoleUpdateOne) SetStatus(c console.Status) *ConsoleUpdateOne {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cuo *ConsoleUpdateOne) SetBeforeBin(ai *adapter.BinInfo) *ConsoleUpdateOne {
-	cuo.mutation.SetBeforeBin(ai)
+func (cuo *ConsoleUpdateOne) SetBeforeBin(ci *cabdef.BinInfo) *ConsoleUpdateOne {
+	cuo.mutation.SetBeforeBin(ci)
 	return cuo
 }
 
@@ -576,8 +577,8 @@ func (cuo *ConsoleUpdateOne) ClearBeforeBin() *ConsoleUpdateOne {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cuo *ConsoleUpdateOne) SetAfterBin(ai *adapter.BinInfo) *ConsoleUpdateOne {
-	cuo.mutation.SetAfterBin(ai)
+func (cuo *ConsoleUpdateOne) SetAfterBin(ci *cabdef.BinInfo) *ConsoleUpdateOne {
+	cuo.mutation.SetAfterBin(ci)
 	return cuo
 }
 

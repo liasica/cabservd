@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
@@ -66,8 +66,8 @@ func (cu *CabinetUpdate) SetNillablePower(b *bool) *CabinetUpdate {
 }
 
 // SetBrand sets the "brand" field.
-func (cu *CabinetUpdate) SetBrand(a adapter.Brand) *CabinetUpdate {
-	cu.mutation.SetBrand(a)
+func (cu *CabinetUpdate) SetBrand(c cabdef.Brand) *CabinetUpdate {
+	cu.mutation.SetBrand(c)
 	return cu
 }
 
@@ -603,8 +603,8 @@ func (cuo *CabinetUpdateOne) SetNillablePower(b *bool) *CabinetUpdateOne {
 }
 
 // SetBrand sets the "brand" field.
-func (cuo *CabinetUpdateOne) SetBrand(a adapter.Brand) *CabinetUpdateOne {
-	cuo.mutation.SetBrand(a)
+func (cuo *CabinetUpdateOne) SetBrand(c cabdef.Brand) *CabinetUpdateOne {
+	cuo.mutation.SetBrand(c)
 	return cuo
 }
 

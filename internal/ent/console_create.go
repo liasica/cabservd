@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
@@ -47,8 +48,8 @@ func (cc *ConsoleCreate) SetNillableBinID(u *uint64) *ConsoleCreate {
 }
 
 // SetOperate sets the "operate" field.
-func (cc *ConsoleCreate) SetOperate(a adapter.Operate) *ConsoleCreate {
-	cc.mutation.SetOperate(a)
+func (cc *ConsoleCreate) SetOperate(c cabdef.Operate) *ConsoleCreate {
+	cc.mutation.SetOperate(c)
 	return cc
 }
 
@@ -103,14 +104,14 @@ func (cc *ConsoleCreate) SetStatus(c console.Status) *ConsoleCreate {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (cc *ConsoleCreate) SetBeforeBin(ai *adapter.BinInfo) *ConsoleCreate {
-	cc.mutation.SetBeforeBin(ai)
+func (cc *ConsoleCreate) SetBeforeBin(ci *cabdef.BinInfo) *ConsoleCreate {
+	cc.mutation.SetBeforeBin(ci)
 	return cc
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (cc *ConsoleCreate) SetAfterBin(ai *adapter.BinInfo) *ConsoleCreate {
-	cc.mutation.SetAfterBin(ai)
+func (cc *ConsoleCreate) SetAfterBin(ci *cabdef.BinInfo) *ConsoleCreate {
+	cc.mutation.SetAfterBin(ci)
 	return cc
 }
 
@@ -475,7 +476,7 @@ func (u *ConsoleUpsert) ClearBinID() *ConsoleUpsert {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsert) SetOperate(v adapter.Operate) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetOperate(v cabdef.Operate) *ConsoleUpsert {
 	u.Set(console.FieldOperate, v)
 	return u
 }
@@ -565,7 +566,7 @@ func (u *ConsoleUpsert) UpdateStatus() *ConsoleUpsert {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsert) SetBeforeBin(v *adapter.BinInfo) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetBeforeBin(v *cabdef.BinInfo) *ConsoleUpsert {
 	u.Set(console.FieldBeforeBin, v)
 	return u
 }
@@ -583,7 +584,7 @@ func (u *ConsoleUpsert) ClearBeforeBin() *ConsoleUpsert {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsert) SetAfterBin(v *adapter.BinInfo) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetAfterBin(v *cabdef.BinInfo) *ConsoleUpsert {
 	u.Set(console.FieldAfterBin, v)
 	return u
 }
@@ -759,7 +760,7 @@ func (u *ConsoleUpsertOne) ClearBinID() *ConsoleUpsertOne {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsertOne) SetOperate(v adapter.Operate) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetOperate(v cabdef.Operate) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetOperate(v)
 	})
@@ -864,7 +865,7 @@ func (u *ConsoleUpsertOne) UpdateStatus() *ConsoleUpsertOne {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsertOne) SetBeforeBin(v *adapter.BinInfo) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetBeforeBin(v *cabdef.BinInfo) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBeforeBin(v)
 	})
@@ -885,7 +886,7 @@ func (u *ConsoleUpsertOne) ClearBeforeBin() *ConsoleUpsertOne {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsertOne) SetAfterBin(v *adapter.BinInfo) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetAfterBin(v *cabdef.BinInfo) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetAfterBin(v)
 	})
@@ -1247,7 +1248,7 @@ func (u *ConsoleUpsertBulk) ClearBinID() *ConsoleUpsertBulk {
 }
 
 // SetOperate sets the "operate" field.
-func (u *ConsoleUpsertBulk) SetOperate(v adapter.Operate) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetOperate(v cabdef.Operate) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetOperate(v)
 	})
@@ -1352,7 +1353,7 @@ func (u *ConsoleUpsertBulk) UpdateStatus() *ConsoleUpsertBulk {
 }
 
 // SetBeforeBin sets the "before_bin" field.
-func (u *ConsoleUpsertBulk) SetBeforeBin(v *adapter.BinInfo) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetBeforeBin(v *cabdef.BinInfo) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBeforeBin(v)
 	})
@@ -1373,7 +1374,7 @@ func (u *ConsoleUpsertBulk) ClearBeforeBin() *ConsoleUpsertBulk {
 }
 
 // SetAfterBin sets the "after_bin" field.
-func (u *ConsoleUpsertBulk) SetAfterBin(v *adapter.BinInfo) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetAfterBin(v *cabdef.BinInfo) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetAfterBin(v)
 	})

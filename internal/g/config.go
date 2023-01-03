@@ -6,7 +6,7 @@
 package g
 
 import (
-    "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/assets"
     log "github.com/sirupsen/logrus"
     "github.com/spf13/viper"
@@ -15,7 +15,7 @@ import (
 )
 
 type config struct {
-    Brand    adapter.Brand
+    Brand    cabdef.Brand
     Postgres struct {
         Dsn   string
         Debug bool

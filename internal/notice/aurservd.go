@@ -9,6 +9,8 @@ import (
     "context"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/codec"
+    "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/auroraride/adapter/message"
     "github.com/auroraride/adapter/tcp"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -35,25 +37,25 @@ func (h *aurservd) CabinetFullUpdate() {
     }
 }
 
-func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *adapter.CabinetMessage) {
+func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *cabdef.CabinetMessage) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
         log.Error("无可同步数据")
         return
     }
 
-    message = &adapter.CabinetMessage{
+    message = &cabdef.CabinetMessage{
         Serial: serial,
         Full:   full,
     }
 
     if cab != nil {
-        message.Cabinet = &adapter.Cabinet{
+        message.Cabinet = &cabdef.Cabinet{
             ID:          cab.ID,
             Online:      cab.Online,
             Brand:       cab.Brand,
             Serial:      cab.Serial,
-            Status:      adapter.CabinetStatus(cab.Status),
+            Status:      cabdef.CabinetStatus(cab.Status),
             Enable:      cab.Enable,
             Lng:         cab.Lng,
             Lat:         cab.Lat,
@@ -66,7 +68,7 @@ func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bin
     }
 
     for _, b := range bins {
-        message.Bins = append(message.Bins, &adapter.Bin{
+        message.Bins = append(message.Bins, &cabdef.Bin{
             ID:            b.ID,
             Brand:         b.Brand,
             Serial:        b.Serial,
@@ -89,7 +91,7 @@ func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bin
 }
 
 func (h *aurservd) SendBattery(sn, serial string) {
-    h.SendMessage(&adapter.BatteryMessage{
+    h.SendMessage(&cabdef.BatteryMessage{
         Battery: adapter.ParseBatterySN(sn),
         Cabinet: serial,
     })
@@ -107,7 +109,7 @@ func (h *aurservd) SendFulldata(serial string, cab *ent.Cabinet, bins ent.Bins) 
     h.SendMessage(WrapCabinetMessage(true, serial, cab, bins))
 }
 
-func (h *aurservd) SendMessage(data adapter.Messenger) {
+func (h *aurservd) SendMessage(data message.Messenger) {
     h.Sender <- data
 }
 

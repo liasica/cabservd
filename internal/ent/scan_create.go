@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
@@ -112,8 +113,8 @@ func (sc *ScanCreate) SetSerial(s string) *ScanCreate {
 }
 
 // SetData sets the "data" field.
-func (sc *ScanCreate) SetData(abur *adapter.CabinetBinUsableResponse) *ScanCreate {
-	sc.mutation.SetData(abur)
+func (sc *ScanCreate) SetData(cbur *cabdef.CabinetBinUsableResponse) *ScanCreate {
+	sc.mutation.SetData(cbur)
 	return sc
 }
 
@@ -450,7 +451,7 @@ func (u *ScanUpsert) UpdateSerial() *ScanUpsert {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsert) SetData(v *adapter.CabinetBinUsableResponse) *ScanUpsert {
+func (u *ScanUpsert) SetData(v *cabdef.CabinetBinUsableResponse) *ScanUpsert {
 	u.Set(scan.FieldData, v)
 	return u
 }
@@ -625,7 +626,7 @@ func (u *ScanUpsertOne) UpdateSerial() *ScanUpsertOne {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsertOne) SetData(v *adapter.CabinetBinUsableResponse) *ScanUpsertOne {
+func (u *ScanUpsertOne) SetData(v *cabdef.CabinetBinUsableResponse) *ScanUpsertOne {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetData(v)
 	})
@@ -973,7 +974,7 @@ func (u *ScanUpsertBulk) UpdateSerial() *ScanUpsertBulk {
 }
 
 // SetData sets the "data" field.
-func (u *ScanUpsertBulk) SetData(v *adapter.CabinetBinUsableResponse) *ScanUpsertBulk {
+func (u *ScanUpsertBulk) SetData(v *cabdef.CabinetBinUsableResponse) *ScanUpsertBulk {
 	return u.Update(func(s *ScanUpsert) {
 		s.SetData(v)
 	})

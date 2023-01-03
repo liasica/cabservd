@@ -10,6 +10,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
@@ -39,7 +40,7 @@ type Scan struct {
 	// 电柜编号
 	Serial string `json:"serial,omitempty"`
 	// 换电信息
-	Data *adapter.CabinetBinUsableResponse `json:"data,omitempty"`
+	Data *cabdef.CabinetBinUsableResponse `json:"data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScanQuery when eager-loading is set.
 	Edges ScanEdges `json:"edges"`

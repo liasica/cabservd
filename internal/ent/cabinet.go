@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
 
@@ -26,7 +26,7 @@ type Cabinet struct {
 	// 市电是否正常
 	Power bool `json:"power,omitempty"`
 	// 品牌
-	Brand adapter.Brand `json:"brand,omitempty"`
+	Brand cabdef.Brand `json:"brand,omitempty"`
 	// 电柜编号
 	Serial string `json:"serial,omitempty"`
 	// 状态
@@ -76,7 +76,7 @@ func (*Cabinet) scanValues(columns []string) ([]any, error) {
 	for i := range columns {
 		switch columns[i] {
 		case cabinet.FieldBrand:
-			values[i] = new(adapter.Brand)
+			values[i] = new(cabdef.Brand)
 		case cabinet.FieldOnline, cabinet.FieldPower, cabinet.FieldEnable:
 			values[i] = new(sql.NullBool)
 		case cabinet.FieldLng, cabinet.FieldLat, cabinet.FieldGsm, cabinet.FieldVoltage, cabinet.FieldCurrent, cabinet.FieldTemperature, cabinet.FieldElectricity:
@@ -133,7 +133,7 @@ func (c *Cabinet) assignValues(columns []string, values []any) error {
 				c.Power = value.Bool
 			}
 		case cabinet.FieldBrand:
-			if value, ok := values[i].(*adapter.Brand); !ok {
+			if value, ok := values[i].(*cabdef.Brand); !ok {
 				return fmt.Errorf("unexpected type %T for field brand", values[i])
 			} else if value != nil {
 				c.Brand = *value

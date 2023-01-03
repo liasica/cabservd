@@ -8,6 +8,7 @@ package types
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/google/uuid"
 )
@@ -18,29 +19,29 @@ var (
         {
             {
                 Step:    1,
-                Operate: adapter.OperateDoorOpen,
-                Door:    adapter.DetectDoorOpen,
-                Battery: adapter.DetectBatteryIgnore,
+                Operate: cabdef.OperateDoorOpen,
+                Door:    cabdef.DetectDoorOpen,
+                Battery: cabdef.DetectBatteryIgnore,
             },
             {
                 Step:    2,
-                Operate: adapter.OperateDetect,
-                Door:    adapter.DetectDoorClose,
-                Battery: adapter.DetectBatteryPutin,
+                Operate: cabdef.OperateDetect,
+                Door:    cabdef.DetectDoorClose,
+                Battery: cabdef.DetectBatteryPutin,
             },
         },
         {
             {
                 Step:    3,
-                Operate: adapter.OperateDoorOpen,
-                Door:    adapter.DetectDoorOpen,
-                Battery: adapter.DetectBatteryIgnore,
+                Operate: cabdef.OperateDoorOpen,
+                Door:    cabdef.DetectDoorOpen,
+                Battery: cabdef.DetectBatteryIgnore,
             },
             {
                 Step:    4,
-                Operate: adapter.OperateDetect,
-                Door:    adapter.DetectDoorClose,
-                Battery: adapter.DetectBatteryPutout,
+                Operate: cabdef.OperateDetect,
+                Door:    cabdef.DetectDoorClose,
+                Battery: cabdef.DetectBatteryPutout,
             },
         },
     }
@@ -49,15 +50,15 @@ var (
     PutinConfigure = BinSteps{
         {
             Step:    1,
-            Operate: adapter.OperateDoorOpen,
-            Door:    adapter.DetectDoorOpen,
-            Battery: adapter.DetectBatteryIgnore,
+            Operate: cabdef.OperateDoorOpen,
+            Door:    cabdef.DetectDoorOpen,
+            Battery: cabdef.DetectBatteryIgnore,
         },
         {
             Step:    2,
-            Operate: adapter.OperateDetect,
-            Door:    adapter.DetectDoorClose,
-            Battery: adapter.DetectBatteryPutin,
+            Operate: cabdef.OperateDetect,
+            Door:    cabdef.DetectDoorClose,
+            Battery: cabdef.DetectBatteryPutin,
         },
     }
 
@@ -65,15 +66,15 @@ var (
     PutoutConfigure = BinSteps{
         {
             Step:    1,
-            Operate: adapter.OperateDoorOpen,
-            Door:    adapter.DetectDoorOpen,
-            Battery: adapter.DetectBatteryIgnore,
+            Operate: cabdef.OperateDoorOpen,
+            Door:    cabdef.DetectDoorOpen,
+            Battery: cabdef.DetectBatteryIgnore,
         },
         {
             Step:    2,
-            Operate: adapter.OperateDetect,
-            Door:    adapter.DetectDoorClose,
-            Battery: adapter.DetectBatteryPutout,
+            Operate: cabdef.OperateDetect,
+            Door:    cabdef.DetectDoorClose,
+            Battery: cabdef.DetectBatteryPutout,
         },
     }
 )
@@ -97,10 +98,10 @@ func NewBinResult(eb *ent.Bin, err error) *BinResult {
 type BinSteps []*BinStep
 
 type BinStep struct {
-    Step    int                   `json:"step"`    // 步骤序号
-    Operate adapter.Operate       `json:"operate"` // 操作指令
-    Door    adapter.DetectDoor    `json:"door"`    // 仓门检测
-    Battery adapter.DetectBattery `json:"battery"` // 电池检测
+    Step    int                  `json:"step"`    // 步骤序号
+    Operate cabdef.Operate       `json:"operate"` // 操作指令
+    Door    cabdef.DetectDoor    `json:"door"`    // 仓门检测
+    Battery cabdef.DetectBattery `json:"battery"` // 电池检测
 }
 
 func (b *BinStep) String() string {

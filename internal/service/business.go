@@ -7,6 +7,7 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/types"
@@ -36,7 +37,7 @@ func (s *businessService) RiderBusinessVerifyX(b adapter.Business) {
 }
 
 // Usable 获取业务可用仓位
-func (s *businessService) Usable(req *adapter.BusinuessUsableRequest) (res *adapter.CabinetBinUsableResponse) {
+func (s *businessService) Usable(req *cabdef.BusinuessUsableRequest) (res *cabdef.CabinetBinUsableResponse) {
     s.RiderBusinessVerifyX(req.Business)
 
     // 判定最小空仓位和最小电池数量
@@ -77,9 +78,9 @@ func (s *businessService) Usable(req *adapter.BusinuessUsableRequest) (res *adap
     }
 
     // 存储扫码记录
-    res = &adapter.CabinetBinUsableResponse{
-        Cabinet:     new(adapter.Cabinet),
-        BusinessBin: new(adapter.Bin),
+    res = &cabdef.CabinetBinUsableResponse{
+        Cabinet:     new(cabdef.Cabinet),
+        BusinessBin: new(cabdef.Bin),
     }
 
     // 拷贝属性
@@ -93,7 +94,7 @@ func (s *businessService) Usable(req *adapter.BusinuessUsableRequest) (res *adap
 }
 
 // Do 执行业务
-func (s *businessService) Do(req *adapter.BusinessRequest) (res adapter.BusinessResponse) {
+func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessResponse) {
     s.RiderBusinessVerifyX(req.Business)
 
     sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, 0)
@@ -103,7 +104,7 @@ func (s *businessService) Do(req *adapter.BusinessRequest) (res adapter.Business
         _ = sc.Update().SetEfficient(false).Exec(s.ctx)
     }()
 
-    cb := func(r *adapter.OperateStepResult) {
+    cb := func(r *cabdef.BusinessStepResult) {
         res.Results = append(res.Results, r)
     }
 

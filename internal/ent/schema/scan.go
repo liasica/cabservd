@@ -11,6 +11,7 @@ import (
     "entgo.io/ent/schema/index"
     "entgo.io/ent/schema/mixin"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/ent/internal"
     "github.com/google/uuid"
 )
@@ -68,7 +69,7 @@ func (Scan) Fields() []ent.Field {
         field.String("user_id").Comment("用户ID"),
         field.Other("user_type", adapter.UserTypeUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("用户类别"),
         field.String("serial").Comment("电柜编号"),
-        field.JSON("data", &adapter.CabinetBinUsableResponse{}).Optional().Comment("换电信息"),
+        field.JSON("data", &cabdef.CabinetBinUsableResponse{}).Optional().Comment("换电信息"),
     }
 }
 

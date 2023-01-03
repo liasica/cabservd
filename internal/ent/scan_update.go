@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/ent/scan"
@@ -97,8 +98,8 @@ func (su *ScanUpdate) SetSerial(s string) *ScanUpdate {
 }
 
 // SetData sets the "data" field.
-func (su *ScanUpdate) SetData(abur *adapter.CabinetBinUsableResponse) *ScanUpdate {
-	su.mutation.SetData(abur)
+func (su *ScanUpdate) SetData(cbur *cabdef.CabinetBinUsableResponse) *ScanUpdate {
+	su.mutation.SetData(cbur)
 	return su
 }
 
@@ -349,8 +350,8 @@ func (suo *ScanUpdateOne) SetSerial(s string) *ScanUpdateOne {
 }
 
 // SetData sets the "data" field.
-func (suo *ScanUpdateOne) SetData(abur *adapter.CabinetBinUsableResponse) *ScanUpdateOne {
-	suo.mutation.SetData(abur)
+func (suo *ScanUpdateOne) SetData(cbur *cabdef.CabinetBinUsableResponse) *ScanUpdateOne {
+	suo.mutation.SetData(cbur)
 	return suo
 }
 

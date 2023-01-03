@@ -7,6 +7,7 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
@@ -32,7 +33,7 @@ func NewScan(params ...any) *scanService {
 }
 
 // Create 新增扫码记录
-func (s *scanService) Create(ab adapter.Business, serial string, cab *ent.Cabinet, data *adapter.CabinetBinUsableResponse) *ent.Scan {
+func (s *scanService) Create(ab adapter.Business, serial string, cab *ent.Cabinet, data *cabdef.CabinetBinUsableResponse) *ent.Scan {
     sm, _ := ent.Database.Scan.Create().SetSerial(serial).SetUserID(s.User.ID).SetData(data).SetUserType(s.User.Type).SetCabinet(cab).SetBusiness(ab).Save(s.ctx)
     return sm
 }

@@ -7,7 +7,7 @@ package ent
 
 import (
     "fmt"
-    "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
 )
 
 // ResetBattery 无电池的时候清除电池信息
@@ -79,8 +79,8 @@ func (b *Bin) ExchangePossible(isFull bool, fakevoltage, fakecurrent, minsoc flo
     }
 }
 
-func (b *Bin) Info() *adapter.BinInfo {
-    return &adapter.BinInfo{
+func (b *Bin) Info() *cabdef.BinInfo {
+    return &cabdef.BinInfo{
         Ordinal:       b.Ordinal,
         BatterySN:     b.BatterySn,
         Voltage:       b.Voltage,

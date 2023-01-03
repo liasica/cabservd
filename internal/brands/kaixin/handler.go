@@ -8,6 +8,7 @@ package kaixin
 import (
     "context"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/goccy/go-json"
 )
@@ -70,7 +71,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 
     // 保存设备识别码
     client.SetSerial(req.DevID)
-    core.LoadOrStoreCabinet(context.Background(), adapter.BrandKaixin, req.DevID)
+    core.LoadOrStoreCabinet(context.Background(), cabdef.BrandKaixin, req.DevID)
 
     // TODO: 保存其他信息
     return
@@ -81,7 +82,7 @@ func (h *Hander) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
         return adapter.ErrorCabinetSerialRequired
     }
-    core.UpdateCabinet(adapter.BrandKaixin, req.DevID, req)
+    core.UpdateCabinet(cabdef.BrandKaixin, req.DevID, req)
     return
 }
 

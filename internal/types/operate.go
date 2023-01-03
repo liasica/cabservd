@@ -5,6 +5,8 @@
 
 package types
 
-import "github.com/auroraride/adapter"
+import (
+    "github.com/auroraride/adapter/defs/cabdef"
+)
 
-type StepCallback func(*adapter.OperateStepResult)
+type StepCallback func(*cabdef.BusinessStepResult)

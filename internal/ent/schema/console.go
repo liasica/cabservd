@@ -11,6 +11,7 @@ import (
     "entgo.io/ent/schema/index"
     "entgo.io/ent/schema/mixin"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/google/uuid"
 )
 
@@ -61,7 +62,7 @@ func (Console) Annotations() []schema.Annotation {
 // Fields of the Console.
 func (Console) Fields() []ent.Field {
     return []ent.Field{
-        field.Other("operate", adapter.OperateUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("操作"),
+        field.Other("operate", cabdef.OperateUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("操作"),
 
         field.String("serial").Comment("电柜设备序列号"),
         field.UUID("uuid", uuid.UUID{}).Immutable().Comment("标识符"),
@@ -74,8 +75,8 @@ func (Console) Fields() []ent.Field {
         field.Int("step").Default(1).Comment("步骤"),
 
         field.Enum("status").Values("invalid", "pending", "running", "success", "failed").Comment("状态 invalid:无效 pending:未开始 running:执行中 success:成功 failed:失败"),
-        field.JSON("before_bin", &adapter.BinInfo{}).Optional().Comment("变化前仓位信息"),
-        field.JSON("after_bin", &adapter.BinInfo{}).Optional().Comment("变化后仓位信息"),
+        field.JSON("before_bin", &cabdef.BinInfo{}).Optional().Comment("变化前仓位信息"),
+        field.JSON("after_bin", &cabdef.BinInfo{}).Optional().Comment("变化后仓位信息"),
 
         field.String("message").Optional().Nillable().Comment("消息"),
         field.Time("startAt").Optional().Nillable().Comment("开始时间"),

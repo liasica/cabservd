@@ -8,7 +8,7 @@ package core
 import (
     "context"
     "fmt"
-    "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -23,7 +23,7 @@ type Parser interface {
     Cabinet() (*ent.CabinetPointer, bool)
 }
 
-func UpdateCabinet(brand adapter.Brand, serial string, p Parser) {
+func UpdateCabinet(brand cabdef.Brand, serial string, p Parser) {
     ctx := context.Background()
 
     cab, exists := p.Cabinet()
@@ -35,7 +35,7 @@ func UpdateCabinet(brand adapter.Brand, serial string, p Parser) {
     SaveBins(ctx, brand, serial, bins)
 }
 
-func LoadOrStoreCabinet(ctx context.Context, brand adapter.Brand, serial string) (cab *ent.Cabinet) {
+func LoadOrStoreCabinet(ctx context.Context, brand cabdef.Brand, serial string) (cab *ent.Cabinet) {
     client := ent.Database.Cabinet
     cab, _ = client.Query().Where(cabinet.Serial(serial)).First(ctx)
     if cab != nil {
@@ -49,7 +49,7 @@ func LoadOrStoreCabinet(ctx context.Context, brand adapter.Brand, serial string)
     return
 }
 
-func SaveCabinet(ctx context.Context, brand adapter.Brand, serial string, item *ent.CabinetPointer) {
+func SaveCabinet(ctx context.Context, brand cabdef.Brand, serial string, item *ent.CabinetPointer) {
     err := ent.Database.Cabinet.Create().
         SetBrand(brand).
         SetSerial(serial).
@@ -113,7 +113,7 @@ func SaveCabinet(ctx context.Context, brand adapter.Brand, serial string, item *
     }
 }
 
-func SaveBins(ctx context.Context, brand adapter.Brand, serial string, items ent.BinPointers) {
+func SaveBins(ctx context.Context, brand cabdef.Brand, serial string, items ent.BinPointers) {
     if len(items) == 0 {
         return
     }

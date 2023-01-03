@@ -6,12 +6,12 @@
 package ent
 
 import (
-    "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/ent/console"
 )
 
-func (c *Console) OperateResult() (res *adapter.OperateStepResult) {
-    res = &adapter.OperateStepResult{
+func (c *Console) OperateResult() (res *cabdef.BusinessStepResult) {
+    res = &cabdef.BusinessStepResult{
         UUID:     c.UUID.String(),
         Operate:  c.Operate,
         Step:     c.Step,

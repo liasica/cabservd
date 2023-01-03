@@ -6,7 +6,7 @@
 package api
 
 import (
-    "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/service"
     "github.com/labstack/echo/v4"
@@ -17,11 +17,11 @@ type exchange struct{}
 var Exchange = new(exchange)
 
 func (*exchange) Usable(c echo.Context) (err error) {
-    ctx, req := app.ContextAndBinding[adapter.ExchangeUsableRequest](c)
+    ctx, req := app.ContextAndBinding[cabdef.ExchangeUsableRequest](c)
     return ctx.SendResponse(service.NewExchange(ctx.User).Usable(req))
 }
 
 func (*exchange) Do(c echo.Context) (err error) {
-    ctx, req := app.ContextAndBinding[adapter.ExchangeRequest](c)
+    ctx, req := app.ContextAndBinding[cabdef.ExchangeRequest](c)
     return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
 }

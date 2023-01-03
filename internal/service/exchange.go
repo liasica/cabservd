@@ -7,6 +7,7 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -30,11 +31,11 @@ func NewExchange(params ...any) *exchangeService {
 }
 
 // Usable 获取电柜待换电信息
-func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapter.CabinetBinUsableResponse) {
-    res = &adapter.CabinetBinUsableResponse{
-        Cabinet: new(adapter.Cabinet),
-        Fully:   new(adapter.Bin),
-        Empty:   new(adapter.Bin),
+func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef.CabinetBinUsableResponse) {
+    res = &cabdef.CabinetBinUsableResponse{
+        Cabinet: new(cabdef.Cabinet),
+        Fully:   new(cabdef.Bin),
+        Empty:   new(cabdef.Bin),
     }
 
     cs := NewCabinet(s.User)
@@ -90,14 +91,14 @@ func (s *exchangeService) Usable(req *adapter.ExchangeUsableRequest) (res *adapt
     return
 }
 
-func (s *exchangeService) Do(req *adapter.ExchangeRequest) (res *adapter.ExchangeResponse) {
+func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeResponse) {
     // 查询扫码记录
     sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, req.Minsoc)
 
     // 开始同步换电流程
     results, err := s.start(req, sc)
 
-    res = &adapter.ExchangeResponse{
+    res = &cabdef.ExchangeResponse{
         Results: results,
     }
 
@@ -122,7 +123,7 @@ func (s *exchangeService) Do(req *adapter.ExchangeRequest) (res *adapter.Exchang
     return
 }
 
-func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (res []*adapter.ExchangeStepMessage, err error) {
+func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res []*cabdef.ExchangeStepMessage, err error) {
     cab, _ := NewCabinet(s.User).QueryWithBin(sc.CabinetID)
 
     // 检查电柜是否可换电
@@ -144,13 +145,13 @@ func (s *exchangeService) start(req *adapter.ExchangeRequest, sc *ent.Scan) (res
         // TODO 任务标记???
     }()
 
-    bins := []*adapter.Bin{
+    bins := []*cabdef.Bin{
         sc.Data.Empty,
         sc.Data.Fully,
     }
 
-    cb := func(r *adapter.OperateStepResult) {
-        data := silk.Pointer(adapter.ExchangeStepMessage(*r))
+    cb := func(r *cabdef.BusinessStepResult) {
+        data := silk.Pointer(cabdef.ExchangeStepMessage(*r))
         res = append(res, data)
         // 异步发送结果
         go notice.Aurservd.SendMessage(data)

@@ -7,6 +7,7 @@ package core
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
     "sync"
@@ -23,7 +24,7 @@ type hub struct {
     addr string
 
     // 电柜品牌
-    brand adapter.Brand
+    brand cabdef.Brand
 
     // 电柜协议
     Bean Hook
