@@ -8,7 +8,7 @@ package app
 import (
     "bytes"
     "github.com/auroraride/adapter"
-    "github.com/goccy/go-json"
+    jsoniter "github.com/json-iterator/go"
     "net/http"
 )
 
@@ -39,7 +39,7 @@ func CreateResponse(params ...any) *adapter.Response {
 // SendResponse 发送响应
 func (c *BaseContext) SendResponse(params ...any) error {
     buffer := &bytes.Buffer{}
-    encoder := json.NewEncoder(buffer)
+    encoder := jsoniter.NewEncoder(buffer)
     encoder.SetEscapeHTML(false)
     _ = encoder.Encode(CreateResponse(params...))
     return c.JSONBlob(http.StatusOK, buffer.Bytes())

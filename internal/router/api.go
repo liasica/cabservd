@@ -20,6 +20,7 @@ import (
 
 func Start() {
     r := echo.New()
+    r.JSONSerializer = &adapter.DefaultJSONSerializer{}
 
     r.HTTPErrorHandler = func(err error, c echo.Context) {
         ctx := app.Context(c)

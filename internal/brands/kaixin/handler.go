@@ -10,7 +10,7 @@ import (
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/goccy/go-json"
+    jsoniter "github.com/json-iterator/go"
 )
 
 type Hander struct {
@@ -31,7 +31,7 @@ func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
 // OnMessage 解析消息
 func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     req := new(Request)
-    err = json.Unmarshal(b, req)
+    err = jsoniter.Unmarshal(b, req)
     if err != nil {
         return
     }

@@ -12,7 +12,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/goccy/go-json"
+    jsoniter "github.com/json-iterator/go"
     "github.com/liasica/go-helpers/tools"
     log "github.com/sirupsen/logrus"
     "time"
@@ -108,7 +108,7 @@ func SaveCabinet(ctx context.Context, brand cabdef.Brand, serial string, item *e
         }).
         Exec(ctx)
     if err != nil {
-        b, _ := json.Marshal(item)
+        b, _ := jsoniter.Marshal(item)
         log.Errorf("电柜保存失败, %s: %v", string(b), err)
     }
 }
@@ -198,7 +198,7 @@ func SaveBins(ctx context.Context, brand cabdef.Brand, serial string, items ent.
             UpdateUUID().
             Exec(ctx)
         if err != nil {
-            b, _ := json.Marshal(item)
+            b, _ := jsoniter.Marshal(item)
             log.Errorf("仓位保存失败, %s: %v", string(b), err)
         }
     }
