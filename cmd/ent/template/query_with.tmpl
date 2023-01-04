@@ -1,0 +1,41 @@
+{{/*
+Copyright (C) liasica. 2021-present.
+
+Created at 2023-01-04
+Based on ent by liasica, magicrolan@qq.com.
+*/}}
+
+{{/* The line below tells Intellij/GoLand to enable the autocompletion based on the *gen.Graph type. */}}
+{{/* gotype: entgo.io/ent/entc/gen.Graph */}}
+
+{{ define "dialect/sql/query/additional/querywith" }}
+    {{ template "helper/querywith" $ }}
+{{ end }}
+
+
+{{ define "helper/querywith" }}
+
+{{ $builder := pascal $.Scope.Builder }}
+{{ $receiver := receiver $builder }}
+
+type {{ $.Name }}QueryWith string
+
+var (
+    {{- range $e := $.Edges }}
+        {{ $.Name }}QueryWith{{ $e.StructField }} {{ $.Name }}QueryWith = "{{ $e.StructField }}"
+    {{- end }}
+)
+
+func ({{ $receiver }} *{{ $builder }}) With (withEdges ...{{ $.Name }}QueryWith) *{{ $builder }} {
+    for _, v := range withEdges {
+        switch v {
+            {{- range $e := $.Edges }}
+            case {{ $.Name }}QueryWith{{ $e.StructField }}:
+                {{ $receiver }}.With{{$e.StructField}}()
+            {{- end }}
+        }
+    }
+	return {{ $receiver }}
+}
+
+{{ end }}

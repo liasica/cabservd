@@ -537,6 +537,22 @@ func (cq *CabinetQuery) Modify(modifiers ...func(s *sql.Selector)) *CabinetSelec
 	return cq.Select()
 }
 
+type CabinetQueryWith string
+
+var (
+	CabinetQueryWithBins CabinetQueryWith = "Bins"
+)
+
+func (cq *CabinetQuery) With(withEdges ...CabinetQueryWith) *CabinetQuery {
+	for _, v := range withEdges {
+		switch v {
+		case CabinetQueryWithBins:
+			cq.WithBins()
+		}
+	}
+	return cq
+}
+
 // CabinetGroupBy is the group-by builder for Cabinet entities.
 type CabinetGroupBy struct {
 	selector

@@ -606,6 +606,25 @@ func (cq *ConsoleQuery) Modify(modifiers ...func(s *sql.Selector)) *ConsoleSelec
 	return cq.Select()
 }
 
+type ConsoleQueryWith string
+
+var (
+	ConsoleQueryWithCabinet ConsoleQueryWith = "Cabinet"
+	ConsoleQueryWithBin     ConsoleQueryWith = "Bin"
+)
+
+func (cq *ConsoleQuery) With(withEdges ...ConsoleQueryWith) *ConsoleQuery {
+	for _, v := range withEdges {
+		switch v {
+		case ConsoleQueryWithCabinet:
+			cq.WithCabinet()
+		case ConsoleQueryWithBin:
+			cq.WithBin()
+		}
+	}
+	return cq
+}
+
 // ConsoleGroupBy is the group-by builder for Console entities.
 type ConsoleGroupBy struct {
 	selector

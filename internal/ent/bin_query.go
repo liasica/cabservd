@@ -534,6 +534,22 @@ func (bq *BinQuery) Modify(modifiers ...func(s *sql.Selector)) *BinSelect {
 	return bq.Select()
 }
 
+type BinQueryWith string
+
+var (
+	BinQueryWithCabinet BinQueryWith = "Cabinet"
+)
+
+func (bq *BinQuery) With(withEdges ...BinQueryWith) *BinQuery {
+	for _, v := range withEdges {
+		switch v {
+		case BinQueryWithCabinet:
+			bq.WithCabinet()
+		}
+	}
+	return bq
+}
+
 // BinGroupBy is the group-by builder for Bin entities.
 type BinGroupBy struct {
 	selector

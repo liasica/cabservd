@@ -534,6 +534,22 @@ func (sq *ScanQuery) Modify(modifiers ...func(s *sql.Selector)) *ScanSelect {
 	return sq.Select()
 }
 
+type ScanQueryWith string
+
+var (
+	ScanQueryWithCabinet ScanQueryWith = "Cabinet"
+)
+
+func (sq *ScanQuery) With(withEdges ...ScanQueryWith) *ScanQuery {
+	for _, v := range withEdges {
+		switch v {
+		case ScanQueryWithCabinet:
+			sq.WithCabinet()
+		}
+	}
+	return sq
+}
+
 // ScanGroupBy is the group-by builder for Scan entities.
 type ScanGroupBy struct {
 	selector
