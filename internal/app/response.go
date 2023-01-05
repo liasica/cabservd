@@ -12,13 +12,15 @@ import (
     "net/http"
 )
 
+type ApiResponse = adapter.Response[any]
+
 // CreateResponse 创建response结构体
 // int: code
 // error: message
 // string: message
 // 其他: data
-func CreateResponse(params ...any) *adapter.Response {
-    r := &adapter.Response{
+func CreateResponse(params ...any) *ApiResponse {
+    r := &ApiResponse{
         Code: http.StatusOK,
     }
     for _, param := range params {
