@@ -77,6 +77,25 @@ var (
             Battery: cabdef.DetectBatteryPutout,
         },
     }
+
+    // OMOpenConfigure 运维开仓
+    OMOpenConfigure = BinSteps{
+        {
+            Step:    1,
+            Operate: cabdef.OperateDoorOpen,
+            Door:    cabdef.DetectDoorOpen,
+            Battery: cabdef.DetectBatteryIgnore,
+        },
+    }
+
+    OMEnableConfigure = BinSteps{
+        {
+            Step:    1,
+            Operate: cabdef.OperateBinEnable,
+            Door:    cabdef.DetectDoorIgnore,
+            Battery: cabdef.DetectBatteryIgnore,
+        },
+    }
 )
 
 type BinResult struct {
@@ -102,6 +121,7 @@ type BinStep struct {
     Operate cabdef.Operate       `json:"operate"` // 操作指令
     Door    cabdef.DetectDoor    `json:"door"`    // 仓门检测
     Battery cabdef.DetectBattery `json:"battery"` // 电池检测
+    Bin     cabdef.DetectBin     `json:"bin"`     // 仓位检测
 }
 
 func (b *BinStep) String() string {

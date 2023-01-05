@@ -46,29 +46,11 @@ func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, e
 }
 
 // Operate 按步骤操作某个仓位
+// TODO 仓位检测
 func (s *binService) Operate(bo *types.Bin) (err error) {
     if bo.StepCallback == nil {
         return adapter.ErrorBadRequest
     }
-    // // 操作之前验证当前状态, 操作值 等于 当前状态时直接返回成功
-    // // TODO 是否有必要?
-    // // TODO 其他详细日志
-    // switch req.Operate {
-    // case cabdef.OperateDoorOpen:
-    //     oc = req.Operate
-    //     door = cabdef.DetectDoorOpen
-    // case cabdef.OperatePutin:
-    //     oc = cabdef.OperateDoorOpen
-    //     door = cabdef.DetectDoorClose
-    // case cabdef.OperatePutout:
-    //     oc = cabdef.OperateDoorOpen
-    //     door = cabdef.DetectDoorClose
-    // case cabdef.OperateBinDisable, cabdef.OperateBinEnable:
-    //     oc = req.Operate
-    // default:
-    //     err = adapter.ErrorOperateCommand
-    //     return
-    // }
 
     // 查询仓位
     eb, _ := NewBin(s.User).QuerySerialOrdinal(bo.Serial, bo.Ordinal)
@@ -76,9 +58,12 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
         return adapter.ErrorBinNotFound
     }
 
+    // TODO 是否有必要操作之前验证当前状态, 操作值 等于 当前状态时直接返回成功
+    // TODO 其他详细日志
+
     fakevoltage, _ := core.Hub.Bean.GetEmptyDeviation()
 
-    // 开始监听
+    // 操作超时时间
     timeout := time.After(time.Duration(bo.Timeout) * time.Second)
 
     // 监听数据库变动
@@ -107,7 +92,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                     return
                 }
 
-                // fmt.Printf("->>>>> [BIN]: %v <<<<<-\n", x)
+                // 更新仓位信息
                 *eb = *x
 
                 var doorOk, batteryOk bool
@@ -178,6 +163,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
     return
 }
 
+// doOperateStep 按步骤操作
 func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, scb types.StepCallback) (err error) {
     // 创建记录
     var co *ent.Console
