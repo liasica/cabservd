@@ -42,3 +42,17 @@ func User() echo.MiddlewareFunc {
         }
     }
 }
+
+func Manager() echo.MiddlewareFunc {
+    return func(next echo.HandlerFunc) echo.HandlerFunc {
+        return func(c echo.Context) error {
+            ctx := app.Context(c)
+
+            if ctx.User == nil || ctx.User.Type != adapter.UserTypeManager {
+                app.Panic(http.StatusForbidden, adapter.ErrorManagerRequired)
+            }
+
+            return next(ctx)
+        }
+    }
+}

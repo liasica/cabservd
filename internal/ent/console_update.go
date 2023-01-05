@@ -227,6 +227,26 @@ func (cu *ConsoleUpdate) ClearDuration() *ConsoleUpdate {
 	return cu
 }
 
+// SetRemark sets the "remark" field.
+func (cu *ConsoleUpdate) SetRemark(s string) *ConsoleUpdate {
+	cu.mutation.SetRemark(s)
+	return cu
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableRemark(s *string) *ConsoleUpdate {
+	if s != nil {
+		cu.SetRemark(*s)
+	}
+	return cu
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (cu *ConsoleUpdate) ClearRemark() *ConsoleUpdate {
+	cu.mutation.ClearRemark()
+	return cu
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cu *ConsoleUpdate) SetCabinet(c *Cabinet) *ConsoleUpdate {
 	return cu.SetCabinetID(c.ID)
@@ -388,6 +408,12 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.DurationCleared() {
 		_spec.ClearField(console.FieldDuration, field.TypeFloat64)
+	}
+	if value, ok := cu.mutation.Remark(); ok {
+		_spec.SetField(console.FieldRemark, field.TypeString, value)
+	}
+	if cu.mutation.RemarkCleared() {
+		_spec.ClearField(console.FieldRemark, field.TypeString)
 	}
 	if cu.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -675,6 +701,26 @@ func (cuo *ConsoleUpdateOne) ClearDuration() *ConsoleUpdateOne {
 	return cuo
 }
 
+// SetRemark sets the "remark" field.
+func (cuo *ConsoleUpdateOne) SetRemark(s string) *ConsoleUpdateOne {
+	cuo.mutation.SetRemark(s)
+	return cuo
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableRemark(s *string) *ConsoleUpdateOne {
+	if s != nil {
+		cuo.SetRemark(*s)
+	}
+	return cuo
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (cuo *ConsoleUpdateOne) ClearRemark() *ConsoleUpdateOne {
+	cuo.mutation.ClearRemark()
+	return cuo
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cuo *ConsoleUpdateOne) SetCabinet(c *Cabinet) *ConsoleUpdateOne {
 	return cuo.SetCabinetID(c.ID)
@@ -860,6 +906,12 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	}
 	if cuo.mutation.DurationCleared() {
 		_spec.ClearField(console.FieldDuration, field.TypeFloat64)
+	}
+	if value, ok := cuo.mutation.Remark(); ok {
+		_spec.SetField(console.FieldRemark, field.TypeString, value)
+	}
+	if cuo.mutation.RemarkCleared() {
+		_spec.ClearField(console.FieldRemark, field.TypeString)
 	}
 	if cuo.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{

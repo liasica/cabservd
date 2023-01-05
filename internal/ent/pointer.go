@@ -67,6 +67,7 @@ type ConsolePointer struct {
 	StartAt   *time.Time        `json:"startAt,omitempty"`
 	StopAt    *time.Time        `json:"stopAt,omitempty"`
 	Duration  *float64          `json:"duration,omitempty"`
+	Remark    *string           `json:"remark,omitempty"`
 }
 
 type ScanPointers []*ScanPointer

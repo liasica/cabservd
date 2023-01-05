@@ -9,4 +9,4 @@ import (
     "github.com/auroraride/adapter/defs/cabdef"
 )
 
-type StepCallback func(*cabdef.BusinessStepResult)
+type StepCallback func(*cabdef.BinOperateResult)

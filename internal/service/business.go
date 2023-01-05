@@ -104,7 +104,7 @@ func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessRe
         _ = sc.Update().SetEfficient(false).Exec(s.ctx)
     }()
 
-    cb := func(r *cabdef.BusinessStepResult) {
+    cb := func(r *cabdef.BinOperateResult) {
         res.Results = append(res.Results, r)
     }
 

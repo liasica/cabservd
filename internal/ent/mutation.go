@@ -3098,6 +3098,7 @@ type ConsoleMutation struct {
 	stopAt         *time.Time
 	duration       *float64
 	addduration    *float64
+	remark         *string
 	clearedFields  map[string]struct{}
 	cabinet        *uint64
 	clearedcabinet bool
@@ -3914,6 +3915,55 @@ func (m *ConsoleMutation) ResetDuration() {
 	delete(m.clearedFields, console.FieldDuration)
 }
 
+// SetRemark sets the "remark" field.
+func (m *ConsoleMutation) SetRemark(s string) {
+	m.remark = &s
+}
+
+// Remark returns the value of the "remark" field in the mutation.
+func (m *ConsoleMutation) Remark() (r string, exists bool) {
+	v := m.remark
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRemark returns the old "remark" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldRemark(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRemark is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRemark requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRemark: %w", err)
+	}
+	return oldValue.Remark, nil
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (m *ConsoleMutation) ClearRemark() {
+	m.remark = nil
+	m.clearedFields[console.FieldRemark] = struct{}{}
+}
+
+// RemarkCleared returns if the "remark" field was cleared in this mutation.
+func (m *ConsoleMutation) RemarkCleared() bool {
+	_, ok := m.clearedFields[console.FieldRemark]
+	return ok
+}
+
+// ResetRemark resets all changes to the "remark" field.
+func (m *ConsoleMutation) ResetRemark() {
+	m.remark = nil
+	delete(m.clearedFields, console.FieldRemark)
+}
+
 // ClearCabinet clears the "cabinet" edge to the Cabinet entity.
 func (m *ConsoleMutation) ClearCabinet() {
 	m.clearedcabinet = true
@@ -4000,7 +4050,7 @@ func (m *ConsoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConsoleMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 17)
 	if m.cabinet != nil {
 		fields = append(fields, console.FieldCabinetID)
 	}
@@ -4049,6 +4099,9 @@ func (m *ConsoleMutation) Fields() []string {
 	if m.duration != nil {
 		fields = append(fields, console.FieldDuration)
 	}
+	if m.remark != nil {
+		fields = append(fields, console.FieldRemark)
+	}
 	return fields
 }
 
@@ -4089,6 +4142,8 @@ func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
 		return m.StopAt()
 	case console.FieldDuration:
 		return m.Duration()
+	case console.FieldRemark:
+		return m.Remark()
 	}
 	return nil, false
 }
@@ -4130,6 +4185,8 @@ func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldStopAt(ctx)
 	case console.FieldDuration:
 		return m.OldDuration(ctx)
+	case console.FieldRemark:
+		return m.OldRemark(ctx)
 	}
 	return nil, fmt.Errorf("unknown Console field %s", name)
 }
@@ -4251,6 +4308,13 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDuration(v)
 		return nil
+	case console.FieldRemark:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRemark(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Console field %s", name)
 }
@@ -4329,6 +4393,9 @@ func (m *ConsoleMutation) ClearedFields() []string {
 	if m.FieldCleared(console.FieldDuration) {
 		fields = append(fields, console.FieldDuration)
 	}
+	if m.FieldCleared(console.FieldRemark) {
+		fields = append(fields, console.FieldRemark)
+	}
 	return fields
 }
 
@@ -4363,6 +4430,9 @@ func (m *ConsoleMutation) ClearField(name string) error {
 		return nil
 	case console.FieldDuration:
 		m.ClearDuration()
+		return nil
+	case console.FieldRemark:
+		m.ClearRemark()
 		return nil
 	}
 	return fmt.Errorf("unknown Console nullable field %s", name)
@@ -4419,6 +4489,9 @@ func (m *ConsoleMutation) ResetField(name string) error {
 		return nil
 	case console.FieldDuration:
 		m.ResetDuration()
+		return nil
+	case console.FieldRemark:
+		m.ResetRemark()
 		return nil
 	}
 	return fmt.Errorf("unknown Console field %s", name)

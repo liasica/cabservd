@@ -150,7 +150,7 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
         sc.Data.Fully,
     }
 
-    cb := func(r *cabdef.BusinessStepResult) {
+    cb := func(r *cabdef.BinOperateResult) {
         data := silk.Pointer(cabdef.ExchangeStepMessage(*r))
         res = append(res, data)
         // 异步发送结果

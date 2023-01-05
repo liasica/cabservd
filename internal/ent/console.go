@@ -54,6 +54,8 @@ type Console struct {
 	StopAt *time.Time `json:"stopAt,omitempty"`
 	// 耗时
 	Duration *float64 `json:"duration,omitempty"`
+	// 备注信息
+	Remark *string `json:"remark,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConsoleQuery when eager-loading is set.
 	Edges ConsoleEdges `json:"edges"`
@@ -113,7 +115,7 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case console.FieldID, console.FieldCabinetID, console.FieldBinID, console.FieldStep:
 			values[i] = new(sql.NullInt64)
-		case console.FieldSerial, console.FieldUserID, console.FieldStatus, console.FieldMessage:
+		case console.FieldSerial, console.FieldUserID, console.FieldStatus, console.FieldMessage, console.FieldRemark:
 			values[i] = new(sql.NullString)
 		case console.FieldStartAt, console.FieldStopAt:
 			values[i] = new(sql.NullTime)
@@ -245,6 +247,13 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				c.Duration = new(float64)
 				*c.Duration = value.Float64
 			}
+		case console.FieldRemark:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field remark", values[i])
+			} else if value.Valid {
+				c.Remark = new(string)
+				*c.Remark = value.String
+			}
 		}
 	}
 	return nil
@@ -339,6 +348,11 @@ func (c *Console) String() string {
 	if v := c.Duration; v != nil {
 		builder.WriteString("duration=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := c.Remark; v != nil {
+		builder.WriteString("remark=")
+		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')
 	return builder.String()

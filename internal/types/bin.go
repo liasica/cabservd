@@ -22,12 +22,14 @@ var (
                 Operate: cabdef.OperateDoorOpen,
                 Door:    cabdef.DetectDoorOpen,
                 Battery: cabdef.DetectBatteryIgnore,
+                Bin:     cabdef.DetectBinUsable,
             },
             {
                 Step:    2,
                 Operate: cabdef.OperateDetect,
                 Door:    cabdef.DetectDoorClose,
                 Battery: cabdef.DetectBatteryPutin,
+                Bin:     cabdef.DetectBinUsable,
             },
         },
         {
@@ -36,12 +38,14 @@ var (
                 Operate: cabdef.OperateDoorOpen,
                 Door:    cabdef.DetectDoorOpen,
                 Battery: cabdef.DetectBatteryIgnore,
+                Bin:     cabdef.DetectBinUsable,
             },
             {
                 Step:    4,
                 Operate: cabdef.OperateDetect,
                 Door:    cabdef.DetectDoorClose,
                 Battery: cabdef.DetectBatteryPutout,
+                Bin:     cabdef.DetectBinUsable,
             },
         },
     }
@@ -53,12 +57,14 @@ var (
             Operate: cabdef.OperateDoorOpen,
             Door:    cabdef.DetectDoorOpen,
             Battery: cabdef.DetectBatteryIgnore,
+            Bin:     cabdef.DetectBinUsable,
         },
         {
             Step:    2,
             Operate: cabdef.OperateDetect,
             Door:    cabdef.DetectDoorClose,
             Battery: cabdef.DetectBatteryPutin,
+            Bin:     cabdef.DetectBinUsable,
         },
     }
 
@@ -69,12 +75,14 @@ var (
             Operate: cabdef.OperateDoorOpen,
             Door:    cabdef.DetectDoorOpen,
             Battery: cabdef.DetectBatteryIgnore,
+            Bin:     cabdef.DetectBinUsable,
         },
         {
             Step:    2,
             Operate: cabdef.OperateDetect,
             Door:    cabdef.DetectDoorClose,
             Battery: cabdef.DetectBatteryPutout,
+            Bin:     cabdef.DetectBinUsable,
         },
     }
 
@@ -85,16 +93,36 @@ var (
             Operate: cabdef.OperateDoorOpen,
             Door:    cabdef.DetectDoorOpen,
             Battery: cabdef.DetectBatteryIgnore,
+            Bin:     cabdef.DetectBinUsable,
         },
     }
 
+    // OMEnableConfigure 运维启用
     OMEnableConfigure = BinSteps{
         {
             Step:    1,
             Operate: cabdef.OperateBinEnable,
             Door:    cabdef.DetectDoorIgnore,
             Battery: cabdef.DetectBatteryIgnore,
+            Bin:     cabdef.DetectBinEnable,
         },
+    }
+
+    // OMDisableConfigure 运维启用
+    OMDisableConfigure = BinSteps{
+        {
+            Step:    1,
+            Operate: cabdef.OperateBinDisable,
+            Door:    cabdef.DetectDoorIgnore,
+            Battery: cabdef.DetectBatteryIgnore,
+            Bin:     cabdef.DetectBinDisable,
+        },
+    }
+
+    OMOperates = map[cabdef.Operate]BinSteps{
+        cabdef.OperateDoorOpen:   OMOpenConfigure,
+        cabdef.OperateBinEnable:  OMEnableConfigure,
+        cabdef.OperateBinDisable: OMDisableConfigure,
     }
 )
 
@@ -140,6 +168,8 @@ type Bin struct {
     Steps        BinSteps         // 规划步骤
     Battery      string           // 校验放入的电池编号
     StepCallback StepCallback     // 每一步的回调
+    Remark       string           // 操作备注
+    BinRemark    *string          // 仓位备注
 }
 
 // Current 获取当前步骤

@@ -61,7 +61,8 @@ func Start() {
         // TODO body dump middleware
     )
 
-    r.POST("/operate/bin", api.Operate.Bin)
+    // 仓位操作 <管理员权限>
+    r.POST("/operate/bin", api.Operate.Bin, mw.Manager())
 
     r.POST("/business/usable", api.Business.Usable)
     r.POST("/business/do", api.Business.Do)

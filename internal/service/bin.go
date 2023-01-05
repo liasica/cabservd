@@ -76,6 +76,11 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
         // 退出时删除监听
         notice.Bin.RemoveListener(ch)
         close(stepper)
+
+        // 判定是否成功以更新备注
+        if err == nil && bo.BinRemark != nil {
+            _ = eb.Update().SetRemark(*bo.BinRemark).Exec(s.ctx)
+        }
     }()
 
     // 开启监听
@@ -95,7 +100,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                 // 更新仓位信息
                 *eb = *x
 
-                var doorOk, batteryOk bool
+                var doorOk, batteryOk, binOk bool
 
                 step := bo.Current()
 
@@ -123,13 +128,24 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                     batteryOk = x.IsLooseNoBattery(fakevoltage)
                 }
 
-                if !x.IsUsable() {
-                    stepper <- types.NewBinResult(eb, adapter.ErrorBinNotUsable)
-                    return
+                switch step.Bin {
+                case cabdef.DetectBinIgnore:
+                    // 忽略仓位检测
+                    binOk = true
+                case cabdef.DetectBinUsable:
+                    binOk = x.IsUsable()
+                    // 如果需要仓位可用但是仓位不可用, 直接发送任务失败并返回
+                    if !binOk {
+                        stepper <- types.NewBinResult(eb, adapter.ErrorBinNotUsable)
+                        return
+                    }
+                case cabdef.DetectBinEnable:
+                    binOk = x.Enable
+                case cabdef.DetectBinDisable:
+                    binOk = !x.Enable
                 }
 
-                if batteryOk && doorOk {
-
+                if batteryOk && doorOk && binOk {
                     // 检查放入电池编号是否匹配
                     if step.Battery == cabdef.DetectBatteryPutin && bo.Battery != "" && eb.BatterySn != bo.Battery {
                         err = adapter.ErrorBatteryPutin
@@ -152,7 +168,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
     }()
 
     for _, step := range bo.Steps {
-        err = s.doOperateStep(bo.UUID, bo.Business, eb, step, stepper, bo.StepCallback)
+        err = s.doOperateStep(bo.UUID, bo.Business, bo.Remark, eb, step, stepper, bo.StepCallback)
 
         // 遇到错误, 直接返回
         if err != nil {
@@ -164,7 +180,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 }
 
 // doOperateStep 按步骤操作
-func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, scb types.StepCallback) (err error) {
+func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, remark string, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, scb types.StepCallback) (err error) {
     // 创建记录
     var co *ent.Console
     co, err = ent.Database.Console.Create().
@@ -180,6 +196,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, eb 
         SetStep(step.Step).
         SetBusiness(business).
         SetUUID(uid).
+        SetRemark(remark).
         Save(s.ctx)
     if err != nil {
         return

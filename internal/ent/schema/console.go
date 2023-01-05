@@ -82,6 +82,8 @@ func (Console) Fields() []ent.Field {
         field.Time("startAt").Optional().Nillable().Comment("开始时间"),
         field.Time("stopAt").Optional().Nillable().Comment("结束时间"),
         field.Float("duration").Optional().Nillable().Comment("耗时"),
+
+        field.String("remark").Optional().Nillable().Comment("备注信息"),
     }
 }
 

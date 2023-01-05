@@ -104,6 +104,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldStartAt:   {Type: field.TypeTime, Column: console.FieldStartAt},
 			console.FieldStopAt:    {Type: field.TypeTime, Column: console.FieldStopAt},
 			console.FieldDuration:  {Type: field.TypeFloat64, Column: console.FieldDuration},
+			console.FieldRemark:    {Type: field.TypeString, Column: console.FieldRemark},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -589,6 +590,11 @@ func (f *ConsoleFilter) WhereStopAt(p entql.TimeP) {
 // WhereDuration applies the entql float64 predicate on the duration field.
 func (f *ConsoleFilter) WhereDuration(p entql.Float64P) {
 	f.Where(p.Field(console.FieldDuration))
+}
+
+// WhereRemark applies the entql string predicate on the remark field.
+func (f *ConsoleFilter) WhereRemark(p entql.StringP) {
+	f.Where(p.Field(console.FieldRemark))
 }
 
 // WhereHasCabinet applies a predicate to check if query has an edge cabinet.

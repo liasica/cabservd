@@ -171,6 +171,20 @@ func (cc *ConsoleCreate) SetNillableDuration(f *float64) *ConsoleCreate {
 	return cc
 }
 
+// SetRemark sets the "remark" field.
+func (cc *ConsoleCreate) SetRemark(s string) *ConsoleCreate {
+	cc.mutation.SetRemark(s)
+	return cc
+}
+
+// SetNillableRemark sets the "remark" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableRemark(s *string) *ConsoleCreate {
+	if s != nil {
+		cc.SetRemark(*s)
+	}
+	return cc
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cc *ConsoleCreate) SetCabinet(c *Cabinet) *ConsoleCreate {
 	return cc.SetCabinetID(c.ID)
@@ -352,6 +366,10 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Duration(); ok {
 		_spec.SetField(console.FieldDuration, field.TypeFloat64, value)
 		_node.Duration = &value
+	}
+	if value, ok := cc.mutation.Remark(); ok {
+		_spec.SetField(console.FieldRemark, field.TypeString, value)
+		_node.Remark = &value
 	}
 	if nodes := cc.mutation.CabinetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -679,6 +697,24 @@ func (u *ConsoleUpsert) ClearDuration() *ConsoleUpsert {
 	return u
 }
 
+// SetRemark sets the "remark" field.
+func (u *ConsoleUpsert) SetRemark(v string) *ConsoleUpsert {
+	u.Set(console.FieldRemark, v)
+	return u
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateRemark() *ConsoleUpsert {
+	u.SetExcluded(console.FieldRemark)
+	return u
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *ConsoleUpsert) ClearRemark() *ConsoleUpsert {
+	u.SetNull(console.FieldRemark)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -994,6 +1030,27 @@ func (u *ConsoleUpsertOne) UpdateDuration() *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) ClearDuration() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.ClearDuration()
+	})
+}
+
+// SetRemark sets the "remark" field.
+func (u *ConsoleUpsertOne) SetRemark(v string) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetRemark(v)
+	})
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateRemark() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateRemark()
+	})
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *ConsoleUpsertOne) ClearRemark() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearRemark()
 	})
 }
 
@@ -1482,6 +1539,27 @@ func (u *ConsoleUpsertBulk) UpdateDuration() *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) ClearDuration() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.ClearDuration()
+	})
+}
+
+// SetRemark sets the "remark" field.
+func (u *ConsoleUpsertBulk) SetRemark(v string) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetRemark(v)
+	})
+}
+
+// UpdateRemark sets the "remark" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateRemark() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateRemark()
+	})
+}
+
+// ClearRemark clears the value of the "remark" field.
+func (u *ConsoleUpsertBulk) ClearRemark() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearRemark()
 	})
 }
 

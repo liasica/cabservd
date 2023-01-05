@@ -45,6 +45,8 @@ const (
 	FieldStopAt = "stop_at"
 	// FieldDuration holds the string denoting the duration field in the database.
 	FieldDuration = "duration"
+	// FieldRemark holds the string denoting the remark field in the database.
+	FieldRemark = "remark"
 	// EdgeCabinet holds the string denoting the cabinet edge name in mutations.
 	EdgeCabinet = "cabinet"
 	// EdgeBin holds the string denoting the bin edge name in mutations.
@@ -86,6 +88,7 @@ var Columns = []string{
 	FieldStartAt,
 	FieldStopAt,
 	FieldDuration,
+	FieldRemark,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

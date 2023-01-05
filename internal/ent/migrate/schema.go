@@ -156,6 +156,7 @@ var (
 		{Name: "start_at", Type: field.TypeTime, Nullable: true, Comment: "开始时间"},
 		{Name: "stop_at", Type: field.TypeTime, Nullable: true, Comment: "结束时间"},
 		{Name: "duration", Type: field.TypeFloat64, Nullable: true, Comment: "耗时"},
+		{Name: "remark", Type: field.TypeString, Nullable: true, Comment: "备注信息"},
 		{Name: "cabinet_id", Type: field.TypeUint64},
 		{Name: "bin_id", Type: field.TypeUint64, Nullable: true},
 	}
@@ -167,13 +168,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "console_cabinet_cabinet",
-				Columns:    []*schema.Column{ConsoleColumns[15]},
+				Columns:    []*schema.Column{ConsoleColumns[16]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "console_bin_bin",
-				Columns:    []*schema.Column{ConsoleColumns[16]},
+				Columns:    []*schema.Column{ConsoleColumns[17]},
 				RefColumns: []*schema.Column{BinColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -182,12 +183,12 @@ var (
 			{
 				Name:    "console_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[15]},
+				Columns: []*schema.Column{ConsoleColumns[16]},
 			},
 			{
 				Name:    "console_bin_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[16]},
+				Columns: []*schema.Column{ConsoleColumns[17]},
 			},
 			{
 				Name:    "console_serial",

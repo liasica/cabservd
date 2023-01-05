@@ -10,8 +10,8 @@ import (
     "github.com/auroraride/cabservd/internal/ent/console"
 )
 
-func (c *Console) OperateResult() (res *cabdef.BusinessStepResult) {
-    res = &cabdef.BusinessStepResult{
+func (c *Console) OperateResult() (res *cabdef.BinOperateResult) {
+    res = &cabdef.BinOperateResult{
         UUID:     c.UUID.String(),
         Operate:  c.Operate,
         Step:     c.Step,
