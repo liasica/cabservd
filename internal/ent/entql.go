@@ -91,6 +91,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldCabinetID: {Type: field.TypeUint64, Column: console.FieldCabinetID},
 			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
 			console.FieldOperate:   {Type: field.TypeOther, Column: console.FieldOperate},
+			console.FieldBrand:     {Type: field.TypeOther, Column: console.FieldBrand},
 			console.FieldSerial:    {Type: field.TypeString, Column: console.FieldSerial},
 			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
 			console.FieldBusiness:  {Type: field.TypeEnum, Column: console.FieldBusiness},
@@ -525,6 +526,11 @@ func (f *ConsoleFilter) WhereBinID(p entql.Uint64P) {
 // WhereOperate applies the entql other predicate on the operate field.
 func (f *ConsoleFilter) WhereOperate(p entql.OtherP) {
 	f.Where(p.Field(console.FieldOperate))
+}
+
+// WhereBrand applies the entql other predicate on the brand field.
+func (f *ConsoleFilter) WhereBrand(p entql.OtherP) {
+	f.Where(p.Field(console.FieldBrand))
 }
 
 // WhereSerial applies the entql string predicate on the serial field.

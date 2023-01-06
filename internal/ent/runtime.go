@@ -102,7 +102,7 @@ func init() {
 	consoleFields := schema.Console{}.Fields()
 	_ = consoleFields
 	// consoleDescStep is the schema descriptor for step field.
-	consoleDescStep := consoleFields[6].Descriptor()
+	consoleDescStep := consoleFields[7].Descriptor()
 	// console.DefaultStep holds the default value on creation for the step field.
 	console.DefaultStep = consoleDescStep.Default.(int)
 	scanMixin := schema.Scan{}.Mixin()

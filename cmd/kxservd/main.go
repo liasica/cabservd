@@ -6,19 +6,16 @@
 package main
 
 import (
-    "context"
     "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/mem"
-    "github.com/auroraride/cabservd/internal/notice"
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/service"
+    "github.com/auroraride/cabservd/internal/task"
     log "github.com/sirupsen/logrus"
 )
 
@@ -28,14 +25,11 @@ func main() {
         // core boot
         internal.Boot()
 
-        // 标记所有电柜为离线和空闲
-        _ = ent.Database.Cabinet.Update().Where(cabinet.Brand(g.Config.Brand)).SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(context.Background())
-
         // TODO 缓存数据?
         // cache()
 
         // 加载hooks
-        notice.Start()
+        task.Start()
 
         // 启动 http server
         go router.Start()

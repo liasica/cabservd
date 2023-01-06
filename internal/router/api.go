@@ -20,10 +20,10 @@ import (
 )
 
 func Start() {
-    r := echo.New()
-    r.JSONSerializer = &adapter.DefaultJSONSerializer{}
+    e := echo.New()
+    e.JSONSerializer = &adapter.DefaultJSONSerializer{}
 
-    r.HTTPErrorHandler = func(err error, c echo.Context) {
+    e.HTTPErrorHandler = func(err error, c echo.Context) {
         ctx := app.Context(c)
         message := err
         code := http.StatusInternalServerError
@@ -49,12 +49,15 @@ func Start() {
         return app.Context(c).SendResponse(http.StatusBadRequest, fmt.Errorf("%v", echo.ErrMethodNotAllowed.Message))
     }
 
-    log.Info("test")
-
-    r.Validator = app.NewValidator()
+    e.Validator = app.NewValidator()
 
     dumpFile := amw.NewDumpFile()
 
+    // 运维接口
+    m := e.Group("/maintain")
+    m.GET("/update", api.Maintain.Update)
+
+    r := e.Group("/")
     r.Use(
         mw.Context(),
         mw.Recover(),
@@ -69,16 +72,13 @@ func Start() {
     )
 
     // 仓位操作 <管理员权限>
-    r.POST("/operate/bin", api.Operate.Bin, mw.Manager())
+    r.POST("operate/bin", api.Operate.Bin, mw.Manager())
 
-    r.POST("/business/usable", api.Business.Usable)
-    r.POST("/business/do", api.Business.Do)
+    r.POST("business/usable", api.Business.Usable)
+    r.POST("business/do", api.Business.Do)
 
-    r.POST("/exchange/usable", api.Exchange.Usable)
-    r.POST("/exchange/do", api.Exchange.Do)
+    r.POST("exchange/usable", api.Exchange.Usable)
+    r.POST("exchange/do", api.Exchange.Do)
 
-    // operation and maintenance 运维接口
-    r.GET("oam/business", api.Oam.Business)
-
-    log.Fatal(r.Start(g.Config.Api.Bind))
+    log.Fatal(e.Start(g.Config.Api.Bind))
 }

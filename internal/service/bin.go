@@ -13,7 +13,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/console"
-    "github.com/auroraride/cabservd/internal/notice"
+    "github.com/auroraride/cabservd/internal/task"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
     log "github.com/sirupsen/logrus"
@@ -68,13 +68,13 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 
     // 监听数据库变动
     ch := make(chan *ent.Bin)
-    notice.Bin.SetListener(eb, ch)
+    task.Bin.SetListener(eb, ch)
 
     stepper := make(chan *types.BinResult)
 
     defer func() {
         // 退出时删除监听
-        notice.Bin.RemoveListener(ch)
+        task.Bin.RemoveListener(ch)
         close(stepper)
 
         // 判定是否成功以更新备注
@@ -184,6 +184,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
     // 创建记录
     var co *ent.Console
     co, err = ent.Database.Console.Create().
+        SetBrand(eb.Brand).
         SetOperate(step.Operate).
         SetCabinetID(eb.CabinetID).
         SetBinID(eb.ID).

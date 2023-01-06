@@ -28,6 +28,8 @@ type Console struct {
 	BinID *uint64 `json:"bin_id,omitempty"`
 	// 操作
 	Operate cabdef.Operate `json:"operate,omitempty"`
+	// 品牌
+	Brand cabdef.Brand `json:"brand,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 标识符
@@ -109,6 +111,8 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 			values[i] = new(adapter.Business)
 		case console.FieldUserType:
 			values[i] = new(adapter.UserType)
+		case console.FieldBrand:
+			values[i] = new(cabdef.Brand)
 		case console.FieldOperate:
 			values[i] = new(cabdef.Operate)
 		case console.FieldDuration:
@@ -160,6 +164,12 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field operate", values[i])
 			} else if value != nil {
 				c.Operate = *value
+			}
+		case console.FieldBrand:
+			if value, ok := values[i].(*cabdef.Brand); !ok {
+				return fmt.Errorf("unexpected type %T for field brand", values[i])
+			} else if value != nil {
+				c.Brand = *value
 			}
 		case console.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -302,6 +312,9 @@ func (c *Console) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("operate=")
 	builder.WriteString(fmt.Sprintf("%v", c.Operate))
+	builder.WriteString(", ")
+	builder.WriteString("brand=")
+	builder.WriteString(fmt.Sprintf("%v", c.Brand))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(c.Serial)

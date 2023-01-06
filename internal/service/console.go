@@ -24,48 +24,6 @@ func NewConsole(params ...any) *consoleService {
     }
 }
 
-// func (s *consoleService) Create(step int, typ console.Type, req *adapter.OperateRequest, cabinetID uint64, b *ent.Bin) (ec *ent.Console, err error) {
-//     // 查询最新仓位信息
-//     var before *adapter.BinInfo
-//     var bid *uint64
-//     // if req.Ordinal != nil {
-//     //     b, _ = NewBin(s.User).QuerySerialOrdinal(req.Serial, *req.Ordinal)
-//     //     if b == nil {
-//     //         err = adapter.ErrorCabinetBinNotFound
-//     //         return
-//     //     }
-//     //     bid = silk.Pointer(b.ID)
-//     //     before = b.Info()
-//     // }
-//     if b != nil {
-//         bid = silk.Pointer(b.ID)
-//         before = b.Info()
-//     }
-//
-//     creator := s.orm.Create().
-//         SetOperate(req.Operate).
-//         SetCabinetID(cabinetID).
-//         SetNillableBinID(bid).
-//         SetSerial(req.Serial).
-//         SetUserID(s.User.ID).
-//         SetUserType(s.User.Type).
-//         SetStatus(console.StatusRunning).
-//         SetStartAt(time.Now()).
-//         SetBeforeBin(before).
-//         SetStep(step).
-//         SetType(typ)
-//
-//     if req.UUID == nil {
-//         creator.SetUUID(uuid.New())
-//     } else {
-//         creator.SetUUID(*req.UUID)
-//     }
-//
-//     ec, err = creator.Save(s.ctx)
-//
-//     return
-// }
-
 // Update 更新记录
 func (s *consoleService) Update(ec *ent.Console, b *ent.Bin, err error) *ent.Console {
     now := time.Now()

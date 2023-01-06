@@ -64,6 +64,7 @@ func (Console) Fields() []ent.Field {
     return []ent.Field{
         field.Other("operate", cabdef.OperateUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("操作"),
 
+        field.Other("brand", cabdef.BrandUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("品牌"),
         field.String("serial").Comment("电柜设备序列号"),
         field.UUID("uuid", uuid.UUID{}).Immutable().Comment("标识符"),
         field.Enum("business").GoType(adapter.Business("")).Comment("业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订"),
@@ -101,6 +102,7 @@ func (Console) Mixin() []ent.Mixin {
 
 func (Console) Indexes() []ent.Index {
     return []ent.Index{
+        index.Fields("brand"),
         index.Fields("serial"),
         index.Fields("uuid"),
         index.Fields("user_id"),

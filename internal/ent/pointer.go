@@ -54,6 +54,7 @@ type ConsolePointer struct {
 	CabinetID *uint64           `json:"cabinet_id,omitempty"`
 	BinID     *uint64           `json:"bin_id,omitempty"`
 	Operate   *cabdef.Operate   `json:"operate,omitempty"`
+	Brand     *cabdef.Brand     `json:"brand,omitempty"`
 	Serial    *string           `json:"serial,omitempty"`
 	UUID      *uuid.UUID        `json:"uuid,omitempty"`
 	Business  *adapter.Business `json:"business,omitempty"`

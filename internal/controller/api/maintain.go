@@ -1,6 +1,6 @@
 // Copyright (C) liasica. 2023-present.
 //
-// Created at 2023-01-03
+// Created at 2023-01-06
 // Based on cabservd by liasica, magicrolan@qq.com.
 
 package api
@@ -11,10 +11,10 @@ import (
     "net/http"
 )
 
-type oam struct{}
+type maintain struct{}
 
-var Oam = new(oam)
+var Maintain = new(maintain)
 
-func (*oam) Business(c echo.Context) (err error) {
-    return c.JSON(http.StatusOK, service.NewOam().Business())
+func (*maintain) Update(c echo.Context) (err error) {
+    return c.JSON(http.StatusOK, service.NewMaintain().Update())
 }

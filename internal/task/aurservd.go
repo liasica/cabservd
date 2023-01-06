@@ -3,7 +3,7 @@
 // Created at 2022-12-29
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package notice
+package task
 
 import (
     "context"

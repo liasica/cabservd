@@ -53,6 +53,12 @@ func (cc *ConsoleCreate) SetOperate(c cabdef.Operate) *ConsoleCreate {
 	return cc
 }
 
+// SetBrand sets the "brand" field.
+func (cc *ConsoleCreate) SetBrand(c cabdef.Brand) *ConsoleCreate {
+	cc.mutation.SetBrand(c)
+	return cc
+}
+
 // SetSerial sets the "serial" field.
 func (cc *ConsoleCreate) SetSerial(s string) *ConsoleCreate {
 	cc.mutation.SetSerial(s)
@@ -244,6 +250,9 @@ func (cc *ConsoleCreate) check() error {
 	if _, ok := cc.mutation.Operate(); !ok {
 		return &ValidationError{Name: "operate", err: errors.New(`ent: missing required field "Console.operate"`)}
 	}
+	if _, ok := cc.mutation.Brand(); !ok {
+		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "Console.brand"`)}
+	}
 	if _, ok := cc.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Console.serial"`)}
 	}
@@ -314,6 +323,10 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Operate(); ok {
 		_spec.SetField(console.FieldOperate, field.TypeOther, value)
 		_node.Operate = value
+	}
+	if value, ok := cc.mutation.Brand(); ok {
+		_spec.SetField(console.FieldBrand, field.TypeOther, value)
+		_node.Brand = value
 	}
 	if value, ok := cc.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
@@ -502,6 +515,18 @@ func (u *ConsoleUpsert) SetOperate(v cabdef.Operate) *ConsoleUpsert {
 // UpdateOperate sets the "operate" field to the value that was provided on create.
 func (u *ConsoleUpsert) UpdateOperate() *ConsoleUpsert {
 	u.SetExcluded(console.FieldOperate)
+	return u
+}
+
+// SetBrand sets the "brand" field.
+func (u *ConsoleUpsert) SetBrand(v cabdef.Brand) *ConsoleUpsert {
+	u.Set(console.FieldBrand, v)
+	return u
+}
+
+// UpdateBrand sets the "brand" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateBrand() *ConsoleUpsert {
+	u.SetExcluded(console.FieldBrand)
 	return u
 }
 
@@ -806,6 +831,20 @@ func (u *ConsoleUpsertOne) SetOperate(v cabdef.Operate) *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) UpdateOperate() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateOperate()
+	})
+}
+
+// SetBrand sets the "brand" field.
+func (u *ConsoleUpsertOne) SetBrand(v cabdef.Brand) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetBrand(v)
+	})
+}
+
+// UpdateBrand sets the "brand" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateBrand() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateBrand()
 	})
 }
 
@@ -1315,6 +1354,20 @@ func (u *ConsoleUpsertBulk) SetOperate(v cabdef.Operate) *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) UpdateOperate() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateOperate()
+	})
+}
+
+// SetBrand sets the "brand" field.
+func (u *ConsoleUpsertBulk) SetBrand(v cabdef.Brand) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetBrand(v)
+	})
+}
+
+// UpdateBrand sets the "brand" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateBrand() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateBrand()
 	})
 }
 

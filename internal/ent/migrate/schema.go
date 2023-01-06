@@ -143,6 +143,7 @@ var (
 	ConsoleColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "operate", Type: field.TypeOther, Comment: "操作", SchemaType: map[string]string{"postgres": "varchar"}},
+		{Name: "brand", Type: field.TypeOther, Comment: "品牌", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜设备序列号"},
 		{Name: "uuid", Type: field.TypeUUID, Comment: "标识符"},
 		{Name: "business", Type: field.TypeEnum, Comment: "业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订", Enums: []string{"operate", "exchange", "active", "pause", "continue", "unsubscribe"}},
@@ -168,13 +169,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "console_cabinet_cabinet",
-				Columns:    []*schema.Column{ConsoleColumns[16]},
+				Columns:    []*schema.Column{ConsoleColumns[17]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "console_bin_bin",
-				Columns:    []*schema.Column{ConsoleColumns[17]},
+				Columns:    []*schema.Column{ConsoleColumns[18]},
 				RefColumns: []*schema.Column{BinColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -183,42 +184,47 @@ var (
 			{
 				Name:    "console_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[16]},
+				Columns: []*schema.Column{ConsoleColumns[17]},
 			},
 			{
 				Name:    "console_bin_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[17]},
+				Columns: []*schema.Column{ConsoleColumns[18]},
 			},
 			{
-				Name:    "console_serial",
+				Name:    "console_brand",
 				Unique:  false,
 				Columns: []*schema.Column{ConsoleColumns[2]},
 			},
 			{
-				Name:    "console_uuid",
+				Name:    "console_serial",
 				Unique:  false,
 				Columns: []*schema.Column{ConsoleColumns[3]},
 			},
 			{
-				Name:    "console_user_id",
+				Name:    "console_uuid",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[5]},
+				Columns: []*schema.Column{ConsoleColumns[4]},
 			},
 			{
-				Name:    "console_user_type",
+				Name:    "console_user_id",
 				Unique:  false,
 				Columns: []*schema.Column{ConsoleColumns[6]},
 			},
 			{
+				Name:    "console_user_type",
+				Unique:  false,
+				Columns: []*schema.Column{ConsoleColumns[7]},
+			},
+			{
 				Name:    "console_start_at",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[12]},
+				Columns: []*schema.Column{ConsoleColumns[13]},
 			},
 			{
 				Name:    "console_stop_at",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[13]},
+				Columns: []*schema.Column{ConsoleColumns[14]},
 			},
 		},
 	}
