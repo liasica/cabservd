@@ -6,9 +6,9 @@
 package g
 
 var (
-    HttpStop chan bool
+    Quit chan bool
 )
 
 func init() {
-    HttpStop = make(chan bool)
+    Quit = make(chan bool)
 }

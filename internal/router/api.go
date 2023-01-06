@@ -19,8 +19,7 @@ import (
     "net/http"
 )
 
-func Start() {
-    e := echo.New()
+func Start(e *echo.Echo) {
     e.JSONSerializer = &adapter.DefaultJSONSerializer{}
 
     e.HTTPErrorHandler = func(err error, c echo.Context) {
@@ -80,5 +79,7 @@ func Start() {
     r.POST("exchange/usable", api.Exchange.Usable)
     r.POST("exchange/do", api.Exchange.Do)
 
-    log.Fatal(e.Start(g.Config.Api.Bind))
+    if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
+        log.Fatal(err)
+    }
 }

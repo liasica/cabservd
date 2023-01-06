@@ -8,7 +8,6 @@ package api
 import (
     "github.com/auroraride/cabservd/internal/service"
     "github.com/labstack/echo/v4"
-    "net/http"
 )
 
 type maintain struct{}
@@ -16,5 +15,6 @@ type maintain struct{}
 var Maintain = new(maintain)
 
 func (*maintain) Update(c echo.Context) (err error) {
-    return c.JSON(http.StatusOK, service.NewMaintain().Update())
+    service.NewMaintain().Update()
+    return nil
 }

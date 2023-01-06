@@ -5,56 +5,8 @@
 
 package main
 
-import (
-    "github.com/auroraride/adapter/codec"
-    "github.com/auroraride/adapter/snag"
-    "github.com/auroraride/cabservd/internal"
-    "github.com/auroraride/cabservd/internal/brands/kaixin"
-    "github.com/auroraride/cabservd/internal/core"
-    "github.com/auroraride/cabservd/internal/g"
-    "github.com/auroraride/cabservd/internal/mem"
-    "github.com/auroraride/cabservd/internal/router"
-    "github.com/auroraride/cabservd/internal/service"
-    "github.com/auroraride/cabservd/internal/task"
-    log "github.com/sirupsen/logrus"
-)
+import "github.com/auroraride/cabservd/internal"
 
 func main() {
-    snag.WithPanic(func() {
-
-        // core boot
-        internal.Boot()
-
-        // TODO 缓存数据?
-        // cache()
-
-        // 加载hooks
-        task.Start()
-
-        // 启动 http server
-        go router.Start()
-
-        // 启动socket hub
-        go core.Start(
-            g.Config.Tcp.Bind,
-            g.Config.Brand,
-            kaixin.New(),
-            &codec.HeaderLength{},
-        )
-
-        select {}
-
-    }, log.StandardLogger())
-}
-
-func cache() {
-    cabs := service.NewCabinet(service.PermissionNotRequired).QuerySerialWithBinAll()
-    for _, cab := range cabs {
-        mem.SetCabinet(cab)
-    }
-
-    bins := service.NewBin(service.PermissionNotRequired).QueryAllBin()
-    for _, b := range bins {
-        mem.SetBin(b)
-    }
+    internal.Boot()
 }
