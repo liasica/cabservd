@@ -8,6 +8,7 @@ package router
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    amw "github.com/auroraride/adapter/middleware"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
@@ -48,12 +49,18 @@ func Start() {
         return app.Context(c).SendResponse(http.StatusBadRequest, fmt.Errorf("%v", echo.ErrMethodNotAllowed.Message))
     }
 
+    log.Info("test")
+
     r.Validator = app.NewValidator()
+
+    dumpFile := amw.NewDumpFile()
 
     r.Use(
         mw.Context(),
         mw.Recover(),
         mw.User(),
+
+        dumpFile.WithDefaultConfig(),
 
         middleware.GzipWithConfig(middleware.GzipConfig{
             Level: 5,

@@ -6,9 +6,9 @@
 package internal
 
 import (
+    "github.com/auroraride/adapter/logger"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
-    "github.com/auroraride/cabservd/pkg/logger"
     "os"
     "time"
 )
