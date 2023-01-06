@@ -79,7 +79,9 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 
         // 判定是否成功以更新备注
         if err == nil && bo.BinRemark != nil {
-            _ = eb.Update().SetRemark(*bo.BinRemark).Exec(s.ctx)
+            _ = s.orm.UpdateOneID(eb.ID).
+                SetNillableRemark(bo.BinRemark).
+                Exec(s.ctx)
         }
     }()
 
@@ -224,13 +226,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
     }
 
     r := <-stepper
-    var b *ent.Bin
-    b, err = r.Result()
-
-    if b != nil {
-        // 更新仓位信息
-        *eb = *b
-    }
+    _, err = r.Result()
 
     return
 }

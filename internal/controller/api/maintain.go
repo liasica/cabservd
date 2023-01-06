@@ -6,6 +6,7 @@
 package api
 
 import (
+    "github.com/auroraride/adapter/async"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/labstack/echo/v4"
     "time"
@@ -21,13 +22,7 @@ func (*maintain) Update(echo.Context) (err error) {
 
     for ; true; <-ticker.C {
         // 是否有进行中的异步业务
-        n := 0
-        g.AsynchronousTask.Range(func(_, _ any) bool {
-            n += 1
-            return true
-        })
-
-        if n == 0 {
+        if async.IsDone() {
             g.Quit <- true
             return
         }

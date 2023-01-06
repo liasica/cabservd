@@ -10,7 +10,6 @@ import (
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/jinzhu/copier"
     "golang.org/x/exp/slices"
@@ -96,12 +95,6 @@ func (s *businessService) Usable(req *cabdef.BusinuessUsableRequest) (res *cabde
 
 // Do 执行业务
 func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessResponse) {
-    g.AsynchronousTask.Store(req.UUID, 1)
-
-    defer func() {
-        g.AsynchronousTask.Delete(req.UUID)
-    }()
-
     s.RiderBusinessVerifyX(req.Business)
 
     sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, 0)

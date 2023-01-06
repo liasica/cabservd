@@ -31,13 +31,13 @@ func (s *operateService) Bin(req *cabdef.OperateBinRequest) (results []*cabdef.B
         app.Panic(http.StatusBadRequest, adapter.ErrorOperateCommand)
     }
 
-    var binRemark string
+    var binRemark *string
 
     switch req.Operate {
     case cabdef.OperateBinDisable:
-        binRemark = req.Remark
+        binRemark = silk.String(req.Remark)
     case cabdef.OperateBinEnable:
-        binRemark = ""
+        binRemark = silk.String("")
     }
 
     err := NewBin(s.User).Operate(&types.Bin{
@@ -48,7 +48,7 @@ func (s *operateService) Bin(req *cabdef.OperateBinRequest) (results []*cabdef.B
         Business:  adapter.BusinessOperate,
         Steps:     types.OMOperates[req.Operate],
         Remark:    req.Remark,
-        BinRemark: silk.String(binRemark),
+        BinRemark: binRemark,
         StepCallback: func(result *cabdef.BinOperateResult) {
             results = append(results, result)
         },

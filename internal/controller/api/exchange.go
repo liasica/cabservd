@@ -6,6 +6,7 @@
 package api
 
 import (
+    "github.com/auroraride/adapter/async"
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/service"
@@ -22,6 +23,8 @@ func (*exchange) Usable(c echo.Context) (err error) {
 }
 
 func (*exchange) Do(c echo.Context) (err error) {
-    ctx, req := app.ContextAndBinding[cabdef.ExchangeRequest](c)
-    return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
+    return async.WithTaskReturn[error](func() error {
+        ctx, req := app.ContextAndBinding[cabdef.ExchangeRequest](c)
+        return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
+    })
 }

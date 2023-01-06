@@ -5,15 +5,10 @@
 
 package g
 
-import "sync"
-
 var (
     Quit chan bool
-
-    AsynchronousTask *sync.Map
 )
 
 func init() {
     Quit = make(chan bool)
-    AsynchronousTask = &sync.Map{}
 }
