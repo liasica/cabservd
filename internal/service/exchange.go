@@ -12,6 +12,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/scan"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/task"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/jinzhu/copier"
@@ -92,6 +93,12 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
 }
 
 func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeResponse) {
+    g.AsynchronousTask.Store(req.UUID, 1)
+
+    defer func() {
+        g.AsynchronousTask.Delete(req.UUID)
+    }()
+
     // 查询扫码记录
     sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, req.Minsoc)
 

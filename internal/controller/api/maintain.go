@@ -7,7 +7,6 @@ package api
 
 import (
     "github.com/auroraride/cabservd/internal/g"
-    "github.com/auroraride/cabservd/internal/task"
     "github.com/labstack/echo/v4"
     "time"
 )
@@ -21,7 +20,13 @@ func (*maintain) Update(echo.Context) (err error) {
     defer ticker.Stop()
 
     for ; true; <-ticker.C {
-        n := task.Bin.GetListenerCount() + task.Cabinet.GetListenerCount()
+        // 是否有进行中的异步业务
+        n := 0
+        g.AsynchronousTask.Range(func(_, _ any) bool {
+            n += 1
+            return true
+        })
+
         if n == 0 {
             g.Quit <- true
             return

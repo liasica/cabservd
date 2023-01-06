@@ -10,6 +10,10 @@ define deploy
 	docker volume prune -f
 endef
 
-.PHONY: kaixin
-kaixin:
+.PHONY: kxservd
+kxservd:
 	$(call deploy,kxservd)
+
+.PHONY: kxservd-dev
+kxservd-dev:
+	$(call deploy,kxservd-dev)
