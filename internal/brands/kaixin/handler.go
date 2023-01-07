@@ -82,7 +82,7 @@ func (h *Hander) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
         return adapter.ErrorCabinetSerialRequired
     }
-    core.UpdateCabinet(cabdef.BrandKaixin, req.DevID, req)
+    core.UpdateCabinet(cabdef.BrandKaixin, req)
     return
 }
 

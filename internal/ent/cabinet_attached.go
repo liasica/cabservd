@@ -45,22 +45,22 @@ func (c *CabinetPointer) String() string {
     builder.WriteString("]变动 ->")
 
     if c.Online != nil {
-        builder.WriteString(" 在线: ")
+        builder.WriteString(" 在线=")
         builder.WriteString(adapter.Bool(*c.Online).String())
     }
 
     if c.Power != nil {
-        builder.WriteString(" 市电: ")
+        builder.WriteString(" 市电=")
         builder.WriteString(adapter.Bool(*c.Power).String())
     }
 
     if c.Status != nil {
-        builder.WriteString(" 状态: ")
+        builder.WriteString(" 状态=")
         builder.WriteString(c.Status.String())
     }
 
     if c.Enable != nil {
-        builder.WriteString(" 启用: ")
+        builder.WriteString(" 启用=")
         builder.WriteString(adapter.Bool(*c.Enable).String())
     }
 

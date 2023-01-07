@@ -117,42 +117,42 @@ func (b *BinPointer) String() string {
     builder.WriteString("]变动 ->")
 
     if b.Open != nil {
-        builder.WriteString(" 开门: ")
+        builder.WriteString(" 开门=")
         builder.WriteString(adapter.Bool(*b.Open).String())
     }
 
     if b.Enable != nil {
-        builder.WriteString(" 启用: ")
+        builder.WriteString(" 启用=")
         builder.WriteString(adapter.Bool(*b.Enable).String())
     }
 
     if b.Health != nil {
-        builder.WriteString(" 健康: ")
+        builder.WriteString(" 健康=")
         builder.WriteString(adapter.Bool(*b.Health).String())
     }
 
     if b.BatteryExists != nil {
-        builder.WriteString(" 电池在位: ")
+        builder.WriteString(" 电池在位=")
         builder.WriteString(adapter.Bool(*b.BatteryExists).String())
     }
 
     if b.BatterySn != nil {
-        builder.WriteString(" 电池: ")
+        builder.WriteString(" 电池=")
         builder.WriteString(*b.BatterySn)
     }
 
     if b.Voltage != nil {
-        builder.WriteString(" 电压: ")
+        builder.WriteString(" 电压=")
         builder.WriteString(fmt.Sprintf("%.2f", *b.Voltage))
     }
 
     if b.Current != nil {
-        builder.WriteString(" 电流: ")
+        builder.WriteString(" 电流=")
         builder.WriteString(fmt.Sprintf("%.2f", *b.Current))
     }
 
     if b.Soc != nil {
-        builder.WriteString(" 容量: ")
+        builder.WriteString(" 容量=")
         builder.WriteString(fmt.Sprintf("%.2f", *b.Soc))
     }
 

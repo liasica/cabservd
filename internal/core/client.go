@@ -92,7 +92,7 @@ func (c *Client) SendMessage(message any, params ...any) (err error) {
     if err != nil {
         log.Errorf("[FD=%d / %s] 发送失败, message: %s", c.Fd(), c.RemoteAddr(), b)
     } else if logMessage {
-        log.Infof("[FD=%d / %s] 发送消息, message: %s", c.Fd(), c.RemoteAddr(), b)
+        log.Infof("[FD=%d / %s, Send] %s", c.Fd(), c.RemoteAddr(), b)
     }
 
     return

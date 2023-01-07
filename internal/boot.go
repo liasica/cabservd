@@ -11,6 +11,7 @@ import (
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
+    "github.com/auroraride/cabservd/internal/demo"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/task"
@@ -37,6 +38,9 @@ func Boot() {
             kaixin.New(),
             &codec.HeaderLength{},
         )
+
+        // debug
+        go demo.Debug()
 
         select {
         case <-g.Quit:

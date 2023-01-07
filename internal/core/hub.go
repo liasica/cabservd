@@ -111,7 +111,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
 
 func (h *hub) handleMessage(b []byte, client *Client) {
     // 记录日志
-    log.Infof("[FD=%d / %s] 接收到消息, message: %s", client.Fd(), client.RemoteAddr(), b)
+    log.Infof("[FD=%d / %s, Recv] %s", client.Fd(), client.RemoteAddr(), b)
 
     // 更新在线状态
     go client.UpdateOnline()

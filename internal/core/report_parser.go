@@ -18,20 +18,26 @@ import (
     "time"
 )
 
-type Parser interface {
-    Bins() ent.BinPointers
-    Cabinet() (*ent.CabinetPointer, bool)
+type ReportParser interface {
+    GetSerial() (string, bool)
+    GetCabinet() (*ent.CabinetPointer, bool)
+    GetBins() ent.BinPointers
 }
 
-func UpdateCabinet(brand cabdef.Brand, serial string, p Parser) {
+func UpdateCabinet(brand cabdef.Brand, p ReportParser) {
     ctx := context.Background()
 
-    cab, exists := p.Cabinet()
+    serial, ok := p.GetSerial()
+    if !ok {
+        return
+    }
+
+    cab, exists := p.GetCabinet()
     if exists {
         SaveCabinet(ctx, brand, serial, cab)
     }
 
-    bins := p.Bins()
+    bins := p.GetBins()
     SaveBins(ctx, brand, serial, bins)
 }
 
@@ -126,8 +132,8 @@ func SaveBins(ctx context.Context, brand cabdef.Brand, serial string, items ent.
     }
 
     for _, item := range items {
-        uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
         log.Info(item)
+        uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
         err := ent.Database.Bin.Create().
             SetUUID(uuid).
             SetBrand(brand).

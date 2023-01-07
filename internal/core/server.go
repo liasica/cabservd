@@ -54,7 +54,7 @@ func (h *hub) deadCheck() {
     // for {
     //     select {
     //     case t := <-ticker.C:
-    //         _ = ent.Database.Cabinet.Update().
+    //         _ = ent.Database.GetCabinet.Update().
     //             Where(
     //                 cabinet.Brand(g.Config.Brand),
     //                 cabinet.UpdatedAtLT(t.Add(-20*time.Minute)),
