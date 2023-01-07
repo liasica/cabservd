@@ -76,7 +76,10 @@ func (req ReportRequest) Bins() (items ent.BinPointers) {
         // 查询是否存在仓位信息
         bin, ok := m[attr.DoorID]
         if !ok {
-            bin = &ent.BinPointer{Ordinal: silk.Int(ordinal)}
+            bin = &ent.BinPointer{
+                Ordinal: silk.Int(ordinal),
+                Name:    silk.String(fmt.Sprintf("%d号仓", ordinal)),
+            }
             m[attr.DoorID] = bin
         }
 
@@ -94,19 +97,15 @@ func (req ReportRequest) Bins() (items ent.BinPointers) {
             bin.BatterySn = silk.String(v)
         case SignalBatteryVoltage:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>> [V]", vf, "<<<<<<<<<<")
             bin.Voltage = silk.Float64(vf)
         case SignalBatteryCurrent:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>> [A]", vf, "<<<<<<<<<<")
             bin.Current = silk.Float64(vf)
         case SignalSOC:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>> [SOC]", vf, "<<<<<<<<<<")
             bin.Soc = silk.Float64(vf)
         case SignalSOH:
             vf := tools.StrToFloat64(v)
-            fmt.Println(">>>>>>>>>> [SOH]", vf, "<<<<<<<<<<")
             bin.Soh = silk.Float64(vf)
         }
     }

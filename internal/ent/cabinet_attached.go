@@ -8,6 +8,7 @@ package ent
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    "strings"
 )
 
 func (c *Cabinet) DetectOnline() (err error) {
@@ -35,4 +36,33 @@ func (c *Cabinet) GetSerial() string {
 
 func (c *Cabinet) GetListenerKey() string {
     return fmt.Sprintf("%s-%d", c.GetTableName(), c.ID)
+}
+
+func (c *CabinetPointer) String() string {
+    var builder strings.Builder
+    builder.WriteString("电柜[")
+    builder.WriteString(*c.Serial)
+    builder.WriteString("]变动 ->")
+
+    if c.Online != nil {
+        builder.WriteString(" 在线: ")
+        builder.WriteString(adapter.Bool(*c.Online).String())
+    }
+
+    if c.Power != nil {
+        builder.WriteString(" 市电: ")
+        builder.WriteString(adapter.Bool(*c.Power).String())
+    }
+
+    if c.Status != nil {
+        builder.WriteString(" 状态: ")
+        builder.WriteString(c.Status.String())
+    }
+
+    if c.Enable != nil {
+        builder.WriteString(" 启用: ")
+        builder.WriteString(adapter.Bool(*c.Enable).String())
+    }
+
+    return builder.String()
 }

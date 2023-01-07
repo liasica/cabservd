@@ -7,7 +7,9 @@ package ent
 
 import (
     "fmt"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
+    "strings"
 )
 
 // ResetBattery 无电池的时候清除电池信息
@@ -104,4 +106,55 @@ func (b *Bin) GetSerial() string {
 
 func (b *Bin) GetListenerKey() string {
     return fmt.Sprintf("%s-%d", b.GetTableName(), b.ID)
+}
+
+func (b *BinPointer) String() string {
+    var builder strings.Builder
+    builder.WriteString("仓位[")
+    builder.WriteString(*b.Serial)
+    builder.WriteString(" - ")
+    builder.WriteString(*b.Name)
+    builder.WriteString("]变动 ->")
+
+    if b.Open != nil {
+        builder.WriteString(" 开门: ")
+        builder.WriteString(adapter.Bool(*b.Open).String())
+    }
+
+    if b.Enable != nil {
+        builder.WriteString(" 启用: ")
+        builder.WriteString(adapter.Bool(*b.Enable).String())
+    }
+
+    if b.Health != nil {
+        builder.WriteString(" 健康: ")
+        builder.WriteString(adapter.Bool(*b.Health).String())
+    }
+
+    if b.BatteryExists != nil {
+        builder.WriteString(" 电池在位: ")
+        builder.WriteString(adapter.Bool(*b.BatteryExists).String())
+    }
+
+    if b.BatterySn != nil {
+        builder.WriteString(" 电池: ")
+        builder.WriteString(*b.BatterySn)
+    }
+
+    if b.Voltage != nil {
+        builder.WriteString(" 电压: ")
+        builder.WriteString(fmt.Sprintf("%.2f", *b.Voltage))
+    }
+
+    if b.Current != nil {
+        builder.WriteString(" 电流: ")
+        builder.WriteString(fmt.Sprintf("%.2f", *b.Current))
+    }
+
+    if b.Soc != nil {
+        builder.WriteString(" 容量: ")
+        builder.WriteString(fmt.Sprintf("%.2f", *b.Soc))
+    }
+
+    return builder.String()
 }
