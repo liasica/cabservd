@@ -33,12 +33,12 @@ type hub struct {
     codec Codec
 
     // 在线的客户端
-    // *Client => serial
+    // serial => *Client
     // serial 在初次连接的时候为空, 当登录成功后是设备的唯一编码
     clients sync.Map
 
-    // 客户端发起连接
-    connect chan *Client
+    // 客户端注册
+    register chan *Client
 
     // 断开客户端连接
     disconnect chan *Client
@@ -53,11 +53,7 @@ func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
     log.Infof("[FD=%d / %s] 新增客户端连接", c.Fd(), c.RemoteAddr())
 
     // 设置连接上下文信息
-    ctx := NewClient(c, h)
-    c.SetContext(ctx)
-
-    // 注册连接
-    h.connect <- ctx
+    c.SetContext(NewClient(c, h))
 
     return
 }
@@ -66,10 +62,9 @@ func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
     log.Infof("[FD=%d / %s] 客户端断开连接, error?: %v", c.Fd(), c.RemoteAddr(), err)
     // 获取客户端
     client, ok := c.Context().(*Client)
-    // 删除客户端
+    // 关闭客户端
     if ok {
-        client.Close()
-        h.clients.Delete(client)
+        go client.Close()
     }
     return
 }

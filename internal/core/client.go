@@ -8,6 +8,7 @@ package core
 import (
     "context"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     jsoniter "github.com/json-iterator/go"
@@ -55,23 +56,18 @@ func (c *Client) run() {
     for {
         select {
         case message := <-c.receiver:
+            if message == nil {
+                return
+            }
             // 消息代理
             c.Hub.handleMessage(message.Data, message.Client)
         }
     }
 }
 
-// SetSerial 设置serial
-func (c *Client) SetSerial(serial string) {
-    c.Hub.clients.Store(c, serial)
-    c.Serial = serial
-}
-
 // SendMessage 向客户端发送消息
 // params[0]: 是否记录消息
 func (c *Client) SendMessage(message any, params ...any) (err error) {
-    // return jsoniter.NewEncoder(c).Encode(c)
-
     b, _ := jsoniter.Marshal(message)
 
     var logMessage bool
@@ -101,8 +97,8 @@ func (c *Client) SendMessage(message any, params ...any) (err error) {
 // GetClient 获取在线的客户端
 func GetClient(devId string) (c *Client, err error) {
     Hub.clients.Range(func(key, value any) bool {
-        client, _ := key.(*Client)
-        sn, _ := value.(string)
+        client, _ := value.(*Client)
+        sn, _ := key.(string)
         if sn == devId {
             c = client
             return false
@@ -117,10 +113,15 @@ func GetClient(devId string) (c *Client, err error) {
 
 // Close 关闭电柜客户端
 func (c *Client) Close() {
-    // 标记电柜为离线
-    if c.Serial != "" {
-        go c.Offline()
-    }
+    snag.WithPanic(func() {
+        c.Hub.clients.Delete(c.Serial)
+        close(c.receiver)
+
+        // 标记电柜为离线
+        if c.Serial != "" {
+            go c.Offline()
+        }
+    }, log.StandardLogger())
 }
 
 // Offline 标记电柜离线
@@ -135,4 +136,8 @@ func (c *Client) Offline() {
 // UpdateOnline 更新电柜离线时间
 func (c *Client) UpdateOnline() {
     c.dead.Reset(20 * time.Minute)
+}
+
+func (c *Client) Register() {
+    c.Hub.register <- c
 }

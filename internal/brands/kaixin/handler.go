@@ -70,7 +70,12 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     // }
 
     // 保存设备识别码
-    client.SetSerial(req.DevID)
+    client.Serial = req.DevID
+
+    // 注册连接
+    client.Register()
+
+    // 查找或创建电柜
     core.LoadOrStoreCabinet(context.Background(), cabdef.BrandKaixin, req.DevID)
 
     // TODO: 保存其他信息

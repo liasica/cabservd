@@ -17,7 +17,7 @@ func Start(addr string, brand cabdef.Brand, bean Hook, codec Codec) {
         Bean:       bean,
         brand:      brand,
         codec:      codec,
-        connect:    make(chan *Client),
+        register:   make(chan *Client),
         disconnect: make(chan *Client),
     }
 
@@ -36,13 +36,10 @@ func Start(addr string, brand cabdef.Brand, bean Hook, codec Codec) {
 func (h *hub) run() {
     for {
         select {
-        case client := <-h.connect:
-            h.clients.Store(client, "")
+        case client := <-h.register:
+            h.clients.Store(client.Serial, client)
         case client := <-h.disconnect:
-            if _, ok := h.clients.Load(client); ok {
-                h.clients.Delete(client)
-            }
-            close(client.receiver)
+            go client.Close()
         }
     }
 }
