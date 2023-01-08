@@ -43,7 +43,7 @@ func (b *Bin) IsStrictNoBattery(fakevoltage, fakecurrent float64) bool {
 
 // IsStrictHasBattery 严格检测有电池
 // 所有项都满足才判定为有电池
-// 常用于: 检测用户电池是否放入
+// 常用于: 检测用户电池是否放入或该仓位是否可办理业务
 func (b *Bin) IsStrictHasBattery(fakevoltage float64) (has bool) {
     has = b.BatteryExists && // 在位
         b.BatterySn != "" && // 电池编码不为空

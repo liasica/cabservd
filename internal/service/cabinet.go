@@ -99,21 +99,28 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
 
     for _, item := range cab.Edges.Bins {
         // 如果仓位未启用或仓位不健康直接跳过
-        if !item.Enable || !item.Health {
+        if !item.IsUsable() {
             continue
-        } else if item.Open {
-            // 有正常未关闭的仓门直接报错
+        }
+
+        // 有正常未关闭的仓门直接报错
+        if item.Open {
             err = adapter.ErrorCabinetDoorOpened
             return
         }
-        // 宽松判定是否有电池
-        if item.IsLooseHasBattery(fakevoltage, fakecurrent) {
-            // 判定电池型号是否满足业务需求
+
+        // 判断电池型号
+        if item.BatterySn != "" {
             bat := adapter.ParseBatterySN(item.BatterySn)
             if strings.ToUpper(bat.Model) != bm {
                 continue
             }
+        }
 
+        // 判定是否可以满足业务
+        switch true {
+        case item.IsStrictHasBattery(fakevoltage):
+            // 严格判定是否有电池
             batteries += 1
             // 若有电池
             // 获取满电仓位
@@ -125,7 +132,8 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
                 // 标定满仓
                 fully = item
             }
-        } else {
+        case item.IsStrictNoBattery(fakevoltage, fakecurrent):
+            // 严格判定是否无电池
             emptynum += 1
             // 若无电池
             if empty == nil {
