@@ -93,7 +93,7 @@ var (
             Operate: cabdef.OperateDoorOpen,
             Door:    cabdef.DetectDoorOpen,
             Battery: cabdef.DetectBatteryIgnore,
-            Bin:     cabdef.DetectBinUsable,
+            Bin:     cabdef.DetectBinIgnore,
         },
     }
 

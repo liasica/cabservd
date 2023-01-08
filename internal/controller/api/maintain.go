@@ -7,18 +7,21 @@ package api
 
 import (
     "github.com/auroraride/adapter/async"
+    "github.com/auroraride/adapter/maintain"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/labstack/echo/v4"
     "time"
 )
 
-type maintain struct{}
+type maintainApi struct{}
 
-var Maintain = new(maintain)
+var Maintain = new(maintainApi)
 
-func (*maintain) Update(echo.Context) (err error) {
+func (*maintainApi) Update(echo.Context) (err error) {
     ticker := time.NewTicker(time.Second)
     defer ticker.Stop()
+
+    _ = maintain.Create()
 
     for ; true; <-ticker.C {
         // 是否有进行中的异步业务

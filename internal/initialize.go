@@ -8,7 +8,7 @@ package internal
 import (
     "context"
     "fmt"
-    "github.com/auroraride/adapter/logger"
+    "github.com/auroraride/adapter/pkg/logger"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
