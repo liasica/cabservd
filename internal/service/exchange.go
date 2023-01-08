@@ -11,6 +11,7 @@ import (
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/ent/scan"
     "github.com/auroraride/cabservd/internal/task"
     "github.com/auroraride/cabservd/internal/types"
@@ -50,16 +51,18 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
     }
 
     // 查询限定时间内其他扫码用户
-    exists, _ := ent.Database.Scan.Query().Where(
+    if exists, _ := ent.Database.Scan.Query().Where(
         scan.CabinetID(cab.ID),
         scan.UserIDNEQ(s.User.ID),
         scan.CreatedAtGT(time.Now().Add(-time.Duration(req.Lock)*time.Second)),
-    ).Exist(s.ctx)
-    if exists {
+    ).Exist(s.ctx); exists {
         app.Panic(http.StatusBadRequest, adapter.ErrorCabinetBusy)
     }
 
-    // TODO 查询是否有正在执行的任务?
+    // 查询是否有正在执行的任务
+    if exists, _ := ent.Database.Console.Query().Where(console.Serial(req.Serial), console.StatusIn(console.StatusRunning)).Exist(s.ctx); exists {
+        app.Panic(http.StatusBadRequest, adapter.ErrorCabinetBusy)
+    }
 
     // 获取空仓和满电仓位
     var fully, empty *ent.Bin
