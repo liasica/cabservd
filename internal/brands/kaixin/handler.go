@@ -11,6 +11,7 @@ import (
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
+    log "github.com/sirupsen/logrus"
 )
 
 type Hander struct {
@@ -50,6 +51,7 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
 
     // 发送登录响应
     if err != nil {
+        log.Errorf("[FD=%d / %s]解析消息失败: %v", client.Fd(), client.RemoteAddr(), err)
         return client.SendMessage(req.Fail())
     }
 
@@ -76,7 +78,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     client.Register()
 
     // 查找或创建电柜
-    core.LoadOrStoreCabinet(context.Background(), cabdef.BrandKaixin, req.DevID)
+    go core.LoadOrStoreCabinet(context.Background(), cabdef.BrandKaixin, req.DevID)
 
     // TODO: 保存其他信息
     return

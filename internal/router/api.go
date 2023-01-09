@@ -55,6 +55,7 @@ func Start(e *echo.Echo) {
     // 运维接口
     m := e.Group("/maintain")
     m.GET("/update", api.Maintain.Update)
+    m.GET("/clients", api.Maintain.Clients)
 
     r := e.Group("/")
     r.Use(

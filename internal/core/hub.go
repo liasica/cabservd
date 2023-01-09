@@ -35,13 +35,7 @@ type hub struct {
     // 在线的客户端
     // serial => *Client
     // serial 在初次连接的时候为空, 当登录成功后是设备的唯一编码
-    clients sync.Map
-
-    // 客户端注册
-    register chan *Client
-
-    // 断开客户端连接
-    disconnect chan *Client
+    Clients *sync.Map
 }
 
 func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {

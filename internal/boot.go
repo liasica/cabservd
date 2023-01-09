@@ -8,6 +8,7 @@ package internal
 import (
     "context"
     "github.com/auroraride/adapter/codec"
+    "github.com/auroraride/adapter/maintain"
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
@@ -41,6 +42,11 @@ func Boot() {
 
         // debug
         go demo.Debug()
+
+        // maintain
+        if maintain.Exists() {
+            _ = maintain.Remove()
+        }
 
         select {
         case <-g.Quit:

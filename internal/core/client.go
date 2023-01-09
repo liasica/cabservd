@@ -96,7 +96,7 @@ func (c *Client) SendMessage(message any, params ...any) (err error) {
 
 // GetClient 获取在线的客户端
 func GetClient(devId string) (c *Client, err error) {
-    Hub.clients.Range(func(key, value any) bool {
+    Hub.Clients.Range(func(key, value any) bool {
         client, _ := value.(*Client)
         sn, _ := key.(string)
         if sn == devId {
@@ -114,13 +114,13 @@ func GetClient(devId string) (c *Client, err error) {
 // Close 关闭电柜客户端
 func (c *Client) Close() {
     snag.WithPanic(func() {
-        c.Hub.clients.Delete(c.Serial)
-        close(c.receiver)
-
         // 标记电柜为离线
         if c.Serial != "" {
             go c.Offline()
         }
+
+        c.Hub.Clients.Delete(c.Serial)
+        close(c.receiver)
     }, log.StandardLogger())
 }
 
@@ -139,5 +139,5 @@ func (c *Client) UpdateOnline() {
 }
 
 func (c *Client) Register() {
-    c.Hub.register <- c
+    c.Hub.Clients.Store(c.Serial, c)
 }

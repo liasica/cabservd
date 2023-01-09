@@ -9,19 +9,18 @@ import (
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
+    "sync"
 )
 
 func Start(addr string, brand cabdef.Brand, bean Hook, codec Codec) {
     Hub = &hub{
-        addr:       addr,
-        Bean:       bean,
-        brand:      brand,
-        codec:      codec,
-        register:   make(chan *Client),
-        disconnect: make(chan *Client),
+        addr:    addr,
+        Bean:    bean,
+        brand:   brand,
+        codec:   codec,
+        Clients: &sync.Map{},
     }
 
-    go Hub.run()
     // go Hub.deadCheck()
 
     log.Fatal(gnet.Run(
@@ -31,17 +30,6 @@ func Start(addr string, brand cabdef.Brand, bean Hook, codec Codec) {
         gnet.WithReuseAddr(true),
         gnet.WithLogger(log.StandardLogger()),
     ))
-}
-
-func (h *hub) run() {
-    for {
-        select {
-        case client := <-h.register:
-            h.clients.Store(client.Serial, client)
-        case client := <-h.disconnect:
-            go client.Close()
-        }
-    }
 }
 
 // 每隔1分钟标记20分之前更新的电柜为离线

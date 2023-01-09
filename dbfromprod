@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+TARGET="$1"
+
+echo "同步数据库: $TARGET"
+
+ssh root@39.106.77.239 "export PGPASSWORD='$PASSWORD'; pg_dump -U postgres -d $TARGET -f /root/$TARGET.sql; rm -rf $TARGET.sql.zip; zip $TARGET.sql.zip $TARGET.sql"
+scp root@39.106.77.239:/root/"$TARGET".sql.zip ~/Downloads/_sql/
+cd ~/Downloads/_sql/ || return
+rm -rf "$TARGET".sql
+unzip "$TARGET".sql.zip
+rm -rf "$TARGET".sql.zip
+dropdb -U liasica "$TARGET"
+createdb "$TARGET"
+psql -d "$TARGET" -U liasica -c "SET timezone = 'Asia/Shanghai'; CREATE EXTENSION postgis; CREATE EXTENSION pg_trgm; CREATE EXTENSION btree_gin;"
+psql -d "$TARGET" -U liasica -f "$TARGET".sql

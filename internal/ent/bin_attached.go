@@ -25,9 +25,7 @@ func (u *BinUpsert) ResetBattery() *BinUpsert {
 func (b *Bin) IsLooseHasBattery(fakevoltage, fakecurrent float64) bool {
     return b.BatteryExists || // 在位
         b.BatterySn != "" || // 编码不为空
-        b.Voltage > fakevoltage || // 电压大于指定值
-        b.Current > fakecurrent || // 电流大于指定值
-        b.Soc > 0 // 容量大于0
+        b.Voltage > fakevoltage // 电压大于指定值
 }
 
 // IsStrictNoBattery 严格检测无电池
@@ -36,9 +34,7 @@ func (b *Bin) IsLooseHasBattery(fakevoltage, fakecurrent float64) bool {
 func (b *Bin) IsStrictNoBattery(fakevoltage, fakecurrent float64) bool {
     return !b.BatteryExists && // 不在位
         b.BatterySn == "" && // 编码为空
-        b.Voltage <= fakevoltage && // 电压小于等于指定值
-        b.Current <= fakecurrent && // 电流小于等于指定值
-        b.Soc <= 0 // 容量小于等于0
+        b.Voltage <= fakevoltage // 电压小于等于指定值
 }
 
 // IsStrictHasBattery 严格检测有电池
@@ -47,8 +43,7 @@ func (b *Bin) IsStrictNoBattery(fakevoltage, fakecurrent float64) bool {
 func (b *Bin) IsStrictHasBattery(fakevoltage float64) (has bool) {
     has = b.BatteryExists && // 在位
         b.BatterySn != "" && // 电池编码不为空
-        b.Voltage > fakevoltage && // 电压大于指定值
-        b.Soc > 0 // 容量不为0
+        b.Voltage > fakevoltage // 电压大于指定值
     return
 }
 
@@ -58,8 +53,7 @@ func (b *Bin) IsStrictHasBattery(fakevoltage float64) (has bool) {
 func (b *Bin) IsLooseNoBattery(fakevoltage float64) bool {
     return !b.BatteryExists || // 不在位
         b.BatterySn == "" || // 电池编号为空
-        b.Voltage <= fakevoltage || // 电压小于等于指定值
-        b.Soc <= 0 // 容量小于等于0
+        b.Voltage <= fakevoltage // 电压小于等于指定值
 }
 
 // IsUsable 检查仓位是否可用
