@@ -9,6 +9,7 @@ import (
     "fmt"
     "github.com/auroraride/adapter"
     amw "github.com/auroraride/adapter/middleware"
+    "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
@@ -49,6 +50,8 @@ func Start(e *echo.Echo) {
     }
 
     e.Validator = app.NewValidator()
+
+    e.Renderer = assets.Templates
 
     dumpFile := amw.NewDumpFile()
 

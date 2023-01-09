@@ -9,6 +9,7 @@ import (
     "context"
     "fmt"
     "github.com/auroraride/adapter/pkg/logger"
+    "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
@@ -36,6 +37,9 @@ func initialize() {
 
     // 加载配置
     g.LoadConfig()
+
+    // 加载模板
+    assets.LoadTemplates()
 
     // 加载数据库
     ent.Database = ent.OpenDatabase(g.Config.Postgres.Dsn, g.Config.Postgres.Debug)

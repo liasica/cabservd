@@ -46,8 +46,10 @@ func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
 func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
     log.Infof("[FD=%d / %s] 新增客户端连接", c.Fd(), c.RemoteAddr())
 
+    client := NewClient(c, h)
+
     // 设置连接上下文信息
-    c.SetContext(NewClient(c, h))
+    c.SetContext(client)
 
     return
 }

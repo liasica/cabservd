@@ -10,7 +10,6 @@ import (
     "github.com/auroraride/adapter/maintain"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/g"
-    jsoniter "github.com/json-iterator/go"
     "github.com/labstack/echo/v4"
     "net/http"
     "sort"
@@ -39,17 +38,15 @@ func (*maintainApi) Update(echo.Context) (err error) {
 }
 
 func (*maintainApi) Clients(c echo.Context) (err error) {
-    var keys []string
-    core.Hub.Clients.Range(func(key, _ any) bool {
-        keys = append(keys, key.(string))
+    var clients []*core.Client
+    core.Hub.Clients.Range(func(k, v any) bool {
+        clients = append(clients, v.(*core.Client))
         return true
     })
 
-    sort.Slice(keys, func(i, j int) bool {
-        return strings.Compare(keys[i], keys[j]) < 0
+    sort.Slice(clients, func(i, j int) bool {
+        return strings.Compare(clients[i].Serial, clients[j].Serial) < 0
     })
 
-    b, _ := jsoniter.Marshal(keys)
-
-    return c.HTMLBlob(http.StatusOK, b)
+    return c.Render(http.StatusOK, "maintain/clients.go.html", clients)
 }

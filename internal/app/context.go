@@ -25,7 +25,7 @@ func Context(c echo.Context) *BaseContext {
     if ok {
         return ctx
     }
-    return NewBaseContext(ctx)
+    return NewBaseContext(c)
 }
 
 func (c *BaseContext) BindValidate(ptr any) {

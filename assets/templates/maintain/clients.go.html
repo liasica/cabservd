@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>当前在线电柜客户端</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/bulma/0.9.4/css/bulma.css">
+</head>
+<body>
+<section class="section">
+    <div class="container is-fluid">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>#</th>
+                <th>电柜编码</th>
+                <th>IP</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ range $i, $c := . }}
+                {{- /*gotype: github.com/auroraride/cabservd/internal/core.Client*/ -}}
+                <tr>
+                    <td>{{ add $i 1 }}</td>
+                    <td>{{ .Serial }}</td>
+                    <td>{{ .Conn.RemoteAddr }}</td>
+                </tr>
+            {{ end }}
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
