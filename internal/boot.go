@@ -24,7 +24,7 @@ func Boot() {
     // 初始化系统
     initialize()
 
-    snag.WithPanic(func() {
+    snag.WithRecover(func() {
         // 加载hooks
         task.Start()
 

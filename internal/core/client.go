@@ -11,6 +11,7 @@ import (
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/google/uuid"
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
@@ -18,6 +19,8 @@ import (
 )
 
 type Client struct {
+    ID uuid.UUID
+
     // gnet 连接
     gnet.Conn
 
@@ -40,6 +43,7 @@ type MessageProxy struct {
 
 func NewClient(conn gnet.Conn, h *hub) *Client {
     c := &Client{
+        ID:       uuid.New(),
         Conn:     conn,
         Hub:      h,
         receiver: make(chan *MessageProxy),
@@ -113,14 +117,23 @@ func GetClient(devId string) (c *Client, err error) {
 
 // Close 关闭电柜客户端
 func (c *Client) Close() {
-    snag.WithPanic(func() {
+    snag.WithRecover(func() {
         // 标记电柜为离线
         if c.Serial != "" {
             go c.Offline()
         }
 
-        c.Hub.Clients.Delete(c.Serial)
         close(c.receiver)
+
+        // 查找并删除客户端
+        c.Hub.Clients.Range(func(k, v any) bool {
+            if client, ok := v.(*Client); ok && client.ID == c.ID {
+                c.Hub.Clients.Delete(k)
+                return false
+            }
+            return true
+        })
+
     }, log.StandardLogger())
 }
 

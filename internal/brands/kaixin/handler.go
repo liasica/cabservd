@@ -30,14 +30,12 @@ func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Hander) OnMessage(b []byte, client *core.Client) (serial string, err error) {
+func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     req := new(Request)
     err = jsoniter.Unmarshal(b, req)
     if err != nil {
         return
     }
-
-    serial = req.DevID
 
     switch req.MsgType {
     case MessageTypeLoginRequest:
@@ -78,6 +76,9 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 
     // 查找或创建电柜
     go core.LoadOrStoreCabinet(context.Background(), cabdef.BrandKaixin, req.DevID)
+
+    // 注册电柜客户端
+    client.Register(req.DevID)
 
     // TODO: 保存其他信息
     return

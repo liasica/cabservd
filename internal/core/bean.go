@@ -15,7 +15,7 @@ type (
         OnConnect() (err error)
 
         // OnMessage 收到消息
-        OnMessage(b []byte, client *Client) (serial string, err error)
+        OnMessage(b []byte, client *Client) (err error)
 
         // SendControl 发送控制
         SendControl(serial string, typ cabdef.Operate, ordinal int) error
@@ -32,7 +32,7 @@ func (h *Bean) OnConnect() (err error) {
     return
 }
 
-func (h *Bean) OnMessage(_ []byte, _ *Client) (serial string, err error) {
+func (h *Bean) OnMessage(_ []byte, _ *Client) (err error) {
     return
 }
 
