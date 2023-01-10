@@ -230,3 +230,13 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 
     return
 }
+
+func (s *binService) BinInfo(req *cabdef.BinInfoRequest) (info *cabdef.BinInfo, err error) {
+    b, _ := s.QuerySerialOrdinal(req.Serial, *req.Ordinal)
+    if b == nil {
+        err = adapter.ErrorBinNotFound
+        return
+    }
+    info = b.Info()
+    return
+}
