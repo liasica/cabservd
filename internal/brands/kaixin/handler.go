@@ -30,12 +30,15 @@ func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
+func (h *Hander) OnMessage(b []byte, client *core.Client) (serial string, err error) {
     req := new(Request)
     err = jsoniter.Unmarshal(b, req)
     if err != nil {
         return
     }
+
+    serial = req.DevID
+
     switch req.MsgType {
     case MessageTypeLoginRequest:
         err = h.LoginHandle(req, client)
@@ -52,10 +55,12 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     // 发送登录响应
     if err != nil {
         log.Errorf("[FD=%d / %s]解析消息失败: %v", client.Fd(), client.RemoteAddr(), err)
-        return client.SendMessage(req.Fail())
+        _ = client.SendMessage(req.Fail())
+        return
     }
 
-    return client.SendMessage(req.Success())
+    err = client.SendMessage(req.Success())
+    return
 }
 
 // LoginHandle 登录请求
@@ -70,12 +75,6 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     // if err != nil {
     //     return
     // }
-
-    // 保存设备识别码
-    client.Serial = req.DevID
-
-    // 注册连接
-    client.Register()
 
     // 查找或创建电柜
     go core.LoadOrStoreCabinet(context.Background(), cabdef.BrandKaixin, req.DevID)

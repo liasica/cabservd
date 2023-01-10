@@ -109,8 +109,10 @@ func (h *hub) handleMessage(b []byte, client *Client) {
 
     // 解析
     // TODO 未知的 Client
-    err := h.Bean.OnMessage(b, client)
+    serial, err := h.Bean.OnMessage(b, client)
     if err != nil {
         log.Errorf("[FD=%d / %s] 解析失败, err: %v, 原始消息: %s", client.Fd(), client.RemoteAddr(), err, b)
     }
+
+    client.Register(serial)
 }
