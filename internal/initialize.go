@@ -15,6 +15,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
     "os"
+    "strings"
     "time"
 )
 
@@ -28,11 +29,20 @@ func initialize() {
     time.Local = loc
 
     // 日志
+    logsplit := "github.com/auroraride/cabservd/"
+    logsplitLen := len(logsplit)
     logger.LoadWithConfig(logger.Config{
         Color:  true,
         Level:  "info",
         Age:    8192,
         Caller: true,
+        CallerSplitter: func(s string) string {
+            n := strings.Index(s, logsplit)
+            if n > -1 {
+                return s[logsplitLen:]
+            }
+            return s
+        },
     })
 
     // 加载配置
