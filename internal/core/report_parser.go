@@ -9,7 +9,7 @@ import (
     "context"
     "fmt"
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"

@@ -8,7 +8,7 @@ package core
 import (
     "context"
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"

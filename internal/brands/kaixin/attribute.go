@@ -7,7 +7,7 @@ package kaixin
 
 import (
     "fmt"
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "strconv"
 )
 

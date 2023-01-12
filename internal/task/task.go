@@ -6,7 +6,7 @@
 package task
 
 import (
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/adapter/pqm"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"

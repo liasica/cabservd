@@ -7,7 +7,7 @@ package middleware
 
 import (
     "fmt"
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/labstack/echo/v4"
     "net/http"

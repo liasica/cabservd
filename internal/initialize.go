@@ -8,7 +8,7 @@ package internal
 import (
     "context"
     "fmt"
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"

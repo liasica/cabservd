@@ -10,7 +10,7 @@ import (
     "database/sql"
     "entgo.io/ent/dialect"
     entsql "entgo.io/ent/dialect/sql"
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/cabservd/internal/ent/migrate"
     _ "github.com/auroraride/cabservd/internal/ent/runtime"
     _ "github.com/jackc/pgx/v4/stdlib"

@@ -7,7 +7,7 @@ package core
 
 import (
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/adapter/pkg/loki"
+    "github.com/auroraride/adapter/loki"
     "github.com/panjf2000/gnet/v2"
     "sync"
 )

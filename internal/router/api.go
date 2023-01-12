@@ -8,8 +8,8 @@ package router
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/loki"
     amw "github.com/auroraride/adapter/middleware"
-    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
