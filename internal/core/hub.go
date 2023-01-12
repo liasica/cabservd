@@ -8,8 +8,8 @@ package core
 import (
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/panjf2000/gnet/v2"
-    log "github.com/sirupsen/logrus"
     "sync"
 )
 
@@ -39,12 +39,12 @@ type hub struct {
 }
 
 func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
-    log.Infof("TCP服务器已启动 %s", h.addr)
+    loki.Infof("TCP服务器已启动 %s", h.addr)
     return gnet.None
 }
 
 func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
-    log.Infof("[FD=%d / %s] 新增客户端连接", c.Fd(), c.RemoteAddr())
+    loki.Infof("[FD=%d / %s] 新增客户端连接", c.Fd(), c.RemoteAddr())
 
     client := NewClient(c, h)
 
@@ -55,7 +55,7 @@ func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 }
 
 func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
-    log.Infof("[FD=%d / %s] 客户端断开连接, error?: %v", c.Fd(), c.RemoteAddr(), err)
+    loki.Infof("[FD=%d / %s] 客户端断开连接, error?: %v", c.Fd(), c.RemoteAddr(), err)
     // 获取客户端
     client, ok := c.Context().(*Client)
     // 关闭客户端
@@ -86,7 +86,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
         }
 
         if err != nil {
-            log.Errorf("[FD=%d / %s] 消息读取失败, err: %v", c.Fd(), c.RemoteAddr(), err)
+            loki.Errorf("[FD=%d / %s] 消息读取失败, err: %v", c.Fd(), c.RemoteAddr(), err)
             return
         }
 
@@ -102,7 +102,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
 
 func (h *hub) handleMessage(b []byte, client *Client) {
     // 记录日志
-    log.Infof("[FD=%d / %s, Recv] %s", client.Fd(), client.RemoteAddr(), b)
+    loki.Infof("[FD=%d / %s, Recv] %s", client.Fd(), client.RemoteAddr(), b)
 
     // 更新在线状态
     go client.UpdateOnline()
@@ -111,6 +111,6 @@ func (h *hub) handleMessage(b []byte, client *Client) {
     // TODO 未知的 Client
     err := h.Bean.OnMessage(b, client)
     if err != nil {
-        log.Errorf("[FD=%d / %s] 解析失败, err: %v, 原始消息: %s", client.Fd(), client.RemoteAddr(), err, b)
+        loki.Errorf("[FD=%d / %s] 解析失败, err: %v, 原始消息: %s", client.Fd(), client.RemoteAddr(), err, b)
     }
 }

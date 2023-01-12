@@ -18,3 +18,7 @@ redis:
   password: ''
   database: 0
   host: 127.0.0.1
+
+loki:
+  job: cabservd
+  url: http://localhost:3100/loki/api/v1/push

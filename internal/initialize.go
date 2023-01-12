@@ -8,14 +8,13 @@ package internal
 import (
     "context"
     "fmt"
-    "github.com/auroraride/adapter/pkg/logger"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
     "os"
-    "strings"
     "time"
 )
 
@@ -28,25 +27,13 @@ func initialize() {
     loc, _ := time.LoadLocation(tz)
     time.Local = loc
 
-    // 日志
-    logsplit := "github.com/auroraride/cabservd/"
-    logsplitLen := len(logsplit)
-    logger.LoadWithConfig(logger.Config{
-        Color:  true,
-        Level:  "info",
-        Age:    8192,
-        Caller: true,
-        CallerSplitter: func(s string) string {
-            n := strings.Index(s, logsplit)
-            if n > -1 {
-                return s[logsplitLen:]
-            }
-            return s
-        },
-    })
-
     // 加载配置
     g.LoadConfig()
+
+    // 日志
+    loki.SetJob(g.Config.Loki.Job)
+    loki.SetUrl(g.Config.Loki.Url)
+    loki.Info("test")
 
     // 加载模板
     assets.LoadTemplates()

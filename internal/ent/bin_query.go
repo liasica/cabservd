@@ -274,6 +274,7 @@ func (bq *BinQuery) Clone() *BinQuery {
 		limit:       bq.limit,
 		offset:      bq.offset,
 		order:       append([]OrderFunc{}, bq.order...),
+		inters:      append([]Interceptor{}, bq.inters...),
 		predicates:  append([]predicate.Bin{}, bq.predicates...),
 		withCabinet: bq.withCabinet.Clone(),
 		// clone intermediate query.

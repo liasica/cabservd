@@ -298,6 +298,7 @@ func (cq *ConsoleQuery) Clone() *ConsoleQuery {
 		limit:       cq.limit,
 		offset:      cq.offset,
 		order:       append([]OrderFunc{}, cq.order...),
+		inters:      append([]Interceptor{}, cq.inters...),
 		predicates:  append([]predicate.Console{}, cq.predicates...),
 		withCabinet: cq.withCabinet.Clone(),
 		withBin:     cq.withBin.Clone(),

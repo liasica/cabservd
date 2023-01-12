@@ -6,10 +6,10 @@
 package task
 
 import (
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/adapter/pqm"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
-    log "github.com/sirupsen/logrus"
     "sync"
 )
 
@@ -30,11 +30,11 @@ func Start() {
     go Aurservd.start()
 
     // TODO 同步消息删除
-    Cabinet = pqm.NewMonitor(dsn, log.StandardLogger(), &ent.Cabinet{}, func(message *pqm.Message[*ent.Cabinet]) {
+    Cabinet = pqm.NewMonitor(dsn, loki.StandardLogger(), &ent.Cabinet{}, func(message *pqm.Message[*ent.Cabinet]) {
         go Aurservd.SendCabinet(message.Data.Serial, message.Data)
     })
 
-    Bin = pqm.NewMonitor(dsn, log.StandardLogger(), &ent.Bin{}, func(message *pqm.Message[*ent.Bin]) {
+    Bin = pqm.NewMonitor(dsn, loki.StandardLogger(), &ent.Bin{}, func(message *pqm.Message[*ent.Bin]) {
         go Aurservd.SendBin(message.Data.Serial, message.Data)
     })
 

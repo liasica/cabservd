@@ -8,8 +8,8 @@ package g
 import (
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/assets"
-    log "github.com/sirupsen/logrus"
     "github.com/spf13/viper"
+    "log"
     "os"
     "path/filepath"
 )
@@ -28,6 +28,10 @@ type config struct {
     }
     Adapter struct {
         Aurservd string
+    }
+    Loki struct {
+        Job string
+        Url string
     }
 }
 

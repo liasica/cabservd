@@ -9,6 +9,7 @@ import (
     "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -16,7 +17,6 @@ import (
     "github.com/auroraride/cabservd/internal/task"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
-    log "github.com/sirupsen/logrus"
     "time"
 )
 
@@ -207,7 +207,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 
     defer func() {
         res := NewConsole(s.User).Update(co, eb, err).OperateResult()
-        log.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.User, eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Errorf("失败: %v", err)))
+        loki.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.User, eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Errorf("失败: %v", err)))
 
         // 同步回调结果
         scb(res)
@@ -220,7 +220,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         // TODO: 开仓失败后是否重复弹开逻辑???
         // TODO: 详细失败日志???
         if err != nil {
-            log.Infof("[%s - %d] %s 失败: %v", eb.Serial, eb.Ordinal, step.Operate, err)
+            loki.Infof("[%s - %d] %s 失败: %v", eb.Serial, eb.Ordinal, step.Operate, err)
             return
         }
     }

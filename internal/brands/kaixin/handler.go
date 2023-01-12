@@ -9,9 +9,9 @@ import (
     "context"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
-    log "github.com/sirupsen/logrus"
 )
 
 type Hander struct {
@@ -52,7 +52,7 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
 
     // 发送登录响应
     if err != nil {
-        log.Errorf("[FD=%d / %s]解析消息失败: %v", client.Fd(), client.RemoteAddr(), err)
+        loki.Errorf("[FD=%d / %s]解析消息失败: %v", client.Fd(), client.RemoteAddr(), err)
         _ = client.SendMessage(req.Fail())
         return
     }

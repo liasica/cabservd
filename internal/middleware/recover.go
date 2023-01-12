@@ -7,9 +7,9 @@ package middleware
 
 import (
     "fmt"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/labstack/echo/v4"
-    log "github.com/sirupsen/logrus"
     "net/http"
     "runtime/debug"
 )
@@ -26,7 +26,7 @@ func Recover() echo.MiddlewareFunc {
                         _ = ctx.SendResponse(v.Code, v.Message, v.Data)
                     default:
                         err := fmt.Errorf("%v", r)
-                        log.Errorf("%v\n%s", r, debug.Stack())
+                        loki.Errorf("%v\n%s", r, debug.Stack())
                         _ = app.Context(c).SendResponse(http.StatusInternalServerError, err)
                     }
                 }

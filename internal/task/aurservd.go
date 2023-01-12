@@ -11,11 +11,11 @@ import (
     "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/adapter/message"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/adapter/tcp"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/g"
-    log "github.com/sirupsen/logrus"
 )
 
 type aurservd struct {
@@ -24,7 +24,7 @@ type aurservd struct {
 
 func newAurservd() *aurservd {
     return &aurservd{
-        Client: tcp.NewClient(g.Config.Adapter.Aurservd, log.StandardLogger(), &codec.HeaderLength{}),
+        Client: tcp.NewClient(g.Config.Adapter.Aurservd, loki.StandardLogger(), &codec.HeaderLength{}),
     }
 }
 
@@ -40,7 +40,7 @@ func (h *aurservd) CabinetFullUpdate() {
 func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *cabdef.CabinetMessage) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
-        log.Error("无可同步数据")
+        loki.Error("无可同步数据")
         return
     }
 

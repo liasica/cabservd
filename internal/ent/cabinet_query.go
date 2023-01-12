@@ -275,6 +275,7 @@ func (cq *CabinetQuery) Clone() *CabinetQuery {
 		limit:      cq.limit,
 		offset:     cq.offset,
 		order:      append([]OrderFunc{}, cq.order...),
+		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Cabinet{}, cq.predicates...),
 		withBins:   cq.withBins.Clone(),
 		// clone intermediate query.

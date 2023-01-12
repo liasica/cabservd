@@ -274,6 +274,7 @@ func (sq *ScanQuery) Clone() *ScanQuery {
 		limit:       sq.limit,
 		offset:      sq.offset,
 		order:       append([]OrderFunc{}, sq.order...),
+		inters:      append([]Interceptor{}, sq.inters...),
 		predicates:  append([]predicate.Scan{}, sq.predicates...),
 		withCabinet: sq.withCabinet.Clone(),
 		// clone intermediate query.

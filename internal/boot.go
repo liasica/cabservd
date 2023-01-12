@@ -9,6 +9,7 @@ import (
     "context"
     "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/maintain"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
     "github.com/auroraride/cabservd/internal/core"
@@ -17,7 +18,6 @@ import (
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/task"
     "github.com/labstack/echo/v4"
-    log "github.com/sirupsen/logrus"
 )
 
 func Boot() {
@@ -53,5 +53,5 @@ func Boot() {
             _ = e.Shutdown(context.Background())
         }
 
-    }, log.StandardLogger())
+    }, loki.StandardLogger())
 }

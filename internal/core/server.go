@@ -7,8 +7,8 @@ package core
 
 import (
     "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/auroraride/adapter/pkg/loki"
     "github.com/panjf2000/gnet/v2"
-    log "github.com/sirupsen/logrus"
     "sync"
 )
 
@@ -23,12 +23,12 @@ func Start(addr string, brand cabdef.Brand, bean Hook, codec Codec) {
 
     // go Hub.deadCheck()
 
-    log.Fatal(gnet.Run(
+    loki.Fatal(gnet.Run(
         Hub,
         Hub.addr,
         gnet.WithMulticore(true),
         gnet.WithReuseAddr(true),
-        gnet.WithLogger(log.StandardLogger()),
+        gnet.WithLogger(loki.StandardLogger()),
     ))
 }
 
