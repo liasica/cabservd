@@ -10,10 +10,10 @@ import (
     "database/sql"
     "entgo.io/ent/dialect"
     entsql "entgo.io/ent/dialect/sql"
-    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/cabservd/internal/ent/migrate"
     _ "github.com/auroraride/cabservd/internal/ent/runtime"
     _ "github.com/jackc/pgx/v4/stdlib"
+    log "github.com/sirupsen/logrus"
 )
 
 var Database *Client
@@ -21,7 +21,7 @@ var Database *Client
 func OpenDatabase(dsn string, debug bool) *Client {
     pgx, err := sql.Open("pgx", dsn)
     if err != nil {
-        loki.Fatalf("数据库打开失败: %v", err)
+        log.Fatalf("数据库打开失败: %v", err)
     }
 
     // 从db变量中构造一个ent.Driver对象。
@@ -93,7 +93,7 @@ $$
 $$;`
     _, err := c.ExecContext(context.Background(), raw)
     if err != nil {
-        loki.Fatal(err)
+        log.Fatal(err)
     }
 }
 
@@ -106,6 +106,6 @@ func autoMigrate(c *Client) {
         migrate.WithDropColumn(true),
         migrate.WithForeignKeys(false),
     ); err != nil {
-        loki.Fatalf("数据库迁移失败: %v", err)
+        log.Fatalf("数据库迁移失败: %v", err)
     }
 }

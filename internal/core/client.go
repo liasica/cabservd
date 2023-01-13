@@ -8,13 +8,13 @@ package core
 import (
     "context"
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/google/uuid"
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
+    log "github.com/sirupsen/logrus"
     "time"
 )
 
@@ -90,9 +90,9 @@ func (c *Client) SendMessage(message any, params ...any) (err error) {
 
     _, err = c.Write(data)
     if err != nil {
-        loki.Errorf("[FD=%d / %s] 发送失败, message: %s", c.Fd(), c.RemoteAddr(), b)
+        log.Errorf("[FD=%d / %s] 发送失败, message: %s", c.Fd(), c.RemoteAddr(), b)
     } else if logMessage {
-        loki.Infof("[FD=%d / %s, Send] %s", c.Fd(), c.RemoteAddr(), b)
+        log.Infof("[FD=%d / %s, Send] %s", c.Fd(), c.RemoteAddr(), b)
     }
 
     return
@@ -134,7 +134,7 @@ func (c *Client) Close() {
             return true
         })
 
-    }, loki.StandardLogger())
+    }, log.StandardLogger())
 }
 
 // Offline 标记电柜离线

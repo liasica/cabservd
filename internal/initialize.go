@@ -8,7 +8,7 @@ package internal
 import (
     "context"
     "fmt"
-    "github.com/auroraride/adapter/loki"
+    "github.com/auroraride/adapter/logger"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -21,6 +21,13 @@ import (
 func initialize() {
     ctx := context.Background()
 
+    logger.LoadWithConfig(logger.Config{
+        Color:  true,
+        Level:  "info",
+        Age:    8192,
+        Caller: true,
+    })
+
     // 设置全局时区
     tz := "Asia/Shanghai"
     _ = os.Setenv("TZ", tz)
@@ -29,11 +36,6 @@ func initialize() {
 
     // 加载配置
     g.LoadConfig()
-
-    // 日志
-    loki.SetJob(g.Config.Loki.Job)
-    loki.SetUrl(g.Config.Loki.Url)
-    loki.Info("test")
 
     // 加载模板
     assets.LoadTemplates()

@@ -7,7 +7,7 @@ package kaixin
 
 import (
     "fmt"
-    "github.com/auroraride/adapter/loki"
+    log "github.com/sirupsen/logrus"
     "strconv"
 )
 
@@ -35,7 +35,7 @@ func (a *Attribute) GetOrdinal() (ordinal int, exists bool) {
     var err error
     ordinal, err = strconv.Atoi(a.DoorID)
     if err != nil {
-        loki.Errorf("仓位解析失败")
+        log.Errorf("仓位解析失败")
         return
     }
 

@@ -9,12 +9,12 @@ import (
     "context"
     "fmt"
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/adapter/loki"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     jsoniter "github.com/json-iterator/go"
     "github.com/liasica/go-helpers/tools"
+    log "github.com/sirupsen/logrus"
     "time"
 )
 
@@ -50,13 +50,13 @@ func LoadOrStoreCabinet(ctx context.Context, brand cabdef.Brand, serial string) 
     var err error
     cab, err = client.Create().SetSerial(serial).SetBrand(brand).Save(ctx)
     if err != nil {
-        loki.Errorf("电柜保存失败: %v", err)
+        log.Errorf("电柜保存失败: %v", err)
     }
     return
 }
 
 func SaveCabinet(ctx context.Context, brand cabdef.Brand, serial string, item *ent.CabinetPointer) {
-    loki.Info(item)
+    log.Info(item)
     err := ent.Database.Cabinet.Create().
         SetBrand(brand).
         SetSerial(serial).
@@ -116,7 +116,7 @@ func SaveCabinet(ctx context.Context, brand cabdef.Brand, serial string, item *e
         Exec(ctx)
     if err != nil {
         b, _ := jsoniter.Marshal(item)
-        loki.Errorf("电柜保存失败, %s: %v", string(b), err)
+        log.Errorf("电柜保存失败, %s: %v", string(b), err)
     }
 }
 
@@ -127,12 +127,12 @@ func SaveBins(ctx context.Context, brand cabdef.Brand, serial string, items ent.
 
     cab := LoadOrStoreCabinet(ctx, brand, serial)
     if cab == nil {
-        loki.Error("仓位保存失败: 未找到电柜信息")
+        log.Error("仓位保存失败: 未找到电柜信息")
         return
     }
 
     for _, item := range items {
-        loki.Info(item)
+        log.Info(item)
         uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
         err := ent.Database.Bin.Create().
             SetUUID(uuid).
@@ -198,7 +198,7 @@ func SaveBins(ctx context.Context, brand cabdef.Brand, serial string, items ent.
             Exec(ctx)
         if err != nil {
             b, _ := jsoniter.Marshal(item)
-            loki.Errorf("仓位保存失败, %s: %v", string(b), err)
+            log.Errorf("仓位保存失败, %s: %v", string(b), err)
         }
     }
 }
