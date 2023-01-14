@@ -10,7 +10,7 @@ import (
     "entgo.io/ent/schema/field"
     "entgo.io/ent/schema/index"
     "entgo.io/ent/schema/mixin"
-    "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/ent/internal"
 )
 
@@ -65,7 +65,7 @@ func (Bin) Fields() []ent.Field {
         field.Uint64("cabinet_id"),
 
         // 电柜信息
-        field.Other("brand", cabdef.BrandUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("品牌"),
+        field.Other("brand", adapter.CabinetBrandUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("品牌"),
         field.String("serial").Comment("电柜设备序列号"),
 
         // 仓位信息

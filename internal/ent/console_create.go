@@ -54,8 +54,8 @@ func (cc *ConsoleCreate) SetOperate(c cabdef.Operate) *ConsoleCreate {
 }
 
 // SetBrand sets the "brand" field.
-func (cc *ConsoleCreate) SetBrand(c cabdef.Brand) *ConsoleCreate {
-	cc.mutation.SetBrand(c)
+func (cc *ConsoleCreate) SetBrand(ab adapter.CabinetBrand) *ConsoleCreate {
+	cc.mutation.SetBrand(ab)
 	return cc
 }
 
@@ -519,7 +519,7 @@ func (u *ConsoleUpsert) UpdateOperate() *ConsoleUpsert {
 }
 
 // SetBrand sets the "brand" field.
-func (u *ConsoleUpsert) SetBrand(v cabdef.Brand) *ConsoleUpsert {
+func (u *ConsoleUpsert) SetBrand(v adapter.CabinetBrand) *ConsoleUpsert {
 	u.Set(console.FieldBrand, v)
 	return u
 }
@@ -835,7 +835,7 @@ func (u *ConsoleUpsertOne) UpdateOperate() *ConsoleUpsertOne {
 }
 
 // SetBrand sets the "brand" field.
-func (u *ConsoleUpsertOne) SetBrand(v cabdef.Brand) *ConsoleUpsertOne {
+func (u *ConsoleUpsertOne) SetBrand(v adapter.CabinetBrand) *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBrand(v)
 	})
@@ -1358,7 +1358,7 @@ func (u *ConsoleUpsertBulk) UpdateOperate() *ConsoleUpsertBulk {
 }
 
 // SetBrand sets the "brand" field.
-func (u *ConsoleUpsertBulk) SetBrand(v cabdef.Brand) *ConsoleUpsertBulk {
+func (u *ConsoleUpsertBulk) SetBrand(v adapter.CabinetBrand) *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.SetBrand(v)
 	})

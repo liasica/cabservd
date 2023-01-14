@@ -6,13 +6,13 @@
 package core
 
 import (
-    "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/auroraride/adapter"
     "github.com/panjf2000/gnet/v2"
     log "github.com/sirupsen/logrus"
     "sync"
 )
 
-func Start(addr string, brand cabdef.Brand, bean Hook, codec Codec) {
+func Start(addr string, brand adapter.CabinetBrand, bean Hook, codec Codec) {
     Hub = &hub{
         addr:    addr,
         Bean:    bean,

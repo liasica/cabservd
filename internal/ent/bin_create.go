@@ -11,7 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -65,8 +65,8 @@ func (bc *BinCreate) SetCabinetID(u uint64) *BinCreate {
 }
 
 // SetBrand sets the "brand" field.
-func (bc *BinCreate) SetBrand(c cabdef.Brand) *BinCreate {
-	bc.mutation.SetBrand(c)
+func (bc *BinCreate) SetBrand(ab adapter.CabinetBrand) *BinCreate {
+	bc.mutation.SetBrand(ab)
 	return bc
 }
 
@@ -585,7 +585,7 @@ func (u *BinUpsert) UpdateCabinetID() *BinUpsert {
 }
 
 // SetBrand sets the "brand" field.
-func (u *BinUpsert) SetBrand(v cabdef.Brand) *BinUpsert {
+func (u *BinUpsert) SetBrand(v adapter.CabinetBrand) *BinUpsert {
 	u.Set(bin.FieldBrand, v)
 	return u
 }
@@ -876,7 +876,7 @@ func (u *BinUpsertOne) UpdateCabinetID() *BinUpsertOne {
 }
 
 // SetBrand sets the "brand" field.
-func (u *BinUpsertOne) SetBrand(v cabdef.Brand) *BinUpsertOne {
+func (u *BinUpsertOne) SetBrand(v adapter.CabinetBrand) *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
 		s.SetBrand(v)
 	})
@@ -1371,7 +1371,7 @@ func (u *BinUpsertBulk) UpdateCabinetID() *BinUpsertBulk {
 }
 
 // SetBrand sets the "brand" field.
-func (u *BinUpsertBulk) SetBrand(v cabdef.Brand) *BinUpsertBulk {
+func (u *BinUpsertBulk) SetBrand(v adapter.CabinetBrand) *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.SetBrand(v)
 	})

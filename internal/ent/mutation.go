@@ -46,7 +46,7 @@ type BinMutation struct {
 	created_at     *time.Time
 	updated_at     *time.Time
 	uuid           *string
-	brand          *cabdef.Brand
+	brand          *adapter.CabinetBrand
 	serial         *string
 	name           *string
 	ordinal        *int
@@ -316,12 +316,12 @@ func (m *BinMutation) ResetCabinetID() {
 }
 
 // SetBrand sets the "brand" field.
-func (m *BinMutation) SetBrand(c cabdef.Brand) {
-	m.brand = &c
+func (m *BinMutation) SetBrand(ab adapter.CabinetBrand) {
+	m.brand = &ab
 }
 
 // Brand returns the value of the "brand" field in the mutation.
-func (m *BinMutation) Brand() (r cabdef.Brand, exists bool) {
+func (m *BinMutation) Brand() (r adapter.CabinetBrand, exists bool) {
 	v := m.brand
 	if v == nil {
 		return
@@ -332,7 +332,7 @@ func (m *BinMutation) Brand() (r cabdef.Brand, exists bool) {
 // OldBrand returns the old "brand" field's value of the Bin entity.
 // If the Bin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BinMutation) OldBrand(ctx context.Context) (v cabdef.Brand, err error) {
+func (m *BinMutation) OldBrand(ctx context.Context) (v adapter.CabinetBrand, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
 	}
@@ -1174,7 +1174,7 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		m.SetCabinetID(v)
 		return nil
 	case bin.FieldBrand:
-		v, ok := value.(cabdef.Brand)
+		v, ok := value.(adapter.CabinetBrand)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1534,7 +1534,7 @@ type CabinetMutation struct {
 	updated_at     *time.Time
 	online         *bool
 	power          *bool
-	brand          *cabdef.Brand
+	brand          *adapter.CabinetBrand
 	serial         *string
 	status         *cabinet.Status
 	enable         *bool
@@ -1804,12 +1804,12 @@ func (m *CabinetMutation) ResetPower() {
 }
 
 // SetBrand sets the "brand" field.
-func (m *CabinetMutation) SetBrand(c cabdef.Brand) {
-	m.brand = &c
+func (m *CabinetMutation) SetBrand(ab adapter.CabinetBrand) {
+	m.brand = &ab
 }
 
 // Brand returns the value of the "brand" field in the mutation.
-func (m *CabinetMutation) Brand() (r cabdef.Brand, exists bool) {
+func (m *CabinetMutation) Brand() (r adapter.CabinetBrand, exists bool) {
 	v := m.brand
 	if v == nil {
 		return
@@ -1820,7 +1820,7 @@ func (m *CabinetMutation) Brand() (r cabdef.Brand, exists bool) {
 // OldBrand returns the old "brand" field's value of the Cabinet entity.
 // If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CabinetMutation) OldBrand(ctx context.Context) (v cabdef.Brand, err error) {
+func (m *CabinetMutation) OldBrand(ctx context.Context) (v adapter.CabinetBrand, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
 	}
@@ -2686,7 +2686,7 @@ func (m *CabinetMutation) SetField(name string, value ent.Value) error {
 		m.SetPower(v)
 		return nil
 	case cabinet.FieldBrand:
-		v, ok := value.(cabdef.Brand)
+		v, ok := value.(adapter.CabinetBrand)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3083,7 +3083,7 @@ type ConsoleMutation struct {
 	typ            string
 	id             *uint64
 	operate        *cabdef.Operate
-	brand          *cabdef.Brand
+	brand          *adapter.CabinetBrand
 	serial         *string
 	uuid           *uuid.UUID
 	business       *adapter.Business
@@ -3330,12 +3330,12 @@ func (m *ConsoleMutation) ResetOperate() {
 }
 
 // SetBrand sets the "brand" field.
-func (m *ConsoleMutation) SetBrand(c cabdef.Brand) {
-	m.brand = &c
+func (m *ConsoleMutation) SetBrand(ab adapter.CabinetBrand) {
+	m.brand = &ab
 }
 
 // Brand returns the value of the "brand" field in the mutation.
-func (m *ConsoleMutation) Brand() (r cabdef.Brand, exists bool) {
+func (m *ConsoleMutation) Brand() (r adapter.CabinetBrand, exists bool) {
 	v := m.brand
 	if v == nil {
 		return
@@ -3346,7 +3346,7 @@ func (m *ConsoleMutation) Brand() (r cabdef.Brand, exists bool) {
 // OldBrand returns the old "brand" field's value of the Console entity.
 // If the Console object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldBrand(ctx context.Context) (v cabdef.Brand, err error) {
+func (m *ConsoleMutation) OldBrand(ctx context.Context) (v adapter.CabinetBrand, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
 	}
@@ -4262,7 +4262,7 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		m.SetOperate(v)
 		return nil
 	case console.FieldBrand:
-		v, ok := value.(cabdef.Brand)
+		v, ok := value.(adapter.CabinetBrand)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

@@ -66,8 +66,8 @@ func (cu *ConsoleUpdate) SetOperate(c cabdef.Operate) *ConsoleUpdate {
 }
 
 // SetBrand sets the "brand" field.
-func (cu *ConsoleUpdate) SetBrand(c cabdef.Brand) *ConsoleUpdate {
-	cu.mutation.SetBrand(c)
+func (cu *ConsoleUpdate) SetBrand(ab adapter.CabinetBrand) *ConsoleUpdate {
+	cu.mutation.SetBrand(ab)
 	return cu
 }
 
@@ -549,8 +549,8 @@ func (cuo *ConsoleUpdateOne) SetOperate(c cabdef.Operate) *ConsoleUpdateOne {
 }
 
 // SetBrand sets the "brand" field.
-func (cuo *ConsoleUpdateOne) SetBrand(c cabdef.Brand) *ConsoleUpdateOne {
-	cuo.mutation.SetBrand(c)
+func (cuo *ConsoleUpdateOne) SetBrand(ab adapter.CabinetBrand) *ConsoleUpdateOne {
+	cuo.mutation.SetBrand(ab)
 	return cuo
 }
 

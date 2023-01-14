@@ -8,7 +8,6 @@ package kaixin
 import (
     "context"
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
     log "github.com/sirupsen/logrus"
@@ -75,7 +74,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     // }
 
     // 查找或创建电柜
-    go core.LoadOrStoreCabinet(context.Background(), cabdef.BrandKaixin, req.DevID)
+    go core.LoadOrStoreCabinet(context.Background(), adapter.CabinetBrandKaixin, req.DevID)
 
     // 注册电柜客户端
     client.Register(req.DevID)
@@ -89,7 +88,7 @@ func (h *Hander) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
         return adapter.ErrorCabinetSerialRequired
     }
-    core.UpdateCabinet(cabdef.BrandKaixin, req)
+    core.UpdateCabinet(adapter.CabinetBrandKaixin, req)
     return
 }
 

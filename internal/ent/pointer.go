@@ -14,61 +14,61 @@ import (
 
 type BinPointers []*BinPointer
 type BinPointer struct {
-	UUID          *string       `json:"uuid,omitempty"`
-	CabinetID     *uint64       `json:"cabinet_id,omitempty"`
-	Brand         *cabdef.Brand `json:"brand,omitempty"`
-	Serial        *string       `json:"serial,omitempty"`
-	Name          *string       `json:"name,omitempty"`
-	Ordinal       *int          `json:"ordinal,omitempty"`
-	Open          *bool         `json:"open,omitempty"`
-	Enable        *bool         `json:"enable,omitempty"`
-	Health        *bool         `json:"health,omitempty"`
-	BatteryExists *bool         `json:"battery_exists,omitempty"`
-	BatterySn     *string       `json:"battery_sn,omitempty"`
-	Voltage       *float64      `json:"voltage,omitempty"`
-	Current       *float64      `json:"current,omitempty"`
-	Soc           *float64      `json:"soc,omitempty"`
-	Soh           *float64      `json:"soh,omitempty"`
-	Remark        *string       `json:"remark,omitempty"`
+	UUID          *string               `json:"uuid,omitempty"`
+	CabinetID     *uint64               `json:"cabinet_id,omitempty"`
+	Brand         *adapter.CabinetBrand `json:"brand,omitempty"`
+	Serial        *string               `json:"serial,omitempty"`
+	Name          *string               `json:"name,omitempty"`
+	Ordinal       *int                  `json:"ordinal,omitempty"`
+	Open          *bool                 `json:"open,omitempty"`
+	Enable        *bool                 `json:"enable,omitempty"`
+	Health        *bool                 `json:"health,omitempty"`
+	BatteryExists *bool                 `json:"battery_exists,omitempty"`
+	BatterySn     *string               `json:"battery_sn,omitempty"`
+	Voltage       *float64              `json:"voltage,omitempty"`
+	Current       *float64              `json:"current,omitempty"`
+	Soc           *float64              `json:"soc,omitempty"`
+	Soh           *float64              `json:"soh,omitempty"`
+	Remark        *string               `json:"remark,omitempty"`
 }
 
 type CabinetPointers []*CabinetPointer
 type CabinetPointer struct {
-	Online      *bool           `json:"online,omitempty"`
-	Power       *bool           `json:"power,omitempty"`
-	Brand       *cabdef.Brand   `json:"brand,omitempty"`
-	Serial      *string         `json:"serial,omitempty"`
-	Status      *cabinet.Status `json:"status,omitempty"`
-	Enable      *bool           `json:"enable,omitempty"`
-	Lng         *float64        `json:"lng,omitempty"`
-	Lat         *float64        `json:"lat,omitempty"`
-	Gsm         *float64        `json:"gsm,omitempty"`
-	Voltage     *float64        `json:"voltage,omitempty"`
-	Current     *float64        `json:"current,omitempty"`
-	Temperature *float64        `json:"temperature,omitempty"`
-	Electricity *float64        `json:"electricity,omitempty"`
+	Online      *bool                 `json:"online,omitempty"`
+	Power       *bool                 `json:"power,omitempty"`
+	Brand       *adapter.CabinetBrand `json:"brand,omitempty"`
+	Serial      *string               `json:"serial,omitempty"`
+	Status      *cabinet.Status       `json:"status,omitempty"`
+	Enable      *bool                 `json:"enable,omitempty"`
+	Lng         *float64              `json:"lng,omitempty"`
+	Lat         *float64              `json:"lat,omitempty"`
+	Gsm         *float64              `json:"gsm,omitempty"`
+	Voltage     *float64              `json:"voltage,omitempty"`
+	Current     *float64              `json:"current,omitempty"`
+	Temperature *float64              `json:"temperature,omitempty"`
+	Electricity *float64              `json:"electricity,omitempty"`
 }
 
 type ConsolePointers []*ConsolePointer
 type ConsolePointer struct {
-	CabinetID *uint64           `json:"cabinet_id,omitempty"`
-	BinID     *uint64           `json:"bin_id,omitempty"`
-	Operate   *cabdef.Operate   `json:"operate,omitempty"`
-	Brand     *cabdef.Brand     `json:"brand,omitempty"`
-	Serial    *string           `json:"serial,omitempty"`
-	UUID      *uuid.UUID        `json:"uuid,omitempty"`
-	Business  *adapter.Business `json:"business,omitempty"`
-	UserID    *string           `json:"user_id,omitempty"`
-	UserType  *adapter.UserType `json:"user_type,omitempty"`
-	Step      *int              `json:"step,omitempty"`
-	Status    *console.Status   `json:"status,omitempty"`
-	BeforeBin **cabdef.BinInfo  `json:"before_bin,omitempty"`
-	AfterBin  **cabdef.BinInfo  `json:"after_bin,omitempty"`
-	Message   *string           `json:"message,omitempty"`
-	StartAt   *time.Time        `json:"startAt,omitempty"`
-	StopAt    *time.Time        `json:"stopAt,omitempty"`
-	Duration  *float64          `json:"duration,omitempty"`
-	Remark    *string           `json:"remark,omitempty"`
+	CabinetID *uint64               `json:"cabinet_id,omitempty"`
+	BinID     *uint64               `json:"bin_id,omitempty"`
+	Operate   *cabdef.Operate       `json:"operate,omitempty"`
+	Brand     *adapter.CabinetBrand `json:"brand,omitempty"`
+	Serial    *string               `json:"serial,omitempty"`
+	UUID      *uuid.UUID            `json:"uuid,omitempty"`
+	Business  *adapter.Business     `json:"business,omitempty"`
+	UserID    *string               `json:"user_id,omitempty"`
+	UserType  *adapter.UserType     `json:"user_type,omitempty"`
+	Step      *int                  `json:"step,omitempty"`
+	Status    *console.Status       `json:"status,omitempty"`
+	BeforeBin **cabdef.BinInfo      `json:"before_bin,omitempty"`
+	AfterBin  **cabdef.BinInfo      `json:"after_bin,omitempty"`
+	Message   *string               `json:"message,omitempty"`
+	StartAt   *time.Time            `json:"startAt,omitempty"`
+	StopAt    *time.Time            `json:"stopAt,omitempty"`
+	Duration  *float64              `json:"duration,omitempty"`
+	Remark    *string               `json:"remark,omitempty"`
 }
 
 type ScanPointers []*ScanPointer
