@@ -15,7 +15,6 @@ import (
     "github.com/auroraride/cabservd/internal/g"
     mw "github.com/auroraride/cabservd/internal/middleware"
     "github.com/labstack/echo/v4"
-    "github.com/labstack/echo/v4/middleware"
     log "github.com/sirupsen/logrus"
     "net/http"
 )
@@ -68,10 +67,9 @@ func Start(e *echo.Echo) {
 
         dumpFile.WithDefaultConfig(),
 
-        middleware.GzipWithConfig(middleware.GzipConfig{
-            Level: 5,
-        }),
-        // TODO body dump middleware
+        // middleware.GzipWithConfig(middleware.GzipConfig{
+        //     Level: 5,
+        // }),
     )
 
     // 仓位操作 <管理员权限>
