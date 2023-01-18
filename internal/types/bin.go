@@ -174,7 +174,7 @@ type Bin struct {
 
 // Current 获取当前步骤
 func (o *Bin) Current() *BinStep {
-    return o.Steps[o.index]
+    return o.Steps[len(o.Steps)-1]
 }
 
 // Next 标记当前步骤完成, 开始下一个步骤

@@ -48,7 +48,7 @@ func initialize() {
 
     // 标记所有正在进行的任务为失败
     _, _ = ent.Database.Console.ExecContext(ctx, fmt.Sprintf(
-        `UPDATE %s SET %s = '%s', MESSAGE = '重启终止', %s = NOW(), %s = EXTRACT(EPOCH FROM (NOW() - start_at)) WHERE %s = %s AND %s = %s`,
+        `UPDATE %s SET %s = '%s', MESSAGE = '异常重启终止', %s = NOW(), %s = EXTRACT(EPOCH FROM (NOW() - start_at)) WHERE %s = '%s' AND %s = '%s'`,
         console.Table,
         console.FieldStatus,
         console.StatusFailed,
