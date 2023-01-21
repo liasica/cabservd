@@ -14,7 +14,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
-    "github.com/go-redis/redis"
+    "github.com/go-redis/redis/v9"
     "os"
     "time"
 )

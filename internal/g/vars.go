@@ -5,7 +5,7 @@
 
 package g
 
-import "github.com/go-redis/redis"
+import "github.com/go-redis/redis/v9"
 
 var (
     Quit  chan bool
