@@ -9,6 +9,7 @@ import (
     "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -16,7 +17,6 @@ import (
     "github.com/auroraride/cabservd/internal/task"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
-    log "github.com/sirupsen/logrus"
     "time"
 )
 

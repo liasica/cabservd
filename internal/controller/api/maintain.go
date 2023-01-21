@@ -8,6 +8,7 @@ package api
 import (
     "github.com/auroraride/adapter/async"
     "github.com/auroraride/adapter/maintain"
+    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/labstack/echo/v4"
@@ -31,6 +32,7 @@ func (*maintainApi) Update(echo.Context) (err error) {
         // 是否有进行中的异步业务
         if async.IsDone() {
             g.Quit <- true
+            zlog.Sync()
             return
         }
     }

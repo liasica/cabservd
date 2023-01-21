@@ -8,9 +8,9 @@ package kaixin
 import (
     "context"
     "github.com/auroraride/adapter"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
-    log "github.com/sirupsen/logrus"
 )
 
 type Hander struct {

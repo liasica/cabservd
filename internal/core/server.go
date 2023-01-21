@@ -7,8 +7,8 @@ package core
 
 import (
     "github.com/auroraride/adapter"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/panjf2000/gnet/v2"
-    log "github.com/sirupsen/logrus"
     "sync"
 )
 
@@ -28,8 +28,7 @@ func Start(addr string, brand adapter.CabinetBrand, bean Hook, codec Codec) {
         Hub.addr,
         gnet.WithMulticore(true),
         gnet.WithReuseAddr(true),
-        gnet.WithLogger(log.StandardLogger()),
-    ))
+    ).Error())
 }
 
 // 每隔1分钟标记20分之前更新的电柜为离线

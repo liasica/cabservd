@@ -7,8 +7,8 @@ package core
 
 import (
     "github.com/auroraride/adapter"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/panjf2000/gnet/v2"
-    log "github.com/sirupsen/logrus"
     "sync"
 )
 

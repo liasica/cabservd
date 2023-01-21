@@ -13,7 +13,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/migrate"
     _ "github.com/auroraride/cabservd/internal/ent/runtime"
     _ "github.com/jackc/pgx/v4/stdlib"
-    log "github.com/sirupsen/logrus"
+    "log"
 )
 
 var Database *Client

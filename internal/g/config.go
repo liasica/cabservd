@@ -16,8 +16,10 @@ const (
 )
 
 type config struct {
-    Brand    adapter.CabinetBrand
-    Postgres struct {
+    Brand       adapter.CabinetBrand
+    Application string
+    Debug       bool
+    Postgres    struct {
         Dsn   string
         Debug bool
     }
@@ -33,6 +35,10 @@ type config struct {
     Loki struct {
         Job string
         Url string
+    }
+    Redis struct {
+        Logkey  string
+        Address string
     }
 }
 

@@ -1,4 +1,6 @@
 brand: ''
+application: cabservd
+debug: false
 
 tcp:
   bind: ''
@@ -14,10 +16,8 @@ postgres:
   debug: false
 
 redis:
-  username: ''
-  password: ''
-  database: 0
-  host: 127.0.0.1
+  address: 127.0.0.1:6379
+  logkey: cabservd
 
 loki:
   job: cabservd

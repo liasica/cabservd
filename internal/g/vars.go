@@ -5,8 +5,11 @@
 
 package g
 
+import "github.com/go-redis/redis"
+
 var (
-    Quit chan bool
+    Quit  chan bool
+    Redis *redis.Client
 )
 
 func init() {

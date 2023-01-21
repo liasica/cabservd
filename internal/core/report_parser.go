@@ -9,12 +9,12 @@ import (
     "context"
     "fmt"
     "github.com/auroraride/adapter"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     jsoniter "github.com/json-iterator/go"
     "github.com/liasica/go-helpers/tools"
-    log "github.com/sirupsen/logrus"
     "time"
 )
 
@@ -56,7 +56,6 @@ func LoadOrStoreCabinet(ctx context.Context, brand adapter.CabinetBrand, serial 
 }
 
 func SaveCabinet(ctx context.Context, brand adapter.CabinetBrand, serial string, item *ent.CabinetPointer) {
-    log.Info(item)
     err := ent.Database.Cabinet.Create().
         SetBrand(brand).
         SetSerial(serial).
@@ -132,7 +131,6 @@ func SaveBins(ctx context.Context, brand adapter.CabinetBrand, serial string, it
     }
 
     for _, item := range items {
-        log.Info(item)
         uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
         err := ent.Database.Bin.Create().
             SetUUID(uuid).

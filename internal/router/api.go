@@ -9,13 +9,13 @@ import (
     "fmt"
     "github.com/auroraride/adapter"
     amw "github.com/auroraride/adapter/middleware"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
     mw "github.com/auroraride/cabservd/internal/middleware"
     "github.com/labstack/echo/v4"
-    log "github.com/sirupsen/logrus"
     "net/http"
 )
 
@@ -84,6 +84,6 @@ func Start(e *echo.Echo) {
     r.POST("device/bininfo", api.Device.BinInfo)
 
     if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
-        log.Fatal(err)
+        log.Fatal(err.Error())
     }
 }

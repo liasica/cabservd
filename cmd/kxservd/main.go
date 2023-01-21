@@ -5,8 +5,13 @@
 
 package main
 
-import "github.com/auroraride/cabservd/internal"
+import (
+    "github.com/auroraride/adapter/zlog"
+    "github.com/auroraride/cabservd/internal"
+)
 
 func main() {
+    defer zlog.Sync()
+
     internal.Boot()
 }

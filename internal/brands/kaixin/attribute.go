@@ -7,7 +7,7 @@ package kaixin
 
 import (
     "fmt"
-    log "github.com/sirupsen/logrus"
+    log "github.com/auroraride/adapter/zlog"
     "strconv"
 )
 

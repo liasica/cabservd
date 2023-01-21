@@ -7,9 +7,9 @@ package middleware
 
 import (
     "fmt"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/labstack/echo/v4"
-    log "github.com/sirupsen/logrus"
     "net/http"
     "runtime/debug"
 )

@@ -12,10 +12,11 @@ import (
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/adapter/message"
     "github.com/auroraride/adapter/tcp"
+    "github.com/auroraride/adapter/zlog"
+    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/g"
-    log "github.com/sirupsen/logrus"
 )
 
 type aurservd struct {
@@ -24,7 +25,7 @@ type aurservd struct {
 
 func newAurservd() *aurservd {
     return &aurservd{
-        Client: tcp.NewClient(g.Config.Adapter.Aurservd, log.StandardLogger(), &codec.HeaderLength{}),
+        Client: tcp.NewClient(g.Config.Adapter.Aurservd, zlog.StandardLogger(), &codec.HeaderLength{}),
     }
 }
 

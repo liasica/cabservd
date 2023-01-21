@@ -22,6 +22,7 @@ def deploy(tag) {
     def str = """
         docker pull registry-vpc.cn-beijing.aliyuncs.com/liasica/cabservd:$tag
         curl $url
+        docker stop ${tag}
         docker rm -f ${tag}
         mkdir -p /var/www/cabservd/${tag}/runtime
         docker run -itd --name ${tag} --restart=always \

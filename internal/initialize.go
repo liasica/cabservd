@@ -8,25 +8,19 @@ package internal
 import (
     "context"
     "fmt"
-    "github.com/auroraride/adapter/logger"
+    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
+    "github.com/go-redis/redis"
     "os"
     "time"
 )
 
 func initialize() {
     ctx := context.Background()
-
-    logger.LoadWithConfig(logger.Config{
-        Color:  true,
-        Level:  "info",
-        Age:    8192,
-        Caller: true,
-    })
 
     // 设置全局时区
     tz := "Asia/Shanghai"
@@ -36,6 +30,15 @@ func initialize() {
 
     // 加载配置
     g.LoadConfig()
+
+    // 加载redis
+    g.Redis = redis.NewClient(&redis.Options{
+        Addr: g.Config.Redis.Address,
+        DB:   0,
+    })
+
+    // 初始化日志
+    zlog.New(g.Config.Application, zlog.NewRedisWriter(g.Redis), g.Config.Debug)
 
     // 加载模板
     assets.LoadTemplates()
