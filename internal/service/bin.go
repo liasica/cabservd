@@ -205,10 +205,15 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         return
     }
 
+    msg := fmt.Sprintf("<%s> [电柜: %s, 仓门: %d] { %s业务%s }", s.User, eb.Serial, eb.Ordinal, business.Text(), step)
     defer func() {
         res := NewConsole(s.User).Update(co, eb, err).OperateResult()
-        log.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.User, eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Errorf("失败: %v", err)))
-
+        // log.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.User, eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Sprintf("失败: %v", err)))
+        msgState := "成功"
+        if err != nil {
+            msgState = "失败: " + err.Error()
+        }
+        log.Info(msg + msgState)
         // 同步回调结果
         scb(res)
     }()
@@ -220,9 +225,10 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         // TODO: 开仓失败后是否重复弹开逻辑???
         // TODO: 详细失败日志???
         if err != nil {
-            log.Infof("[%s - %d] %s 失败: %v", eb.Serial, eb.Ordinal, step.Operate, err)
+            log.Info(msg + ", 命令执行失败: " + err.Error())
             return
         }
+        log.Info(msg + ", 命令执行成功")
     }
 
     r := <-stepper

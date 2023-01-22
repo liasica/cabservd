@@ -7,11 +7,11 @@ package middleware
 
 import (
     "fmt"
-    log "github.com/auroraride/adapter/zlog"
+    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/labstack/echo/v4"
+    "go.uber.org/zap"
     "net/http"
-    "runtime/debug"
 )
 
 func Recover() echo.MiddlewareFunc {
@@ -26,7 +26,7 @@ func Recover() echo.MiddlewareFunc {
                         _ = ctx.SendResponse(v.Code, v.Message, v.Data)
                     default:
                         err := fmt.Errorf("%v", r)
-                        log.Errorf("%v\n%s", r, debug.Stack())
+                        zlog.Error("捕获未处理崩溃", zap.Error(err), zap.Stack("stack"))
                         _ = app.Context(c).SendResponse(http.StatusInternalServerError, err)
                     }
                 }

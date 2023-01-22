@@ -8,9 +8,10 @@ package kaixin
 import (
     "context"
     "github.com/auroraride/adapter"
-    log "github.com/auroraride/adapter/zlog"
+    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
+    "go.uber.org/zap"
 )
 
 type Hander struct {
@@ -49,9 +50,9 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
         return
     }
 
-    // 发送登录响应
+    // 发送失败响应
     if err != nil {
-        log.Errorf("[FD=%d / %s]解析消息失败: %v", client.Fd(), client.RemoteAddr(), err)
+        zlog.Error("凯信消息解析失败", zap.Int("FD", client.Fd()), zap.String("address", client.RemoteAddr().String()), zap.Error(err))
         _ = client.SendMessage(req.Fail())
         return
     }

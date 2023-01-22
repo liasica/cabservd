@@ -67,5 +67,5 @@ func (h *Hander) SendControl(serial string, typ cabdef.Operate, ordinal int) (er
         return
     }
 
-    return c.SendMessage(msg, true)
+    return c.SendMessage(msg)
 }

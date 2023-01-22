@@ -10,12 +10,12 @@ import (
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/adapter/zlog"
-    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/google/uuid"
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
+    "go.uber.org/zap"
     "time"
 )
 
@@ -72,13 +72,8 @@ func (c *Client) run() {
 
 // SendMessage 向客户端发送消息
 // params[0]: 是否记录消息
-func (c *Client) SendMessage(message any, params ...any) (err error) {
+func (c *Client) SendMessage(message any) (err error) {
     b, _ := jsoniter.Marshal(message)
-
-    var logMessage bool
-    if len(params) > 0 {
-        logMessage = params[0].(bool)
-    }
 
     data := c.Hub.codec.Encode(b)
 
@@ -91,9 +86,9 @@ func (c *Client) SendMessage(message any, params ...any) (err error) {
 
     _, err = c.Write(data)
     if err != nil {
-        log.Errorf("[FD=%d / %s] 发送失败, message: %s", c.Fd(), c.RemoteAddr(), b)
-    } else if logMessage {
-        log.Infof("[FD=%d / %s, Send] %s", c.Fd(), c.RemoteAddr(), b)
+        zlog.Error("消息发送失败", zap.Error(err), zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.Binary("payload", data))
+    } else {
+        zlog.Info("发送消息 ↓", zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.Binary("payload", data))
     }
 
     return
