@@ -53,11 +53,11 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
     // 发送失败响应
     if err != nil {
         zlog.Error("凯信消息解析失败", zap.Int("FD", client.Fd()), zap.String("address", client.RemoteAddr().String()), zap.Error(err))
-        _ = client.SendMessage(req.Fail())
+        _ = client.SendMessage(req.Fail(), false)
         return
     }
 
-    err = client.SendMessage(req.Success())
+    err = client.SendMessage(req.Success(), false)
     return
 }
 
