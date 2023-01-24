@@ -7,6 +7,7 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -15,53 +16,53 @@ import (
 )
 
 type cabinetService struct {
-    *BaseService
+    *app.BaseService
 
     orm *ent.CabinetClient
 }
 
 func NewCabinet(params ...any) *cabinetService {
     return &cabinetService{
-        BaseService: newService(params...),
+        BaseService: app.NewService(params...),
         orm:         ent.Database.Cabinet,
     }
 }
 
 func (s *cabinetService) Query(id uint64) (*ent.Cabinet, error) {
-    return s.orm.Query().Where(cabinet.ID(id)).First(s.ctx)
+    return s.orm.Query().Where(cabinet.ID(id)).First(s.GetContext())
 }
 
 func (s *cabinetService) QueryWithBin(id uint64) (*ent.Cabinet, error) {
     return s.orm.Query().Where(cabinet.ID(id)).WithBins(func(query *ent.BinQuery) {
         query.Order(ent.Asc(bin.FieldOrdinal))
-    }).First(s.ctx)
+    }).First(s.GetContext())
 }
 
 func (s *cabinetService) QuerySerial(serial string) (*ent.Cabinet, error) {
-    return s.orm.Query().Where(cabinet.Serial(serial)).First(s.ctx)
+    return s.orm.Query().Where(cabinet.Serial(serial)).First(s.GetContext())
 }
 
 func (s *cabinetService) QuerySerialWithBin(serial string) (*ent.Cabinet, error) {
     return s.orm.Query().Where(cabinet.Serial(serial)).WithBins(func(query *ent.BinQuery) {
         query.Order(ent.Asc(bin.FieldOrdinal))
-    }).First(s.ctx)
+    }).First(s.GetContext())
 }
 
 func (s *cabinetService) QuerySerialWithBinAll() ent.Cabinets {
     items, _ := s.orm.Query().WithBins(func(query *ent.BinQuery) {
         query.Order(ent.Asc(bin.FieldOrdinal))
-    }).All(s.ctx)
+    }).All(s.GetContext())
     return items
 }
 
 func (s *cabinetService) QueryAllCabinet() ent.Cabinets {
-    items, _ := s.orm.Query().All(s.ctx)
+    items, _ := s.orm.Query().All(s.GetContext())
     return items
 }
 
 // UpdateStatus 更新电柜状态
 func (s *cabinetService) UpdateStatus(serial string, status cabinet.Status) error {
-    return s.orm.Update().Where(cabinet.Serial(serial)).SetStatus(status).Exec(s.ctx)
+    return s.orm.Update().Where(cabinet.Serial(serial)).SetStatus(status).Exec(s.GetContext())
 }
 
 // DetectCabinet 验证电柜是否满足基本业务需求

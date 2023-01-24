@@ -7,8 +7,8 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/jinzhu/copier"
@@ -17,12 +17,12 @@ import (
 )
 
 type businessService struct {
-    *BaseService
+    *app.BaseService
 }
 
 func NewBusiness(params ...any) *businessService {
     return &businessService{
-        BaseService: newService(params...),
+        BaseService: app.NewService(params...),
     }
 }
 
@@ -54,7 +54,7 @@ func (s *businessService) Usable(req *cabdef.BusinuessUsableRequest) (res *cabde
         return
     }
 
-    cs := NewCabinet(s.User)
+    cs := NewCabinet(s.GetUser())
     // 查找电柜和仓位
     cab, _ := cs.QuerySerialWithBin(req.Serial)
 
@@ -87,7 +87,7 @@ func (s *businessService) Usable(req *cabdef.BusinuessUsableRequest) (res *cabde
     _ = copier.Copy(res.Cabinet, cab)
     _ = copier.Copy(res.BusinessBin, target)
 
-    sm := NewScan(s.User).Create(req.Business, req.Serial, cab, res)
+    sm := NewScan(s.GetUser()).Create(req.Business, req.Serial, cab, res)
     res.UUID = sm.UUID.String()
 
     return
@@ -97,11 +97,11 @@ func (s *businessService) Usable(req *cabdef.BusinuessUsableRequest) (res *cabde
 func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessResponse) {
     s.RiderBusinessVerifyX(req.Business)
 
-    sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, 0)
+    sc := NewScan(s.GetUser()).CensorX(req.UUID, req.Timeout, 0)
 
     defer func() {
         // 标记扫码失效
-        _ = sc.Update().SetEfficient(false).Exec(s.ctx)
+        _ = sc.Update().SetEfficient(false).Exec(s.GetContext())
     }()
 
     cb := func(r *cabdef.BinOperateResult) {
@@ -120,7 +120,7 @@ func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessRe
     }
 
     // 开始操作
-    err := NewBin(s.User).Operate(&types.Bin{
+    err := NewBin(s.GetUser()).Operate(&types.Bin{
         Timeout:      req.Timeout,
         Serial:       req.Serial,
         UUID:         req.UUID,

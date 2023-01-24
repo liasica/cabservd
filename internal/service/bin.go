@@ -8,6 +8,7 @@ package service
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
     log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/core"
@@ -21,28 +22,28 @@ import (
 )
 
 type binService struct {
-    *BaseService
+    *app.BaseService
     orm *ent.BinClient
 }
 
 func NewBin(params ...any) *binService {
     return &binService{
-        BaseService: newService(params...),
+        BaseService: app.NewService(params...),
         orm:         ent.Database.Bin,
     }
 }
 
 func (s *binService) QueryAllBin() ent.Bins {
-    items, _ := s.orm.Query().All(s.ctx)
+    items, _ := s.orm.Query().All(s.GetContext())
     return items
 }
 
 func (s *binService) Query(id uint64) (*ent.Bin, error) {
-    return s.orm.Query().Where(bin.ID(id)).First(s.ctx)
+    return s.orm.Query().Where(bin.ID(id)).First(s.GetContext())
 }
 
 func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, error) {
-    return s.orm.Query().Where(bin.Serial(serial), bin.Ordinal(ordinal)).First(s.ctx)
+    return s.orm.Query().Where(bin.Serial(serial), bin.Ordinal(ordinal)).First(s.GetContext())
 }
 
 // Operate 按步骤操作某个仓位
@@ -53,7 +54,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
     }
 
     // 查询仓位
-    eb, _ := NewBin(s.User).QuerySerialOrdinal(bo.Serial, bo.Ordinal)
+    eb, _ := NewBin(s.GetUser()).QuerySerialOrdinal(bo.Serial, bo.Ordinal)
     if eb == nil {
         return adapter.ErrorBinNotFound
     }
@@ -81,7 +82,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
         if err == nil && bo.BinRemark != nil {
             _ = s.orm.UpdateOneID(eb.ID).
                 SetNillableRemark(bo.BinRemark).
-                Exec(s.ctx)
+                Exec(s.GetContext())
         }
     }()
 
@@ -191,8 +192,8 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         SetCabinetID(eb.CabinetID).
         SetBinID(eb.ID).
         SetSerial(eb.Serial).
-        SetUserID(s.User.ID).
-        SetUserType(s.User.Type).
+        SetUserID(s.GetUser().ID).
+        SetUserType(s.GetUser().Type).
         SetStatus(console.StatusRunning).
         SetStartAt(time.Now()).
         SetBeforeBin(eb.Info()).
@@ -200,15 +201,15 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         SetBusiness(business).
         SetUUID(uid).
         SetRemark(remark).
-        Save(s.ctx)
+        Save(s.GetContext())
     if err != nil {
         return
     }
 
-    msg := fmt.Sprintf("<%s> [电柜: %s, 仓门: %d] { %s业务%s }", s.User, eb.Serial, eb.Ordinal, business.Text(), step)
+    msg := fmt.Sprintf("<%s> [电柜: %s, 仓门: %d] { %s业务%s }", s.GetUser(), eb.Serial, eb.Ordinal, business.Text(), step)
     defer func() {
-        res := NewConsole(s.User).Update(co, eb, err).OperateResult()
-        // log.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.User, eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Sprintf("失败: %v", err)))
+        res := NewConsole(s.GetUser()).Update(co, eb, err).OperateResult()
+        // log.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.GetUser(), eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Sprintf("失败: %v", err)))
         msgState := "成功"
         if err != nil {
             msgState = "失败: " + err.Error()

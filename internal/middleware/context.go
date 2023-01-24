@@ -6,7 +6,7 @@
 package middleware
 
 import (
-    "github.com/auroraride/cabservd/internal/app"
+    "github.com/auroraride/adapter/app"
     "github.com/labstack/echo/v4"
 )
 

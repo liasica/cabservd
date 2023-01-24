@@ -6,20 +6,21 @@
 package service
 
 import (
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/console"
     "time"
 )
 
 type consoleService struct {
-    *BaseService
+    *app.BaseService
 
     orm *ent.ConsoleClient
 }
 
 func NewConsole(params ...any) *consoleService {
     return &consoleService{
-        BaseService: newService(params...),
+        BaseService: app.NewService(params...),
         orm:         ent.Database.Console,
     }
 }
@@ -43,6 +44,6 @@ func (s *consoleService) Update(ec *ent.Console, b *ent.Bin, err error) *ent.Con
         cr.SetStatus(console.StatusSuccess)
     }
 
-    ec, _ = cr.Save(s.ctx)
+    ec, _ = cr.Save(s.GetContext())
     return ec
 }

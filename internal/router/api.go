@@ -8,10 +8,10 @@ package router
 import (
     "fmt"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     amw "github.com/auroraride/adapter/middleware"
     "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
-    "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
     mw "github.com/auroraride/cabservd/internal/middleware"

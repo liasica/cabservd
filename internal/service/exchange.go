@@ -7,8 +7,8 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
@@ -22,12 +22,12 @@ import (
 )
 
 type exchangeService struct {
-    *BaseService
+    *app.BaseService
 }
 
 func NewExchange(params ...any) *exchangeService {
     return &exchangeService{
-        BaseService: newService(params...),
+        BaseService: app.NewService(params...),
     }
 }
 
@@ -39,7 +39,7 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
         Empty:   new(cabdef.Bin),
     }
 
-    cs := NewCabinet(s.User)
+    cs := NewCabinet(s.GetUser())
 
     // 获取电柜状态
     cab, _ := cs.QuerySerialWithBin(req.Serial)
@@ -53,14 +53,14 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
     // 查询限定时间内其他扫码用户
     if exists, _ := ent.Database.Scan.Query().Where(
         scan.CabinetID(cab.ID),
-        scan.UserIDNEQ(s.User.ID),
+        scan.UserIDNEQ(s.GetUser().ID),
         scan.CreatedAtGT(time.Now().Add(-time.Duration(req.Lock)*time.Second)),
-    ).Exist(s.ctx); exists {
+    ).Exist(s.GetContext()); exists {
         app.Panic(http.StatusBadRequest, adapter.ErrorCabinetBusy)
     }
 
     // 查询是否有正在执行的任务
-    if exists, _ := ent.Database.Console.Query().Where(console.Serial(req.Serial), console.StatusIn(console.StatusRunning)).Exist(s.ctx); exists {
+    if exists, _ := ent.Database.Console.Query().Where(console.Serial(req.Serial), console.StatusIn(console.StatusRunning)).Exist(s.GetContext()); exists {
         app.Panic(http.StatusBadRequest, adapter.ErrorCabinetBusy)
     }
 
@@ -88,7 +88,7 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
     _ = copier.Copy(res.Empty, empty)
 
     // 存储扫码记录
-    sm := NewScan(s.User).Create(adapter.BusinessExchange, req.Serial, cab, res)
+    sm := NewScan(s.GetUser()).Create(adapter.BusinessExchange, req.Serial, cab, res)
     res.UUID = sm.UUID.String()
 
     return
@@ -96,7 +96,7 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
 
 func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeResponse) {
     // 查询扫码记录
-    sc := NewScan(s.User).CensorX(req.UUID, req.Timeout, req.Minsoc)
+    sc := NewScan(s.GetUser()).CensorX(req.UUID, req.Timeout, req.Minsoc)
 
     // 开始同步换电流程
     results, err := s.start(req, sc)
@@ -127,23 +127,23 @@ func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeR
 }
 
 func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res []*cabdef.ExchangeStepMessage, err error) {
-    cab, _ := NewCabinet(s.User).QueryWithBin(sc.CabinetID)
+    cab, _ := NewCabinet(s.GetUser()).QueryWithBin(sc.CabinetID)
 
     // 检查电柜是否可换电
-    err = NewCabinet(s.User).DetectCabinet(cab)
+    err = NewCabinet(s.GetUser()).DetectCabinet(cab)
     if err != nil {
         return
     }
 
     // 标记电柜为换电中
-    _ = cab.Update().SetStatus(cabinet.StatusExchange).Exec(s.ctx)
+    _ = cab.Update().SetStatus(cabinet.StatusExchange).Exec(s.GetContext())
 
     defer func() {
         // 标记电柜为空闲
-        _ = cab.Update().SetStatus(cabinet.StatusIdle).Exec(s.ctx)
+        _ = cab.Update().SetStatus(cabinet.StatusIdle).Exec(s.GetContext())
 
         // 标记扫码失效
-        _ = sc.Update().SetEfficient(false).Exec(s.ctx)
+        _ = sc.Update().SetEfficient(false).Exec(s.GetContext())
 
         // TODO 任务标记???
     }()
@@ -163,7 +163,7 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
     for i, conf := range types.ExchangeConfigure {
         b := bins[i]
 
-        err = NewBin(s.User).Operate(&types.Bin{
+        err = NewBin(s.GetUser()).Operate(&types.Bin{
             Timeout:      req.Timeout,
             Serial:       sc.Serial,
             UUID:         req.UUID,

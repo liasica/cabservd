@@ -7,8 +7,8 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -20,21 +20,21 @@ import (
 )
 
 type scanService struct {
-    *BaseService
+    *app.BaseService
 
     orm *ent.ScanClient
 }
 
 func NewScan(params ...any) *scanService {
     return &scanService{
-        BaseService: newService(params...),
+        BaseService: app.NewService(params...),
         orm:         ent.Database.Scan,
     }
 }
 
 // Create 新增扫码记录
 func (s *scanService) Create(ab adapter.Business, serial string, cab *ent.Cabinet, data *cabdef.CabinetBinUsableResponse) *ent.Scan {
-    sm, _ := ent.Database.Scan.Create().SetSerial(serial).SetUserID(s.User.ID).SetData(data).SetUserType(s.User.Type).SetCabinet(cab).SetBusiness(ab).Save(s.ctx)
+    sm, _ := ent.Database.Scan.Create().SetSerial(serial).SetUserID(s.GetUser().ID).SetData(data).SetUserType(s.GetUser().Type).SetCabinet(cab).SetBusiness(ab).Save(s.GetContext())
     return sm
 }
 
@@ -44,7 +44,7 @@ func (s *scanService) QueryUUID(uid uuid.UUID) (*ent.Scan, error) {
     // if err != nil {
     //     app.Panic(http.StatusBadRequest, adapter.ErrorBadRequest)
     // }
-    return s.orm.Query().Where(scan.UUID(uid)).First(s.ctx)
+    return s.orm.Query().Where(scan.UUID(uid)).First(s.GetContext())
 }
 
 // CensorX 获取并检查扫码是否有效
@@ -55,10 +55,10 @@ func (s *scanService) CensorX(uid uuid.UUID, expires int64, minsoc float64) (sc 
     }
 
     // 后续是否有该电柜扫码记录
-    es, _ := s.orm.Query().Where(scan.CreatedAtGT(sc.CreatedAt), scan.CabinetID(sc.CabinetID)).Exist(s.ctx)
+    es, _ := s.orm.Query().Where(scan.CreatedAtGT(sc.CreatedAt), scan.CabinetID(sc.CabinetID)).Exist(s.GetContext())
 
     // 后续是否有该电柜操作记录
-    ec, _ := ent.Database.Console.Query().Where(console.CabinetID(sc.CabinetID), console.StartAtGT(sc.CreatedAt)).Exist(s.ctx)
+    ec, _ := ent.Database.Console.Query().Where(console.CabinetID(sc.CabinetID), console.StartAtGT(sc.CreatedAt)).Exist(s.GetContext())
 
     // 超时判定
     if es || ec || !sc.Efficient || time.Now().After(sc.CreatedAt.Add(time.Duration(expires)*time.Second)) {
@@ -79,7 +79,7 @@ func (s *scanService) CensorX(uid uuid.UUID, expires int64, minsoc float64) (sc 
 func (s *scanService) ExchangeAbleX(sc *ent.Scan, minsoc float64) {
     // 再次检查仓位是否正确
     data := sc.Data
-    bins, _ := ent.Database.Bin.Query().Where(bin.IDIn(data.Fully.ID, data.Empty.ID)).All(s.ctx)
+    bins, _ := ent.Database.Bin.Query().Where(bin.IDIn(data.Fully.ID, data.Empty.ID)).All(s.GetContext())
     if len(bins) != 2 {
         app.Panic(http.StatusBadRequest, adapter.ErrorScanExpired)
     }

@@ -7,8 +7,8 @@ package service
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
     "github.com/liasica/go-helpers/silk"
@@ -16,12 +16,12 @@ import (
 )
 
 type operateService struct {
-    *BaseService
+    *app.BaseService
 }
 
 func NewOperate(params ...any) *operateService {
     return &operateService{
-        BaseService: newService(params...),
+        BaseService: app.NewService(params...),
     }
 }
 
@@ -40,7 +40,7 @@ func (s *operateService) Bin(req *cabdef.OperateBinRequest) (results []*cabdef.B
         binRemark = silk.String("")
     }
 
-    err := NewBin(s.User).Operate(&types.Bin{
+    err := NewBin(s.GetUser()).Operate(&types.Bin{
         Timeout:   120,
         Serial:    req.Serial,
         UUID:      uuid.New(),

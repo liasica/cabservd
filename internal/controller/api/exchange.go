@@ -7,10 +7,10 @@ package api
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/async"
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/adapter/maintain"
-    "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/service"
     "github.com/labstack/echo/v4"
 )

@@ -7,8 +7,8 @@ package middleware
 
 import (
     "fmt"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/zlog"
-    "github.com/auroraride/cabservd/internal/app"
     "github.com/labstack/echo/v4"
     "go.uber.org/zap"
     "net/http"
