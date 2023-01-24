@@ -12,7 +12,6 @@ import (
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/labstack/echo/v4"
-    "github.com/labstack/echo/v4/middleware"
     "net/http"
 )
 
@@ -40,10 +39,6 @@ func Start(e *echo.Echo) {
         }),
 
         dump.WithDefaultConfig(),
-
-        middleware.GzipWithConfig(middleware.GzipConfig{
-            Level: 5,
-        }),
     )
 
     // 仓位操作 <管理员权限>
