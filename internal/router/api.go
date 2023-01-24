@@ -19,7 +19,7 @@ import (
 func Start(e *echo.Echo) {
     e.Renderer = assets.Templates
 
-    dumpFile := app.NewDumpLoggerMiddleware(zlog.StandardLogger())
+    dump := app.NewDumpLoggerMiddleware(zlog.StandardLogger())
 
     // 运维接口
     m := e.Group("/maintain")
@@ -39,7 +39,7 @@ func Start(e *echo.Echo) {
             return userSkipper[c.Path()]
         }),
 
-        dumpFile.WithDefaultConfig(),
+        dump.WithDefaultConfig(),
 
         middleware.GzipWithConfig(middleware.GzipConfig{
             Level: 5,
