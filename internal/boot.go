@@ -8,6 +8,7 @@ package internal
 import (
     "context"
     "fmt"
+    "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/maintain"
     "github.com/auroraride/adapter/snag"
@@ -22,7 +23,6 @@ import (
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/task"
     "github.com/go-redis/redis/v9"
-    "github.com/labstack/echo/v4"
     "os"
     "time"
 )
@@ -76,7 +76,7 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         task.Start()
 
         // 启动 http server
-        e := echo.New()
+        e := app.NewEcho()
         go router.Start(e)
 
         // 启动socket hub

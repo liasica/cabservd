@@ -6,9 +6,6 @@
 package router
 
 import (
-    "fmt"
-    "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/app"
     amw "github.com/auroraride/adapter/middleware"
     "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
@@ -20,36 +17,6 @@ import (
 )
 
 func Start(e *echo.Echo) {
-    e.JSONSerializer = &adapter.DefaultJSONSerializer{}
-
-    e.HTTPErrorHandler = func(err error, c echo.Context) {
-        ctx := app.Context(c)
-        message := err
-        code := http.StatusInternalServerError
-        var data any
-        switch err.(type) {
-        case *echo.HTTPError:
-            target := err.(*echo.HTTPError)
-            message = fmt.Errorf("%v", target.Message)
-            break
-        }
-        _ = ctx.SendResponse(code, message, data)
-    }
-
-    echo.NotFoundHandler = func(c echo.Context) error {
-        return app.Context(c).SendResponse(http.StatusNotFound, adapter.ErrorNotFound)
-    }
-
-    echo.MethodNotAllowedHandler = func(c echo.Context) error {
-        routerAllowMethods, ok := c.Get(echo.ContextKeyHeaderAllow).(string)
-        if ok && routerAllowMethods != "" {
-            c.Response().Header().Set(echo.HeaderAllow, routerAllowMethods)
-        }
-        return app.Context(c).SendResponse(http.StatusBadRequest, fmt.Errorf("%v", echo.ErrMethodNotAllowed.Message))
-    }
-
-    e.Validator = app.NewValidator()
-
     e.Renderer = assets.Templates
 
     dumpFile := amw.NewDumpLoggerMiddleware(zlog.StandardLogger())
