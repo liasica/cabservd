@@ -9,7 +9,7 @@ import (
     "fmt"
     "github.com/auroraride/adapter"
     amw "github.com/auroraride/adapter/middleware"
-    log "github.com/auroraride/adapter/zlog"
+    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/app"
     "github.com/auroraride/cabservd/internal/controller/api"
@@ -52,7 +52,7 @@ func Start(e *echo.Echo) {
 
     e.Renderer = assets.Templates
 
-    dumpFile := amw.NewDumpFile()
+    dumpFile := amw.NewDumpLoggerMiddleware(zlog.StandardLogger())
 
     // 运维接口
     m := e.Group("/maintain")
@@ -84,6 +84,6 @@ func Start(e *echo.Echo) {
     r.POST("device/bininfo", api.Device.BinInfo)
 
     if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
-        log.Fatal(err.Error())
+        zlog.Fatal(err.Error())
     }
 }
