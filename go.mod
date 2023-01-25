@@ -3,10 +3,9 @@ module github.com/auroraride/cabservd
 go 1.19
 
 require (
-	ariga.io/atlas v0.9.1-0.20230119123307-a3ab6808892b
-	entgo.io/ent v0.11.6
+	ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb
+	entgo.io/ent v0.11.7
 	github.com/auroraride/adapter v0.0.0
-	github.com/go-playground/validator/v10 v10.11.1
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/google/uuid v1.3.0
 	github.com/jackc/pgx/v4 v4.17.2
@@ -16,7 +15,8 @@ require (
 	github.com/liasica/go-helpers v0.0.0-20221130010501-6c8b04fa0f35
 	github.com/panjf2000/gnet/v2 v2.2.4
 	github.com/spf13/cobra v1.6.1
-	golang.org/x/exp v0.0.0-20230118134722-a68e582fa157
+	go.uber.org/zap v1.24.0
+	golang.org/x/exp v0.0.0-20230124195608-d38c7dcee874
 	golang.org/x/tools v0.5.0
 )
 
@@ -29,6 +29,7 @@ require (
 	github.com/go-openapi/inflect v0.19.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.0 // indirect
+	github.com/go-playground/validator/v10 v10.11.1 // indirect
 	github.com/go-resty/resty/v2 v2.7.1-0.20220719224223-313f4190d9b8 // indirect
 	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
@@ -67,7 +68,6 @@ require (
 	go.elastic.co/ecszap v1.0.1 // indirect
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
-	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.5.0 // indirect
 	golang.org/x/mod v0.7.0 // indirect
 	golang.org/x/net v0.5.0 // indirect

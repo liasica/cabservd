@@ -7,6 +7,7 @@ package g
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/maintain"
     "github.com/auroraride/cabservd/assets"
     "log"
 )
@@ -17,6 +18,7 @@ const (
 
 type config struct {
     Brand       adapter.CabinetBrand
+    Maintain    maintain.Config
     Application string
     Debug       bool
     Postgres    struct {

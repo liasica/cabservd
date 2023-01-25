@@ -23,6 +23,7 @@ import (
     "github.com/auroraride/cabservd/internal/router"
     "github.com/auroraride/cabservd/internal/task"
     "github.com/go-redis/redis/v9"
+    "github.com/labstack/echo/v4"
     "os"
     "time"
 )
@@ -76,7 +77,17 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         task.Start()
 
         // 启动 http server
-        e := app.NewEcho()
+        userSkipper := map[string]bool{
+            "/maintain/update/:token": true,
+            "/maintain/clients":       true,
+        }
+        e := app.NewEcho(&app.EchoConfig{
+            AuthSkipper: func(c echo.Context) bool {
+                return userSkipper[c.Path()]
+            },
+            Logger:   zlog.StandardLogger(),
+            Maintain: g.Config.Maintain,
+        })
         go router.Start(e)
 
         // 启动socket hub
@@ -96,7 +107,7 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         }
 
         select {
-        case <-g.Quit:
+        case <-app.Quit:
             _ = e.Shutdown(context.Background())
         }
 

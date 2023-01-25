@@ -2,6 +2,11 @@ brand: ''
 application: cabservd
 debug: false
 
+maintain:
+  token: ''
+  ip:
+    - 127.0.0.1
+
 tcp:
   bind: ''
 

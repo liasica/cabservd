@@ -18,7 +18,7 @@ node {
 }
 
 def deploy(tag) {
-    def url = "https://${tag}.auroraride.com/maintain/update"
+    def url = "https://${tag}.auroraride.com/maintain/update/iemANTrAplaSTuRAMetBAHureAVaTertRiUMShrOWpUraNCfaseNtIderIANsGUE"
     def str = """
         docker pull registry-vpc.cn-beijing.aliyuncs.com/liasica/cabservd:$tag
         curl $url
