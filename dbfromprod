@@ -12,5 +12,5 @@ unzip "$TARGET".sql.zip
 rm -rf "$TARGET".sql.zip
 dropdb -U liasica "$TARGET"
 createdb "$TARGET"
-psql -d "$TARGET" -U liasica -c "SET timezone = 'Asia/Shanghai'; CREATE EXTENSION postgis; CREATE EXTENSION pg_trgm; CREATE EXTENSION btree_gin;"
+psql -d "$TARGET" -U liasica -c "SET timezone = 'Asia/Shanghai'; CREATE EXTENSION pg_trgm; CREATE EXTENSION btree_gin;"
 psql -d "$TARGET" -U liasica -f "$TARGET".sql

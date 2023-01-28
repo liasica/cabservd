@@ -1,5 +1,5 @@
-brand: ''
-application: cabservd
+brand: KAIXIN
+application: ''
 debug: false
 
 maintain:
@@ -8,22 +8,23 @@ maintain:
     - 127.0.0.1
 
 tcp:
-  bind: ''
+  bind: 0.0.0.0:16510
 
 api:
-  bind: ''
+  bind: 0.0.0.0:5110
 
-adapter:
-  aurservd: 127.0.0.1:5631
+aurservd:
+  tcp: 127.0.0.1:5020
+  api: http://127.0.0.1:5010
 
 postgres:
-  dsn: host=localhost user=postgres password= dbname=cabinet port=5432 sslmode=disable TimeZone=Asia/Shanghai
+  dsn: host=localhost user=postgres password=QGyof&AYf8rSEg*#^zzjiXRN1ykWn*4# dbname=kxservd port=5432 sslmode=disable TimeZone=Asia/Shanghai
   debug: false
 
 redis:
   address: 127.0.0.1:6379
-  logkey: cabservd
+  logkey: kxservd
 
-loki:
-  job: cabservd
-  url: http://localhost:3100/loki/api/v1/push
+bmservd:
+  XC:
+    api: http://127.0.0.1:5210

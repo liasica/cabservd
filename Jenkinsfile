@@ -1,15 +1,15 @@
 node {
-    stage('kxservd') {
-        if (TAG == 'kxservd') {
-            echo '开始部署[kxservd]'
+    stage('kxcab') {
+        if (TAG == 'kxcab') {
+            echo '开始部署[kxcab]'
             sshagent (credentials: ['Jenkins']) {
                 sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
             }
         }
     }
-    stage('kxservd-dev') {
-        if (TAG == 'kxservd-dev') {
-            echo '开始部署[kxservd-dev]'
+    stage('kxcab-dev') {
+        if (TAG == 'kxcab-dev') {
+            echo '开始部署[kxcab-dev]'
             sshagent (credentials: ['Jenkins']) {
                 sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
             }

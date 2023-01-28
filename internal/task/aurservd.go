@@ -6,7 +6,6 @@
 package task
 
 import (
-    "context"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/defs/cabdef"
@@ -15,7 +14,6 @@ import (
     "github.com/auroraride/adapter/zlog"
     log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/g"
 )
 
@@ -25,14 +23,11 @@ type aurservd struct {
 
 func newAurservd() *aurservd {
     return &aurservd{
-        Client: tcp.NewClient(g.Config.Adapter.Aurservd, zlog.StandardLogger(), &codec.HeaderLength{}),
+        Client: tcp.NewClient(g.Config.Aurservd.Tcp, zlog.StandardLogger(), &codec.HeaderLength{}),
     }
 }
 
-func (h *aurservd) CabinetFullUpdate() {
-    cabs, _ := ent.Database.Cabinet.Query().WithBins(func(query *ent.BinQuery) {
-        query.Order(ent.Asc(bin.FieldOrdinal))
-    }).All(context.Background())
+func (h *aurservd) CabinetFullUpdate(cabs ent.Cabinets) {
     for _, cab := range cabs {
         h.SendFulldata(cab.Serial, cab, cab.Edges.Bins)
     }
@@ -114,13 +109,13 @@ func (h *aurservd) SendMessage(data message.Messenger) {
     h.Sender <- data
 }
 
-func (h *aurservd) start() {
+func (h *aurservd) start(cabs ent.Cabinets) {
     h.Hooks.Start = func() {
         wg.Add(1)
     }
 
     h.Hooks.Connect = func() {
-        h.CabinetFullUpdate()
+        h.CabinetFullUpdate(cabs)
         wg.Done()
     }
 

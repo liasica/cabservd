@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="kxcab" type="GoApplicationRunConfiguration" factoryName="Go Application">
+    <module name="cabservd" />
+    <working_directory value="$PROJECT_DIR$" />
+    <go_parameters value="-trimpath -tags=go_json,poll_opt" />
+    <kind value="DIRECTORY" />
+    <package value="cabservd/cmd/kxservd" />
+    <directory value="$PROJECT_DIR$/cmd/kxcab" />
+    <filePath value="$PROJECT_DIR$/cmd/kxservd/main.go" />
+    <output_directory value="$PROJECT_DIR$/build/debug/" />
+    <method v="2" />
+  </configuration>
+</component>

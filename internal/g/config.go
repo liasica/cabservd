@@ -17,30 +17,24 @@ const (
 )
 
 type config struct {
-    Brand       adapter.CabinetBrand
-    Maintain    maintain.Config
-    Application string
-    Debug       bool
-    Postgres    struct {
+    adapter.Configure `mapstructure:",squash"`
+
+    Brand    adapter.CabinetBrand
+    Maintain maintain.Config
+    Debug    bool
+    Postgres struct {
         Dsn   string
         Debug bool
     }
     Tcp struct {
         Bind string
     }
-    Api struct {
-        Bind string
+    Aurservd struct {
+        Tcp string
+        Api string
     }
-    Adapter struct {
-        Aurservd string
-    }
-    Loki struct {
-        Job string
-        Url string
-    }
-    Redis struct {
-        Logkey  string
-        Address string
+    Bmservd map[adapter.BatteryBrand]struct {
+        Api string
     }
 }
 
@@ -51,7 +45,8 @@ var (
 func LoadConfig() {
     var err error
 
-    Config, err = adapter.LoadConfigure[config](configFile, assets.DefaultConfig)
+    Config = new(config)
+    err = adapter.LoadConfigure(Config, configFile, assets.DefaultConfig)
     if err != nil {
         log.Fatal(err)
     }
@@ -60,4 +55,20 @@ func LoadConfig() {
     if Config.Brand == "" {
         log.Fatal("请配置brand参数")
     }
+
+    Config.setKeys()
+}
+
+func (c *config) GetBmsApiUrl(brand adapter.BatteryBrand, api string) (url string, err error) {
+    cfg, ok := c.Bmservd[brand]
+    if !ok || cfg.Api == "" {
+        err = adapter.ErrorConfig
+        return
+    }
+    url = cfg.Api + api
+    return
+}
+
+func (c *config) setKeys() {
+    CacheCabinetKey = c.GetCacheKey("CABINET")
 }

@@ -11,7 +11,6 @@ import (
     "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/maintain"
-    "github.com/auroraride/adapter/snag"
     "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/core"
@@ -72,44 +71,41 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         console.StatusRunning,
     ))
 
-    snag.WithRecover(func() {
-        // 加载hooks
-        task.Start()
+    // 加载hooks
+    task.Start()
 
-        // 启动 http server
-        userSkipper := map[string]bool{
-            "/maintain/update/:token": true,
-            "/maintain/clients":       true,
-        }
-        e := app.NewEcho(&app.EchoConfig{
-            AuthSkipper: func(c echo.Context) bool {
-                return userSkipper[c.Path()]
-            },
-            Logger:   zlog.StandardLogger(),
-            Maintain: g.Config.Maintain,
-        })
-        go router.Start(e)
+    // 启动 http server
+    userSkipper := map[string]bool{
+        "/maintain/update/:token": true,
+        "/maintain/clients":       true,
+    }
+    e := app.NewEcho(&app.EchoConfig{
+        AuthSkipper: func(c echo.Context) bool {
+            return userSkipper[c.Path()]
+        },
+        Logger:   zlog.StandardLogger(),
+        Maintain: g.Config.Maintain,
+    })
+    go router.Start(e)
 
-        // 启动socket hub
-        go core.Start(
-            g.Config.Tcp.Bind,
-            g.Config.Brand,
-            hook,
-            codecor,
-        )
+    // 启动socket hub
+    go core.Start(
+        g.Config.Tcp.Bind,
+        g.Config.Brand,
+        hook,
+        codecor,
+    )
 
-        // debug
-        go demo.Debug()
+    // debug
+    go demo.Debug()
 
-        // maintain
-        if maintain.Exists() {
-            _ = maintain.Remove()
-        }
+    // maintain
+    if maintain.Exists() {
+        _ = maintain.Remove()
+    }
 
-        select {
-        case <-app.Quit:
-            _ = e.Shutdown(context.Background())
-        }
-
-    }, zlog.StandardLogger())
+    select {
+    case <-app.Quit:
+        _ = e.Shutdown(context.Background())
+    }
 }

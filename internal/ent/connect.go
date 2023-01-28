@@ -60,7 +60,8 @@ BEGIN
     notification = JSON_BUILD_OBJECT(
             'table', TG_TABLE_NAME,
             'action', TG_OP,
-            'data', data);
+            'data', data,
+            'old', ROW_TO_JSON(OLD));
 
     -- Execute pg_notify(channel, notification)
     PERFORM pg_notify(TG_TABLE_NAME, notification::TEXT);

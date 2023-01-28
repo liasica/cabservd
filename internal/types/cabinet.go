@@ -5,7 +5,10 @@
 
 package types
 
-import "github.com/auroraride/cabservd/internal/ent"
+import (
+    "github.com/auroraride/cabservd/internal/ent"
+    jsoniter "github.com/json-iterator/go"
+)
 
 // CabinetBinInfo 电柜仓位情况
 type CabinetBinInfo struct {
@@ -16,4 +19,17 @@ type CabinetBinInfo struct {
     Abnormal int      // 故障数量
     Disabled int      // 禁用数量
     Opened   int      // 开仓数量
+}
+
+type CabinetCache struct {
+    Lng *float64 `json:"lng"`
+    Lat *float64 `json:"lat"`
+}
+
+func (c *CabinetCache) MarshalBinary() ([]byte, error) {
+    return jsoniter.Marshal(c)
+}
+
+func (c *CabinetCache) UnmarshalBinary(data []byte) error {
+    return jsoniter.Unmarshal(data, c)
 }
