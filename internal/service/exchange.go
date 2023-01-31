@@ -13,7 +13,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/ent/scan"
-    "github.com/auroraride/cabservd/internal/task"
+    "github.com/auroraride/cabservd/internal/sync"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/jinzhu/copier"
     "github.com/liasica/go-helpers/silk"
@@ -157,7 +157,7 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
         data := silk.Pointer(cabdef.ExchangeStepMessage(*r))
         res = append(res, data)
         // 异步发送结果
-        go task.Aurservd.SendMessage(data)
+        go sync.SendMessage(data)
     }
 
     for i, conf := range types.ExchangeConfigure {

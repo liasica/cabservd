@@ -15,7 +15,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/console"
-    "github.com/auroraride/cabservd/internal/task"
+    "github.com/auroraride/cabservd/internal/sync"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
     "time"
@@ -69,13 +69,13 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 
     // 监听数据库变动
     ch := make(chan *ent.Bin)
-    task.Bin.SetListener(eb, ch)
+    sync.Bin.SetListener(eb, ch)
 
     stepper := make(chan *types.BinResult)
 
     defer func() {
         // 退出时删除监听
-        task.Bin.RemoveListener(ch)
+        sync.Bin.RemoveListener(ch)
         close(stepper)
 
         // 判定是否成功以更新备注

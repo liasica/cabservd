@@ -30,7 +30,6 @@ type config struct {
         Bind string
     }
     Aurservd struct {
-        Tcp string
         Api string
     }
     Bmservd map[adapter.BatteryBrand]struct {

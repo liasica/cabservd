@@ -20,7 +20,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/router"
-    "github.com/auroraride/cabservd/internal/task"
+    "github.com/auroraride/cabservd/internal/sync"
     "github.com/go-redis/redis/v9"
     "github.com/labstack/echo/v4"
     "os"
@@ -72,7 +72,7 @@ func Boot(hook core.Hook, codecor codec.Codec) {
     ))
 
     // 加载hooks
-    task.Start()
+    sync.Start()
 
     // 启动 http server
     userSkipper := map[string]bool{

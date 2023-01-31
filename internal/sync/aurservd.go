@@ -3,40 +3,44 @@
 // Created at 2022-12-29
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package task
+package sync
 
 import (
-    "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/adapter/message"
-    "github.com/auroraride/adapter/tcp"
+    "github.com/auroraride/adapter/sync"
     "github.com/auroraride/adapter/zlog"
-    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
+    "go.uber.org/zap"
 )
 
-type aurservd struct {
-    *tcp.Client
-}
+var (
+    syncCabinet  *sync.Sync[cabdef.CabinetMessage]
+    syncExchange *sync.Sync[cabdef.ExchangeStepMessage]
+)
 
-func newAurservd() *aurservd {
-    return &aurservd{
-        Client: tcp.NewClient(g.Config.Aurservd.Tcp, zlog.StandardLogger(), &codec.HeaderLength{}),
-    }
-}
+func createSync() {
+    logger := zlog.StandardLogger().GetLogger().WithOptions(zap.AddCallerSkip(-2))
+    syncCabinet = sync.New[cabdef.CabinetMessage](
+        g.Redis,
+        g.Config.Environment,
+        sync.StreamCabinet,
+        nil,
+        logger,
+    )
 
-func (h *aurservd) CabinetFullUpdate(cabs ent.Cabinets) {
-    for _, cab := range cabs {
-        h.SendFulldata(cab.Serial, cab, cab.Edges.Bins)
-    }
+    syncExchange = sync.New[cabdef.ExchangeStepMessage](
+        g.Redis,
+        g.Config.Environment,
+        sync.StreamExchange,
+        nil,
+        logger,
+    )
 }
 
 func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *cabdef.CabinetMessage) {
     // 不符合要求直接返回
     if cab == nil && len(bins) == 0 {
-        log.Error("无可同步数据")
         return
     }
 
@@ -86,38 +90,23 @@ func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bin
     return
 }
 
-func (h *aurservd) SendBattery(sn, serial string) {
-    h.SendMessage(&cabdef.BatteryMessage{
-        Battery: adapter.ParseBatterySN(sn),
-        Cabinet: serial,
-    })
+func SendCabinet(serial string, cab *ent.Cabinet) {
+    SendMessage(WrapCabinetMessage(false, serial, cab, nil))
 }
 
-func (h *aurservd) SendCabinet(serial string, cab *ent.Cabinet) {
-    h.SendMessage(WrapCabinetMessage(false, serial, cab, nil))
+func SendBin(serial string, b *ent.Bin) {
+    SendMessage(WrapCabinetMessage(false, serial, nil, ent.Bins{b}))
 }
 
-func (h *aurservd) SendBin(serial string, b *ent.Bin) {
-    h.SendMessage(WrapCabinetMessage(false, serial, nil, ent.Bins{b}))
+func SendCabinetFull(serial string, cab *ent.Cabinet, bins ent.Bins) {
+    SendMessage(WrapCabinetMessage(true, serial, cab, bins))
 }
 
-func (h *aurservd) SendFulldata(serial string, cab *ent.Cabinet, bins ent.Bins) {
-    h.SendMessage(WrapCabinetMessage(true, serial, cab, bins))
-}
-
-func (h *aurservd) SendMessage(data message.Messenger) {
-    h.Sender <- data
-}
-
-func (h *aurservd) start(cabs ent.Cabinets) {
-    h.Hooks.Start = func() {
-        wg.Add(1)
+func SendMessage(data any) {
+    switch message := data.(type) {
+    case *cabdef.CabinetMessage:
+        syncCabinet.Push(message)
+    case *cabdef.ExchangeStepMessage:
+        syncExchange.Push(message)
     }
-
-    h.Hooks.Connect = func() {
-        h.CabinetFullUpdate(cabs)
-        wg.Done()
-    }
-
-    h.Run()
 }
