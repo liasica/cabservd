@@ -85,9 +85,9 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
 
     _, err = c.Write(data)
     if err != nil {
-        zlog.Error("消息发送失败", zap.Error(err), zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.Binary("payload", data))
+        zlog.Error("消息发送失败", zap.Error(err), zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.ByteString("payload", b))
     } else if savelog {
-        zlog.Info("发送消息 ↓", zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.Binary("payload", data))
+        zlog.Info("发送消息 ↓", zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.ByteString("payload", b))
     }
 
     return
