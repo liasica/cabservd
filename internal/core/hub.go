@@ -7,9 +7,10 @@ package core
 
 import (
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/zlog"
+    "github.com/auroraride/adapter/log"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
+    "strconv"
     "sync"
 )
 
@@ -39,12 +40,12 @@ type hub struct {
 }
 
 func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
-    zlog.Info("TCP服务器已启动: " + h.addr)
+    zap.L().Info("TCP服务器已启动: " + h.addr)
     return gnet.None
 }
 
 func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
-    zlog.Info("新增客户端连接", zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()))
+    zap.L().Info("新增客户端连接 -> " + c.RemoteAddr().String() + ":" + strconv.Itoa(c.Fd()))
 
     client := NewClient(c, h)
 
@@ -55,7 +56,7 @@ func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 }
 
 func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
-    zlog.Info("客户端断开连接", zap.Error(err), zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()))
+    zap.L().Info("客户端断开连接 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), zap.Error(err))
     // 获取客户端
     client, ok := c.Context().(*Client)
     // 关闭客户端
@@ -86,7 +87,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
         }
 
         if err != nil {
-            zlog.Error("消息读取失败", zap.Error(err), zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()))
+            zap.L().Error("消息读取失败 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), zap.Error(err))
             return
         }
 
@@ -101,15 +102,30 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
 }
 
 func (h *hub) handleMessage(b []byte, c *Client) {
+    fields := []zap.Field{
+        zap.ByteString("decoded", b),
+    }
+    var (
+        err     error
+        message any
+    )
+
     // 记录日志
-    zlog.Info("收到消息 ↑", zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.ByteString("payload", b))
+    defer func() {
+        lvl := zap.InfoLevel
+        if err != nil {
+            lvl = zap.ErrorLevel
+            fields = append(fields, zap.Error(err))
+        }
+        if message != nil {
+            fields = append(fields, log.Payload(message))
+        }
+        zap.L().Log(lvl, "收到消息 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), fields...)
+    }()
 
     // 更新在线状态
     go c.UpdateOnline()
 
     // 解析数据
-    err := h.Bean.OnMessage(b, c)
-    if err != nil {
-        zlog.Error("消息解析失败", zap.Error(err), zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.ByteString("payload", b))
-    }
+    message, err = h.Bean.OnMessage(b, c)
 }

@@ -6,11 +6,9 @@
 package service
 
 import (
-    "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
-    log "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -18,6 +16,8 @@ import (
     "github.com/auroraride/cabservd/internal/sync"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
+    "go.uber.org/zap"
+    "strconv"
     "time"
 )
 
@@ -206,15 +206,30 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         return
     }
 
-    msg := fmt.Sprintf("<%s> [电柜: %s, 仓门: %d] { %s业务%s }", s.GetUser(), eb.Serial, eb.Ordinal, business.Text(), step)
+    buf := adapter.NewBuffer()
+    defer adapter.ReleaseBuffer(buf)
+
+    buf.WriteString("<")
+    buf.WriteString(s.GetUser().String())
+    buf.WriteString("> [电柜: ")
+    buf.WriteString(eb.Serial)
+    buf.WriteString(", 仓门:")
+    buf.WriteString(strconv.Itoa(eb.Ordinal))
+    buf.WriteString("] { ")
+    buf.WriteString(business.Text())
+    buf.WriteString("业务")
+    buf.WriteString(step.String())
+    buf.WriteString(" }")
+
     defer func() {
         res := NewConsole(s.GetUser()).Update(co, eb, err).OperateResult()
-        // log.Infof("<%s> [电柜: %s, 仓门: %d] { %s业务%s } 执行%v", s.GetUser(), eb.Serial, eb.Ordinal, business.Text(), step, adapter.Or[any](err == nil, "成功", fmt.Sprintf("失败: %v", err)))
-        msgState := "成功"
+
         if err != nil {
-            msgState = "失败: " + err.Error()
+            zap.L().Error(buf.String(), zap.Error(err))
+        } else {
+            zap.L().Info(buf.String())
         }
-        log.Info(msg + msgState)
+
         // 同步回调结果
         scb(res)
     }()
@@ -226,10 +241,8 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         // TODO: 开仓失败后是否重复弹开逻辑???
         // TODO: 详细失败日志???
         if err != nil {
-            log.Info(msg + ", 命令执行失败: " + err.Error())
             return
         }
-        log.Info(msg + ", 命令执行成功")
     }
 
     r := <-stepper

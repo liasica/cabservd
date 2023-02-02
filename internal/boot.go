@@ -10,8 +10,8 @@ import (
     "fmt"
     "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/codec"
+    "github.com/auroraride/adapter/log"
     "github.com/auroraride/adapter/maintain"
-    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/demo"
@@ -23,6 +23,7 @@ import (
     "github.com/auroraride/cabservd/internal/sync"
     "github.com/go-redis/redis/v9"
     "github.com/labstack/echo/v4"
+    "io"
     "os"
     "time"
 )
@@ -46,7 +47,14 @@ func Boot(hook core.Hook, codecor codec.Codec) {
     })
 
     // 初始化日志
-    zlog.New(g.Config.Application, zlog.NewRedisWriter(g.Redis), g.Config.Debug)
+    log.Initialize(&log.Config{
+        FormatJson:  true,
+        Stdout:      g.Config.Debug,
+        Application: g.Config.Application,
+        Writers: []io.Writer{
+            log.NewRedisWriter(g.Redis),
+        },
+    })
 
     // 加载模板
     assets.LoadTemplates()

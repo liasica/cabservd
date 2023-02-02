@@ -10,7 +10,6 @@ import (
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/batdef"
     "github.com/auroraride/adapter/pqm"
-    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -77,7 +76,7 @@ func reign(data, old *ent.Bin) {
     var result types.CabinetCache
     err := g.Redis.HGet(context.Background(), g.CacheCabinetKey, data.Serial).Scan(&result)
     if err != nil {
-        zlog.Error("从缓存中获取电柜信息失败", zap.Error(err))
+        zap.L().Error("从缓存中获取电柜信息失败", zap.Error(err))
     }
 
     item := &batdef.Reign{
@@ -111,7 +110,7 @@ func doReign(data *batdef.Reign) {
     url, err := g.Config.GetBmsApiUrl(bat.Brand, "/battery/reign")
     b, _ := jsoniter.Marshal(data)
     if err != nil {
-        zlog.Error("电池在位请求失败", zap.Error(err), zap.ByteString("payload", b))
+        zap.L().Error("电池在位请求失败", zap.Error(err), zap.ByteString("body", b))
         return
     }
 

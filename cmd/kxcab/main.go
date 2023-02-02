@@ -7,13 +7,10 @@ package main
 
 import (
     "github.com/auroraride/adapter/codec"
-    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
 )
 
 func main() {
-    defer zlog.Sync()
-
     internal.Boot(kaixin.New(), &codec.HeaderLength{})
 }

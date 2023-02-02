@@ -7,7 +7,6 @@ package kaixin
 
 import (
     "fmt"
-    "github.com/auroraride/adapter/zlog"
     "go.uber.org/zap"
     "strconv"
 )
@@ -36,7 +35,7 @@ func (a *Attribute) GetOrdinal() (ordinal int, exists bool) {
     var err error
     ordinal, err = strconv.Atoi(a.DoorID)
     if err != nil {
-        zlog.Error("仓位解析失败", zap.Error(err))
+        zap.L().Error("仓位解析失败", zap.Error(err))
         return
     }
 

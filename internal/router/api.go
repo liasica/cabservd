@@ -7,11 +7,11 @@ package router
 
 import (
     "github.com/auroraride/adapter/app"
-    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/assets"
     "github.com/auroraride/cabservd/internal/controller/api"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/labstack/echo/v4"
+    "go.uber.org/zap"
     "net/http"
 )
 
@@ -30,6 +30,6 @@ func Start(e *echo.Echo) {
     e.POST("device/bininfo", api.Device.BinInfo)
 
     if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
-        zlog.Fatal(err.Error())
+        zap.L().Fatal(err.Error())
     }
 }

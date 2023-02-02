@@ -7,8 +7,8 @@ package core
 
 import (
     "github.com/auroraride/adapter"
-    log "github.com/auroraride/adapter/zlog"
     "github.com/panjf2000/gnet/v2"
+    "go.uber.org/zap"
     "sync"
 )
 
@@ -23,7 +23,7 @@ func Start(addr string, brand adapter.CabinetBrand, bean Hook, codec Codec) {
 
     // go Hub.deadCheck()
 
-    log.Fatal(gnet.Run(
+    zap.L().Fatal(gnet.Run(
         Hub,
         Hub.addr,
         gnet.WithMulticore(true),

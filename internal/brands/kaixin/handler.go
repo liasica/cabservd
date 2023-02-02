@@ -8,7 +8,6 @@ package kaixin
 import (
     "context"
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
     "go.uber.org/zap"
@@ -30,7 +29,7 @@ func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
+func (h *Hander) OnMessage(b []byte, client *core.Client) (message any, err error) {
     req := new(Request)
     err = jsoniter.Unmarshal(b, req)
     if err != nil {
@@ -52,13 +51,13 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
 
     // 发送失败响应
     if err != nil {
-        zlog.Error("凯信消息解析失败", zap.Int("FD", client.Fd()), zap.String("address", client.RemoteAddr().String()), zap.Error(err))
+        zap.L().Error("凯信消息解析失败", zap.Int("FD", client.Fd()), zap.String("address", client.RemoteAddr().String()), zap.Error(err))
         _ = client.SendMessage(req.Fail(), false)
         return
     }
 
     err = client.SendMessage(req.Success(), false)
-    return
+    return req, err
 }
 
 // LoginHandle 登录请求

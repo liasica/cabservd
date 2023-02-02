@@ -9,11 +9,10 @@ import (
     "context"
     "fmt"
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/zlog"
+    "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    jsoniter "github.com/json-iterator/go"
     "github.com/liasica/go-helpers/tools"
     "go.uber.org/zap"
     "time"
@@ -51,7 +50,7 @@ func LoadOrStoreCabinet(ctx context.Context, brand adapter.CabinetBrand, serial 
     var err error
     cab, err = client.Create().SetSerial(serial).SetBrand(brand).Save(ctx)
     if err != nil {
-        zlog.Error("电柜保存失败", zap.Error(err))
+        zap.L().Error("电柜保存失败", zap.Error(err))
     }
     return
 }
@@ -115,8 +114,7 @@ func SaveCabinet(ctx context.Context, brand adapter.CabinetBrand, serial string,
         }).
         Exec(ctx)
     if err != nil {
-        b, _ := jsoniter.Marshal(item)
-        zlog.Error("电柜保存失败", zap.Error(err), zap.ByteString("payload", b))
+        zap.L().Error("电柜保存失败", zap.Error(err), log.Payload(item))
     }
 }
 
@@ -127,7 +125,7 @@ func SaveBins(ctx context.Context, brand adapter.CabinetBrand, serial string, it
 
     cab := LoadOrStoreCabinet(ctx, brand, serial)
     if cab == nil {
-        zlog.Error("仓位保存失败: 未找到电柜信息")
+        zap.L().Error("仓位保存失败: 未找到电柜信息")
         return
     }
 
@@ -196,8 +194,7 @@ func SaveBins(ctx context.Context, brand adapter.CabinetBrand, serial string, it
             UpdateUUID().
             Exec(ctx)
         if err != nil {
-            b, _ := jsoniter.Marshal(item)
-            zlog.Error("仓位保存失败", zap.Error(err), zap.ByteString("payload", b))
+            zap.L().Error("仓位保存失败", zap.Error(err), log.Payload(item))
         }
     }
 }

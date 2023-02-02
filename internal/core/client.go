@@ -8,8 +8,8 @@ package core
 import (
     "context"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/log"
     "github.com/auroraride/adapter/snag"
-    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/google/uuid"
@@ -76,6 +76,23 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
 
     data := c.Hub.codec.Encode(b)
 
+    fields := []zap.Field{
+        zap.Int("FD", c.Fd()),
+        zap.String("address", c.RemoteAddr().String()),
+        log.Payload(message),
+    }
+
+    defer func() {
+        if savelog {
+            level := zap.InfoLevel
+            if err != nil {
+                level = zap.ErrorLevel
+                fields = append(fields, zap.Error(err), log.Binary(b))
+            }
+            zap.L().Log(level, "发送消息", fields...)
+        }
+    }()
+
     // // TODO DEMO
     // if len(params) > 1 {
     //     x := []byte(fmt.Sprintf(`{"msgType":500,"txnNo":%d,"devId":"CH6004KXHD220728222","paramList":[{"id":"02301001","value":"04","doorId":"7"}]}`, time.Now().UnixMilli()))
@@ -84,11 +101,6 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
     // }
 
     _, err = c.Write(data)
-    if err != nil {
-        zlog.Error("消息发送失败", zap.Error(err), zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.ByteString("payload", b))
-    } else if savelog {
-        zlog.Info("发送消息 ↓", zap.Int("FD", c.Fd()), zap.String("address", c.RemoteAddr().String()), zap.ByteString("payload", b))
-    }
 
     return
 }
