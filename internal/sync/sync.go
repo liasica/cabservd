@@ -47,8 +47,7 @@ func Start() {
 
     dsn := g.Config.Postgres.Dsn
 
-    // TODO 同步消息删除
-    Cabinet = pqm.NewMonitor(dsn, zlog.StandardLogger(), &ent.Cabinet{}, func(message *pqm.Message[*ent.Cabinet]) {
+    Cabinet = pqm.NewMonitor(dsn, &ent.Cabinet{}, func(message *pqm.Message[*ent.Cabinet]) {
         g.Redis.HSet(context.Background(), g.CacheCabinetKey, message.Data.Serial, &types.CabinetCache{
             Lng: message.Data.Lng,
             Lat: message.Data.Lat,
@@ -56,7 +55,7 @@ func Start() {
         go SendCabinet(message.Data.Serial, message.Data)
     })
 
-    Bin = pqm.NewMonitor(dsn, zlog.StandardLogger(), &ent.Bin{}, func(message *pqm.Message[*ent.Bin]) {
+    Bin = pqm.NewMonitor(dsn, &ent.Bin{}, func(message *pqm.Message[*ent.Bin]) {
         go reign(message.Data, message.Old)
         go SendBin(message.Data.Serial, message.Data)
     })

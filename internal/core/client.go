@@ -129,7 +129,7 @@ func (c *Client) Close() {
             return true
         })
 
-    }, zlog.StandardLogger())
+    })
 }
 
 // Offline 标记电柜离线

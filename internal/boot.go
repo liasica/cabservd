@@ -83,7 +83,6 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         AuthSkipper: func(c echo.Context) bool {
             return userSkipper[c.Path()]
         },
-        Logger:   zlog.StandardLogger(),
         Maintain: g.Config.Maintain,
     })
     go router.Start(e)

@@ -8,7 +8,6 @@ package sync
 import (
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/adapter/sync"
-    "github.com/auroraride/adapter/zlog"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
     "go.uber.org/zap"
@@ -20,13 +19,11 @@ var (
 )
 
 func createSync() {
-    logger := zlog.StandardLogger().GetLogger().WithOptions(zap.AddCallerSkip(-2))
     syncCabinet = sync.New[cabdef.CabinetMessage](
         g.Redis,
         g.Config.Environment,
         sync.StreamCabinet,
         nil,
-        logger,
     )
 
     syncExchange = sync.New[cabdef.ExchangeStepMessage](
@@ -34,8 +31,9 @@ func createSync() {
         g.Config.Environment,
         sync.StreamExchange,
         nil,
-        logger,
     )
+
+    zap.AddCaller()
 }
 
 func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *cabdef.CabinetMessage) {
