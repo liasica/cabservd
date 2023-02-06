@@ -47,7 +47,7 @@ func Boot(hook core.Hook, codecor codec.Codec) {
     })
 
     // 初始化日志
-    log.Initialize(&log.Config{
+    log.New(&log.Config{
         FormatJson:  true,
         Stdout:      g.Config.Debug,
         Application: g.Config.Application,

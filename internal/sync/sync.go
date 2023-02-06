@@ -9,6 +9,7 @@ import (
     "context"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/batdef"
+    "github.com/auroraride/adapter/log"
     "github.com/auroraride/adapter/pqm"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -110,7 +111,7 @@ func doReign(data *batdef.Reign) {
     url, err := g.Config.GetBmsApiUrl(bat.Brand, "/battery/reign")
     b, _ := jsoniter.Marshal(data)
     if err != nil {
-        zap.L().Error("电池在位请求失败", zap.Error(err), zap.ByteString("body", b))
+        zap.L().Error("电池在位请求失败", zap.Error(err), log.ResponseBody(b))
         return
     }
 
