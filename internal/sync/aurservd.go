@@ -10,7 +10,6 @@ import (
     "github.com/auroraride/adapter/sync"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/g"
-    "go.uber.org/zap"
 )
 
 var (
@@ -32,8 +31,6 @@ func createSync() {
         sync.StreamExchange,
         nil,
     )
-
-    zap.AddCaller()
 }
 
 func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bins) (message *cabdef.CabinetMessage) {
