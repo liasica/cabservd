@@ -25,6 +25,7 @@ import (
     "github.com/labstack/echo/v4"
     "io"
     "os"
+    "strings"
     "time"
 )
 
@@ -54,7 +55,7 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         Writers: []io.Writer{
             log.NewRedisWriter(g.Redis),
         },
-    })
+    }, log.WithNamed(g.Config.Brand.LoggerName()))
 
     // 加载模板
     assets.LoadTemplates()
@@ -91,7 +92,8 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         AuthSkipper: func(c echo.Context) bool {
             return userSkipper[c.Path()]
         },
-        Maintain: g.Config.Maintain,
+        Maintain:    g.Config.Maintain,
+        Application: strings.ToLower(g.Config.Application),
     })
     go router.Start(e)
 
