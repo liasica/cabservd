@@ -17,6 +17,7 @@ import (
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
+    "strconv"
     "time"
 )
 
@@ -77,20 +78,18 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
 
     data := c.Hub.codec.Encode(b)
 
-    fields := []zap.Field{
-        zap.Int("FD", c.Fd()),
-        zap.String("address", c.RemoteAddr().String()),
-        zap.ByteString("data", b),
-    }
-
     defer func() {
+        fields := []zap.Field{
+            log.ResponseBody(b),
+        }
+
         if savelog || g.Config.Environment.IsDevelopment() {
             level := zap.InfoLevel
             if err != nil {
                 level = zap.ErrorLevel
                 fields = append(fields, zap.Error(err), log.Binary(b))
             }
-            zap.L().Log(level, "发送消息", fields...)
+            zap.L().Log(level, "发送消息 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), fields...)
         }
     }()
 

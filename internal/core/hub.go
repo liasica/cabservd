@@ -120,7 +120,7 @@ func (h *hub) handleMessage(b []byte, c *Client) {
         if message != nil {
             fields = append(fields, log.Payload(message))
         }
-        zap.L().Log(lvl, "收到消息 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), fields...)
+        zap.L().Log(lvl, "收到消息 <- "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), fields...)
     }()
 
     // 更新在线状态
