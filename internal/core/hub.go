@@ -7,6 +7,7 @@ package core
 
 import (
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/codec"
     "github.com/auroraride/adapter/log"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
@@ -31,7 +32,7 @@ type hub struct {
     Bean Hook
 
     // 编码协议
-    codec Codec
+    codec codec.Codec
 
     // 在线的客户端
     // serial => *Client

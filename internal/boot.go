@@ -103,13 +103,13 @@ func Boot(hook core.Hook, codecor codec.Codec) {
         codecor,
     )
 
-    // debug
-    go demo.Debug()
-
     // maintain
     if maintain.Exists() {
         _ = maintain.Remove()
     }
+
+    // debug
+    go demo.Debug()
 
     select {
     case <-app.Quit:
