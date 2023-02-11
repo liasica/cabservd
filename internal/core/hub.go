@@ -57,11 +57,13 @@ func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
 }
 
 func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
-    zap.L().Info("客户端断开连接 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), zap.Error(err))
+    text := c.RemoteAddr().String() + ":" + strconv.Itoa(c.Fd())
+    defer zap.L().Info("客户端断开连接 -> "+text, zap.Error(err))
     // 获取客户端
     client, ok := c.Context().(*Client)
     // 关闭客户端
     if ok {
+        text += ":" + client.Serial
         go client.Close()
     }
     return
