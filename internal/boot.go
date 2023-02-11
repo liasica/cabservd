@@ -50,7 +50,7 @@ func Boot(hook core.Hook, codecor codec.Codec) {
     log.New(&log.Config{
         FormatJson:  true,
         Stdout:      g.Config.Debug,
-        Application: g.Config.Brand.LoggerName(),
+        Application: g.Config.Brand.LoggerName(g.Config.Environment),
         Writers: []io.Writer{
             log.NewRedisWriter(g.Redis),
         },

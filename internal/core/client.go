@@ -12,6 +12,7 @@ import (
     "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/google/uuid"
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
@@ -79,11 +80,11 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
     fields := []zap.Field{
         zap.Int("FD", c.Fd()),
         zap.String("address", c.RemoteAddr().String()),
-        log.Payload(message),
+        zap.ByteString("data", b),
     }
 
     defer func() {
-        if savelog {
+        if savelog || g.Config.Environment.IsDevelopment() {
             level := zap.InfoLevel
             if err != nil {
                 level = zap.ErrorLevel
