@@ -64,14 +64,14 @@ func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
     // 关闭客户端
     if ok {
         text += ":" + client.Serial
-        go client.Close()
+        go client.AfterClose()
     }
     return
 }
 
 func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     // 获取客户端
-    client, ok := c.Context().(*Client)
+    cli, ok := c.Context().(*Client)
     if !ok {
         // TODO 关闭连接
         return gnet.Shutdown
@@ -95,16 +95,13 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
         }
 
         // 使用channel处理消息体
-        client.receiver <- &MessageProxy{
-            Data:   b,
-            Client: client,
-        }
+        go h.handleMessage(cli, b)
     }
 
     return gnet.None
 }
 
-func (h *hub) handleMessage(b []byte, c *Client) {
+func (h *hub) handleMessage(c *Client, b []byte) {
     fields := []zap.Field{
         zap.ByteString("decoded", b),
     }

@@ -29,9 +29,6 @@ type Client struct {
     // 电柜编号
     Serial string
 
-    // 消息代理
-    receiver chan *MessageProxy
-
     // 上次接收消息时间
     dead *time.Timer
 }
@@ -43,29 +40,13 @@ type MessageProxy struct {
 
 func NewClient(conn gnet.Conn, h *hub) *Client {
     c := &Client{
-        Conn:     conn,
-        Hub:      h,
-        receiver: make(chan *MessageProxy),
+        Conn: conn,
+        Hub:  h,
     }
     c.dead = time.AfterFunc(20*time.Minute, func() {
         c.Offline()
     })
-    go c.run()
     return c
-}
-
-// 启动客户端任务
-func (c *Client) run() {
-    for {
-        select {
-        case message := <-c.receiver:
-            if message == nil {
-                return
-            }
-            // 消息代理
-            c.Hub.handleMessage(message.Data, message.Client)
-        }
-    }
 }
 
 // SendMessage 向客户端发送消息
@@ -117,15 +98,16 @@ func GetClient(serial string) (c *Client, err error) {
     return
 }
 
-// Close 关闭电柜客户端
-func (c *Client) Close() {
+// AfterClose 关闭电柜客户端
+func (c *Client) AfterClose() {
     snag.WithRecover(func() {
+        // 停止计时
+        c.dead.Stop()
+
         // 标记电柜为离线
         if c.Serial != "" {
             go c.Offline()
         }
-
-        close(c.receiver)
 
         // 查找并删除客户端
         c.Hub.Clients.Delete(c.Serial)
