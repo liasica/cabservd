@@ -34,14 +34,14 @@ func UpdateCabinet(brand adapter.CabinetBrand, p ReportParser) {
 
     cab, exists := p.GetCabinet()
     if exists {
-        SaveCabinet(ctx, brand, serial, cab)
+        SaveCabinet(ctx, serial, cab)
     }
 
     bins := p.GetBins()
     SaveBins(ctx, brand, serial, bins)
 }
 
-func LoadOrStoreCabinet(ctx context.Context, brand adapter.CabinetBrand, serial string) (cab *ent.Cabinet) {
+func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
     client := ent.Database.Cabinet
     cab, _ = client.Query().Where(cabinet.Serial(serial)).First(ctx)
     if cab != nil {
@@ -55,7 +55,7 @@ func LoadOrStoreCabinet(ctx context.Context, brand adapter.CabinetBrand, serial 
     return
 }
 
-func SaveCabinet(ctx context.Context, brand adapter.CabinetBrand, serial string, item *ent.CabinetPointer) {
+func SaveCabinet(ctx context.Context, serial string, item *ent.CabinetPointer) {
     err := ent.Database.Cabinet.Create().
         SetSerial(serial).
         OnConflictColumns(cabinet.FieldSerial).
@@ -122,7 +122,7 @@ func SaveBins(ctx context.Context, brand adapter.CabinetBrand, serial string, it
         return
     }
 
-    cab := LoadOrStoreCabinet(ctx, brand, serial)
+    cab := LoadOrStoreCabinet(ctx, serial)
     if cab == nil {
         zap.L().Error("仓位保存失败: 未找到电柜信息")
         return

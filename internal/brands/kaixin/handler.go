@@ -74,7 +74,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
     // }
 
     // 查找或创建电柜
-    go core.LoadOrStoreCabinet(context.Background(), adapter.CabinetBrandKaixin, req.DevID)
+    go core.LoadOrStoreCabinet(context.Background(), req.DevID)
 
     // 注册电柜客户端
     client.Register(req.DevID)
