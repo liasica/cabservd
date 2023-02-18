@@ -65,12 +65,6 @@ func (cu *ConsoleUpdate) SetOperate(c cabdef.Operate) *ConsoleUpdate {
 	return cu
 }
 
-// SetBrand sets the "brand" field.
-func (cu *ConsoleUpdate) SetBrand(ab adapter.CabinetBrand) *ConsoleUpdate {
-	cu.mutation.SetBrand(ab)
-	return cu
-}
-
 // SetSerial sets the "serial" field.
 func (cu *ConsoleUpdate) SetSerial(s string) *ConsoleUpdate {
 	cu.mutation.SetSerial(s)
@@ -355,9 +349,6 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Operate(); ok {
 		_spec.SetField(console.FieldOperate, field.TypeOther, value)
 	}
-	if value, ok := cu.mutation.Brand(); ok {
-		_spec.SetField(console.FieldBrand, field.TypeOther, value)
-	}
 	if value, ok := cu.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)
 	}
@@ -545,12 +536,6 @@ func (cuo *ConsoleUpdateOne) ClearBinID() *ConsoleUpdateOne {
 // SetOperate sets the "operate" field.
 func (cuo *ConsoleUpdateOne) SetOperate(c cabdef.Operate) *ConsoleUpdateOne {
 	cuo.mutation.SetOperate(c)
-	return cuo
-}
-
-// SetBrand sets the "brand" field.
-func (cuo *ConsoleUpdateOne) SetBrand(ab adapter.CabinetBrand) *ConsoleUpdateOne {
-	cuo.mutation.SetBrand(ab)
 	return cuo
 }
 
@@ -861,9 +846,6 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	}
 	if value, ok := cuo.mutation.Operate(); ok {
 		_spec.SetField(console.FieldOperate, field.TypeOther, value)
-	}
-	if value, ok := cuo.mutation.Brand(); ok {
-		_spec.SetField(console.FieldBrand, field.TypeOther, value)
 	}
 	if value, ok := cuo.mutation.Serial(); ok {
 		_spec.SetField(console.FieldSerial, field.TypeString, value)

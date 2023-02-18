@@ -63,18 +63,16 @@ func Boot(hook core.Hook, codecor codec.Codec) {
     ent.Database = ent.OpenDatabase(g.Config.Postgres.Dsn, g.Config.Postgres.Debug)
 
     // 标记所有电柜为离线和空闲
-    _ = ent.Database.Cabinet.Update().Where(cabinet.Brand(g.Config.Brand)).SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(ctx)
+    _ = ent.Database.Cabinet.Update().SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(ctx)
 
     // 标记所有正在进行的任务为失败
     _, _ = ent.Database.Console.ExecContext(ctx, fmt.Sprintf(
-        `UPDATE %s SET %s = '%s', MESSAGE = '异常重启终止', %s = NOW(), %s = EXTRACT(EPOCH FROM (NOW() - start_at)) WHERE %s = '%s' AND %s = '%s'`,
+        `UPDATE %s SET %s = '%s', MESSAGE = '异常重启终止', %s = NOW(), %s = EXTRACT(EPOCH FROM (NOW() - start_at)) WHERE %s = '%s'`,
         console.Table,
         console.FieldStatus,
         console.StatusFailed,
         console.FieldStopAt,
         console.FieldDuration,
-        console.FieldBrand,
-        g.Config.Brand,
         console.FieldStatus,
         console.StatusRunning,
     ))

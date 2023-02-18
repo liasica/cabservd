@@ -69,6 +69,12 @@ type BinDeleteOne struct {
 	bd *BinDelete
 }
 
+// Where appends a list predicates to the BinDelete builder.
+func (bdo *BinDeleteOne) Where(ps ...predicate.Bin) *BinDeleteOne {
+	bdo.bd.mutation.Where(ps...)
+	return bdo
+}
+
 // Exec executes the deletion query.
 func (bdo *BinDeleteOne) Exec(ctx context.Context) error {
 	n, err := bdo.bd.Exec(ctx)
@@ -84,5 +90,7 @@ func (bdo *BinDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (bdo *BinDeleteOne) ExecX(ctx context.Context) {
-	bdo.bd.ExecX(ctx)
+	if err := bdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

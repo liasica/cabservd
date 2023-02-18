@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -26,8 +25,6 @@ type Bin struct {
 	UUID string `json:"uuid,omitempty"`
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
-	// 品牌
-	Brand adapter.CabinetBrand `json:"brand,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 仓位名称(N号仓)
@@ -86,8 +83,6 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case bin.FieldBrand:
-			values[i] = new(adapter.CabinetBrand)
 		case bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists:
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
@@ -142,12 +137,6 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field cabinet_id", values[i])
 			} else if value.Valid {
 				b.CabinetID = uint64(value.Int64)
-			}
-		case bin.FieldBrand:
-			if value, ok := values[i].(*adapter.CabinetBrand); !ok {
-				return fmt.Errorf("unexpected type %T for field brand", values[i])
-			} else if value != nil {
-				b.Brand = *value
 			}
 		case bin.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -235,14 +224,14 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 
 // QueryCabinet queries the "cabinet" edge of the Bin entity.
 func (b *Bin) QueryCabinet() *CabinetQuery {
-	return (&BinClient{config: b.config}).QueryCabinet(b)
+	return NewBinClient(b.config).QueryCabinet(b)
 }
 
 // Update returns a builder for updating this Bin.
 // Note that you need to call Bin.Unwrap() before calling this method if this Bin
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (b *Bin) Update() *BinUpdateOne {
-	return (&BinClient{config: b.config}).UpdateOne(b)
+	return NewBinClient(b.config).UpdateOne(b)
 }
 
 // Unwrap unwraps the Bin entity that was returned from a transaction after it was closed,
@@ -272,9 +261,6 @@ func (b *Bin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("cabinet_id=")
 	builder.WriteString(fmt.Sprintf("%v", b.CabinetID))
-	builder.WriteString(", ")
-	builder.WriteString("brand=")
-	builder.WriteString(fmt.Sprintf("%v", b.Brand))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(b.Serial)

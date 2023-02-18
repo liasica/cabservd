@@ -48,7 +48,7 @@ func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bin
         message.Cabinet = &cabdef.Cabinet{
             ID:          cab.ID,
             Online:      cab.Online,
-            Brand:       cab.Brand,
+            Brand:       g.Config.Brand,
             Serial:      cab.Serial,
             Status:      cabdef.CabinetStatus(cab.Status),
             Enable:      cab.Enable,
@@ -65,7 +65,7 @@ func WrapCabinetMessage(full bool, serial string, cab *ent.Cabinet, bins ent.Bin
     for _, b := range bins {
         message.Bins = append(message.Bins, &cabdef.Bin{
             ID:            b.ID,
-            Brand:         b.Brand,
+            Brand:         g.Config.Brand,
             Serial:        b.Serial,
             Name:          b.Name,
             Ordinal:       b.Ordinal,

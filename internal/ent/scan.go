@@ -179,14 +179,14 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 
 // QueryCabinet queries the "cabinet" edge of the Scan entity.
 func (s *Scan) QueryCabinet() *CabinetQuery {
-	return (&ScanClient{config: s.config}).QueryCabinet(s)
+	return NewScanClient(s.config).QueryCabinet(s)
 }
 
 // Update returns a builder for updating this Scan.
 // Note that you need to call Scan.Unwrap() before calling this method if this Scan
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (s *Scan) Update() *ScanUpdateOne {
-	return (&ScanClient{config: s.config}).UpdateOne(s)
+	return NewScanClient(s.config).UpdateOne(s)
 }
 
 // Unwrap unwraps the Scan entity that was returned from a transaction after it was closed,

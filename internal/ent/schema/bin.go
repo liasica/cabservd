@@ -1,16 +1,13 @@
 package schema
 
 import (
-    "ariga.io/atlas/sql/postgres"
     "entgo.io/ent"
-    "entgo.io/ent/dialect"
     "entgo.io/ent/dialect/entsql"
     "entgo.io/ent/schema"
     "entgo.io/ent/schema/edge"
     "entgo.io/ent/schema/field"
     "entgo.io/ent/schema/index"
     "entgo.io/ent/schema/mixin"
-    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/ent/internal"
 )
 
@@ -65,7 +62,6 @@ func (Bin) Fields() []ent.Field {
         field.Uint64("cabinet_id"),
 
         // 电柜信息
-        field.Other("brand", adapter.CabinetBrandUnknown).SchemaType(map[string]string{dialect.Postgres: postgres.TypeVarChar}).Comment("品牌"),
         field.String("serial").Comment("电柜设备序列号"),
 
         // 仓位信息
@@ -108,7 +104,7 @@ func (Bin) Mixin() []ent.Mixin {
 func (Bin) Indexes() []ent.Index {
     return []ent.Index{
         index.Fields("cabinet_id"),
-        index.Fields("serial", "brand"),
+        index.Fields("serial"),
         index.Fields("battery_exists"),
         index.Fields("ordinal"),
         index.Fields("battery_sn"),

@@ -48,7 +48,7 @@ func LoadOrStoreCabinet(ctx context.Context, brand adapter.CabinetBrand, serial 
         return
     }
     var err error
-    cab, err = client.Create().SetSerial(serial).SetBrand(brand).Save(ctx)
+    cab, err = client.Create().SetSerial(serial).Save(ctx)
     if err != nil {
         zap.L().Error("电柜保存失败", zap.Error(err))
     }
@@ -57,7 +57,6 @@ func LoadOrStoreCabinet(ctx context.Context, brand adapter.CabinetBrand, serial 
 
 func SaveCabinet(ctx context.Context, brand adapter.CabinetBrand, serial string, item *ent.CabinetPointer) {
     err := ent.Database.Cabinet.Create().
-        SetBrand(brand).
         SetSerial(serial).
         OnConflictColumns(cabinet.FieldSerial).
         Update(func(u *ent.CabinetUpsert) {
@@ -133,7 +132,6 @@ func SaveBins(ctx context.Context, brand adapter.CabinetBrand, serial string, it
         uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
         err := ent.Database.Bin.Create().
             SetUUID(uuid).
-            SetBrand(brand).
             SetSerial(serial).
             SetName(*item.Name).
             SetCabinetID(cab.ID).

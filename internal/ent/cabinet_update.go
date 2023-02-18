@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
@@ -62,12 +61,6 @@ func (cu *CabinetUpdate) SetNillablePower(b *bool) *CabinetUpdate {
 	if b != nil {
 		cu.SetPower(*b)
 	}
-	return cu
-}
-
-// SetBrand sets the "brand" field.
-func (cu *CabinetUpdate) SetBrand(ab adapter.CabinetBrand) *CabinetUpdate {
-	cu.mutation.SetBrand(ab)
 	return cu
 }
 
@@ -417,9 +410,6 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Power(); ok {
 		_spec.SetField(cabinet.FieldPower, field.TypeBool, value)
 	}
-	if value, ok := cu.mutation.Brand(); ok {
-		_spec.SetField(cabinet.FieldBrand, field.TypeOther, value)
-	}
 	if value, ok := cu.mutation.Serial(); ok {
 		_spec.SetField(cabinet.FieldSerial, field.TypeString, value)
 	}
@@ -599,12 +589,6 @@ func (cuo *CabinetUpdateOne) SetNillablePower(b *bool) *CabinetUpdateOne {
 	if b != nil {
 		cuo.SetPower(*b)
 	}
-	return cuo
-}
-
-// SetBrand sets the "brand" field.
-func (cuo *CabinetUpdateOne) SetBrand(ab adapter.CabinetBrand) *CabinetUpdateOne {
-	cuo.mutation.SetBrand(ab)
 	return cuo
 }
 
@@ -977,9 +961,6 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 	}
 	if value, ok := cuo.mutation.Power(); ok {
 		_spec.SetField(cabinet.FieldPower, field.TypeBool, value)
-	}
-	if value, ok := cuo.mutation.Brand(); ok {
-		_spec.SetField(cabinet.FieldBrand, field.TypeOther, value)
 	}
 	if value, ok := cuo.mutation.Serial(); ok {
 		_spec.SetField(cabinet.FieldSerial, field.TypeString, value)

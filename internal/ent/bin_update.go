@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
@@ -46,12 +45,6 @@ func (bu *BinUpdate) SetUUID(s string) *BinUpdate {
 // SetCabinetID sets the "cabinet_id" field.
 func (bu *BinUpdate) SetCabinetID(u uint64) *BinUpdate {
 	bu.mutation.SetCabinetID(u)
-	return bu
-}
-
-// SetBrand sets the "brand" field.
-func (bu *BinUpdate) SetBrand(ab adapter.CabinetBrand) *BinUpdate {
-	bu.mutation.SetBrand(ab)
 	return bu
 }
 
@@ -352,9 +345,6 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := bu.mutation.UUID(); ok {
 		_spec.SetField(bin.FieldUUID, field.TypeString, value)
 	}
-	if value, ok := bu.mutation.Brand(); ok {
-		_spec.SetField(bin.FieldBrand, field.TypeOther, value)
-	}
 	if value, ok := bu.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
 	}
@@ -484,12 +474,6 @@ func (buo *BinUpdateOne) SetUUID(s string) *BinUpdateOne {
 // SetCabinetID sets the "cabinet_id" field.
 func (buo *BinUpdateOne) SetCabinetID(u uint64) *BinUpdateOne {
 	buo.mutation.SetCabinetID(u)
-	return buo
-}
-
-// SetBrand sets the "brand" field.
-func (buo *BinUpdateOne) SetBrand(ab adapter.CabinetBrand) *BinUpdateOne {
-	buo.mutation.SetBrand(ab)
 	return buo
 }
 
@@ -813,9 +797,6 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if value, ok := buo.mutation.UUID(); ok {
 		_spec.SetField(bin.FieldUUID, field.TypeString, value)
-	}
-	if value, ok := buo.mutation.Brand(); ok {
-		_spec.SetField(bin.FieldBrand, field.TypeOther, value)
 	}
 	if value, ok := buo.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)

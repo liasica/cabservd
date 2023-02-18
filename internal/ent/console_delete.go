@@ -69,6 +69,12 @@ type ConsoleDeleteOne struct {
 	cd *ConsoleDelete
 }
 
+// Where appends a list predicates to the ConsoleDelete builder.
+func (cdo *ConsoleDeleteOne) Where(ps ...predicate.Console) *ConsoleDeleteOne {
+	cdo.cd.mutation.Where(ps...)
+	return cdo
+}
+
 // Exec executes the deletion query.
 func (cdo *ConsoleDeleteOne) Exec(ctx context.Context) error {
 	n, err := cdo.cd.Exec(ctx)
@@ -84,5 +90,7 @@ func (cdo *ConsoleDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (cdo *ConsoleDeleteOne) ExecX(ctx context.Context) {
-	cdo.cd.ExecX(ctx)
+	if err := cdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

@@ -18,11 +18,8 @@ import (
 // BinQuery is the builder for querying Bin entities.
 type BinQuery struct {
 	config
-	limit       *int
-	offset      *int
-	unique      *bool
+	ctx         *QueryContext
 	order       []OrderFunc
-	fields      []string
 	inters      []Interceptor
 	predicates  []predicate.Bin
 	withCabinet *CabinetQuery
@@ -40,20 +37,20 @@ func (bq *BinQuery) Where(ps ...predicate.Bin) *BinQuery {
 
 // Limit the number of records to be returned by this query.
 func (bq *BinQuery) Limit(limit int) *BinQuery {
-	bq.limit = &limit
+	bq.ctx.Limit = &limit
 	return bq
 }
 
 // Offset to start from.
 func (bq *BinQuery) Offset(offset int) *BinQuery {
-	bq.offset = &offset
+	bq.ctx.Offset = &offset
 	return bq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (bq *BinQuery) Unique(unique bool) *BinQuery {
-	bq.unique = &unique
+	bq.ctx.Unique = &unique
 	return bq
 }
 
@@ -88,7 +85,7 @@ func (bq *BinQuery) QueryCabinet() *CabinetQuery {
 // First returns the first Bin entity from the query.
 // Returns a *NotFoundError when no Bin was found.
 func (bq *BinQuery) First(ctx context.Context) (*Bin, error) {
-	nodes, err := bq.Limit(1).All(newQueryContext(ctx, TypeBin, "First"))
+	nodes, err := bq.Limit(1).All(setContextOp(ctx, bq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +108,7 @@ func (bq *BinQuery) FirstX(ctx context.Context) *Bin {
 // Returns a *NotFoundError when no Bin ID was found.
 func (bq *BinQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = bq.Limit(1).IDs(newQueryContext(ctx, TypeBin, "FirstID")); err != nil {
+	if ids, err = bq.Limit(1).IDs(setContextOp(ctx, bq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +131,7 @@ func (bq *BinQuery) FirstIDX(ctx context.Context) uint64 {
 // Returns a *NotSingularError when more than one Bin entity is found.
 // Returns a *NotFoundError when no Bin entities are found.
 func (bq *BinQuery) Only(ctx context.Context) (*Bin, error) {
-	nodes, err := bq.Limit(2).All(newQueryContext(ctx, TypeBin, "Only"))
+	nodes, err := bq.Limit(2).All(setContextOp(ctx, bq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +159,7 @@ func (bq *BinQuery) OnlyX(ctx context.Context) *Bin {
 // Returns a *NotFoundError when no entities are found.
 func (bq *BinQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = bq.Limit(2).IDs(newQueryContext(ctx, TypeBin, "OnlyID")); err != nil {
+	if ids, err = bq.Limit(2).IDs(setContextOp(ctx, bq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +184,7 @@ func (bq *BinQuery) OnlyIDX(ctx context.Context) uint64 {
 
 // All executes the query and returns a list of Bins.
 func (bq *BinQuery) All(ctx context.Context) ([]*Bin, error) {
-	ctx = newQueryContext(ctx, TypeBin, "All")
+	ctx = setContextOp(ctx, bq.ctx, "All")
 	if err := bq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -207,7 +204,7 @@ func (bq *BinQuery) AllX(ctx context.Context) []*Bin {
 // IDs executes the query and returns a list of Bin IDs.
 func (bq *BinQuery) IDs(ctx context.Context) ([]uint64, error) {
 	var ids []uint64
-	ctx = newQueryContext(ctx, TypeBin, "IDs")
+	ctx = setContextOp(ctx, bq.ctx, "IDs")
 	if err := bq.Select(bin.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -225,7 +222,7 @@ func (bq *BinQuery) IDsX(ctx context.Context) []uint64 {
 
 // Count returns the count of the given query.
 func (bq *BinQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeBin, "Count")
+	ctx = setContextOp(ctx, bq.ctx, "Count")
 	if err := bq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +240,7 @@ func (bq *BinQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (bq *BinQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeBin, "Exist")
+	ctx = setContextOp(ctx, bq.ctx, "Exist")
 	switch _, err := bq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -271,16 +268,14 @@ func (bq *BinQuery) Clone() *BinQuery {
 	}
 	return &BinQuery{
 		config:      bq.config,
-		limit:       bq.limit,
-		offset:      bq.offset,
+		ctx:         bq.ctx.Clone(),
 		order:       append([]OrderFunc{}, bq.order...),
 		inters:      append([]Interceptor{}, bq.inters...),
 		predicates:  append([]predicate.Bin{}, bq.predicates...),
 		withCabinet: bq.withCabinet.Clone(),
 		// clone intermediate query.
-		sql:    bq.sql.Clone(),
-		path:   bq.path,
-		unique: bq.unique,
+		sql:  bq.sql.Clone(),
+		path: bq.path,
 	}
 }
 
@@ -310,9 +305,9 @@ func (bq *BinQuery) WithCabinet(opts ...func(*CabinetQuery)) *BinQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (bq *BinQuery) GroupBy(field string, fields ...string) *BinGroupBy {
-	bq.fields = append([]string{field}, fields...)
+	bq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &BinGroupBy{build: bq}
-	grbuild.flds = &bq.fields
+	grbuild.flds = &bq.ctx.Fields
 	grbuild.label = bin.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -331,10 +326,10 @@ func (bq *BinQuery) GroupBy(field string, fields ...string) *BinGroupBy {
 //		Select(bin.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (bq *BinQuery) Select(fields ...string) *BinSelect {
-	bq.fields = append(bq.fields, fields...)
+	bq.ctx.Fields = append(bq.ctx.Fields, fields...)
 	sbuild := &BinSelect{BinQuery: bq}
 	sbuild.label = bin.Label
-	sbuild.flds, sbuild.scan = &bq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &bq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -354,7 +349,7 @@ func (bq *BinQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range bq.fields {
+	for _, f := range bq.ctx.Fields {
 		if !bin.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -417,6 +412,9 @@ func (bq *BinQuery) loadCabinet(ctx context.Context, query *CabinetQuery, nodes 
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(cabinet.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -439,9 +437,9 @@ func (bq *BinQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(bq.modifiers) > 0 {
 		_spec.Modifiers = bq.modifiers
 	}
-	_spec.Node.Columns = bq.fields
-	if len(bq.fields) > 0 {
-		_spec.Unique = bq.unique != nil && *bq.unique
+	_spec.Node.Columns = bq.ctx.Fields
+	if len(bq.ctx.Fields) > 0 {
+		_spec.Unique = bq.ctx.Unique != nil && *bq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, bq.driver, _spec)
 }
@@ -459,10 +457,10 @@ func (bq *BinQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   bq.sql,
 		Unique: true,
 	}
-	if unique := bq.unique; unique != nil {
+	if unique := bq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := bq.fields; len(fields) > 0 {
+	if fields := bq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, bin.FieldID)
 		for i := range fields {
@@ -478,10 +476,10 @@ func (bq *BinQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := bq.limit; limit != nil {
+	if limit := bq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := bq.offset; offset != nil {
+	if offset := bq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := bq.order; len(ps) > 0 {
@@ -497,7 +495,7 @@ func (bq *BinQuery) querySpec() *sqlgraph.QuerySpec {
 func (bq *BinQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(bq.driver.Dialect())
 	t1 := builder.Table(bin.Table)
-	columns := bq.fields
+	columns := bq.ctx.Fields
 	if len(columns) == 0 {
 		columns = bin.Columns
 	}
@@ -506,7 +504,7 @@ func (bq *BinQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = bq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if bq.unique != nil && *bq.unique {
+	if bq.ctx.Unique != nil && *bq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range bq.modifiers {
@@ -518,12 +516,12 @@ func (bq *BinQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range bq.order {
 		p(selector)
 	}
-	if offset := bq.offset; offset != nil {
+	if offset := bq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := bq.limit; limit != nil {
+	if limit := bq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -565,7 +563,7 @@ func (bgb *BinGroupBy) Aggregate(fns ...AggregateFunc) *BinGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (bgb *BinGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeBin, "GroupBy")
+	ctx = setContextOp(ctx, bgb.build.ctx, "GroupBy")
 	if err := bgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -613,7 +611,7 @@ func (bs *BinSelect) Aggregate(fns ...AggregateFunc) *BinSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (bs *BinSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeBin, "Select")
+	ctx = setContextOp(ctx, bs.ctx, "Select")
 	if err := bs.prepareQuery(ctx); err != nil {
 		return err
 	}

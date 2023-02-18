@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
 
@@ -25,8 +24,6 @@ type Cabinet struct {
 	Online bool `json:"online,omitempty"`
 	// 市电是否正常
 	Power bool `json:"power,omitempty"`
-	// 品牌
-	Brand adapter.CabinetBrand `json:"brand,omitempty"`
 	// 电柜编号
 	Serial string `json:"serial,omitempty"`
 	// 状态
@@ -75,8 +72,6 @@ func (*Cabinet) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case cabinet.FieldBrand:
-			values[i] = new(adapter.CabinetBrand)
 		case cabinet.FieldOnline, cabinet.FieldPower, cabinet.FieldEnable:
 			values[i] = new(sql.NullBool)
 		case cabinet.FieldLng, cabinet.FieldLat, cabinet.FieldGsm, cabinet.FieldVoltage, cabinet.FieldCurrent, cabinet.FieldTemperature, cabinet.FieldElectricity:
@@ -131,12 +126,6 @@ func (c *Cabinet) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field power", values[i])
 			} else if value.Valid {
 				c.Power = value.Bool
-			}
-		case cabinet.FieldBrand:
-			if value, ok := values[i].(*adapter.CabinetBrand); !ok {
-				return fmt.Errorf("unexpected type %T for field brand", values[i])
-			} else if value != nil {
-				c.Brand = *value
 			}
 		case cabinet.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -212,14 +201,14 @@ func (c *Cabinet) assignValues(columns []string, values []any) error {
 
 // QueryBins queries the "bins" edge of the Cabinet entity.
 func (c *Cabinet) QueryBins() *BinQuery {
-	return (&CabinetClient{config: c.config}).QueryBins(c)
+	return NewCabinetClient(c.config).QueryBins(c)
 }
 
 // Update returns a builder for updating this Cabinet.
 // Note that you need to call Cabinet.Unwrap() before calling this method if this Cabinet
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (c *Cabinet) Update() *CabinetUpdateOne {
-	return (&CabinetClient{config: c.config}).UpdateOne(c)
+	return NewCabinetClient(c.config).UpdateOne(c)
 }
 
 // Unwrap unwraps the Cabinet entity that was returned from a transaction after it was closed,
@@ -249,9 +238,6 @@ func (c *Cabinet) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("power=")
 	builder.WriteString(fmt.Sprintf("%v", c.Power))
-	builder.WriteString(", ")
-	builder.WriteString("brand=")
-	builder.WriteString(fmt.Sprintf("%v", c.Brand))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(c.Serial)

@@ -243,6 +243,7 @@ func (c *BinClient) DeleteOneID(id uint64) *BinDeleteOne {
 func (c *BinClient) Query() *BinQuery {
 	return &BinQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeBin},
 		inters: c.Interceptors(),
 	}
 }
@@ -376,6 +377,7 @@ func (c *CabinetClient) DeleteOneID(id uint64) *CabinetDeleteOne {
 func (c *CabinetClient) Query() *CabinetQuery {
 	return &CabinetQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeCabinet},
 		inters: c.Interceptors(),
 	}
 }
@@ -509,6 +511,7 @@ func (c *ConsoleClient) DeleteOneID(id uint64) *ConsoleDeleteOne {
 func (c *ConsoleClient) Query() *ConsoleQuery {
 	return &ConsoleQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeConsole},
 		inters: c.Interceptors(),
 	}
 }
@@ -658,6 +661,7 @@ func (c *ScanClient) DeleteOneID(id uint64) *ScanDeleteOne {
 func (c *ScanClient) Query() *ScanQuery {
 	return &ScanQuery{
 		config: c.config,
+		ctx:    &QueryContext{Type: TypeScan},
 		inters: c.Interceptors(),
 	}
 }

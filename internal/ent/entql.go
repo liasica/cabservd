@@ -33,7 +33,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 			bin.FieldUpdatedAt:     {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
 			bin.FieldUUID:          {Type: field.TypeString, Column: bin.FieldUUID},
 			bin.FieldCabinetID:     {Type: field.TypeUint64, Column: bin.FieldCabinetID},
-			bin.FieldBrand:         {Type: field.TypeOther, Column: bin.FieldBrand},
 			bin.FieldSerial:        {Type: field.TypeString, Column: bin.FieldSerial},
 			bin.FieldName:          {Type: field.TypeString, Column: bin.FieldName},
 			bin.FieldOrdinal:       {Type: field.TypeInt, Column: bin.FieldOrdinal},
@@ -64,7 +63,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 			cabinet.FieldUpdatedAt:   {Type: field.TypeTime, Column: cabinet.FieldUpdatedAt},
 			cabinet.FieldOnline:      {Type: field.TypeBool, Column: cabinet.FieldOnline},
 			cabinet.FieldPower:       {Type: field.TypeBool, Column: cabinet.FieldPower},
-			cabinet.FieldBrand:       {Type: field.TypeOther, Column: cabinet.FieldBrand},
 			cabinet.FieldSerial:      {Type: field.TypeString, Column: cabinet.FieldSerial},
 			cabinet.FieldStatus:      {Type: field.TypeEnum, Column: cabinet.FieldStatus},
 			cabinet.FieldEnable:      {Type: field.TypeBool, Column: cabinet.FieldEnable},
@@ -91,7 +89,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldCabinetID: {Type: field.TypeUint64, Column: console.FieldCabinetID},
 			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
 			console.FieldOperate:   {Type: field.TypeOther, Column: console.FieldOperate},
-			console.FieldBrand:     {Type: field.TypeOther, Column: console.FieldBrand},
 			console.FieldSerial:    {Type: field.TypeString, Column: console.FieldSerial},
 			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
 			console.FieldBusiness:  {Type: field.TypeEnum, Column: console.FieldBusiness},
@@ -260,11 +257,6 @@ func (f *BinFilter) WhereCabinetID(p entql.Uint64P) {
 	f.Where(p.Field(bin.FieldCabinetID))
 }
 
-// WhereBrand applies the entql other predicate on the brand field.
-func (f *BinFilter) WhereBrand(p entql.OtherP) {
-	f.Where(p.Field(bin.FieldBrand))
-}
-
 // WhereSerial applies the entql string predicate on the serial field.
 func (f *BinFilter) WhereSerial(p entql.StringP) {
 	f.Where(p.Field(bin.FieldSerial))
@@ -404,11 +396,6 @@ func (f *CabinetFilter) WherePower(p entql.BoolP) {
 	f.Where(p.Field(cabinet.FieldPower))
 }
 
-// WhereBrand applies the entql other predicate on the brand field.
-func (f *CabinetFilter) WhereBrand(p entql.OtherP) {
-	f.Where(p.Field(cabinet.FieldBrand))
-}
-
 // WhereSerial applies the entql string predicate on the serial field.
 func (f *CabinetFilter) WhereSerial(p entql.StringP) {
 	f.Where(p.Field(cabinet.FieldSerial))
@@ -526,11 +513,6 @@ func (f *ConsoleFilter) WhereBinID(p entql.Uint64P) {
 // WhereOperate applies the entql other predicate on the operate field.
 func (f *ConsoleFilter) WhereOperate(p entql.OtherP) {
 	f.Where(p.Field(console.FieldOperate))
-}
-
-// WhereBrand applies the entql other predicate on the brand field.
-func (f *ConsoleFilter) WhereBrand(p entql.OtherP) {
-	f.Where(p.Field(console.FieldBrand))
 }
 
 // WhereSerial applies the entql string predicate on the serial field.

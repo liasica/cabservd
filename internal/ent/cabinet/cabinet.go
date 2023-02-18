@@ -20,8 +20,6 @@ const (
 	FieldOnline = "online"
 	// FieldPower holds the string denoting the power field in the database.
 	FieldPower = "power"
-	// FieldBrand holds the string denoting the brand field in the database.
-	FieldBrand = "brand"
 	// FieldSerial holds the string denoting the serial field in the database.
 	FieldSerial = "serial"
 	// FieldStatus holds the string denoting the status field in the database.
@@ -62,7 +60,6 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldOnline,
 	FieldPower,
-	FieldBrand,
 	FieldSerial,
 	FieldStatus,
 	FieldEnable,

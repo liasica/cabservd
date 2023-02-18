@@ -28,8 +28,6 @@ type Console struct {
 	BinID *uint64 `json:"bin_id,omitempty"`
 	// 操作
 	Operate cabdef.Operate `json:"operate,omitempty"`
-	// 品牌
-	Brand adapter.CabinetBrand `json:"brand,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 标识符
@@ -109,8 +107,6 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case console.FieldBusiness:
 			values[i] = new(adapter.Business)
-		case console.FieldBrand:
-			values[i] = new(adapter.CabinetBrand)
 		case console.FieldUserType:
 			values[i] = new(adapter.UserType)
 		case console.FieldOperate:
@@ -164,12 +160,6 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field operate", values[i])
 			} else if value != nil {
 				c.Operate = *value
-			}
-		case console.FieldBrand:
-			if value, ok := values[i].(*adapter.CabinetBrand); !ok {
-				return fmt.Errorf("unexpected type %T for field brand", values[i])
-			} else if value != nil {
-				c.Brand = *value
 			}
 		case console.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -271,19 +261,19 @@ func (c *Console) assignValues(columns []string, values []any) error {
 
 // QueryCabinet queries the "cabinet" edge of the Console entity.
 func (c *Console) QueryCabinet() *CabinetQuery {
-	return (&ConsoleClient{config: c.config}).QueryCabinet(c)
+	return NewConsoleClient(c.config).QueryCabinet(c)
 }
 
 // QueryBin queries the "bin" edge of the Console entity.
 func (c *Console) QueryBin() *BinQuery {
-	return (&ConsoleClient{config: c.config}).QueryBin(c)
+	return NewConsoleClient(c.config).QueryBin(c)
 }
 
 // Update returns a builder for updating this Console.
 // Note that you need to call Console.Unwrap() before calling this method if this Console
 // was returned from a transaction, and the transaction was committed or rolled back.
 func (c *Console) Update() *ConsoleUpdateOne {
-	return (&ConsoleClient{config: c.config}).UpdateOne(c)
+	return NewConsoleClient(c.config).UpdateOne(c)
 }
 
 // Unwrap unwraps the Console entity that was returned from a transaction after it was closed,
@@ -312,9 +302,6 @@ func (c *Console) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("operate=")
 	builder.WriteString(fmt.Sprintf("%v", c.Operate))
-	builder.WriteString(", ")
-	builder.WriteString("brand=")
-	builder.WriteString(fmt.Sprintf("%v", c.Brand))
 	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(c.Serial)

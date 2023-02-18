@@ -19,8 +19,6 @@ const (
 	FieldUUID = "uuid"
 	// FieldCabinetID holds the string denoting the cabinet_id field in the database.
 	FieldCabinetID = "cabinet_id"
-	// FieldBrand holds the string denoting the brand field in the database.
-	FieldBrand = "brand"
 	// FieldSerial holds the string denoting the serial field in the database.
 	FieldSerial = "serial"
 	// FieldName holds the string denoting the name field in the database.
@@ -67,7 +65,6 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldUUID,
 	FieldCabinetID,
-	FieldBrand,
 	FieldSerial,
 	FieldName,
 	FieldOrdinal,

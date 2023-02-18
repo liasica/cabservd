@@ -15,7 +15,6 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "uuid", Type: field.TypeString, Unique: true, Size: 32, Comment: "唯一标识"},
-		{Name: "brand", Type: field.TypeOther, Comment: "品牌", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜设备序列号"},
 		{Name: "name", Type: field.TypeString, Comment: "仓位名称(N号仓)"},
 		{Name: "ordinal", Type: field.TypeInt, Comment: "仓位序号(从1开始)"},
@@ -39,7 +38,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "bin_cabinet_bins",
-				Columns:    []*schema.Column{BinColumns[18]},
+				Columns:    []*schema.Column{BinColumns[17]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -53,32 +52,32 @@ var (
 			{
 				Name:    "bin_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[18]},
+				Columns: []*schema.Column{BinColumns[17]},
 			},
 			{
-				Name:    "bin_serial_brand",
+				Name:    "bin_serial",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[5], BinColumns[4]},
+				Columns: []*schema.Column{BinColumns[4]},
 			},
 			{
 				Name:    "bin_battery_exists",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[11]},
+				Columns: []*schema.Column{BinColumns[10]},
 			},
 			{
 				Name:    "bin_ordinal",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[7]},
+				Columns: []*schema.Column{BinColumns[6]},
 			},
 			{
 				Name:    "bin_battery_sn",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[12]},
+				Columns: []*schema.Column{BinColumns[11]},
 			},
 			{
 				Name:    "bin_soc",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[15]},
+				Columns: []*schema.Column{BinColumns[14]},
 			},
 		},
 	}
@@ -89,7 +88,6 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "online", Type: field.TypeBool, Comment: "是否在线", Default: false},
 		{Name: "power", Type: field.TypeBool, Comment: "市电是否正常", Default: true},
-		{Name: "brand", Type: field.TypeOther, Comment: "品牌", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Unique: true, Comment: "电柜编号"},
 		{Name: "status", Type: field.TypeEnum, Comment: "状态", Enums: []string{"initializing", "idle", "busy", "exchange", "abnormal"}, Default: "initializing"},
 		{Name: "enable", Type: field.TypeBool, Comment: "电柜是否启用", Default: false},
@@ -113,29 +111,24 @@ var (
 				Columns: []*schema.Column{CabinetColumns[1]},
 			},
 			{
-				Name:    "cabinet_brand",
-				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[5]},
-			},
-			{
 				Name:    "cabinet_status",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[7]},
+				Columns: []*schema.Column{CabinetColumns[6]},
 			},
 			{
 				Name:    "cabinet_enable",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[8]},
+				Columns: []*schema.Column{CabinetColumns[7]},
 			},
 			{
 				Name:    "cabinet_lng",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[9]},
+				Columns: []*schema.Column{CabinetColumns[8]},
 			},
 			{
 				Name:    "cabinet_lat",
 				Unique:  false,
-				Columns: []*schema.Column{CabinetColumns[10]},
+				Columns: []*schema.Column{CabinetColumns[9]},
 			},
 		},
 	}
@@ -143,7 +136,6 @@ var (
 	ConsoleColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "operate", Type: field.TypeOther, Comment: "操作", SchemaType: map[string]string{"postgres": "varchar"}},
-		{Name: "brand", Type: field.TypeOther, Comment: "品牌", SchemaType: map[string]string{"postgres": "varchar"}},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜设备序列号"},
 		{Name: "uuid", Type: field.TypeUUID, Comment: "标识符"},
 		{Name: "business", Type: field.TypeEnum, Comment: "业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订", Enums: []string{"operate", "exchange", "active", "pause", "continue", "unsubscribe"}},
@@ -169,13 +161,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "console_cabinet_cabinet",
-				Columns:    []*schema.Column{ConsoleColumns[17]},
+				Columns:    []*schema.Column{ConsoleColumns[16]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "console_bin_bin",
-				Columns:    []*schema.Column{ConsoleColumns[18]},
+				Columns:    []*schema.Column{ConsoleColumns[17]},
 				RefColumns: []*schema.Column{BinColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -184,47 +176,42 @@ var (
 			{
 				Name:    "console_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[17]},
+				Columns: []*schema.Column{ConsoleColumns[16]},
 			},
 			{
 				Name:    "console_bin_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[18]},
-			},
-			{
-				Name:    "console_brand",
-				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[2]},
+				Columns: []*schema.Column{ConsoleColumns[17]},
 			},
 			{
 				Name:    "console_serial",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[3]},
+				Columns: []*schema.Column{ConsoleColumns[2]},
 			},
 			{
 				Name:    "console_uuid",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[4]},
+				Columns: []*schema.Column{ConsoleColumns[3]},
 			},
 			{
 				Name:    "console_user_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[6]},
+				Columns: []*schema.Column{ConsoleColumns[5]},
 			},
 			{
 				Name:    "console_user_type",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[7]},
+				Columns: []*schema.Column{ConsoleColumns[6]},
 			},
 			{
 				Name:    "console_start_at",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[13]},
+				Columns: []*schema.Column{ConsoleColumns[12]},
 			},
 			{
 				Name:    "console_stop_at",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[14]},
+				Columns: []*schema.Column{ConsoleColumns[13]},
 			},
 		},
 	}

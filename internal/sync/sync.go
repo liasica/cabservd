@@ -10,7 +10,6 @@ import (
     "github.com/auroraride/adapter/pqm"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
-    "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/types"
     "sync"
@@ -28,7 +27,7 @@ func Start() {
     createSync()
 
     // 获取所有电柜
-    cabs, _ := ent.Database.Cabinet.Query().WithBins(func(query *ent.BinQuery) { query.Order(ent.Asc(bin.FieldOrdinal)) }).Where(cabinet.Brand(g.Config.Brand)).All(context.Background())
+    cabs, _ := ent.Database.Cabinet.Query().WithBins(func(query *ent.BinQuery) { query.Order(ent.Asc(bin.FieldOrdinal)) }).All(context.Background())
 
     // 缓存电柜信息
     for _, cab := range cabs {

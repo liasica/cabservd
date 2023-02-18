@@ -7,7 +7,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 )
 
@@ -74,11 +73,6 @@ func Online(v bool) predicate.Cabinet {
 // Power applies equality check predicate on the "power" field. It's identical to PowerEQ.
 func Power(v bool) predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldEQ(FieldPower, v))
-}
-
-// Brand applies equality check predicate on the "brand" field. It's identical to BrandEQ.
-func Brand(v adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldEQ(FieldBrand, v))
 }
 
 // Serial applies equality check predicate on the "serial" field. It's identical to SerialEQ.
@@ -224,46 +218,6 @@ func PowerEQ(v bool) predicate.Cabinet {
 // PowerNEQ applies the NEQ predicate on the "power" field.
 func PowerNEQ(v bool) predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldNEQ(FieldPower, v))
-}
-
-// BrandEQ applies the EQ predicate on the "brand" field.
-func BrandEQ(v adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldEQ(FieldBrand, v))
-}
-
-// BrandNEQ applies the NEQ predicate on the "brand" field.
-func BrandNEQ(v adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldNEQ(FieldBrand, v))
-}
-
-// BrandIn applies the In predicate on the "brand" field.
-func BrandIn(vs ...adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldIn(FieldBrand, vs...))
-}
-
-// BrandNotIn applies the NotIn predicate on the "brand" field.
-func BrandNotIn(vs ...adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldNotIn(FieldBrand, vs...))
-}
-
-// BrandGT applies the GT predicate on the "brand" field.
-func BrandGT(v adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldGT(FieldBrand, v))
-}
-
-// BrandGTE applies the GTE predicate on the "brand" field.
-func BrandGTE(v adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldGTE(FieldBrand, v))
-}
-
-// BrandLT applies the LT predicate on the "brand" field.
-func BrandLT(v adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldLT(FieldBrand, v))
-}
-
-// BrandLTE applies the LTE predicate on the "brand" field.
-func BrandLTE(v adapter.CabinetBrand) predicate.Cabinet {
-	return predicate.Cabinet(sql.FieldLTE(FieldBrand, v))
 }
 
 // SerialEQ applies the EQ predicate on the "serial" field.

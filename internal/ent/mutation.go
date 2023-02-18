@@ -46,7 +46,6 @@ type BinMutation struct {
 	created_at     *time.Time
 	updated_at     *time.Time
 	uuid           *string
-	brand          *adapter.CabinetBrand
 	serial         *string
 	name           *string
 	ordinal        *int
@@ -313,42 +312,6 @@ func (m *BinMutation) OldCabinetID(ctx context.Context) (v uint64, err error) {
 // ResetCabinetID resets all changes to the "cabinet_id" field.
 func (m *BinMutation) ResetCabinetID() {
 	m.cabinet = nil
-}
-
-// SetBrand sets the "brand" field.
-func (m *BinMutation) SetBrand(ab adapter.CabinetBrand) {
-	m.brand = &ab
-}
-
-// Brand returns the value of the "brand" field in the mutation.
-func (m *BinMutation) Brand() (r adapter.CabinetBrand, exists bool) {
-	v := m.brand
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldBrand returns the old "brand" field's value of the Bin entity.
-// If the Bin object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BinMutation) OldBrand(ctx context.Context) (v adapter.CabinetBrand, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBrand requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBrand: %w", err)
-	}
-	return oldValue.Brand, nil
-}
-
-// ResetBrand resets all changes to the "brand" field.
-func (m *BinMutation) ResetBrand() {
-	m.brand = nil
 }
 
 // SetSerial sets the "serial" field.
@@ -992,7 +955,7 @@ func (m *BinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BinMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, bin.FieldCreatedAt)
 	}
@@ -1004,9 +967,6 @@ func (m *BinMutation) Fields() []string {
 	}
 	if m.cabinet != nil {
 		fields = append(fields, bin.FieldCabinetID)
-	}
-	if m.brand != nil {
-		fields = append(fields, bin.FieldBrand)
 	}
 	if m.serial != nil {
 		fields = append(fields, bin.FieldSerial)
@@ -1063,8 +1023,6 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.UUID()
 	case bin.FieldCabinetID:
 		return m.CabinetID()
-	case bin.FieldBrand:
-		return m.Brand()
 	case bin.FieldSerial:
 		return m.Serial()
 	case bin.FieldName:
@@ -1108,8 +1066,6 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldUUID(ctx)
 	case bin.FieldCabinetID:
 		return m.OldCabinetID(ctx)
-	case bin.FieldBrand:
-		return m.OldBrand(ctx)
 	case bin.FieldSerial:
 		return m.OldSerial(ctx)
 	case bin.FieldName:
@@ -1172,13 +1128,6 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCabinetID(v)
-		return nil
-	case bin.FieldBrand:
-		v, ok := value.(adapter.CabinetBrand)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetBrand(v)
 		return nil
 	case bin.FieldSerial:
 		v, ok := value.(string)
@@ -1404,9 +1353,6 @@ func (m *BinMutation) ResetField(name string) error {
 	case bin.FieldCabinetID:
 		m.ResetCabinetID()
 		return nil
-	case bin.FieldBrand:
-		m.ResetBrand()
-		return nil
 	case bin.FieldSerial:
 		m.ResetSerial()
 		return nil
@@ -1534,7 +1480,6 @@ type CabinetMutation struct {
 	updated_at     *time.Time
 	online         *bool
 	power          *bool
-	brand          *adapter.CabinetBrand
 	serial         *string
 	status         *cabinet.Status
 	enable         *bool
@@ -1801,42 +1746,6 @@ func (m *CabinetMutation) OldPower(ctx context.Context) (v bool, err error) {
 // ResetPower resets all changes to the "power" field.
 func (m *CabinetMutation) ResetPower() {
 	m.power = nil
-}
-
-// SetBrand sets the "brand" field.
-func (m *CabinetMutation) SetBrand(ab adapter.CabinetBrand) {
-	m.brand = &ab
-}
-
-// Brand returns the value of the "brand" field in the mutation.
-func (m *CabinetMutation) Brand() (r adapter.CabinetBrand, exists bool) {
-	v := m.brand
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldBrand returns the old "brand" field's value of the Cabinet entity.
-// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *CabinetMutation) OldBrand(ctx context.Context) (v adapter.CabinetBrand, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBrand requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBrand: %w", err)
-	}
-	return oldValue.Brand, nil
-}
-
-// ResetBrand resets all changes to the "brand" field.
-func (m *CabinetMutation) ResetBrand() {
-	m.brand = nil
 }
 
 // SetSerial sets the "serial" field.
@@ -2525,7 +2434,7 @@ func (m *CabinetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CabinetMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 14)
 	if m.created_at != nil {
 		fields = append(fields, cabinet.FieldCreatedAt)
 	}
@@ -2537,9 +2446,6 @@ func (m *CabinetMutation) Fields() []string {
 	}
 	if m.power != nil {
 		fields = append(fields, cabinet.FieldPower)
-	}
-	if m.brand != nil {
-		fields = append(fields, cabinet.FieldBrand)
 	}
 	if m.serial != nil {
 		fields = append(fields, cabinet.FieldSerial)
@@ -2587,8 +2493,6 @@ func (m *CabinetMutation) Field(name string) (ent.Value, bool) {
 		return m.Online()
 	case cabinet.FieldPower:
 		return m.Power()
-	case cabinet.FieldBrand:
-		return m.Brand()
 	case cabinet.FieldSerial:
 		return m.Serial()
 	case cabinet.FieldStatus:
@@ -2626,8 +2530,6 @@ func (m *CabinetMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldOnline(ctx)
 	case cabinet.FieldPower:
 		return m.OldPower(ctx)
-	case cabinet.FieldBrand:
-		return m.OldBrand(ctx)
 	case cabinet.FieldSerial:
 		return m.OldSerial(ctx)
 	case cabinet.FieldStatus:
@@ -2684,13 +2586,6 @@ func (m *CabinetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetPower(v)
-		return nil
-	case cabinet.FieldBrand:
-		v, ok := value.(adapter.CabinetBrand)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetBrand(v)
 		return nil
 	case cabinet.FieldSerial:
 		v, ok := value.(string)
@@ -2955,9 +2850,6 @@ func (m *CabinetMutation) ResetField(name string) error {
 	case cabinet.FieldPower:
 		m.ResetPower()
 		return nil
-	case cabinet.FieldBrand:
-		m.ResetBrand()
-		return nil
 	case cabinet.FieldSerial:
 		m.ResetSerial()
 		return nil
@@ -3083,7 +2975,6 @@ type ConsoleMutation struct {
 	typ            string
 	id             *uint64
 	operate        *cabdef.Operate
-	brand          *adapter.CabinetBrand
 	serial         *string
 	uuid           *uuid.UUID
 	business       *adapter.Business
@@ -3327,42 +3218,6 @@ func (m *ConsoleMutation) OldOperate(ctx context.Context) (v cabdef.Operate, err
 // ResetOperate resets all changes to the "operate" field.
 func (m *ConsoleMutation) ResetOperate() {
 	m.operate = nil
-}
-
-// SetBrand sets the "brand" field.
-func (m *ConsoleMutation) SetBrand(ab adapter.CabinetBrand) {
-	m.brand = &ab
-}
-
-// Brand returns the value of the "brand" field in the mutation.
-func (m *ConsoleMutation) Brand() (r adapter.CabinetBrand, exists bool) {
-	v := m.brand
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldBrand returns the old "brand" field's value of the Console entity.
-// If the Console object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConsoleMutation) OldBrand(ctx context.Context) (v adapter.CabinetBrand, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBrand requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBrand: %w", err)
-	}
-	return oldValue.Brand, nil
-}
-
-// ResetBrand resets all changes to the "brand" field.
-func (m *ConsoleMutation) ResetBrand() {
-	m.brand = nil
 }
 
 // SetSerial sets the "serial" field.
@@ -4087,7 +3942,7 @@ func (m *ConsoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConsoleMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 17)
 	if m.cabinet != nil {
 		fields = append(fields, console.FieldCabinetID)
 	}
@@ -4096,9 +3951,6 @@ func (m *ConsoleMutation) Fields() []string {
 	}
 	if m.operate != nil {
 		fields = append(fields, console.FieldOperate)
-	}
-	if m.brand != nil {
-		fields = append(fields, console.FieldBrand)
 	}
 	if m.serial != nil {
 		fields = append(fields, console.FieldSerial)
@@ -4156,8 +4008,6 @@ func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
 		return m.BinID()
 	case console.FieldOperate:
 		return m.Operate()
-	case console.FieldBrand:
-		return m.Brand()
 	case console.FieldSerial:
 		return m.Serial()
 	case console.FieldUUID:
@@ -4201,8 +4051,6 @@ func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldBinID(ctx)
 	case console.FieldOperate:
 		return m.OldOperate(ctx)
-	case console.FieldBrand:
-		return m.OldBrand(ctx)
 	case console.FieldSerial:
 		return m.OldSerial(ctx)
 	case console.FieldUUID:
@@ -4260,13 +4108,6 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetOperate(v)
-		return nil
-	case console.FieldBrand:
-		v, ok := value.(adapter.CabinetBrand)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetBrand(v)
 		return nil
 	case console.FieldSerial:
 		v, ok := value.(string)
@@ -4501,9 +4342,6 @@ func (m *ConsoleMutation) ResetField(name string) error {
 		return nil
 	case console.FieldOperate:
 		m.ResetOperate()
-		return nil
-	case console.FieldBrand:
-		m.ResetBrand()
 		return nil
 	case console.FieldSerial:
 		m.ResetSerial()

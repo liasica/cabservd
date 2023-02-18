@@ -69,6 +69,12 @@ type CabinetDeleteOne struct {
 	cd *CabinetDelete
 }
 
+// Where appends a list predicates to the CabinetDelete builder.
+func (cdo *CabinetDeleteOne) Where(ps ...predicate.Cabinet) *CabinetDeleteOne {
+	cdo.cd.mutation.Where(ps...)
+	return cdo
+}
+
 // Exec executes the deletion query.
 func (cdo *CabinetDeleteOne) Exec(ctx context.Context) error {
 	n, err := cdo.cd.Exec(ctx)
@@ -84,5 +90,7 @@ func (cdo *CabinetDeleteOne) Exec(ctx context.Context) error {
 
 // ExecX is like Exec, but panics if an error occurs.
 func (cdo *CabinetDeleteOne) ExecX(ctx context.Context) {
-	cdo.cd.ExecX(ctx)
+	if err := cdo.Exec(ctx); err != nil {
+		panic(err)
+	}
 }

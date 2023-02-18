@@ -19,8 +19,6 @@ const (
 	FieldBinID = "bin_id"
 	// FieldOperate holds the string denoting the operate field in the database.
 	FieldOperate = "operate"
-	// FieldBrand holds the string denoting the brand field in the database.
-	FieldBrand = "brand"
 	// FieldSerial holds the string denoting the serial field in the database.
 	FieldSerial = "serial"
 	// FieldUUID holds the string denoting the uuid field in the database.
@@ -77,7 +75,6 @@ var Columns = []string{
 	FieldCabinetID,
 	FieldBinID,
 	FieldOperate,
-	FieldBrand,
 	FieldSerial,
 	FieldUUID,
 	FieldBusiness,

@@ -18,11 +18,8 @@ import (
 // ScanQuery is the builder for querying Scan entities.
 type ScanQuery struct {
 	config
-	limit       *int
-	offset      *int
-	unique      *bool
+	ctx         *QueryContext
 	order       []OrderFunc
-	fields      []string
 	inters      []Interceptor
 	predicates  []predicate.Scan
 	withCabinet *CabinetQuery
@@ -40,20 +37,20 @@ func (sq *ScanQuery) Where(ps ...predicate.Scan) *ScanQuery {
 
 // Limit the number of records to be returned by this query.
 func (sq *ScanQuery) Limit(limit int) *ScanQuery {
-	sq.limit = &limit
+	sq.ctx.Limit = &limit
 	return sq
 }
 
 // Offset to start from.
 func (sq *ScanQuery) Offset(offset int) *ScanQuery {
-	sq.offset = &offset
+	sq.ctx.Offset = &offset
 	return sq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
 func (sq *ScanQuery) Unique(unique bool) *ScanQuery {
-	sq.unique = &unique
+	sq.ctx.Unique = &unique
 	return sq
 }
 
@@ -88,7 +85,7 @@ func (sq *ScanQuery) QueryCabinet() *CabinetQuery {
 // First returns the first Scan entity from the query.
 // Returns a *NotFoundError when no Scan was found.
 func (sq *ScanQuery) First(ctx context.Context) (*Scan, error) {
-	nodes, err := sq.Limit(1).All(newQueryContext(ctx, TypeScan, "First"))
+	nodes, err := sq.Limit(1).All(setContextOp(ctx, sq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +108,7 @@ func (sq *ScanQuery) FirstX(ctx context.Context) *Scan {
 // Returns a *NotFoundError when no Scan ID was found.
 func (sq *ScanQuery) FirstID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = sq.Limit(1).IDs(newQueryContext(ctx, TypeScan, "FirstID")); err != nil {
+	if ids, err = sq.Limit(1).IDs(setContextOp(ctx, sq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +131,7 @@ func (sq *ScanQuery) FirstIDX(ctx context.Context) uint64 {
 // Returns a *NotSingularError when more than one Scan entity is found.
 // Returns a *NotFoundError when no Scan entities are found.
 func (sq *ScanQuery) Only(ctx context.Context) (*Scan, error) {
-	nodes, err := sq.Limit(2).All(newQueryContext(ctx, TypeScan, "Only"))
+	nodes, err := sq.Limit(2).All(setContextOp(ctx, sq.ctx, "Only"))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +159,7 @@ func (sq *ScanQuery) OnlyX(ctx context.Context) *Scan {
 // Returns a *NotFoundError when no entities are found.
 func (sq *ScanQuery) OnlyID(ctx context.Context) (id uint64, err error) {
 	var ids []uint64
-	if ids, err = sq.Limit(2).IDs(newQueryContext(ctx, TypeScan, "OnlyID")); err != nil {
+	if ids, err = sq.Limit(2).IDs(setContextOp(ctx, sq.ctx, "OnlyID")); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +184,7 @@ func (sq *ScanQuery) OnlyIDX(ctx context.Context) uint64 {
 
 // All executes the query and returns a list of Scans.
 func (sq *ScanQuery) All(ctx context.Context) ([]*Scan, error) {
-	ctx = newQueryContext(ctx, TypeScan, "All")
+	ctx = setContextOp(ctx, sq.ctx, "All")
 	if err := sq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -207,7 +204,7 @@ func (sq *ScanQuery) AllX(ctx context.Context) []*Scan {
 // IDs executes the query and returns a list of Scan IDs.
 func (sq *ScanQuery) IDs(ctx context.Context) ([]uint64, error) {
 	var ids []uint64
-	ctx = newQueryContext(ctx, TypeScan, "IDs")
+	ctx = setContextOp(ctx, sq.ctx, "IDs")
 	if err := sq.Select(scan.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -225,7 +222,7 @@ func (sq *ScanQuery) IDsX(ctx context.Context) []uint64 {
 
 // Count returns the count of the given query.
 func (sq *ScanQuery) Count(ctx context.Context) (int, error) {
-	ctx = newQueryContext(ctx, TypeScan, "Count")
+	ctx = setContextOp(ctx, sq.ctx, "Count")
 	if err := sq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -243,7 +240,7 @@ func (sq *ScanQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (sq *ScanQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = newQueryContext(ctx, TypeScan, "Exist")
+	ctx = setContextOp(ctx, sq.ctx, "Exist")
 	switch _, err := sq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -271,16 +268,14 @@ func (sq *ScanQuery) Clone() *ScanQuery {
 	}
 	return &ScanQuery{
 		config:      sq.config,
-		limit:       sq.limit,
-		offset:      sq.offset,
+		ctx:         sq.ctx.Clone(),
 		order:       append([]OrderFunc{}, sq.order...),
 		inters:      append([]Interceptor{}, sq.inters...),
 		predicates:  append([]predicate.Scan{}, sq.predicates...),
 		withCabinet: sq.withCabinet.Clone(),
 		// clone intermediate query.
-		sql:    sq.sql.Clone(),
-		path:   sq.path,
-		unique: sq.unique,
+		sql:  sq.sql.Clone(),
+		path: sq.path,
 	}
 }
 
@@ -310,9 +305,9 @@ func (sq *ScanQuery) WithCabinet(opts ...func(*CabinetQuery)) *ScanQuery {
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (sq *ScanQuery) GroupBy(field string, fields ...string) *ScanGroupBy {
-	sq.fields = append([]string{field}, fields...)
+	sq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &ScanGroupBy{build: sq}
-	grbuild.flds = &sq.fields
+	grbuild.flds = &sq.ctx.Fields
 	grbuild.label = scan.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
@@ -331,10 +326,10 @@ func (sq *ScanQuery) GroupBy(field string, fields ...string) *ScanGroupBy {
 //		Select(scan.FieldCreatedAt).
 //		Scan(ctx, &v)
 func (sq *ScanQuery) Select(fields ...string) *ScanSelect {
-	sq.fields = append(sq.fields, fields...)
+	sq.ctx.Fields = append(sq.ctx.Fields, fields...)
 	sbuild := &ScanSelect{ScanQuery: sq}
 	sbuild.label = scan.Label
-	sbuild.flds, sbuild.scan = &sq.fields, sbuild.Scan
+	sbuild.flds, sbuild.scan = &sq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
@@ -354,7 +349,7 @@ func (sq *ScanQuery) prepareQuery(ctx context.Context) error {
 			}
 		}
 	}
-	for _, f := range sq.fields {
+	for _, f := range sq.ctx.Fields {
 		if !scan.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
@@ -417,6 +412,9 @@ func (sq *ScanQuery) loadCabinet(ctx context.Context, query *CabinetQuery, nodes
 		}
 		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
+	if len(ids) == 0 {
+		return nil
+	}
 	query.Where(cabinet.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -439,9 +437,9 @@ func (sq *ScanQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(sq.modifiers) > 0 {
 		_spec.Modifiers = sq.modifiers
 	}
-	_spec.Node.Columns = sq.fields
-	if len(sq.fields) > 0 {
-		_spec.Unique = sq.unique != nil && *sq.unique
+	_spec.Node.Columns = sq.ctx.Fields
+	if len(sq.ctx.Fields) > 0 {
+		_spec.Unique = sq.ctx.Unique != nil && *sq.ctx.Unique
 	}
 	return sqlgraph.CountNodes(ctx, sq.driver, _spec)
 }
@@ -459,10 +457,10 @@ func (sq *ScanQuery) querySpec() *sqlgraph.QuerySpec {
 		From:   sq.sql,
 		Unique: true,
 	}
-	if unique := sq.unique; unique != nil {
+	if unique := sq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
 	}
-	if fields := sq.fields; len(fields) > 0 {
+	if fields := sq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
 		_spec.Node.Columns = append(_spec.Node.Columns, scan.FieldID)
 		for i := range fields {
@@ -478,10 +476,10 @@ func (sq *ScanQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 	}
-	if limit := sq.limit; limit != nil {
+	if limit := sq.ctx.Limit; limit != nil {
 		_spec.Limit = *limit
 	}
-	if offset := sq.offset; offset != nil {
+	if offset := sq.ctx.Offset; offset != nil {
 		_spec.Offset = *offset
 	}
 	if ps := sq.order; len(ps) > 0 {
@@ -497,7 +495,7 @@ func (sq *ScanQuery) querySpec() *sqlgraph.QuerySpec {
 func (sq *ScanQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(sq.driver.Dialect())
 	t1 := builder.Table(scan.Table)
-	columns := sq.fields
+	columns := sq.ctx.Fields
 	if len(columns) == 0 {
 		columns = scan.Columns
 	}
@@ -506,7 +504,7 @@ func (sq *ScanQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector = sq.sql
 		selector.Select(selector.Columns(columns...)...)
 	}
-	if sq.unique != nil && *sq.unique {
+	if sq.ctx.Unique != nil && *sq.ctx.Unique {
 		selector.Distinct()
 	}
 	for _, m := range sq.modifiers {
@@ -518,12 +516,12 @@ func (sq *ScanQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	for _, p := range sq.order {
 		p(selector)
 	}
-	if offset := sq.offset; offset != nil {
+	if offset := sq.ctx.Offset; offset != nil {
 		// limit is mandatory for offset clause. We start
 		// with default value, and override it below if needed.
 		selector.Offset(*offset).Limit(math.MaxInt32)
 	}
-	if limit := sq.limit; limit != nil {
+	if limit := sq.ctx.Limit; limit != nil {
 		selector.Limit(*limit)
 	}
 	return selector
@@ -565,7 +563,7 @@ func (sgb *ScanGroupBy) Aggregate(fns ...AggregateFunc) *ScanGroupBy {
 
 // Scan applies the selector query and scans the result into the given value.
 func (sgb *ScanGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeScan, "GroupBy")
+	ctx = setContextOp(ctx, sgb.build.ctx, "GroupBy")
 	if err := sgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -613,7 +611,7 @@ func (ss *ScanSelect) Aggregate(fns ...AggregateFunc) *ScanSelect {
 
 // Scan applies the selector query and scans the result into the given value.
 func (ss *ScanSelect) Scan(ctx context.Context, v any) error {
-	ctx = newQueryContext(ctx, TypeScan, "Select")
+	ctx = setContextOp(ctx, ss.ctx, "Select")
 	if err := ss.prepareQuery(ctx); err != nil {
 		return err
 	}

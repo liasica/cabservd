@@ -187,7 +187,6 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
     // 创建记录
     var co *ent.Console
     co, err = ent.Database.Console.Create().
-        SetBrand(eb.Brand).
         SetOperate(step.Operate).
         SetCabinetID(eb.CabinetID).
         SetBinID(eb.ID).

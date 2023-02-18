@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -61,12 +60,6 @@ func (bc *BinCreate) SetUUID(s string) *BinCreate {
 // SetCabinetID sets the "cabinet_id" field.
 func (bc *BinCreate) SetCabinetID(u uint64) *BinCreate {
 	bc.mutation.SetCabinetID(u)
-	return bc
-}
-
-// SetBrand sets the "brand" field.
-func (bc *BinCreate) SetBrand(ab adapter.CabinetBrand) *BinCreate {
-	bc.mutation.SetBrand(ab)
 	return bc
 }
 
@@ -333,9 +326,6 @@ func (bc *BinCreate) check() error {
 	if _, ok := bc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet_id", err: errors.New(`ent: missing required field "Bin.cabinet_id"`)}
 	}
-	if _, ok := bc.mutation.Brand(); !ok {
-		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "Bin.brand"`)}
-	}
 	if _, ok := bc.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Bin.serial"`)}
 	}
@@ -419,10 +409,6 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.UUID(); ok {
 		_spec.SetField(bin.FieldUUID, field.TypeString, value)
 		_node.UUID = value
-	}
-	if value, ok := bc.mutation.Brand(); ok {
-		_spec.SetField(bin.FieldBrand, field.TypeOther, value)
-		_node.Brand = value
 	}
 	if value, ok := bc.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
@@ -581,18 +567,6 @@ func (u *BinUpsert) SetCabinetID(v uint64) *BinUpsert {
 // UpdateCabinetID sets the "cabinet_id" field to the value that was provided on create.
 func (u *BinUpsert) UpdateCabinetID() *BinUpsert {
 	u.SetExcluded(bin.FieldCabinetID)
-	return u
-}
-
-// SetBrand sets the "brand" field.
-func (u *BinUpsert) SetBrand(v adapter.CabinetBrand) *BinUpsert {
-	u.Set(bin.FieldBrand, v)
-	return u
-}
-
-// UpdateBrand sets the "brand" field to the value that was provided on create.
-func (u *BinUpsert) UpdateBrand() *BinUpsert {
-	u.SetExcluded(bin.FieldBrand)
 	return u
 }
 
@@ -872,20 +846,6 @@ func (u *BinUpsertOne) SetCabinetID(v uint64) *BinUpsertOne {
 func (u *BinUpsertOne) UpdateCabinetID() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateCabinetID()
-	})
-}
-
-// SetBrand sets the "brand" field.
-func (u *BinUpsertOne) SetBrand(v adapter.CabinetBrand) *BinUpsertOne {
-	return u.Update(func(s *BinUpsert) {
-		s.SetBrand(v)
-	})
-}
-
-// UpdateBrand sets the "brand" field to the value that was provided on create.
-func (u *BinUpsertOne) UpdateBrand() *BinUpsertOne {
-	return u.Update(func(s *BinUpsert) {
-		s.UpdateBrand()
 	})
 }
 
@@ -1367,20 +1327,6 @@ func (u *BinUpsertBulk) SetCabinetID(v uint64) *BinUpsertBulk {
 func (u *BinUpsertBulk) UpdateCabinetID() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateCabinetID()
-	})
-}
-
-// SetBrand sets the "brand" field.
-func (u *BinUpsertBulk) SetBrand(v adapter.CabinetBrand) *BinUpsertBulk {
-	return u.Update(func(s *BinUpsert) {
-		s.SetBrand(v)
-	})
-}
-
-// UpdateBrand sets the "brand" field to the value that was provided on create.
-func (u *BinUpsertBulk) UpdateBrand() *BinUpsertBulk {
-	return u.Update(func(s *BinUpsert) {
-		s.UpdateBrand()
 	})
 }
 

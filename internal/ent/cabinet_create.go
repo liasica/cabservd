@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/auroraride/adapter"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -77,12 +76,6 @@ func (cc *CabinetCreate) SetNillablePower(b *bool) *CabinetCreate {
 	if b != nil {
 		cc.SetPower(*b)
 	}
-	return cc
-}
-
-// SetBrand sets the "brand" field.
-func (cc *CabinetCreate) SetBrand(ab adapter.CabinetBrand) *CabinetCreate {
-	cc.mutation.SetBrand(ab)
 	return cc
 }
 
@@ -308,9 +301,6 @@ func (cc *CabinetCreate) check() error {
 	if _, ok := cc.mutation.Power(); !ok {
 		return &ValidationError{Name: "power", err: errors.New(`ent: missing required field "Cabinet.power"`)}
 	}
-	if _, ok := cc.mutation.Brand(); !ok {
-		return &ValidationError{Name: "brand", err: errors.New(`ent: missing required field "Cabinet.brand"`)}
-	}
 	if _, ok := cc.mutation.Serial(); !ok {
 		return &ValidationError{Name: "serial", err: errors.New(`ent: missing required field "Cabinet.serial"`)}
 	}
@@ -373,10 +363,6 @@ func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Power(); ok {
 		_spec.SetField(cabinet.FieldPower, field.TypeBool, value)
 		_node.Power = value
-	}
-	if value, ok := cc.mutation.Brand(); ok {
-		_spec.SetField(cabinet.FieldBrand, field.TypeOther, value)
-		_node.Brand = value
 	}
 	if value, ok := cc.mutation.Serial(); ok {
 		_spec.SetField(cabinet.FieldSerial, field.TypeString, value)
@@ -522,18 +508,6 @@ func (u *CabinetUpsert) SetPower(v bool) *CabinetUpsert {
 // UpdatePower sets the "power" field to the value that was provided on create.
 func (u *CabinetUpsert) UpdatePower() *CabinetUpsert {
 	u.SetExcluded(cabinet.FieldPower)
-	return u
-}
-
-// SetBrand sets the "brand" field.
-func (u *CabinetUpsert) SetBrand(v adapter.CabinetBrand) *CabinetUpsert {
-	u.Set(cabinet.FieldBrand, v)
-	return u
-}
-
-// UpdateBrand sets the "brand" field to the value that was provided on create.
-func (u *CabinetUpsert) UpdateBrand() *CabinetUpsert {
-	u.SetExcluded(cabinet.FieldBrand)
 	return u
 }
 
@@ -825,20 +799,6 @@ func (u *CabinetUpsertOne) SetPower(v bool) *CabinetUpsertOne {
 func (u *CabinetUpsertOne) UpdatePower() *CabinetUpsertOne {
 	return u.Update(func(s *CabinetUpsert) {
 		s.UpdatePower()
-	})
-}
-
-// SetBrand sets the "brand" field.
-func (u *CabinetUpsertOne) SetBrand(v adapter.CabinetBrand) *CabinetUpsertOne {
-	return u.Update(func(s *CabinetUpsert) {
-		s.SetBrand(v)
-	})
-}
-
-// UpdateBrand sets the "brand" field to the value that was provided on create.
-func (u *CabinetUpsertOne) UpdateBrand() *CabinetUpsertOne {
-	return u.Update(func(s *CabinetUpsert) {
-		s.UpdateBrand()
 	})
 }
 
@@ -1334,20 +1294,6 @@ func (u *CabinetUpsertBulk) SetPower(v bool) *CabinetUpsertBulk {
 func (u *CabinetUpsertBulk) UpdatePower() *CabinetUpsertBulk {
 	return u.Update(func(s *CabinetUpsert) {
 		s.UpdatePower()
-	})
-}
-
-// SetBrand sets the "brand" field.
-func (u *CabinetUpsertBulk) SetBrand(v adapter.CabinetBrand) *CabinetUpsertBulk {
-	return u.Update(func(s *CabinetUpsert) {
-		s.SetBrand(v)
-	})
-}
-
-// UpdateBrand sets the "brand" field to the value that was provided on create.
-func (u *CabinetUpsertBulk) UpdateBrand() *CabinetUpsertBulk {
-	return u.Update(func(s *CabinetUpsert) {
-		s.UpdateBrand()
 	})
 }
 
