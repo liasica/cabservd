@@ -6,9 +6,9 @@
 package main
 
 import (
-    "github.com/auroraride/adapter/codec"
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
+    "github.com/auroraride/cabservd/internal/codec"
 )
 
 func main() {

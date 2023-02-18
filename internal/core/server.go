@@ -7,7 +7,7 @@ package core
 
 import (
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/codec"
+    "github.com/auroraride/cabservd/internal/codec"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
 )
