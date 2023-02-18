@@ -10,10 +10,7 @@ import (
     "github.com/auroraride/adapter/maintain"
     "github.com/auroraride/cabservd/assets"
     "log"
-)
-
-const (
-    configFile = "config/config.yaml"
+    "os"
 )
 
 type config struct {
@@ -43,6 +40,10 @@ var (
 
 func LoadConfig() {
     var err error
+    configFile := os.Getenv("CONFIG_FILE")
+    if configFile == "" {
+        configFile = "config/config.yaml"
+    }
 
     Config = new(config)
     err = adapter.LoadConfigure(Config, configFile, assets.DefaultConfig)
