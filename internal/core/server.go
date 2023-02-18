@@ -10,16 +10,14 @@ import (
     "github.com/auroraride/adapter/codec"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
-    "sync"
 )
 
 func Start(addr string, brand adapter.CabinetBrand, bean Hook, codec codec.Codec) {
     Hub = &hub{
-        addr:    addr,
-        Bean:    bean,
-        brand:   brand,
-        codec:   codec,
-        Clients: &sync.Map{},
+        addr:  addr,
+        Bean:  bean,
+        brand: brand,
+        codec: codec,
     }
 
     // go Hub.deadCheck()

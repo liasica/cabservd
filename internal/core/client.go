@@ -13,7 +13,6 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/g"
-    "github.com/google/uuid"
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
@@ -22,8 +21,6 @@ import (
 )
 
 type Client struct {
-    ID uuid.UUID
-
     // gnet 连接
     gnet.Conn
 
@@ -46,7 +43,6 @@ type MessageProxy struct {
 
 func NewClient(conn gnet.Conn, h *hub) *Client {
     c := &Client{
-        ID:       uuid.New(),
         Conn:     conn,
         Hub:      h,
         receiver: make(chan *MessageProxy),
@@ -106,19 +102,18 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
 }
 
 // GetClient 获取在线的客户端
-func GetClient(devId string) (c *Client, err error) {
-    Hub.Clients.Range(func(key, value any) bool {
-        client, _ := value.(*Client)
-        sn, _ := key.(string)
-        if sn == devId {
-            c = client
-            return false
+func GetClient(serial string) (c *Client, err error) {
+    v, exists := Hub.Clients.Load(serial)
+    if exists {
+        var ok bool
+        c, ok = v.(*Client)
+        if ok {
+            return
         }
-        return true
-    })
-    if c == nil {
-        err = adapter.ErrorCabinetClientNotFound
     }
+
+    err = adapter.ErrorCabinetClientNotFound
+
     return
 }
 
@@ -133,14 +128,7 @@ func (c *Client) Close() {
         close(c.receiver)
 
         // 查找并删除客户端
-        c.Hub.Clients.Range(func(k, v any) bool {
-            if client, ok := v.(*Client); ok && client.ID == c.ID {
-                c.Hub.Clients.Delete(k)
-                return false
-            }
-            return true
-        })
-
+        c.Hub.Clients.Delete(c.Serial)
     })
 }
 
