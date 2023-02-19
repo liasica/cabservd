@@ -29,7 +29,9 @@ func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Hander) OnMessage(b []byte, client *core.Client) (message any, err error) {
+func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
+    go client.Info("收到消息 ↑", zap.ByteString("decoded", b))
+
     req := new(Request)
     err = jsoniter.Unmarshal(b, req)
     if err != nil {
@@ -51,13 +53,12 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (message any, err erro
 
     // 发送失败响应
     if err != nil {
-        zap.L().Error("凯信消息解析失败", zap.Int("FD", client.Fd()), zap.String("address", client.RemoteAddr().String()), zap.Error(err))
         _ = client.SendMessage(req.Fail(), false)
         return
     }
 
     err = client.SendMessage(req.Success(), false)
-    return req, err
+    return err
 }
 
 // LoginHandle 登录请求

@@ -7,7 +7,6 @@ package core
 
 import (
     "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/codec"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
@@ -89,7 +88,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
             return
         }
 
-        // 使用channel处理消息体
+        // 处理消息
         go h.handleMessage(cli, b)
     }
 
@@ -97,30 +96,13 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
 }
 
 func (h *hub) handleMessage(c *Client, b []byte) {
-    fields := []zap.Field{
-        zap.ByteString("decoded", b),
-    }
-    var (
-        err     error
-        message any
-    )
-
-    // 记录日志
-    defer func() {
-        lvl := zap.InfoLevel
-        if err != nil {
-            lvl = zap.ErrorLevel
-            fields = append(fields, zap.Error(err))
-        }
-        if message != nil {
-            fields = append(fields, log.Payload(message))
-        }
-        c.Log(lvl, "收到消息 ↑", fields...)
-    }()
-
     // 更新在线状态
     go c.UpdateOnline()
 
     // 解析数据
-    message, err = h.Bean.OnMessage(b, c)
+    err := h.Bean.OnMessage(b, c)
+
+    if err != nil {
+        c.Error("消息解析失败", zap.Error(err))
+    }
 }
