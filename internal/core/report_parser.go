@@ -8,7 +8,6 @@ package core
 import (
     "context"
     "fmt"
-    "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -24,7 +23,7 @@ type ReportParser interface {
     GetBins() ent.BinPointers
 }
 
-func UpdateCabinet(brand adapter.CabinetBrand, p ReportParser) {
+func UpdateCabinet(p ReportParser) {
     ctx := context.Background()
 
     serial, ok := p.GetSerial()
@@ -38,7 +37,7 @@ func UpdateCabinet(brand adapter.CabinetBrand, p ReportParser) {
     }
 
     bins := p.GetBins()
-    SaveBins(ctx, brand, serial, bins)
+    SaveBins(ctx, serial, bins)
 }
 
 func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
@@ -117,7 +116,7 @@ func SaveCabinet(ctx context.Context, serial string, item *ent.CabinetPointer) {
     }
 }
 
-func SaveBins(ctx context.Context, brand adapter.CabinetBrand, serial string, items ent.BinPointers) {
+func SaveBins(ctx context.Context, serial string, items ent.BinPointers) {
     if len(items) == 0 {
         return
     }
@@ -129,7 +128,7 @@ func SaveBins(ctx context.Context, brand adapter.CabinetBrand, serial string, it
     }
 
     for _, item := range items {
-        uuid := tools.Md5String(fmt.Sprintf("%s_%s_%d", brand, serial, *item.Ordinal))
+        uuid := tools.Md5String(fmt.Sprintf("%s_%d", serial, *item.Ordinal))
         err := ent.Database.Bin.Create().
             SetUUID(uuid).
             SetSerial(serial).

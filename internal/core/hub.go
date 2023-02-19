@@ -23,9 +23,6 @@ type hub struct {
     // address to listen
     addr string
 
-    // 电柜品牌
-    brand adapter.CabinetBrand
-
     // 电柜协议
     Bean Hook
 

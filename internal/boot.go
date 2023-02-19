@@ -96,7 +96,6 @@ func Boot(hook core.Hook, codecor codec.Codec) {
     // 启动socket hub
     go core.Start(
         g.Config.Tcp.Bind,
-        g.Config.Brand,
         hook,
         codecor,
     )
