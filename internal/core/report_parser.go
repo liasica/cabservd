@@ -42,13 +42,13 @@ func UpdateCabinet(brand adapter.CabinetBrand, p ReportParser) {
 }
 
 func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
-    client := ent.Database.Cabinet
-    cab, _ = client.Query().Where(cabinet.Serial(serial)).First(ctx)
+    orm := ent.Database.Cabinet
+    cab, _ = orm.Query().Where(cabinet.Serial(serial)).First(ctx)
     if cab != nil {
         return
     }
     var err error
-    cab, err = client.Create().SetSerial(serial).Save(ctx)
+    cab, err = orm.Create().SetSerial(serial).Save(ctx)
     if err != nil {
         zap.L().Error("电柜保存失败", zap.Error(err))
     }

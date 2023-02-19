@@ -19,7 +19,7 @@ const (
 
 type Codec interface {
     Decode(c gnet.Conn) (b []byte, err error)
-    Encode(data []byte) []byte
+    Encode(data []byte) (b []byte)
 }
 
 // Newline 以\n为分割处理

@@ -16,7 +16,6 @@ import (
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
-    "strconv"
     "time"
 )
 
@@ -66,7 +65,7 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
                 level = zap.ErrorLevel
                 fields = append(fields, zap.Error(err), log.Binary(b))
             }
-            zap.L().Log(level, "发送消息 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), fields...)
+            c.Log(level, "发送消息 ↓ ", fields...)
         }
     }()
 

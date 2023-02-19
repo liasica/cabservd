@@ -11,7 +11,6 @@ import (
     "github.com/auroraride/cabservd/internal/codec"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
-    "strconv"
     "sync"
 )
 
@@ -46,24 +45,20 @@ func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
 }
 
 func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
-    zap.L().Info("新增客户端连接 -> " + c.RemoteAddr().String() + ":" + strconv.Itoa(c.Fd()))
-
     client := NewClient(c, h)
+    client.Info("新增客户端连接")
 
     // 设置连接上下文信息
     c.SetContext(client)
-
     return
 }
 
 func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
-    text := c.RemoteAddr().String() + ":" + strconv.Itoa(c.Fd())
-    defer zap.L().Info("客户端断开连接 -> "+text, zap.Error(err))
     // 获取客户端
     client, ok := c.Context().(*Client)
     // 关闭客户端
     if ok {
-        text += ":" + client.Serial
+        client.Info("客户端断开连接", zap.Error(err))
         go client.AfterClose()
     }
     return
@@ -90,7 +85,7 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
         }
 
         if err != nil {
-            zap.L().Error("消息读取失败 -> "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), zap.Error(err))
+            cli.Error("消息读取失败", zap.Error(err))
             return
         }
 
@@ -120,7 +115,7 @@ func (h *hub) handleMessage(c *Client, b []byte) {
         if message != nil {
             fields = append(fields, log.Payload(message))
         }
-        zap.L().Log(lvl, "收到消息 <- "+c.RemoteAddr().String()+":"+strconv.Itoa(c.Fd()), fields...)
+        c.Log(lvl, "收到消息 ↑", fields...)
     }()
 
     // 更新在线状态
