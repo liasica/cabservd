@@ -90,8 +90,9 @@ func (c *Client) UpdateOnline() {
 
 // Register 保存设备识别码并注册连接
 func (c *Client) Register(serial string) {
-    if serial != "" {
-        c.Serial = serial
-        c.Hub.Clients.Store(serial, c)
+    if serial == "" {
+        return
     }
+    c.Serial = serial
+    c.Hub.Clients.Store(serial, c)
 }

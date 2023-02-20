@@ -8,7 +8,9 @@ package kaixin
 import (
     "context"
     "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/core"
+    "github.com/google/uuid"
     jsoniter "github.com/json-iterator/go"
     "go.uber.org/zap"
 )
@@ -29,8 +31,9 @@ func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
-    go client.Info("收到消息 ↑", zap.ByteString("decoded", b))
+func (h *Hander) OnMessage(b []byte, c *core.Client) (err error) {
+    uid := uuid.New().String()
+    go c.Info("收到消息 ↑", zap.ByteString("decoded", b), zap.String("uid", uid))
 
     req := new(Request)
     err = jsoniter.Unmarshal(b, req)
@@ -40,7 +43,7 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
 
     switch req.MsgType {
     case MessageTypeLoginRequest:
-        err = h.LoginHandle(req, client)
+        err = h.LoginHandle(req, c)
     case MessageTypeReportRequest:
         err = h.ReportHandle(req)
     case MessageTypeNoticeRequest:
@@ -51,13 +54,19 @@ func (h *Hander) OnMessage(b []byte, client *core.Client) (err error) {
         return
     }
 
+    // 注册电柜客户端
+    // FIX FOR: 凯信电柜离线后, 有时候会不重发100(注册信息), 此处做兼容处理, Fuck
+    c.Register(req.DevID)
+
+    go c.Info("格式化消息", log.Payload(req), zap.String("uid", uid))
+
     // 发送失败响应
     if err != nil {
-        _ = client.SendMessage(req.Fail(), false)
+        _ = c.SendMessage(req.Fail(), false)
         return
     }
 
-    err = client.SendMessage(req.Success(), false)
+    err = c.SendMessage(req.Success(), false)
     return err
 }
 

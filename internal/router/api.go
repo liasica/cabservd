@@ -18,6 +18,8 @@ import (
 func Start(e *echo.Echo) {
     e.Renderer = assets.Templates
 
+    e.GET("/maintain/clients", api.Maintain.Clients)
+
     // 仓位操作 <管理员权限>
     e.POST("/operate/bin", api.Operate.Bin, app.UserTypeManagerMiddleware())
 

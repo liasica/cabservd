@@ -61,10 +61,10 @@ func (h *hub) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
         // 标记电柜为离线
         if c.Serial != "" {
             go c.Offline()
-        }
 
-        // 查找并删除客户端
-        h.Clients.Delete(c.Serial)
+            // 查找并删除客户端
+            h.Clients.Delete(c.Serial)
+        }
     }
     return
 }
