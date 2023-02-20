@@ -18,15 +18,15 @@ const (
 )
 
 type Codec interface {
-    Decode(c gnet.Conn) (b []byte, err error)
+    Decode(conn gnet.Conn) (b []byte, err error)
     Encode(data []byte) (b []byte)
 }
 
 // Newline 以\n为分割处理
 type Newline struct{}
 
-func (codec *Newline) Decode(c gnet.Conn) (b []byte, err error) {
-    b, err = bufio.NewReader(c).ReadBytes('\n')
+func (codec *Newline) Decode(conn gnet.Conn) (b []byte, err error) {
+    b, err = bufio.NewReader(conn).ReadBytes('\n')
     if err != nil {
         return
     }
@@ -40,19 +40,19 @@ func (codec *Newline) Encode(message []byte) []byte {
 // HeaderLength 以头部4字节定义
 type HeaderLength struct{}
 
-func (codec *HeaderLength) Decode(c gnet.Conn) ([]byte, error) {
-    buf, _ := c.Peek(bodySize)
+func (codec *HeaderLength) Decode(conn gnet.Conn) ([]byte, error) {
+    buf, _ := conn.Peek(bodySize)
     if len(buf) < bodySize {
         return nil, adapter.ErrorIncompletePacket
     }
 
     bodyLen := binary.BigEndian.Uint32(buf[:bodySize])
     msgLen := bodySize + int(bodyLen)
-    if c.InboundBuffered() < msgLen {
+    if conn.InboundBuffered() < msgLen {
         return nil, adapter.ErrorIncompletePacket
     }
-    buf, _ = c.Peek(msgLen)
-    _, _ = c.Discard(msgLen)
+    buf, _ = conn.Peek(msgLen)
+    _, _ = conn.Discard(msgLen)
 
     return bytes.TrimSpace(bytes.Replace(buf[bodySize:msgLen], adapter.Newline, nil, -1)), nil
 }

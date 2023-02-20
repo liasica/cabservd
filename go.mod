@@ -3,8 +3,8 @@ module github.com/auroraride/cabservd
 go 1.19
 
 require (
-	ariga.io/atlas v0.9.1-0.20230119145809-92243f7c55cb
-	entgo.io/ent v0.11.7
+	ariga.io/atlas v0.9.1-0.20230212142236-47ec3817e19f
+	entgo.io/ent v0.11.9-0.20230219143902-44327541440b
 	github.com/auroraride/adapter v0.0.0
 	github.com/go-redis/redis/v9 v9.0.0-rc.2
 	github.com/google/uuid v1.3.0

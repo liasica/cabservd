@@ -7,12 +7,10 @@ package core
 
 import (
     "context"
-    "fmt"
     "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/liasica/go-helpers/tools"
     "go.uber.org/zap"
     "time"
 )
@@ -128,14 +126,12 @@ func SaveBins(ctx context.Context, serial string, items ent.BinPointers) {
     }
 
     for _, item := range items {
-        uuid := tools.Md5String(fmt.Sprintf("%s_%d", serial, *item.Ordinal))
         err := ent.Database.Bin.Create().
-            SetUUID(uuid).
             SetSerial(serial).
             SetName(*item.Name).
             SetCabinetID(cab.ID).
             SetOrdinal(*item.Ordinal).
-            OnConflictColumns(bin.FieldUUID).
+            OnConflictColumns(bin.FieldSerial, bin.FieldOrdinal).
             Update(func(u *ent.BinUpsert) {
                 // 更新时间和电柜ID
                 u.SetUpdatedAt(time.Now()).SetCabinetID(cab.ID)
@@ -188,7 +184,6 @@ func SaveBins(ctx context.Context, serial string, items ent.BinPointers) {
                     // }
                 }
             }).
-            UpdateUUID().
             Exec(ctx)
         if err != nil {
             zap.L().Error("仓位保存失败", zap.Error(err), log.Payload(item))

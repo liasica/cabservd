@@ -40,29 +40,38 @@ func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
     return gnet.None
 }
 
-func (h *hub) OnOpen(c gnet.Conn) (out []byte, action gnet.Action) {
-    client := NewClient(c, h)
-    client.Info("新增客户端连接")
+func (h *hub) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
+    c := NewClient(conn, h)
+    c.Info("新增客户端连接")
 
     // 设置连接上下文信息
-    c.SetContext(client)
+    conn.SetContext(c)
     return
 }
 
-func (h *hub) OnClose(c gnet.Conn, err error) (action gnet.Action) {
+func (h *hub) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
     // 获取客户端
-    client, ok := c.Context().(*Client)
+    c, ok := conn.Context().(*Client)
     // 关闭客户端
     if ok {
-        client.Info("客户端断开连接", zap.Error(err))
-        go client.AfterClose()
+        c.Info("客户端断开连接", zap.Error(err))
+        // 停止计时
+        c.dead.Stop()
+
+        // 标记电柜为离线
+        if c.Serial != "" {
+            go c.Offline()
+        }
+
+        // 查找并删除客户端
+        h.Clients.Delete(c.Serial)
     }
     return
 }
 
-func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
+func (h *hub) OnTraffic(conn gnet.Conn) (action gnet.Action) {
     // 获取客户端
-    cli, ok := c.Context().(*Client)
+    c, ok := conn.Context().(*Client)
     if !ok {
         // TODO 关闭连接
         return gnet.Shutdown
@@ -74,19 +83,19 @@ func (h *hub) OnTraffic(c gnet.Conn) (action gnet.Action) {
     )
 
     for {
-        b, err = h.codec.Decode(c)
+        b, err = h.codec.Decode(conn)
 
         if err == adapter.ErrorIncompletePacket {
             break
         }
 
         if err != nil {
-            cli.Error("消息读取失败", zap.Error(err))
+            c.Error("消息读取失败", zap.Error(err))
             return
         }
 
         // 处理消息
-        go h.handleMessage(cli, b)
+        go h.handleMessage(c, b)
     }
 
     return gnet.None
@@ -102,4 +111,18 @@ func (h *hub) handleMessage(c *Client, b []byte) {
     if err != nil {
         c.Error("消息解析失败", zap.Error(err))
     }
+}
+
+// GetClient 获取在线的客户端
+func GetClient(serial string) (c *Client, err error) {
+    v, exists := Hub.Clients.Load(serial)
+    if exists {
+        var ok bool
+        if c, ok = v.(*Client); ok {
+            return
+        }
+    }
+
+    err = adapter.ErrorCabinetClientNotFound
+    return
 }

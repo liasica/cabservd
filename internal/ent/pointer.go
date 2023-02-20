@@ -14,7 +14,6 @@ import (
 
 type BinPointers []*BinPointer
 type BinPointer struct {
-	UUID          *string  `json:"uuid,omitempty"`
 	CabinetID     *uint64  `json:"cabinet_id,omitempty"`
 	Serial        *string  `json:"serial,omitempty"`
 	Name          *string  `json:"name,omitempty"`

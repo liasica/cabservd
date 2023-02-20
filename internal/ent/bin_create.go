@@ -51,12 +51,6 @@ func (bc *BinCreate) SetNillableUpdatedAt(t *time.Time) *BinCreate {
 	return bc
 }
 
-// SetUUID sets the "uuid" field.
-func (bc *BinCreate) SetUUID(s string) *BinCreate {
-	bc.mutation.SetUUID(s)
-	return bc
-}
-
 // SetCabinetID sets the "cabinet_id" field.
 func (bc *BinCreate) SetCabinetID(u uint64) *BinCreate {
 	bc.mutation.SetCabinetID(u)
@@ -315,14 +309,6 @@ func (bc *BinCreate) check() error {
 	if _, ok := bc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Bin.updated_at"`)}
 	}
-	if _, ok := bc.mutation.UUID(); !ok {
-		return &ValidationError{Name: "uuid", err: errors.New(`ent: missing required field "Bin.uuid"`)}
-	}
-	if v, ok := bc.mutation.UUID(); ok {
-		if err := bin.UUIDValidator(v); err != nil {
-			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
-		}
-	}
 	if _, ok := bc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet_id", err: errors.New(`ent: missing required field "Bin.cabinet_id"`)}
 	}
@@ -405,10 +391,6 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.UpdatedAt(); ok {
 		_spec.SetField(bin.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
-	}
-	if value, ok := bc.mutation.UUID(); ok {
-		_spec.SetField(bin.FieldUUID, field.TypeString, value)
-		_node.UUID = value
 	}
 	if value, ok := bc.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
@@ -543,18 +525,6 @@ func (u *BinUpsert) SetUpdatedAt(v time.Time) *BinUpsert {
 // UpdateUpdatedAt sets the "updated_at" field to the value that was provided on create.
 func (u *BinUpsert) UpdateUpdatedAt() *BinUpsert {
 	u.SetExcluded(bin.FieldUpdatedAt)
-	return u
-}
-
-// SetUUID sets the "uuid" field.
-func (u *BinUpsert) SetUUID(v string) *BinUpsert {
-	u.Set(bin.FieldUUID, v)
-	return u
-}
-
-// UpdateUUID sets the "uuid" field to the value that was provided on create.
-func (u *BinUpsert) UpdateUUID() *BinUpsert {
-	u.SetExcluded(bin.FieldUUID)
 	return u
 }
 
@@ -818,20 +788,6 @@ func (u *BinUpsertOne) SetUpdatedAt(v time.Time) *BinUpsertOne {
 func (u *BinUpsertOne) UpdateUpdatedAt() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateUpdatedAt()
-	})
-}
-
-// SetUUID sets the "uuid" field.
-func (u *BinUpsertOne) SetUUID(v string) *BinUpsertOne {
-	return u.Update(func(s *BinUpsert) {
-		s.SetUUID(v)
-	})
-}
-
-// UpdateUUID sets the "uuid" field to the value that was provided on create.
-func (u *BinUpsertOne) UpdateUUID() *BinUpsertOne {
-	return u.Update(func(s *BinUpsert) {
-		s.UpdateUUID()
 	})
 }
 
@@ -1299,20 +1255,6 @@ func (u *BinUpsertBulk) SetUpdatedAt(v time.Time) *BinUpsertBulk {
 func (u *BinUpsertBulk) UpdateUpdatedAt() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.UpdateUpdatedAt()
-	})
-}
-
-// SetUUID sets the "uuid" field.
-func (u *BinUpsertBulk) SetUUID(v string) *BinUpsertBulk {
-	return u.Update(func(s *BinUpsert) {
-		s.SetUUID(v)
-	})
-}
-
-// UpdateUUID sets the "uuid" field to the value that was provided on create.
-func (u *BinUpsertBulk) UpdateUUID() *BinUpsertBulk {
-	return u.Update(func(s *BinUpsert) {
-		s.UpdateUUID()
 	})
 }
 

@@ -45,7 +45,6 @@ type BinMutation struct {
 	id             *uint64
 	created_at     *time.Time
 	updated_at     *time.Time
-	uuid           *string
 	serial         *string
 	name           *string
 	ordinal        *int
@@ -240,42 +239,6 @@ func (m *BinMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error)
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *BinMutation) ResetUpdatedAt() {
 	m.updated_at = nil
-}
-
-// SetUUID sets the "uuid" field.
-func (m *BinMutation) SetUUID(s string) {
-	m.uuid = &s
-}
-
-// UUID returns the value of the "uuid" field in the mutation.
-func (m *BinMutation) UUID() (r string, exists bool) {
-	v := m.uuid
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUUID returns the old "uuid" field's value of the Bin entity.
-// If the Bin object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *BinMutation) OldUUID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUUID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUUID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUUID: %w", err)
-	}
-	return oldValue.UUID, nil
-}
-
-// ResetUUID resets all changes to the "uuid" field.
-func (m *BinMutation) ResetUUID() {
-	m.uuid = nil
 }
 
 // SetCabinetID sets the "cabinet_id" field.
@@ -955,15 +918,12 @@ func (m *BinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BinMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 16)
 	if m.created_at != nil {
 		fields = append(fields, bin.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, bin.FieldUpdatedAt)
-	}
-	if m.uuid != nil {
-		fields = append(fields, bin.FieldUUID)
 	}
 	if m.cabinet != nil {
 		fields = append(fields, bin.FieldCabinetID)
@@ -1019,8 +979,6 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case bin.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case bin.FieldUUID:
-		return m.UUID()
 	case bin.FieldCabinetID:
 		return m.CabinetID()
 	case bin.FieldSerial:
@@ -1062,8 +1020,6 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldCreatedAt(ctx)
 	case bin.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case bin.FieldUUID:
-		return m.OldUUID(ctx)
 	case bin.FieldCabinetID:
 		return m.OldCabinetID(ctx)
 	case bin.FieldSerial:
@@ -1114,13 +1070,6 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
-		return nil
-	case bin.FieldUUID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUUID(v)
 		return nil
 	case bin.FieldCabinetID:
 		v, ok := value.(uint64)
@@ -1346,9 +1295,6 @@ func (m *BinMutation) ResetField(name string) error {
 		return nil
 	case bin.FieldUpdatedAt:
 		m.ResetUpdatedAt()
-		return nil
-	case bin.FieldUUID:
-		m.ResetUUID()
 		return nil
 	case bin.FieldCabinetID:
 		m.ResetCabinetID()

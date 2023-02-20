@@ -31,7 +31,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 		Fields: map[string]*sqlgraph.FieldSpec{
 			bin.FieldCreatedAt:     {Type: field.TypeTime, Column: bin.FieldCreatedAt},
 			bin.FieldUpdatedAt:     {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
-			bin.FieldUUID:          {Type: field.TypeString, Column: bin.FieldUUID},
 			bin.FieldCabinetID:     {Type: field.TypeUint64, Column: bin.FieldCabinetID},
 			bin.FieldSerial:        {Type: field.TypeString, Column: bin.FieldSerial},
 			bin.FieldName:          {Type: field.TypeString, Column: bin.FieldName},
@@ -245,11 +244,6 @@ func (f *BinFilter) WhereCreatedAt(p entql.TimeP) {
 // WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
 func (f *BinFilter) WhereUpdatedAt(p entql.TimeP) {
 	f.Where(p.Field(bin.FieldUpdatedAt))
-}
-
-// WhereUUID applies the entql string predicate on the uuid field.
-func (f *BinFilter) WhereUUID(p entql.StringP) {
-	f.Where(p.Field(bin.FieldUUID))
 }
 
 // WhereCabinetID applies the entql uint64 predicate on the cabinet_id field.

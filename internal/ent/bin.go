@@ -21,8 +21,6 @@ type Bin struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// 唯一标识
-	UUID string `json:"uuid,omitempty"`
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// 电柜设备序列号
@@ -89,7 +87,7 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case bin.FieldID, bin.FieldCabinetID, bin.FieldOrdinal:
 			values[i] = new(sql.NullInt64)
-		case bin.FieldUUID, bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
+		case bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
 			values[i] = new(sql.NullString)
 		case bin.FieldCreatedAt, bin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -125,12 +123,6 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				b.UpdatedAt = value.Time
-			}
-		case bin.FieldUUID:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field uuid", values[i])
-			} else if value.Valid {
-				b.UUID = value.String
 			}
 		case bin.FieldCabinetID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -255,9 +247,6 @@ func (b *Bin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(b.UpdatedAt.Format(time.ANSIC))
-	builder.WriteString(", ")
-	builder.WriteString("uuid=")
-	builder.WriteString(b.UUID)
 	builder.WriteString(", ")
 	builder.WriteString("cabinet_id=")
 	builder.WriteString(fmt.Sprintf("%v", b.CabinetID))

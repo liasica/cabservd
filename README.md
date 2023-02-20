@@ -101,4 +101,27 @@ $$
         END IF;
     END
 $$;
+
+CREATE OR REPLACE FUNCTION set_serial_id_seq() RETURNS TRIGGER AS
+$$
+BEGIN
+    EXECUTE (FORMAT('SELECT setval(''%s_%s_seq'', (SELECT MAX(%s) from %s));',
+                    TG_TABLE_NAME,
+                    TG_ARGV[0],
+                    TG_ARGV[0],
+                    TG_TABLE_NAME));
+    RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+DO
+$$
+    BEGIN
+        CREATE OR REPLACE TRIGGER set_auto_id_seq
+            AFTER INSERT OR UPDATE OR DELETE
+            ON bin
+            FOR EACH STATEMENT
+        EXECUTE PROCEDURE set_serial_id_seq('id');
+    END
+$$;
 ```

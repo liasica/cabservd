@@ -7,9 +7,7 @@ package core
 
 import (
     "context"
-    "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/log"
-    "github.com/auroraride/adapter/snag"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/g"
@@ -43,7 +41,7 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
         Hub:  h,
     }
     c.dead = time.AfterFunc(20*time.Minute, func() {
-        c.Offline()
+        _ = c.Conn.Close()
     })
     return c
 }
@@ -79,38 +77,6 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
     _, err = c.Write(data)
 
     return
-}
-
-// GetClient 获取在线的客户端
-func GetClient(serial string) (c *Client, err error) {
-    v, exists := Hub.Clients.Load(serial)
-    if exists {
-        var ok bool
-        c, ok = v.(*Client)
-        if ok {
-            return
-        }
-    }
-
-    err = adapter.ErrorCabinetClientNotFound
-
-    return
-}
-
-// AfterClose 关闭电柜客户端
-func (c *Client) AfterClose() {
-    snag.WithRecover(func() {
-        // 停止计时
-        c.dead.Stop()
-
-        // 标记电柜为离线
-        if c.Serial != "" {
-            go c.Offline()
-        }
-
-        // 查找并删除客户端
-        c.Hub.Clients.Delete(c.Serial)
-    })
 }
 
 // Offline 标记电柜离线

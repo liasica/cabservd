@@ -36,12 +36,6 @@ func (bu *BinUpdate) SetUpdatedAt(t time.Time) *BinUpdate {
 	return bu
 }
 
-// SetUUID sets the "uuid" field.
-func (bu *BinUpdate) SetUUID(s string) *BinUpdate {
-	bu.mutation.SetUUID(s)
-	return bu
-}
-
 // SetCabinetID sets the "cabinet_id" field.
 func (bu *BinUpdate) SetCabinetID(u uint64) *BinUpdate {
 	bu.mutation.SetCabinetID(u)
@@ -301,11 +295,6 @@ func (bu *BinUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (bu *BinUpdate) check() error {
-	if v, ok := bu.mutation.UUID(); ok {
-		if err := bin.UUIDValidator(v); err != nil {
-			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
-		}
-	}
 	if _, ok := bu.mutation.CabinetID(); bu.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Bin.cabinet"`)
 	}
@@ -341,9 +330,6 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.UpdatedAt(); ok {
 		_spec.SetField(bin.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := bu.mutation.UUID(); ok {
-		_spec.SetField(bin.FieldUUID, field.TypeString, value)
 	}
 	if value, ok := bu.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
@@ -462,12 +448,6 @@ type BinUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (buo *BinUpdateOne) SetUpdatedAt(t time.Time) *BinUpdateOne {
 	buo.mutation.SetUpdatedAt(t)
-	return buo
-}
-
-// SetUUID sets the "uuid" field.
-func (buo *BinUpdateOne) SetUUID(s string) *BinUpdateOne {
-	buo.mutation.SetUUID(s)
 	return buo
 }
 
@@ -737,11 +717,6 @@ func (buo *BinUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (buo *BinUpdateOne) check() error {
-	if v, ok := buo.mutation.UUID(); ok {
-		if err := bin.UUIDValidator(v); err != nil {
-			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
-		}
-	}
 	if _, ok := buo.mutation.CabinetID(); buo.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Bin.cabinet"`)
 	}
@@ -794,9 +769,6 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if value, ok := buo.mutation.UpdatedAt(); ok {
 		_spec.SetField(bin.FieldUpdatedAt, field.TypeTime, value)
-	}
-	if value, ok := buo.mutation.UUID(); ok {
-		_spec.SetField(bin.FieldUUID, field.TypeString, value)
 	}
 	if value, ok := buo.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
