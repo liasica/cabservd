@@ -30,11 +30,6 @@ type Client struct {
     dead *time.Timer
 }
 
-type MessageProxy struct {
-    Data   []byte
-    Client *Client
-}
-
 func NewClient(conn gnet.Conn, h *hub) *Client {
     c := &Client{
         Conn: conn,
