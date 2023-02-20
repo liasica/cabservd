@@ -87,12 +87,3 @@ func (c *Client) Offline() {
 func (c *Client) UpdateOnline() {
     c.dead.Reset(20 * time.Minute)
 }
-
-// Register 保存设备识别码并注册连接
-func (c *Client) Register(serial string) {
-    if serial == "" {
-        return
-    }
-    c.Serial = serial
-    c.Hub.Clients.Store(serial, c)
-}

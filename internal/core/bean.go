@@ -7,6 +7,7 @@ package core
 
 import (
     "github.com/auroraride/adapter/defs/cabdef"
+    "go.uber.org/zap"
 )
 
 type (
@@ -15,7 +16,9 @@ type (
         OnConnect() (err error)
 
         // OnMessage 收到消息
-        OnMessage(b []byte, client *Client) (err error)
+        // serial 需要注册的电柜编号
+        // fields zap日志字段
+        OnMessage(b []byte, client *Client) (serial string, fields []zap.Field, err error)
 
         // SendControl 发送控制
         SendControl(serial string, typ cabdef.Operate, ordinal int) error
@@ -32,7 +35,7 @@ func (h *Bean) OnConnect() (err error) {
     return
 }
 
-func (h *Bean) OnMessage(_ []byte, _ *Client) (err error) {
+func (h *Bean) OnMessage(_ []byte, _ *Client) (serial string, fields []zap.Field, err error) {
     return
 }
 

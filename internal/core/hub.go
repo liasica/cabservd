@@ -10,6 +10,7 @@ import (
     "github.com/auroraride/cabservd/internal/codec"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
+    "go.uber.org/zap/zapcore"
     "sync"
 )
 
@@ -106,10 +107,30 @@ func (h *hub) handleMessage(c *Client, b []byte) {
     go c.UpdateOnline()
 
     // 解析数据
-    err := h.Bean.OnMessage(b, c)
+    serial, fields, err := h.Bean.OnMessage(b, c)
+    lvl := zapcore.InfoLevel
 
     if err != nil {
-        c.Error("消息解析失败", zap.Error(err))
+        lvl = zapcore.ErrorLevel
+    }
+
+    go c.Log(lvl, "收到消息 ↑", fields...)
+
+    // 注册电柜客户端
+    if serial != "" {
+        c.Serial = serial
+        h.register(c)
+    }
+}
+
+// Register 保存设备识别码并注册连接
+func (h *hub) register(c *Client) {
+    if c.Serial == "" {
+        return
+    }
+
+    if _, ok := h.Clients.Load(c.Serial); !ok {
+        h.Clients.Store(c.Serial, c)
     }
 }
 

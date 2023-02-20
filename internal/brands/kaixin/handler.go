@@ -10,7 +10,6 @@ import (
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/core"
-    "github.com/google/uuid"
     jsoniter "github.com/json-iterator/go"
     "go.uber.org/zap"
 )
@@ -31,15 +30,19 @@ func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Hander) OnMessage(b []byte, c *core.Client) (err error) {
-    uid := uuid.New().String()
-    go c.Info("收到消息 ↑", zap.ByteString("decoded", b), zap.String("uid", uid))
+func (h *Hander) OnMessage(b []byte, c *core.Client) (serial string, fields []zap.Field, err error) {
+    fields = []zap.Field{
+        zap.ByteString("decoded", b),
+    }
 
     req := new(Request)
     err = jsoniter.Unmarshal(b, req)
     if err != nil {
         return
     }
+
+    serial = req.DevID
+    fields = append(fields, log.Payload(req))
 
     switch req.MsgType {
     case MessageTypeLoginRequest:
@@ -54,12 +57,6 @@ func (h *Hander) OnMessage(b []byte, c *core.Client) (err error) {
         return
     }
 
-    // 注册电柜客户端
-    // FIX FOR: 凯信电柜离线后, 有时候会不重发100(注册信息), 此处做兼容处理, Fuck
-    c.Register(req.DevID)
-
-    go c.Info("格式化消息", log.Payload(req), zap.String("uid", uid))
-
     // 发送失败响应
     if err != nil {
         _ = c.SendMessage(req.Fail(), false)
@@ -67,7 +64,7 @@ func (h *Hander) OnMessage(b []byte, c *core.Client) (err error) {
     }
 
     err = c.SendMessage(req.Success(), false)
-    return err
+    return
 }
 
 // LoginHandle 登录请求
@@ -85,9 +82,6 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 
     // 查找或创建电柜
     go core.LoadOrStoreCabinet(context.Background(), req.DevID)
-
-    // 注册电柜客户端
-    client.Register(req.DevID)
 
     // TODO: 保存其他信息
     return
