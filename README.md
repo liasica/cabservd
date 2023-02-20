@@ -107,8 +107,10 @@ $$
 BEGIN
     EXECUTE (FORMAT('SELECT setval(''%s_%s_seq'', (SELECT MAX(%s) from %s));',
                     TG_TABLE_NAME,
-                    TG_ARGV[0],
-                    TG_ARGV[0],
+                    'id',
+                    'id',
+        --                     TG_ARGV[0],
+        --                     TG_ARGV[0],
                     TG_TABLE_NAME));
     RETURN OLD;
 END;
@@ -121,7 +123,13 @@ $$
             AFTER INSERT OR UPDATE OR DELETE
             ON bin
             FOR EACH STATEMENT
-        EXECUTE PROCEDURE set_serial_id_seq('id');
+        EXECUTE PROCEDURE set_serial_id_seq();
+
+        CREATE OR REPLACE TRIGGER set_auto_id_seq
+            AFTER INSERT OR UPDATE OR DELETE
+            ON cabinet
+            FOR EACH STATEMENT
+        EXECUTE PROCEDURE set_serial_id_seq();
     END
 $$;
 ```
