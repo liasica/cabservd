@@ -59,11 +59,11 @@ func (h *Hander) OnMessage(b []byte, c *core.Client) (serial string, fields []za
 
     // 发送失败响应
     if err != nil {
-        _ = c.SendMessage(req.Fail(), false)
+        _ = c.SendMessage(req.Fail())
         return
     }
 
-    err = c.SendMessage(req.Success(), false)
+    err = c.SendMessage(req.Success())
     return
 }
 

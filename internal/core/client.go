@@ -10,7 +10,6 @@ import (
     "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/auroraride/cabservd/internal/g"
     jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
@@ -42,7 +41,7 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
 }
 
 // SendMessage 向客户端发送消息
-func (c *Client) SendMessage(message any, savelog bool) (err error) {
+func (c *Client) SendMessage(message any) (err error) {
     b, _ := jsoniter.Marshal(message)
 
     data := c.Hub.codec.Encode(b)
@@ -52,22 +51,13 @@ func (c *Client) SendMessage(message any, savelog bool) (err error) {
             log.ResponseBody(b),
         }
 
-        if savelog || g.Config.Environment.IsDevelopment() {
-            level := zap.InfoLevel
-            if err != nil {
-                level = zap.ErrorLevel
-                fields = append(fields, zap.Error(err), log.Binary(b))
-            }
-            c.Log(level, "发送消息 ↓ ", fields...)
+        level := zap.InfoLevel
+        if err != nil {
+            level = zap.ErrorLevel
+            fields = append(fields, zap.Error(err), log.Binary(b))
         }
+        c.Log(level, "发送消息 ↓ ", fields...)
     }()
-
-    // // TODO DEMO
-    // if len(params) > 1 {
-    //     x := []byte(fmt.Sprintf(`{"msgType":500,"txnNo":%d,"devId":"CH6004KXHD220728222","paramList":[{"id":"02301001","value":"04","doorId":"7"}]}`, time.Now().UnixMilli()))
-    //     data = append(data, c.Hub.codec.Encode(x)...)
-    //     fmt.Printf("%x", data)
-    // }
 
     _, err = c.Write(data)
 
