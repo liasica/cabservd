@@ -235,7 +235,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 
     if step.Operate.IsCommand() {
         // 电柜控制
-        err = core.Hub.Bean.SendControl(eb.Serial, step.Operate, eb.Ordinal)
+        err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal)
 
         // TODO: 开仓失败后是否重复弹开逻辑???
         // TODO: 详细失败日志???
