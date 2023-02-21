@@ -42,7 +42,14 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
 
 // SendMessage 向客户端发送消息
 func (c *Client) SendMessage(message any) (err error) {
-    b, _ := jsoniter.Marshal(message)
+    var b []byte
+
+    switch v := message.(type) {
+    case []byte:
+        b = v
+    default:
+        b, _ = jsoniter.Marshal(message)
+    }
 
     data := c.Hub.codec.Encode(b)
 
