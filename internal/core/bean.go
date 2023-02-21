@@ -13,15 +13,15 @@ import (
 type (
     Hook interface {
         // OnConnect 连接接口
-        OnConnect() (err error)
+        OnConnect(c *Client)
 
         // OnMessage 收到消息
         // serial 需要注册的电柜编号
         // fields zap日志字段
-        OnMessage(b []byte, client *Client) (serial string, fields []zap.Field, err error)
+        OnMessage(c *Client, b []byte) (serial string, fields []zap.Field, err error)
 
         // SendControl 发送控制
-        SendControl(serial string, typ cabdef.Operate, ordinal int) error
+        SendControl(serial string, typ cabdef.Operate, ordinal int, params ...any) error
 
         // GetEmptyDeviation 获取空仓最大电压和电流
         // 空仓的时候有可能会有一定的电压和电流
@@ -31,15 +31,15 @@ type (
     Bean struct{}
 )
 
-func (h *Bean) OnConnect() (err error) {
+func (h *Bean) OnConnect(*Client) {
     return
 }
 
-func (h *Bean) OnMessage(_ []byte, _ *Client) (serial string, fields []zap.Field, err error) {
+func (h *Bean) OnMessage(_ *Client, _ []byte) (serial string, fields []zap.Field, err error) {
     return
 }
 
-func (h *Bean) SendControl(serial string, typ cabdef.Operate, ordinal int) (err error) {
+func (h *Bean) SendControl(_ string, _ cabdef.Operate, _ int, _ ...any) (err error) {
     return
 }
 

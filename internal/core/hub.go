@@ -45,6 +45,8 @@ func (h *hub) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
     c := NewClient(conn, h)
     c.Info("新增客户端连接")
 
+    h.Bean.OnConnect(c)
+
     // 设置连接上下文信息
     conn.SetContext(c)
     return
@@ -107,7 +109,7 @@ func (h *hub) handleMessage(c *Client, b []byte) {
     go c.UpdateOnline()
 
     // 解析数据
-    serial, fields, err := h.Bean.OnMessage(b, c)
+    serial, fields, err := h.Bean.OnMessage(c, b)
     lvl := zapcore.InfoLevel
 
     if err != nil {

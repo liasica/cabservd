@@ -14,23 +14,23 @@ import (
     "go.uber.org/zap"
 )
 
-type Hander struct {
+type Handler struct {
     core.Bean
 }
 
-func New() *Hander {
-    return &Hander{}
+func New() *Handler {
+    return &Handler{}
 }
 
 // GetEmptyDeviation TODO 后续做在数据库中
-func (h *Hander) GetEmptyDeviation() (voltage, current float64) {
+func (h *Handler) GetEmptyDeviation() (voltage, current float64) {
     voltage = 40
     current = 1
     return
 }
 
 // OnMessage 解析消息
-func (h *Hander) OnMessage(b []byte, c *core.Client) (serial string, fields []zap.Field, err error) {
+func (h *Handler) OnMessage(c *core.Client, b []byte) (serial string, fields []zap.Field, err error) {
     fields = []zap.Field{
         zap.ByteString("decoded", b),
     }
@@ -68,7 +68,7 @@ func (h *Hander) OnMessage(b []byte, c *core.Client) (serial string, fields []za
 }
 
 // LoginHandle 登录请求
-func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
+func (h *Handler) LoginHandle(req *Request, client *core.Client) (err error) {
     if req.DevID == "" {
         return adapter.ErrorCabinetSerialRequired
     }
@@ -88,7 +88,7 @@ func (h *Hander) LoginHandle(req *Request, client *core.Client) (err error) {
 }
 
 // ReportHandle 状态上报请求
-func (h *Hander) ReportHandle(req *Request) (err error) {
+func (h *Handler) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
         return adapter.ErrorCabinetSerialRequired
     }
@@ -97,7 +97,7 @@ func (h *Hander) ReportHandle(req *Request) (err error) {
 }
 
 // NoticeHandle 告警上报请求
-func (h *Hander) NoticeHandle(req *Request) (err error) {
+func (h *Handler) NoticeHandle(req *Request) (err error) {
     // TODO 解读并保存所有告警信息
     return
 }
