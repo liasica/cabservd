@@ -21,7 +21,7 @@ type (
         OnMessage(c *Client, b []byte) (serial string, fields []zap.Field, err error)
 
         // SendOperate 发送主要控制
-        SendOperate(serial string, typ cabdef.Operate, ordinal int, params ...any) error
+        SendOperate(serial string, typ cabdef.Operate, ordinal int) error
 
         // GetEmptyDeviation 获取空仓最大电压和电流
         // 空仓的时候有可能会有一定的电压和电流
@@ -39,7 +39,7 @@ func (h *Bean) OnMessage(_ *Client, _ []byte) (serial string, fields []zap.Field
     return
 }
 
-func (h *Bean) SendOperate(_ string, _ cabdef.Operate, _ int, _ ...any) (err error) {
+func (h *Bean) SendOperate(_ string, _ cabdef.Operate, _ int) (err error) {
     return
 }
 
