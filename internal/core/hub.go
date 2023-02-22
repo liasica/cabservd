@@ -109,7 +109,7 @@ func (h *hub) handleMessage(c *Client, b []byte) {
     go c.UpdateOnline()
 
     // 解析数据
-    serial, res, fields, err := h.Bean.OnMessage(b)
+    serial, res, fields, err := h.Bean.OnMessage(c, b)
     lvl := zapcore.InfoLevel
 
     if err != nil {

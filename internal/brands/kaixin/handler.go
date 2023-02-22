@@ -31,7 +31,7 @@ func (h *Handler) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Handler) OnMessage(b []byte) (serial string, res any, fields []zap.Field, err error) {
+func (h *Handler) OnMessage(_ *core.Client, b []byte) (serial string, res any, fields []zap.Field, err error) {
     fields = []zap.Field{
         zap.ByteString("decoded", b),
     }
