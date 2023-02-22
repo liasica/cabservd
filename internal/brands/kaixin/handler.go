@@ -9,6 +9,7 @@ import (
     "context"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/log"
+    "github.com/auroraride/cabservd/internal/codec"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
     "go.uber.org/zap"
@@ -18,8 +19,8 @@ type Handler struct {
     core.Bean
 }
 
-func New() *Handler {
-    return &Handler{}
+func New() (core.Hook, codec.Codec) {
+    return &Handler{}, &codec.HeaderLength{}
 }
 
 // GetEmptyDeviation TODO 后续做在数据库中
@@ -30,7 +31,7 @@ func (h *Handler) GetEmptyDeviation() (voltage, current float64) {
 }
 
 // OnMessage 解析消息
-func (h *Handler) OnMessage(c *core.Client, b []byte) (serial string, fields []zap.Field, err error) {
+func (h *Handler) OnMessage(b []byte) (serial string, res any, fields []zap.Field, err error) {
     fields = []zap.Field{
         zap.ByteString("decoded", b),
     }
@@ -46,7 +47,7 @@ func (h *Handler) OnMessage(c *core.Client, b []byte) (serial string, fields []z
 
     switch req.MsgType {
     case MessageTypeLoginRequest:
-        err = h.LoginHandle(req, c)
+        err = h.LoginHandle(req)
     case MessageTypeReportRequest:
         err = h.ReportHandle(req)
     case MessageTypeNoticeRequest:
@@ -59,16 +60,16 @@ func (h *Handler) OnMessage(c *core.Client, b []byte) (serial string, fields []z
 
     // 发送失败响应
     if err != nil {
-        _ = c.SendMessage(req.Fail())
+        res = req.Fail()
         return
     }
 
-    err = c.SendMessage(req.Success())
+    res = req.Success()
     return
 }
 
 // LoginHandle 登录请求
-func (h *Handler) LoginHandle(req *Request, client *core.Client) (err error) {
+func (h *Handler) LoginHandle(req *Request) (err error) {
     if req.DevID == "" {
         return adapter.ErrorCabinetSerialRequired
     }

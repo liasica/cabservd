@@ -29,7 +29,7 @@ func Start(e *echo.Echo) {
     e.POST("/exchange/usable", api.Exchange.Usable)
     e.POST("/exchange/do", api.Exchange.Do)
 
-    e.POST("device/bininfo", api.Device.BinInfo)
+    e.POST("/device/bininfo", api.Device.BinInfo)
 
     if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
         zap.L().Fatal(err.Error())

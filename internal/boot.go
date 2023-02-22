@@ -28,7 +28,9 @@ import (
     "time"
 )
 
-func Boot(hook core.Hook, codecor codec.Codec) {
+type HookFunc = func() (core.Hook, codec.Codec)
+
+func Boot(hf HookFunc) {
     ctx := context.Background()
 
     // 设置全局时区
@@ -48,9 +50,10 @@ func Boot(hook core.Hook, codecor codec.Codec) {
 
     // 初始化日志
     log.New(&log.Config{
-        FormatJson:  true,
-        Stdout:      g.Config.Debug,
-        Application: g.Config.Brand.LoggerName(g.Config.Environment),
+        FormatJson:    true,
+        Stdout:        g.Config.Debug,
+        Application:   g.Config.Brand.LoggerName(g.Config.Environment),
+        WithOutCaller: true,
         Writers: []io.Writer{
             log.NewRedisWriter(g.Redis),
         },
@@ -93,6 +96,7 @@ func Boot(hook core.Hook, codecor codec.Codec) {
     })
     go router.Start(e)
 
+    hook, codecor := hf()
     // 启动socket hub
     go core.Start(
         g.Config.Tcp.Bind,

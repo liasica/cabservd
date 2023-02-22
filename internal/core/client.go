@@ -7,6 +7,7 @@ package core
 
 import (
     "context"
+    "encoding/hex"
     "github.com/auroraride/adapter/log"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -42,29 +43,36 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
 
 // SendMessage 向客户端发送消息
 func (c *Client) SendMessage(message any) (err error) {
-    var b []byte
+    var (
+        b      []byte
+        data   []byte
+        fields []zap.Field
+        useHex bool
+    )
 
     switch v := message.(type) {
     case []byte:
         b = v
+        useHex = true
     default:
         b, _ = jsoniter.Marshal(message)
     }
 
-    data := c.Hub.codec.Encode(b)
-
     defer func() {
-        fields := []zap.Field{
-            log.ResponseBody(b),
+        if useHex {
+            fields = append(fields, zap.String("encoded", hex.EncodeToString(data)))
+        } else {
+            fields = append(fields, log.ResponseBody(b))
         }
-
         level := zap.InfoLevel
         if err != nil {
             level = zap.ErrorLevel
-            fields = append(fields, zap.Error(err), log.Binary(b))
+            fields = append(fields, zap.Error(err), log.Binary(data))
         }
         c.Log(level, "发送消息 ↓ ", fields...)
     }()
+
+    data = c.Hub.codec.Encode(b)
 
     _, err = c.Write(data)
 

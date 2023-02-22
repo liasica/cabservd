@@ -109,19 +109,25 @@ func (h *hub) handleMessage(c *Client, b []byte) {
     go c.UpdateOnline()
 
     // 解析数据
-    serial, fields, err := h.Bean.OnMessage(c, b)
+    serial, res, fields, err := h.Bean.OnMessage(b)
     lvl := zapcore.InfoLevel
 
     if err != nil {
         lvl = zapcore.ErrorLevel
+        fields = append(fields, zap.Error(err))
     }
 
-    go c.Log(lvl, "收到消息 ↑", fields...)
+    c.Log(lvl, "收到消息 ↑", fields...)
 
     // 注册电柜客户端
     if serial != "" {
         c.Serial = serial
         h.register(c)
+    }
+
+    // 如果需要发送消息
+    if res != nil {
+        _ = c.SendMessage(res)
     }
 }
 

@@ -8,9 +8,8 @@ package main
 import (
     "github.com/auroraride/cabservd/internal"
     "github.com/auroraride/cabservd/internal/brands/kaixin"
-    "github.com/auroraride/cabservd/internal/codec"
 )
 
 func main() {
-    internal.Boot(kaixin.New(), &codec.HeaderLength{})
+    internal.Boot(kaixin.New)
 }
