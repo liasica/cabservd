@@ -5,6 +5,13 @@
 
 package kaixin
 
+import (
+    "github.com/auroraride/adapter/log"
+    "github.com/auroraride/cabservd/internal/codec"
+    jsoniter "github.com/json-iterator/go"
+    "go.uber.org/zap"
+)
+
 // Result 响应结果
 type Result int
 
@@ -13,10 +20,24 @@ const (
     LoginResultSuccess
 )
 
+func getMessage(c codec.Codec, data any) (message []byte, fields []zap.Field) {
+    b, _ := jsoniter.Marshal(data)
+    message = c.Encode(b)
+    log.ResponseBody(b)
+    fields = []zap.Field{
+        zap.ByteString("data", b),
+    }
+    return
+}
+
 // Response 响应
 type Response struct {
     Message
     Result Result `json:"result"` // 结果
+}
+
+func (r *Response) GetMessage(c codec.Codec) ([]byte, []zap.Field) {
+    return getMessage(c, r)
 }
 
 // Request 全局消息请求体
@@ -31,6 +52,10 @@ type Request struct {
 // String TODO 转为String
 func (r *Request) String() string {
     return "TODO"
+}
+
+func (r *Request) GetMessage(c codec.Codec) ([]byte, []zap.Field) {
+    return getMessage(c, r)
 }
 
 // Success 成功响应

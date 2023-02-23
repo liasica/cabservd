@@ -7,11 +7,9 @@ package core
 
 import (
     "context"
-    "encoding/hex"
-    "github.com/auroraride/adapter/log"
+    "github.com/auroraride/cabservd/internal/codec"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    jsoniter "github.com/json-iterator/go"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
     "time"
@@ -41,40 +39,59 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
     return c
 }
 
+type ResponseMessenger interface {
+    GetMessage(c codec.Codec) ([]byte, []zap.Field)
+}
+
 // SendMessage 向客户端发送消息
-func (c *Client) SendMessage(message any) (err error) {
-    var (
-        b      []byte
-        data   []byte
-        fields []zap.Field
-        useHex bool
-    )
-
-    switch v := message.(type) {
-    case []byte:
-        b = v
-        useHex = true
-    default:
-        b, _ = jsoniter.Marshal(message)
+func (c *Client) SendMessage(messenger ResponseMessenger) (err error) {
+    // var (
+    //     b      []byte
+    //     data   []byte
+    //     fields []zap.Field
+    //     useHex bool
+    // )
+    //
+    //
+    // switch v := message.(type) {
+    // case []byte:
+    //     b = v
+    //     useHex = true
+    // default:
+    //     b, _ = jsoniter.Marshal(message)
+    // }
+    //
+    // defer func() {
+    //     for _, opt := range options {
+    //         switch ov := opt.(type) {
+    //         case zap.Field:
+    //             fields = append(fields, ov)
+    //         }
+    //     }
+    //     if useHex {
+    //         fields = append(fields, log.Hex(data))
+    //     } else {
+    //         fields = append(fields, log.ResponseBody(b))
+    //     }
+    //     level := zap.InfoLevel
+    //     if err != nil {
+    //         level = zap.ErrorLevel
+    //         fields = append(fields, zap.Error(err), log.Binary(data))
+    //     }
+    //     c.Log(level, "发送消息 ↓ ", fields...)
+    // }()
+    //
+    // data = c.Hub.codec.Encode(b)
+    //
+    // _, err = c.Write(data)
+    b, fields := messenger.GetMessage(c.Hub.codec)
+    _, err = c.Write(b)
+    lvl := zap.InfoLevel
+    if err != nil {
+        lvl = zap.ErrorLevel
+        fields = append(fields, zap.Error(err))
     }
-
-    defer func() {
-        if useHex {
-            fields = append(fields, zap.String("encoded", hex.EncodeToString(data)))
-        } else {
-            fields = append(fields, log.ResponseBody(b))
-        }
-        level := zap.InfoLevel
-        if err != nil {
-            level = zap.ErrorLevel
-            fields = append(fields, zap.Error(err), log.Binary(data))
-        }
-        c.Log(level, "发送消息 ↓ ", fields...)
-    }()
-
-    data = c.Hub.codec.Encode(b)
-
-    _, err = c.Write(data)
+    c.Log(lvl, "发送消息 ↓ ", fields...)
 
     return
 }

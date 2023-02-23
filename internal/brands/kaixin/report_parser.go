@@ -6,11 +6,11 @@
 package kaixin
 
 import (
-    "fmt"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/liasica/go-helpers/silk"
     "github.com/liasica/go-helpers/tools"
+    "strconv"
 )
 
 // GetSerial 获取电柜编码
@@ -92,7 +92,7 @@ func (r *Request) GetBins() (items ent.BinPointers) {
             bin = &ent.BinPointer{
                 Serial:  silk.String(r.DevID),
                 Ordinal: silk.Int(ordinal),
-                Name:    silk.String(fmt.Sprintf("%d号仓", ordinal)),
+                Name:    silk.String(strconv.Itoa(ordinal) + "号仓"),
             }
             m[attr.DoorID] = bin
         }

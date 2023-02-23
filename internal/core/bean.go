@@ -18,7 +18,7 @@ type (
         // OnMessage 收到消息
         // serial 需要注册的电柜编号
         // fields zap日志字段
-        OnMessage(c *Client, b []byte) (serial string, res any, fields []zap.Field, err error)
+        OnMessage(c *Client, b []byte) (serial string, res ResponseMessenger, fields []zap.Field, err error)
 
         // SendOperate 发送主要控制
         SendOperate(serial string, typ cabdef.Operate, ordinal int) error
@@ -35,7 +35,7 @@ func (h *Bean) OnConnect(*Client) {
     return
 }
 
-func (h *Bean) OnMessage(_ *Client, _ []byte) (serial string, _ any, fields []zap.Field, err error) {
+func (h *Bean) OnMessage(_ *Client, _ []byte) (serial string, _ ResponseMessenger, fields []zap.Field, err error) {
     return
 }
 
