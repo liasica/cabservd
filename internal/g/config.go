@@ -26,12 +26,6 @@ type config struct {
     Tcp struct {
         Bind string
     }
-    Aurservd struct {
-        Api string
-    }
-    Bmservd map[adapter.BatteryBrand]struct {
-        Api string
-    }
 }
 
 var (
@@ -57,16 +51,6 @@ func LoadConfig() {
     }
 
     Config.setKeys()
-}
-
-func (c *config) GetBmsApiUrl(brand adapter.BatteryBrand, api string) (url string, err error) {
-    cfg, ok := c.Bmservd[brand]
-    if !ok || cfg.Api == "" {
-        err = adapter.ErrorConfig
-        return
-    }
-    url = cfg.Api + api
-    return
 }
 
 func (c *config) setKeys() {
