@@ -179,11 +179,9 @@ func (o *Bin) Current() *BinStep {
 
 // Next 标记当前步骤完成, 开始下一个步骤
 func (o *Bin) Next() bool {
-    if o.index+1 > len(o.Steps) {
-        fmt.Println("无下一步骤了")
+    if o.index+1 >= len(o.Steps) {
         return false
     }
     o.index += 1
-    fmt.Println("还有下一步骤")
     return true
 }

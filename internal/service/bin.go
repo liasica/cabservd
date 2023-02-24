@@ -6,7 +6,6 @@
 package service
 
 import (
-    "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
@@ -75,7 +74,6 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
     stepper := make(chan *types.BinResult)
 
     defer func() {
-        fmt.Println("退出时删除监听")
         // 退出时删除监听
         sync.Bin.RemoveListener(ch)
         close(stepper)
@@ -150,17 +148,13 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                     binOk = !x.Enable
                 }
 
-                fmt.Println(batteryOk, doorOk, binOk)
-
                 if batteryOk && doorOk && binOk {
-                    fmt.Println("这里处理完成了")
                     // 检查放入电池编号是否匹配
                     if step.Battery == cabdef.DetectBatteryPutin && bo.Battery != "" && eb.BatterySn != bo.Battery {
                         err = adapter.ErrorBatteryPutin
                     }
 
                     adapter.ChSafeSend(stepper, types.NewBinResult(eb, err))
-                    fmt.Println("这里尝试发送了")
 
                     // 如果有错误, 终止
                     if err != nil {
@@ -169,7 +163,6 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 
                     // 尝试开启下次任务, 如果没有下次任务, 终止
                     if !bo.Next() {
-                        fmt.Println("这里没有next了")
                         return
                     }
                 }
@@ -251,9 +244,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
         }
     }
 
-    fmt.Println("这里开始读取")
     r := <-stepper
-    fmt.Println("这里读取成功了")
     _, err = r.Result()
 
     return
