@@ -16,10 +16,12 @@ import (
 type config struct {
     adapter.Configure `mapstructure:",squash"`
 
-    Brand    adapter.CabinetBrand
-    Maintain maintain.Config
-    Debug    bool
-    Postgres struct {
+    Brand        adapter.CabinetBrand
+    Maintain     maintain.Config
+    Debug        bool
+    DeadDuration int  `koanf:"dead-duration"` // 离线判定时间
+    NonBms       bool `koanf:"non-bms"`       // 是否不包含bms通讯
+    Postgres     struct {
         Dsn   string
         Debug bool
     }

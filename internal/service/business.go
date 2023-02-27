@@ -10,6 +10,7 @@ import (
     "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/ent"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/jinzhu/copier"
     "golang.org/x/exp/slices"
@@ -114,6 +115,10 @@ func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessRe
     case adapter.BusinessActive, adapter.BusinessContinue:
         conf = types.PutoutConfigure
     case adapter.BusinessPause, adapter.BusinessUnsubscribe:
+        // 如果和bms通讯并需要放入电池
+        if !g.Config.NonBms && req.Battery == "" {
+            app.Panic(adapter.ErrorBatteryNotFound)
+        }
         conf = types.PutinConfigure
     default:
         app.Panic(http.StatusBadRequest, adapter.ErrorBusiness)

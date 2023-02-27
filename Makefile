@@ -17,3 +17,11 @@ kxcab:
 .PHONY: kxcab-dev
 kxcab-dev:
 	$(call deploy,kxcab-dev,kxcab)
+
+.PHONY: ydcab-dev
+ydcab-dev:
+	$(call deploy,ydcab-dev,ydcab)
+
+.PHONY: ydcab
+ydcab:
+	$(call deploy,ydcab,ydcab)

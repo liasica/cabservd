@@ -10,6 +10,7 @@ import (
     "github.com/auroraride/cabservd/internal/codec"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
     "time"
@@ -33,7 +34,11 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
         Conn: conn,
         Hub:  h,
     }
-    c.dead = time.AfterFunc(20*time.Minute, func() {
+    var dd time.Duration = 20
+    if g.Config.DeadDuration > 0 {
+        dd = time.Duration(g.Config.DeadDuration)
+    }
+    c.dead = time.AfterFunc(dd*time.Minute, func() {
         _ = c.Conn.Close()
     })
     return c

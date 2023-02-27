@@ -13,6 +13,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/ent/scan"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/sync"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/jinzhu/copier"
@@ -95,6 +96,12 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
 }
 
 func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeResponse) {
+    // 校验参数
+    if req.Battery == "" && !g.Config.NonBms {
+        res.Error = adapter.ErrorBatteryNotFound.Error()
+        return
+    }
+
     // 查询扫码记录
     sc := NewScan(s.GetUser()).CensorX(req.UUID, req.Timeout, req.Minsoc)
 

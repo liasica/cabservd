@@ -67,8 +67,8 @@ func New() (core.Hook, codec.Codec) {
 
 // GetEmptyDeviation TODO 后续做在数据库中
 func (h *Handler) GetEmptyDeviation() (voltage, current float64) {
-    voltage = 40
-    current = 1
+    voltage = 45
+    current = -1
     return
 }
 
@@ -126,6 +126,7 @@ func (h *Handler) OnMessage(c *core.Client, data []byte) (serial string, res cor
     case CodeExchangeCancel:
     case CodeExchangeException:
     case CodeGetQrcode:
+        message = h.getQrcode(c.Serial)
     case CodeGetAllowReserCount:
     case CodePeriodMsgV2:
     case CodePeriodMsgBlankBox:
@@ -155,4 +156,14 @@ func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int) (e
         CommandEnable(serial, index)
     }
     return
+}
+
+func (h *Handler) getQrcode(sn string) []byte {
+    var (
+        sb [16]byte
+        qr [128]byte
+    )
+    copy(sb[:], adapter.ConvertString2Bytes(sn))
+    // copy(qr[:], adapter.ConvertString2Bytes(sn))
+    return append(sb[:], qr[:]...)
 }

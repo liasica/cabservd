@@ -137,9 +137,7 @@ func (h *hub) register(c *Client) {
         return
     }
 
-    if _, ok := h.Clients.Load(c.Serial); !ok {
-        h.Clients.Store(c.Serial, c)
-    }
+    h.Clients.Store(c.Serial, c)
 }
 
 // GetClient 获取在线的客户端

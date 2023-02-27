@@ -15,6 +15,22 @@ node {
             }
         }
     }
+    stage('ydcab') {
+        if (TAG == 'ydcab') {
+            echo '开始部署[ydcab]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
+    stage('ydcab-dev') {
+        if (TAG == 'ydcab-dev') {
+            echo '开始部署[ydcab-dev]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
 }
 
 def deploy(tag) {

@@ -12,6 +12,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/g"
     "go.uber.org/zap"
     "strings"
 )
@@ -111,12 +112,13 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
             return
         }
 
-        // 判断电池型号
-        if item.BatterySn != "" {
+        // 如果有bms通讯, 判断电池编码和型号
+        if item.BatterySn != "" && !g.Config.NonBms {
             var bat *adapter.Battery
             bat, err = adapter.ParseBatterySN(item.BatterySn)
             if err != nil {
                 zap.L().Error("电池编码错误: "+item.BatterySn, zap.Error(err))
+                continue
             }
             if strings.ToUpper(bat.Model) != bm {
                 continue

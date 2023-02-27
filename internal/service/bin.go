@@ -13,6 +13,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/console"
+    "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/sync"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
@@ -149,8 +150,8 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                 }
 
                 if batteryOk && doorOk && binOk {
-                    // 检查放入电池编号是否匹配
-                    if step.Battery == cabdef.DetectBatteryPutin && bo.Battery != "" && eb.BatterySn != bo.Battery {
+                    // 若有bms通讯, 需检查放入电池编号是否匹配
+                    if !g.Config.NonBms && step.Battery == cabdef.DetectBatteryPutin && bo.Battery != "" && eb.BatterySn != bo.Battery {
                         err = adapter.ErrorBatteryPutin
                     }
 
