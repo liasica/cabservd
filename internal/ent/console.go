@@ -360,9 +360,3 @@ func (c *Console) String() string {
 
 // Consoles is a parsable slice of Console.
 type Consoles []*Console
-
-func (c Consoles) config(cfg config) {
-	for _i := range c {
-		c[_i].config = cfg
-	}
-}

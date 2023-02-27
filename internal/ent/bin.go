@@ -23,6 +23,8 @@ type Bin struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// CabinetID holds the value of the "cabinet_id" field.
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
+	// 唯一标识
+	UUID string `json:"uuid,omitempty"`
 	// 电柜设备序列号
 	Serial string `json:"serial,omitempty"`
 	// 仓位名称(N号仓)
@@ -87,7 +89,7 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case bin.FieldID, bin.FieldCabinetID, bin.FieldOrdinal:
 			values[i] = new(sql.NullInt64)
-		case bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
+		case bin.FieldUUID, bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
 			values[i] = new(sql.NullString)
 		case bin.FieldCreatedAt, bin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -129,6 +131,12 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field cabinet_id", values[i])
 			} else if value.Valid {
 				b.CabinetID = uint64(value.Int64)
+			}
+		case bin.FieldUUID:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field uuid", values[i])
+			} else if value.Valid {
+				b.UUID = value.String
 			}
 		case bin.FieldSerial:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -251,6 +259,9 @@ func (b *Bin) String() string {
 	builder.WriteString("cabinet_id=")
 	builder.WriteString(fmt.Sprintf("%v", b.CabinetID))
 	builder.WriteString(", ")
+	builder.WriteString("uuid=")
+	builder.WriteString(b.UUID)
+	builder.WriteString(", ")
 	builder.WriteString("serial=")
 	builder.WriteString(b.Serial)
 	builder.WriteString(", ")
@@ -297,9 +308,3 @@ func (b *Bin) String() string {
 
 // Bins is a parsable slice of Bin.
 type Bins []*Bin
-
-func (b Bins) config(cfg config) {
-	for _i := range b {
-		b[_i].config = cfg
-	}
-}

@@ -226,10 +226,12 @@ func (cq *ConsoleQuery) AllX(ctx context.Context) []*Console {
 }
 
 // IDs executes the query and returns a list of Console IDs.
-func (cq *ConsoleQuery) IDs(ctx context.Context) ([]uint64, error) {
-	var ids []uint64
+func (cq *ConsoleQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+	if cq.ctx.Unique == nil && cq.path != nil {
+		cq.Unique(true)
+	}
 	ctx = setContextOp(ctx, cq.ctx, "IDs")
-	if err := cq.Select(console.FieldID).Scan(ctx, &ids); err != nil {
+	if err = cq.Select(console.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -520,20 +522,12 @@ func (cq *ConsoleQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (cq *ConsoleQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   console.Table,
-			Columns: console.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: console.FieldID,
-			},
-		},
-		From:   cq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(console.Table, console.Columns, sqlgraph.NewFieldSpec(console.FieldID, field.TypeUint64))
+	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if cq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := cq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

@@ -14,6 +14,7 @@ var (
 		{Name: "id", Type: field.TypeUint64, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "uuid", Type: field.TypeString, Unique: true, Size: 32, Comment: "唯一标识"},
 		{Name: "serial", Type: field.TypeString, Comment: "电柜设备序列号"},
 		{Name: "name", Type: field.TypeString, Comment: "仓位名称(N号仓)"},
 		{Name: "ordinal", Type: field.TypeInt, Comment: "仓位序号(从1开始)"},
@@ -37,7 +38,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "bin_cabinet_bins",
-				Columns:    []*schema.Column{BinColumns[16]},
+				Columns:    []*schema.Column{BinColumns[17]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -51,27 +52,32 @@ var (
 			{
 				Name:    "bin_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[16]},
+				Columns: []*schema.Column{BinColumns[17]},
 			},
 			{
 				Name:    "bin_serial_ordinal",
 				Unique:  true,
-				Columns: []*schema.Column{BinColumns[3], BinColumns[5]},
+				Columns: []*schema.Column{BinColumns[4], BinColumns[6]},
 			},
 			{
 				Name:    "bin_battery_exists",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[9]},
+				Columns: []*schema.Column{BinColumns[10]},
+			},
+			{
+				Name:    "bin_ordinal",
+				Unique:  false,
+				Columns: []*schema.Column{BinColumns[6]},
 			},
 			{
 				Name:    "bin_battery_sn",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[10]},
+				Columns: []*schema.Column{BinColumns[11]},
 			},
 			{
 				Name:    "bin_soc",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[13]},
+				Columns: []*schema.Column{BinColumns[14]},
 			},
 		},
 	}

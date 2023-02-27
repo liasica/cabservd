@@ -10,14 +10,16 @@ import (
 
 	"github.com/auroraride/cabservd/internal/ent/migrate"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
+	stdsql "database/sql"
 )
 
 // Client is the client that holds all ent builders.
@@ -50,6 +52,55 @@ func (c *Client) init() {
 	c.Cabinet = NewCabinetClient(c.config)
 	c.Console = NewConsoleClient(c.config)
 	c.Scan = NewScanClient(c.config)
+}
+
+type (
+	// config is the configuration for the client and its builder.
+	config struct {
+		// driver used for executing database requests.
+		driver dialect.Driver
+		// debug enable a debug logging.
+		debug bool
+		// log used for logging on debug mode.
+		log func(...any)
+		// hooks to execute on mutations.
+		hooks *hooks
+		// interceptors to execute on queries.
+		inters *inters
+	}
+	// Option function to configure the client.
+	Option func(*config)
+)
+
+// options applies the options on the config object.
+func (c *config) options(opts ...Option) {
+	for _, opt := range opts {
+		opt(c)
+	}
+	if c.debug {
+		c.driver = dialect.Debug(c.driver, c.log)
+	}
+}
+
+// Debug enables debug logging on the ent.Driver.
+func Debug() Option {
+	return func(c *config) {
+		c.debug = true
+	}
+}
+
+// Log sets the logging function for debug mode.
+func Log(fn func(...any)) Option {
+	return func(c *config) {
+		c.log = fn
+	}
+}
+
+// Driver configures the client driver.
+func Driver(driver dialect.Driver) Option {
+	return func(c *config) {
+		c.driver = driver
+	}
 }
 
 // Open opens a database/sql.DB specified by the driver name and
@@ -185,7 +236,7 @@ func (c *BinClient) Use(hooks ...Hook) {
 	c.hooks.Bin = append(c.hooks.Bin, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `bin.Intercept(f(g(h())))`.
 func (c *BinClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Bin = append(c.inters.Bin, interceptors...)
@@ -319,7 +370,7 @@ func (c *CabinetClient) Use(hooks ...Hook) {
 	c.hooks.Cabinet = append(c.hooks.Cabinet, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `cabinet.Intercept(f(g(h())))`.
 func (c *CabinetClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Cabinet = append(c.inters.Cabinet, interceptors...)
@@ -453,7 +504,7 @@ func (c *ConsoleClient) Use(hooks ...Hook) {
 	c.hooks.Console = append(c.hooks.Console, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `console.Intercept(f(g(h())))`.
 func (c *ConsoleClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Console = append(c.inters.Console, interceptors...)
@@ -603,7 +654,7 @@ func (c *ScanClient) Use(hooks ...Hook) {
 	c.hooks.Scan = append(c.hooks.Scan, hooks...)
 }
 
-// Use adds a list of query interceptors to the interceptors stack.
+// Intercept adds a list of query interceptors to the interceptors stack.
 // A call to `Intercept(f, g, h)` equals to `scan.Intercept(f(g(h())))`.
 func (c *ScanClient) Intercept(interceptors ...Interceptor) {
 	c.inters.Scan = append(c.inters.Scan, interceptors...)
@@ -719,4 +770,38 @@ func (c *ScanClient) mutate(ctx context.Context, m *ScanMutation) (Value, error)
 	default:
 		return nil, fmt.Errorf("ent: unknown Scan mutation op: %q", m.Op())
 	}
+}
+
+// hooks and interceptors per client, for fast access.
+type (
+	hooks struct {
+		Bin, Cabinet, Console, Scan []ent.Hook
+	}
+	inters struct {
+		Bin, Cabinet, Console, Scan []ent.Interceptor
+	}
+)
+
+// ExecContext allows calling the underlying ExecContext method of the driver if it is supported by it.
+// See, database/sql#DB.ExecContext for more information.
+func (c *config) ExecContext(ctx context.Context, query string, args ...any) (stdsql.Result, error) {
+	ex, ok := c.driver.(interface {
+		ExecContext(context.Context, string, ...any) (stdsql.Result, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.ExecContext is not supported")
+	}
+	return ex.ExecContext(ctx, query, args...)
+}
+
+// QueryContext allows calling the underlying QueryContext method of the driver if it is supported by it.
+// See, database/sql#DB.QueryContext for more information.
+func (c *config) QueryContext(ctx context.Context, query string, args ...any) (*stdsql.Rows, error) {
+	q, ok := c.driver.(interface {
+		QueryContext(context.Context, string, ...any) (*stdsql.Rows, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.QueryContext is not supported")
+	}
+	return q.QueryContext(ctx, query, args...)
 }

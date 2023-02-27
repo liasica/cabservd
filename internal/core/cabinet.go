@@ -11,7 +11,9 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/liasica/go-helpers/tools"
     "go.uber.org/zap"
+    "strconv"
     "time"
 )
 
@@ -126,12 +128,14 @@ func SaveBins(ctx context.Context, serial string, items ent.BinPointers) {
     }
 
     for _, item := range items {
+        uuid := tools.Md5String(serial + "_" + strconv.Itoa(*item.Ordinal))
         err := ent.Database.Bin.Create().
+            SetUUID(uuid).
             SetSerial(serial).
             SetName(*item.Name).
             SetCabinetID(cab.ID).
             SetOrdinal(*item.Ordinal).
-            OnConflictColumns(bin.FieldSerial, bin.FieldOrdinal).
+            OnConflictColumns(bin.FieldUUID).
             Update(func(u *ent.BinUpsert) {
                 // 更新时间和电柜ID
                 u.SetUpdatedAt(time.Now()).SetCabinetID(cab.ID)

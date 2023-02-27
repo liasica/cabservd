@@ -184,16 +184,7 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := su.check(); err != nil {
 		return n, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   scan.Table,
-			Columns: scan.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: scan.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(scan.Table, scan.Columns, sqlgraph.NewFieldSpec(scan.FieldID, field.TypeUint64))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -377,6 +368,12 @@ func (suo *ScanUpdateOne) ClearCabinet() *ScanUpdateOne {
 	return suo
 }
 
+// Where appends a list predicates to the ScanUpdate builder.
+func (suo *ScanUpdateOne) Where(ps ...predicate.Scan) *ScanUpdateOne {
+	suo.mutation.Where(ps...)
+	return suo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (suo *ScanUpdateOne) Select(field string, fields ...string) *ScanUpdateOne {
@@ -443,16 +440,7 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 	if err := suo.check(); err != nil {
 		return _node, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   scan.Table,
-			Columns: scan.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: scan.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(scan.Table, scan.Columns, sqlgraph.NewFieldSpec(scan.FieldID, field.TypeUint64))
 	id, ok := suo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Scan.id" for update`)}

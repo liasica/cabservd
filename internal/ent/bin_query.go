@@ -202,10 +202,12 @@ func (bq *BinQuery) AllX(ctx context.Context) []*Bin {
 }
 
 // IDs executes the query and returns a list of Bin IDs.
-func (bq *BinQuery) IDs(ctx context.Context) ([]uint64, error) {
-	var ids []uint64
+func (bq *BinQuery) IDs(ctx context.Context) (ids []uint64, err error) {
+	if bq.ctx.Unique == nil && bq.path != nil {
+		bq.Unique(true)
+	}
 	ctx = setContextOp(ctx, bq.ctx, "IDs")
-	if err := bq.Select(bin.FieldID).Scan(ctx, &ids); err != nil {
+	if err = bq.Select(bin.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
@@ -445,20 +447,12 @@ func (bq *BinQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (bq *BinQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := &sqlgraph.QuerySpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   bin.Table,
-			Columns: bin.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: bin.FieldID,
-			},
-		},
-		From:   bq.sql,
-		Unique: true,
-	}
+	_spec := sqlgraph.NewQuerySpec(bin.Table, bin.Columns, sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64))
+	_spec.From = bq.sql
 	if unique := bq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
+	} else if bq.path != nil {
+		_spec.Unique = true
 	}
 	if fields := bq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))

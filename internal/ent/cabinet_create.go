@@ -339,13 +339,7 @@ func (cc *CabinetCreate) sqlSave(ctx context.Context) (*Cabinet, error) {
 func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Cabinet{config: cc.config}
-		_spec = &sqlgraph.CreateSpec{
-			Table: cabinet.Table,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: cabinet.FieldID,
-			},
-		}
+		_spec = sqlgraph.NewCreateSpec(cabinet.Table, sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64))
 	)
 	_spec.OnConflict = cc.conflict
 	if value, ok := cc.mutation.CreatedAt(); ok {

@@ -288,9 +288,3 @@ func (c *Cabinet) String() string {
 
 // Cabinets is a parsable slice of Cabinet.
 type Cabinets []*Cabinet
-
-func (c Cabinets) config(cfg config) {
-	for _i := range c {
-		c[_i].config = cfg
-	}
-}

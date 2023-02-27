@@ -42,6 +42,12 @@ func (bu *BinUpdate) SetCabinetID(u uint64) *BinUpdate {
 	return bu
 }
 
+// SetUUID sets the "uuid" field.
+func (bu *BinUpdate) SetUUID(s string) *BinUpdate {
+	bu.mutation.SetUUID(s)
+	return bu
+}
+
 // SetSerial sets the "serial" field.
 func (bu *BinUpdate) SetSerial(s string) *BinUpdate {
 	bu.mutation.SetSerial(s)
@@ -295,6 +301,11 @@ func (bu *BinUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (bu *BinUpdate) check() error {
+	if v, ok := bu.mutation.UUID(); ok {
+		if err := bin.UUIDValidator(v); err != nil {
+			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
+		}
+	}
 	if _, ok := bu.mutation.CabinetID(); bu.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Bin.cabinet"`)
 	}
@@ -311,16 +322,7 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := bu.check(); err != nil {
 		return n, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   bin.Table,
-			Columns: bin.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: bin.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(bin.Table, bin.Columns, sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64))
 	if ps := bu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -330,6 +332,9 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := bu.mutation.UpdatedAt(); ok {
 		_spec.SetField(bin.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := bu.mutation.UUID(); ok {
+		_spec.SetField(bin.FieldUUID, field.TypeString, value)
 	}
 	if value, ok := bu.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)
@@ -454,6 +459,12 @@ func (buo *BinUpdateOne) SetUpdatedAt(t time.Time) *BinUpdateOne {
 // SetCabinetID sets the "cabinet_id" field.
 func (buo *BinUpdateOne) SetCabinetID(u uint64) *BinUpdateOne {
 	buo.mutation.SetCabinetID(u)
+	return buo
+}
+
+// SetUUID sets the "uuid" field.
+func (buo *BinUpdateOne) SetUUID(s string) *BinUpdateOne {
+	buo.mutation.SetUUID(s)
 	return buo
 }
 
@@ -672,6 +683,12 @@ func (buo *BinUpdateOne) ClearCabinet() *BinUpdateOne {
 	return buo
 }
 
+// Where appends a list predicates to the BinUpdate builder.
+func (buo *BinUpdateOne) Where(ps ...predicate.Bin) *BinUpdateOne {
+	buo.mutation.Where(ps...)
+	return buo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (buo *BinUpdateOne) Select(field string, fields ...string) *BinUpdateOne {
@@ -717,6 +734,11 @@ func (buo *BinUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (buo *BinUpdateOne) check() error {
+	if v, ok := buo.mutation.UUID(); ok {
+		if err := bin.UUIDValidator(v); err != nil {
+			return &ValidationError{Name: "uuid", err: fmt.Errorf(`ent: validator failed for field "Bin.uuid": %w`, err)}
+		}
+	}
 	if _, ok := buo.mutation.CabinetID(); buo.mutation.CabinetCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Bin.cabinet"`)
 	}
@@ -733,16 +755,7 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	if err := buo.check(); err != nil {
 		return _node, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   bin.Table,
-			Columns: bin.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: bin.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(bin.Table, bin.Columns, sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64))
 	id, ok := buo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Bin.id" for update`)}
@@ -769,6 +782,9 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if value, ok := buo.mutation.UpdatedAt(); ok {
 		_spec.SetField(bin.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := buo.mutation.UUID(); ok {
+		_spec.SetField(bin.FieldUUID, field.TypeString, value)
 	}
 	if value, ok := buo.mutation.Serial(); ok {
 		_spec.SetField(bin.FieldSerial, field.TypeString, value)

@@ -70,6 +70,11 @@ func CabinetID(v uint64) predicate.Bin {
 	return predicate.Bin(sql.FieldEQ(FieldCabinetID, v))
 }
 
+// UUID applies equality check predicate on the "uuid" field. It's identical to UUIDEQ.
+func UUID(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldEQ(FieldUUID, v))
+}
+
 // Serial applies equality check predicate on the "serial" field. It's identical to SerialEQ.
 func Serial(v string) predicate.Bin {
 	return predicate.Bin(sql.FieldEQ(FieldSerial, v))
@@ -233,6 +238,71 @@ func CabinetIDIn(vs ...uint64) predicate.Bin {
 // CabinetIDNotIn applies the NotIn predicate on the "cabinet_id" field.
 func CabinetIDNotIn(vs ...uint64) predicate.Bin {
 	return predicate.Bin(sql.FieldNotIn(FieldCabinetID, vs...))
+}
+
+// UUIDEQ applies the EQ predicate on the "uuid" field.
+func UUIDEQ(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldEQ(FieldUUID, v))
+}
+
+// UUIDNEQ applies the NEQ predicate on the "uuid" field.
+func UUIDNEQ(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldNEQ(FieldUUID, v))
+}
+
+// UUIDIn applies the In predicate on the "uuid" field.
+func UUIDIn(vs ...string) predicate.Bin {
+	return predicate.Bin(sql.FieldIn(FieldUUID, vs...))
+}
+
+// UUIDNotIn applies the NotIn predicate on the "uuid" field.
+func UUIDNotIn(vs ...string) predicate.Bin {
+	return predicate.Bin(sql.FieldNotIn(FieldUUID, vs...))
+}
+
+// UUIDGT applies the GT predicate on the "uuid" field.
+func UUIDGT(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldGT(FieldUUID, v))
+}
+
+// UUIDGTE applies the GTE predicate on the "uuid" field.
+func UUIDGTE(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldGTE(FieldUUID, v))
+}
+
+// UUIDLT applies the LT predicate on the "uuid" field.
+func UUIDLT(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldLT(FieldUUID, v))
+}
+
+// UUIDLTE applies the LTE predicate on the "uuid" field.
+func UUIDLTE(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldLTE(FieldUUID, v))
+}
+
+// UUIDContains applies the Contains predicate on the "uuid" field.
+func UUIDContains(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldContains(FieldUUID, v))
+}
+
+// UUIDHasPrefix applies the HasPrefix predicate on the "uuid" field.
+func UUIDHasPrefix(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldHasPrefix(FieldUUID, v))
+}
+
+// UUIDHasSuffix applies the HasSuffix predicate on the "uuid" field.
+func UUIDHasSuffix(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldHasSuffix(FieldUUID, v))
+}
+
+// UUIDEqualFold applies the EqualFold predicate on the "uuid" field.
+func UUIDEqualFold(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldEqualFold(FieldUUID, v))
+}
+
+// UUIDContainsFold applies the ContainsFold predicate on the "uuid" field.
+func UUIDContainsFold(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldContainsFold(FieldUUID, v))
 }
 
 // SerialEQ applies the EQ predicate on the "serial" field.

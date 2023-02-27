@@ -384,16 +384,7 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := cu.check(); err != nil {
 		return n, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   cabinet.Table,
-			Columns: cabinet.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: cabinet.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(cabinet.Table, cabinet.Columns, sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -856,6 +847,12 @@ func (cuo *CabinetUpdateOne) RemoveBins(b ...*Bin) *CabinetUpdateOne {
 	return cuo.RemoveBinIDs(ids...)
 }
 
+// Where appends a list predicates to the CabinetUpdate builder.
+func (cuo *CabinetUpdateOne) Where(ps ...predicate.Cabinet) *CabinetUpdateOne {
+	cuo.mutation.Where(ps...)
+	return cuo
+}
+
 // Select allows selecting one or more fields (columns) of the returned entity.
 // The default is selecting all fields defined in the entity schema.
 func (cuo *CabinetUpdateOne) Select(field string, fields ...string) *CabinetUpdateOne {
@@ -919,16 +916,7 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 	if err := cuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := &sqlgraph.UpdateSpec{
-		Node: &sqlgraph.NodeSpec{
-			Table:   cabinet.Table,
-			Columns: cabinet.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeUint64,
-				Column: cabinet.FieldID,
-			},
-		},
-	}
+	_spec := sqlgraph.NewUpdateSpec(cabinet.Table, cabinet.Columns, sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64))
 	id, ok := cuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Cabinet.id" for update`)}

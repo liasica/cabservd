@@ -240,9 +240,3 @@ func (s *Scan) String() string {
 
 // Scans is a parsable slice of Scan.
 type Scans []*Scan
-
-func (s Scans) config(cfg config) {
-	for _i := range s {
-		s[_i].config = cfg
-	}
-}
