@@ -83,6 +83,9 @@ func (h *Handler) OnMessage(c *core.Client, data []byte) (serial string, res cor
 
     // 是否已发送响应报文
     defer func() {
+        if c.Serial != "" {
+            serial = c.Serial
+        }
         if err == nil {
             fields = []zap.Field{
                 zap.Int("code", int(code)),
