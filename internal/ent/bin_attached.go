@@ -61,8 +61,8 @@ func (b *Bin) IsUsable() bool {
     return b.Health && b.Enable
 }
 
-// ExchangePossible 检查仓位是否可操作换电
-func (b *Bin) ExchangePossible(isFull bool, fakevoltage, fakecurrent, minsoc float64) bool {
+// BusinessPossible 检查仓位是否可操作换电
+func (b *Bin) BusinessPossible(isFull bool, fakevoltage, fakecurrent, minsoc float64) bool {
     if !b.IsUsable() || b.Open {
         return false
     }

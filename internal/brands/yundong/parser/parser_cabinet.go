@@ -148,7 +148,7 @@ func (d *CabinetData) GetCabinet() (cp *ent.CabinetPointer, exists bool) {
         return
     }
 
-    status := cabinet.StatusIdle
+    status := cabinet.StatusNormal
     if len(d.Alarms) > 0 {
         status = cabinet.StatusAbnormal
     }

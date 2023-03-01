@@ -55,19 +55,12 @@ func (s *businessService) Usable(req *cabdef.BusinuessUsableRequest) (res *cabde
         return
     }
 
-    cs := NewCabinet(s.GetUser())
-    // 查找电柜和仓位
-    cab, _ := cs.QuerySerialWithBin(req.Serial)
-
     // 验证电柜是否可以办理业务
-    err := cs.DetectCabinet(cab)
-    if err != nil {
-        app.Panic(http.StatusBadRequest, err)
-    }
+    cab := NewCabinet(app.PermissionNotRequired).OperableX(req.Serial)
 
     // 获取可办理业务的仓位
-    var fully, empty, target *ent.Bin
-    fully, empty, err = cs.BusinessInfo(req.Model, cab, req.Minsoc, minbatteries, minemptybins)
+    var target *ent.Bin
+    fully, empty, err := NewCabinet(s.GetUser()).BusinessInfo(req.Model, cab, req.Minsoc, minbatteries, minemptybins)
     if err != nil {
         app.Panic(http.StatusBadRequest, err)
     }
@@ -98,7 +91,11 @@ func (s *businessService) Usable(req *cabdef.BusinuessUsableRequest) (res *cabde
 func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessResponse) {
     s.RiderBusinessVerifyX(req.Business)
 
+    // 检查扫码是否有效
     sc := NewScan(s.GetUser()).CensorX(req.UUID, req.Timeout, 0)
+
+    // 检查是否可办理业务
+    _ = NewCabinet(app.PermissionNotRequired).OperableX(req.Serial)
 
     defer func() {
         // 标记扫码失效

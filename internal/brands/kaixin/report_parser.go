@@ -40,11 +40,11 @@ func (r *Request) GetCabinet() (cab *ent.CabinetPointer, exists bool) {
         switch attr.ID {
         case SignalCabinetStatus:
             m := map[string]cabinet.Status{
-                "0": cabinet.StatusIdle,
-                "1": cabinet.StatusIdle,
-                "2": cabinet.StatusBusy,
-                "3": cabinet.StatusBusy,
-                "4": cabinet.StatusBusy,
+                "0": cabinet.StatusNormal,
+                "1": cabinet.StatusNormal,
+                "2": cabinet.StatusAbnormal,
+                "3": cabinet.StatusAbnormal,
+                "4": cabinet.StatusAbnormal,
                 "5": cabinet.StatusAbnormal,
             }
             cab.Status = silk.Pointer(m[v])

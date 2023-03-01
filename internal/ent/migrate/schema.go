@@ -89,7 +89,7 @@ var (
 		{Name: "online", Type: field.TypeBool, Comment: "是否在线", Default: false},
 		{Name: "power", Type: field.TypeBool, Comment: "市电是否正常", Default: true},
 		{Name: "serial", Type: field.TypeString, Unique: true, Comment: "电柜编号"},
-		{Name: "status", Type: field.TypeEnum, Comment: "状态", Enums: []string{"initializing", "idle", "busy", "exchange", "abnormal"}, Default: "initializing"},
+		{Name: "status", Type: field.TypeEnum, Comment: "状态", Enums: []string{"initializing", "normal", "abnormal"}, Default: "initializing"},
 		{Name: "enable", Type: field.TypeBool, Comment: "电柜是否启用", Default: false},
 		{Name: "lng", Type: field.TypeFloat64, Nullable: true, Comment: "经度"},
 		{Name: "lat", Type: field.TypeFloat64, Nullable: true, Comment: "纬度"},

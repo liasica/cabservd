@@ -10,8 +10,6 @@ import (
     "github.com/auroraride/adapter/app"
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/ent/scan"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/sync"
@@ -40,16 +38,8 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
         Empty:   new(cabdef.Bin),
     }
 
-    cs := NewCabinet(s.GetUser())
-
-    // 获取电柜状态
-    cab, _ := cs.QuerySerialWithBin(req.Serial)
-
     // 检查电柜是否可换电
-    err := cs.DetectCabinet(cab)
-    if err != nil {
-        app.Panic(http.StatusBadRequest, err)
-    }
+    cab := NewCabinet(app.PermissionNotRequired).OperableX(req.Serial)
 
     // 查询限定时间内其他扫码用户
     if exists, _ := ent.Database.Scan.Query().Where(
@@ -60,14 +50,8 @@ func (s *exchangeService) Usable(req *cabdef.ExchangeUsableRequest) (res *cabdef
         app.Panic(http.StatusBadRequest, adapter.ErrorCabinetBusy)
     }
 
-    // 查询是否有正在执行的任务
-    if exists, _ := ent.Database.Console.Query().Where(console.Serial(req.Serial), console.StatusIn(console.StatusRunning)).Exist(s.GetContext()); exists {
-        app.Panic(http.StatusBadRequest, adapter.ErrorCabinetBusy)
-    }
-
     // 获取空仓和满电仓位
-    var fully, empty *ent.Bin
-    fully, empty, err = cs.BusinessInfo(req.Model, cab, req.Minsoc, 1, 1)
+    fully, empty, err := NewCabinet(s.GetUser()).BusinessInfo(req.Model, cab, req.Minsoc, 1, 1)
 
     if err != nil {
         app.Panic(http.StatusBadRequest, err)
@@ -105,6 +89,9 @@ func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeR
     // 查询扫码记录
     sc := NewScan(s.GetUser()).CensorX(req.UUID, req.Timeout, req.Minsoc)
 
+    // 检查电柜是否可换电
+    _ = NewCabinet(s.GetUser()).OperableX(sc.Serial)
+
     // 开始同步换电流程
     results, err := s.start(req, sc)
 
@@ -134,21 +121,7 @@ func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeR
 }
 
 func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res []*cabdef.ExchangeStepMessage, err error) {
-    cab, _ := NewCabinet(s.GetUser()).QueryWithBin(sc.CabinetID)
-
-    // 检查电柜是否可换电
-    err = NewCabinet(s.GetUser()).DetectCabinet(cab)
-    if err != nil {
-        return
-    }
-
-    // 标记电柜为换电中
-    _ = cab.Update().SetStatus(cabinet.StatusExchange).Exec(s.GetContext())
-
     defer func() {
-        // 标记电柜为空闲
-        _ = cab.Update().SetStatus(cabinet.StatusIdle).Exec(s.GetContext())
-
         // 标记扫码失效
         _ = sc.Update().SetEfficient(false).Exec(s.GetContext())
 

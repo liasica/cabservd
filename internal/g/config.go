@@ -28,6 +28,9 @@ type config struct {
     Tcp struct {
         Bind string
     }
+    Rpc struct {
+        Bind string
+    }
 }
 
 var (

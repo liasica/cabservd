@@ -106,9 +106,7 @@ const DefaultStatus = StatusInitializing
 // Status values.
 const (
 	StatusInitializing Status = "initializing"
-	StatusIdle         Status = "idle"
-	StatusBusy         Status = "busy"
-	StatusExchange     Status = "exchange"
+	StatusNormal       Status = "normal"
 	StatusAbnormal     Status = "abnormal"
 )
 
@@ -119,7 +117,7 @@ func (s Status) String() string {
 // StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
 func StatusValidator(s Status) error {
 	switch s {
-	case StatusInitializing, StatusIdle, StatusBusy, StatusExchange, StatusAbnormal:
+	case StatusInitializing, StatusNormal, StatusAbnormal:
 		return nil
 	default:
 		return fmt.Errorf("cabinet: invalid enum value for status field: %q", s)

@@ -20,6 +20,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
     "github.com/auroraride/cabservd/internal/router"
+    "github.com/auroraride/cabservd/internal/rpc"
     "github.com/auroraride/cabservd/internal/sync"
     "github.com/go-redis/redis/v9"
     "github.com/labstack/echo/v4"
@@ -65,8 +66,8 @@ func Boot(hf HookFunc) {
     // 加载数据库
     ent.Database = ent.OpenDatabase(g.Config.Postgres.Dsn, g.Config.Postgres.Debug)
 
-    // 标记所有电柜为离线和空闲
-    _ = ent.Database.Cabinet.Update().SetOnline(false).SetStatus(cabinet.StatusIdle).Exec(ctx)
+    // 标记所有电柜为正常和空闲
+    _ = ent.Database.Cabinet.Update().SetOnline(false).SetStatus(cabinet.StatusNormal).Exec(ctx)
 
     // 标记所有正在进行的任务为失败
     _, _ = ent.Database.Console.ExecContext(ctx, fmt.Sprintf(
@@ -82,6 +83,9 @@ func Boot(hf HookFunc) {
 
     // 加载hooks
     sync.Start()
+
+    // 启动rpc server
+    go rpc.Run()
 
     // 启动 http server
     userSkipper := map[string]bool{

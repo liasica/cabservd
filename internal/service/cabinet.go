@@ -12,8 +12,10 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
     "go.uber.org/zap"
+    "net/http"
     "strings"
 )
 
@@ -67,28 +69,44 @@ func (s *cabinetService) UpdateStatus(serial string, status cabinet.Status) erro
     return s.orm.Update().Where(cabinet.Serial(serial)).SetStatus(status).Exec(s.GetContext())
 }
 
-// DetectCabinet 验证电柜是否满足基本业务需求
-func (s *cabinetService) DetectCabinet(cab *ent.Cabinet) error {
+// Operable 验证电柜是否满足基本业务操作需求
+func (s *cabinetService) Operable(serial string) (cab *ent.Cabinet, err error) {
+    // 查找电柜和仓位
+    cab, _ = NewCabinet(app.PermissionNotRequired).QuerySerialWithBin(serial)
+
     if cab == nil {
-        return adapter.ErrorCabinetNotFound
+        return nil, adapter.ErrorCabinetNotFound
     }
 
-    // 电柜需要空闲
-    if cab.Status != cabinet.StatusIdle {
-        return adapter.ErrorCabinetBusy
+    // 电柜非正常
+    if cab.Status != cabinet.StatusNormal {
+        return nil, adapter.ErrorCabinetAbnormal
     }
 
     // 电柜需要在线
     if !cab.Online {
-        return adapter.ErrorCabinetOffline
+        return nil, adapter.ErrorCabinetOffline
     }
 
     // 可办理业务的仓位至少有两个
     if len(cab.Edges.Bins) < 2 {
-        return adapter.ErrorBinNotEnough
+        return nil, adapter.ErrorBinNotEnough
     }
 
-    return nil
+    // 查询是否有正在执行的任务
+    if exists, _ := ent.Database.Console.Query().Where(console.Serial(serial), console.Or(console.StatusIn(console.StatusRunning))).Exist(s.GetContext()); exists {
+        return nil, adapter.ErrorCabinetBusy
+    }
+
+    return
+}
+
+func (s *cabinetService) OperableX(serial string) *ent.Cabinet {
+    cab, err := NewCabinet(app.PermissionNotRequired).Operable(serial)
+    if err != nil {
+        app.Panic(http.StatusBadRequest, err)
+    }
+    return cab
 }
 
 // BusinessInfo 获取业务仓位信息
@@ -114,7 +132,7 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
 
         // 如果有bms通讯, 判断电池编码和型号
         if item.BatterySn != "" && !g.Config.NonBms {
-            var bat *adapter.Battery
+            var bat adapter.Battery
             bat, err = adapter.ParseBatterySN(item.BatterySn)
             if err != nil {
                 zap.L().Error("电池编码错误: "+item.BatterySn, zap.Error(err))

@@ -87,7 +87,7 @@ func (s *scanService) ExchangeAbleX(sc *ent.Scan, minsoc float64) {
     // 验证是否可以换电
     fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
     for _, b := range bins {
-        if !b.ExchangePossible(b.ID == data.Fully.ID, fakevoltage, fakecurrent, minsoc) {
+        if !b.BusinessPossible(b.ID == data.Fully.ID, fakevoltage, fakecurrent, minsoc) {
             app.Panic(http.StatusBadRequest, adapter.ErrorExchangeCannot)
         }
     }
