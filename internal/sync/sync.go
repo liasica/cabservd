@@ -31,7 +31,7 @@ func Start() {
 
     // 缓存电柜信息
     for _, cab := range cabs {
-        go SendCabinetFull(cab.Serial, cab, cab.Edges.Bins)
+        // go SendCabinetFull(cab.Serial, cab, cab.Edges.Bins)
         g.Redis.HSet(context.Background(), g.CacheCabinetKey, cab.Serial, &types.CabinetCache{
             Lng: cab.Lng,
             Lat: cab.Lat,
@@ -45,11 +45,11 @@ func Start() {
             Lng: message.Data.Lng,
             Lat: message.Data.Lat,
         })
-        go SendCabinet(message.Data.Serial, message.Data)
+        // go SendCabinet(message.Data.Serial, message.Data)
     })
 
     Bin = pqm.NewMonitor(dsn, &ent.Bin{}, func(message *pqm.Message[*ent.Bin]) {
-        go SendBin(message.Data.Serial, message.Data)
+        // go SendBin(message.Data.Serial, message.Data)
     })
 
     // 启动数据数据库监听
