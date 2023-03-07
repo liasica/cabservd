@@ -7,6 +7,8 @@ package sync
 
 import (
     "context"
+    "github.com/auroraride/adapter"
+    "github.com/auroraride/adapter/defs/batdef"
     "github.com/auroraride/adapter/pqm"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
@@ -49,7 +51,42 @@ func Start() {
     })
 
     Bin = pqm.NewMonitor(dsn, &ent.Bin{}, func(message *pqm.Message[*ent.Bin]) {
+        // 非智能电柜跳过
+        if g.Config.NonBms {
+            return
+        }
         // go SendBin(message.Data.Serial, message.Data)
+        // 如果旧仓位电池编号和新电池编号不相同
+        oldsn := message.Old.BatterySn
+        newsn := message.Data.BatterySn
+        serial := message.Data.Serial
+        ordinal := message.Data.Ordinal
+
+        if oldsn != newsn {
+            // TODO 记录电池放入取出
+            if oldsn != "" {
+                // 取出
+                if b, err := adapter.ParseBatterySN(oldsn); err == nil {
+                    SendMessage(&batdef.BatteryFlow{
+                        Putin:   false,
+                        Battery: b,
+                        Serial:  serial,
+                        Ordinal: ordinal,
+                    })
+                }
+            }
+            if newsn != "" {
+                // 放入
+                if b, err := adapter.ParseBatterySN(newsn); err == nil {
+                    SendMessage(&batdef.BatteryFlow{
+                        Putin:   true,
+                        Battery: b,
+                        Serial:  serial,
+                        Ordinal: ordinal,
+                    })
+                }
+            }
+        }
     })
 
     // 启动数据数据库监听
