@@ -63,28 +63,25 @@ func Start() {
         ordinal := message.Data.Ordinal
 
         if oldsn != newsn {
+            data := &batdef.BatteryFlow{
+                Serial:  serial,
+                Ordinal: ordinal,
+            }
             // TODO 记录电池放入取出
             if oldsn != "" {
                 // 取出
                 if b, err := adapter.ParseBatterySN(oldsn); err == nil {
-                    SendMessage(&batdef.BatteryFlow{
-                        Putin:   false,
-                        Battery: b,
-                        Serial:  serial,
-                        Ordinal: ordinal,
-                    })
+                    data.Out = &b
                 }
             }
             if newsn != "" {
                 // 放入
                 if b, err := adapter.ParseBatterySN(newsn); err == nil {
-                    SendMessage(&batdef.BatteryFlow{
-                        Putin:   true,
-                        Battery: b,
-                        Serial:  serial,
-                        Ordinal: ordinal,
-                    })
+                    data.In = &b
                 }
+            }
+            if data.Out != nil || data.In != nil {
+                SendMessage(data)
             }
         }
     })

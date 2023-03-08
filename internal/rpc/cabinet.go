@@ -80,8 +80,8 @@ func (s *cabinetServer) Sync(ctx context.Context, req *pb.CabinetSyncRequest) (r
         return
     }
 
-    res = &pb.CabinetSyncResponse{Items: make([]*pb.CabinetSyncItem, len(cabs))}
-    for m, c := range cabs {
+    res = &pb.CabinetSyncResponse{Items: make(map[string]*pb.CabinetSyncItem)}
+    for _, c := range cabs {
         item := &pb.CabinetSyncItem{
             Serial: c.Serial,
             Bins:   make([]*pb.CabinetSyncBin, len(c.Edges.Bins)),
@@ -140,7 +140,7 @@ func (s *cabinetServer) Sync(ctx context.Context, req *pb.CabinetSyncRequest) (r
             item.Bins[n] = nb
         }
 
-        res.Items[m] = item
+        res.Items[item.Serial] = item
     }
 
     return
