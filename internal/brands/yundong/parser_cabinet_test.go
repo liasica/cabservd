@@ -3,7 +3,7 @@
 // Created at 2023-02-16
 // Based on yundong by liasica, magicrolan@qq.com.
 
-package parser
+package yundong
 
 import (
     "encoding/hex"

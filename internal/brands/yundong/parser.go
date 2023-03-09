@@ -3,15 +3,11 @@
 // Created at 2023-02-15
 // Based on yundong by liasica, magicrolan@qq.com.
 
-package parser
+package yundong
 
 import "strconv"
 
 type Parser struct {
-}
-
-func New() *Parser {
-    return &Parser{}
 }
 
 type Field struct {

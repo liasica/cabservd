@@ -11,7 +11,6 @@ import (
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
     "github.com/auroraride/adapter/log"
-    "github.com/auroraride/cabservd/internal/brands/yundong/parser"
     "github.com/auroraride/cabservd/internal/codec"
     "github.com/auroraride/cabservd/internal/core"
     "github.com/auroraride/cabservd/internal/g"
@@ -26,7 +25,7 @@ type Handler struct {
     core.Bean
 
     serverInfo *Server
-    parser     *parser.Parser
+    parser     *Parser
 }
 
 type Server struct {
@@ -60,7 +59,7 @@ func New() (core.Hook, codec.Codec) {
     info.Address = buf.Bytes()
 
     return &Handler{
-        parser:     parser.New(),
+        parser:     &Parser{},
         serverInfo: info,
     }, NewCodec()
 }

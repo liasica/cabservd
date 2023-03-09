@@ -3,7 +3,7 @@
 // Created at 2023-01-07
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package kaixin
+package tower
 
 import (
     "github.com/auroraride/cabservd/internal/ent"
@@ -33,7 +33,7 @@ func (r *Request) GetCabinet() (cab *ent.CabinetPointer, exists bool) {
     for _, attr := range r.AttrList {
         v := attr.ValueString()
 
-        if _, ok := CabinetSignal[attr.ID]; ok {
+        if _, ok := CabinetSignalMap[attr.ID]; ok {
             exists = true
         }
 
@@ -87,40 +87,46 @@ func (r *Request) GetBins() (items ent.BinPointers) {
         }
 
         // 查询是否存在仓位信息
-        bin, ok := m[attr.DoorID]
+        b, ok := m[attr.DoorID]
         if !ok {
-            bin = &ent.BinPointer{
+            b = &ent.BinPointer{
                 Serial:  silk.String(r.DevID),
                 Ordinal: silk.Int(ordinal),
                 Name:    silk.String(strconv.Itoa(ordinal) + "号仓"),
             }
-            m[attr.DoorID] = bin
+            m[attr.DoorID] = b
         }
 
         // TODO 电池在位检测信号量
         switch attr.ID {
         case SignalBinStatus:
-            bin.Health = silk.Bool(v != "5")
+            b.Health = silk.Bool(v != "5")
         case SignalBinDoorStatus:
-            bin.Open = silk.Bool(v == "1")
+            b.Open = silk.Bool(v == "1")
         case SignalBinEnable:
-            bin.Enable = silk.Bool(v == "1")
+            b.Enable = silk.Bool(v == "1")
         case SignalBatteryExists:
-            bin.BatteryExists = silk.Bool(v == "1")
+            b.BatteryExists = silk.Bool(v == "1")
         case SignalBatterySN:
-            bin.BatterySn = silk.String(v)
+            b.BatterySn = silk.String(v)
         case SignalBatteryVoltage:
             vf := tools.StrToFloat64(v)
-            bin.Voltage = silk.Float64(vf)
+            b.Voltage = silk.Float64(vf)
         case SignalBatteryCurrent:
             vf := tools.StrToFloat64(v)
-            bin.Current = silk.Float64(vf)
+            b.Current = silk.Float64(vf)
         case SignalSOC:
             vf := tools.StrToFloat64(v)
-            bin.Soc = silk.Float64(vf)
+            b.Soc = silk.Float64(vf)
         case SignalSOH:
             vf := tools.StrToFloat64(v)
-            bin.Soh = silk.Float64(vf)
+            b.Soh = silk.Float64(vf)
+        }
+
+        for s, f := range binSignals {
+            if s == attr.ID {
+                f(b, attr, v)
+            }
         }
     }
 

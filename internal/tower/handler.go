@@ -3,24 +3,48 @@
 // Created at 2022-11-04
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package kaixin
+package tower
 
 import (
     "context"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/log"
-    "github.com/auroraride/cabservd/internal/codec"
     "github.com/auroraride/cabservd/internal/core"
     jsoniter "github.com/json-iterator/go"
     "go.uber.org/zap"
+)
+
+var (
+    messageType    *MessageTypeList
+    cabinetSignals map[Signal]CabinetSignalFunc
+    binSignals     map[Signal]BinSignalFunc
 )
 
 type Handler struct {
     core.Bean
 }
 
-func New() (core.Hook, codec.Codec) {
-    return &Handler{}, &codec.HeaderLength{}
+func New(mt *MessageTypeList, params ...any) *Handler {
+    cabinetSignals = make(map[Signal]CabinetSignalFunc)
+    binSignals = make(map[Signal]BinSignalFunc)
+
+    for _, param := range params {
+        switch m := param.(type) {
+        case map[Signal]CabinetSignalFunc:
+            for k, v := range m {
+                CabinetSignalMap[k] = struct{}{}
+                cabinetSignals[k] = v
+            }
+        case map[Signal]BinSignalFunc:
+            for k, v := range m {
+                binSignals[k] = v
+            }
+        }
+    }
+
+    messageType = mt
+
+    return &Handler{}
 }
 
 // GetEmptyDeviation TODO 后续做在数据库中
@@ -46,13 +70,13 @@ func (h *Handler) OnMessage(_ *core.Client, b []byte) (serial string, res core.R
     fields = append(fields, log.Payload(req))
 
     switch req.MsgType {
-    case MessageTypeLoginRequest:
+    case messageType.LoginRequest:
         err = h.LoginHandle(req)
-    case MessageTypeReportRequest:
+    case messageType.ReportRequest:
         err = h.ReportHandle(req)
-    case MessageTypeNoticeRequest:
+    case messageType.NoticeRequest:
         err = h.NoticeHandle(req)
-    case MessageTypeControlResponse:
+    case messageType.ControlResponse:
         // TODO 控制成功逻辑
         // 收到成功逻辑处理完成后, 不发送反馈消息
         return

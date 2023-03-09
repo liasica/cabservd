@@ -3,7 +3,29 @@
 // Created at 2022-11-05
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package kaixin
+package tower
+
+import "github.com/auroraride/cabservd/internal/ent"
+
+type CabinetSignalFunc func(*ent.CabinetPointer, *Attribute, string)
+
+type BinSignalFunc func(*ent.BinPointer, *Attribute, string)
+
+var (
+    CabinetSignalMap = map[Signal]struct{}{
+        SignalCabinetStatus:  {},
+        SignalLng:            {},
+        SignalLat:            {},
+        SignalDeviceID:       {},
+        SignalGSM:            {},
+        SignalCabinetVoltage: {},
+        SignalCabinetCurrent: {},
+        SignalCabinetTemp:    {},
+        SignalEnable:         {},
+        SignalElectricity:    {},
+        SignalCabinetControl: {},
+    }
+)
 
 type Signal string
 
@@ -19,7 +41,7 @@ const (
     SignalBinDoorStatus Signal = "02103001" // 仓位柜门状态 0:关 1:开
     SignalBinEnable     Signal = "02118001" // 柜门是否禁用 (0:禁用 1:启用)
 
-    SignalBatteryExists      Signal = "02140001" // 电池在位检测 0:无电池 1:有电池
+    SignalBatteryExists      Signal = "02140001" // 电池在位检测 0:无电池 1:有电池 <凯信>
     SignalBatterySN          Signal = "02106001" // 柜内电池SN
     SignalBatteryVoltage     Signal = "01111001" // 电池总电压 (V)
     SignalBatteryCurrent     Signal = "01112001" // 电池总电流 (A)
@@ -49,21 +71,4 @@ const (
     SignalPower          Signal = "02019001" // 市电状态 0:正常 1:断电
 
     SignalCabinetControl Signal = "02301001" // 控制换电柜命令
-)
-
-var (
-    SignalLabels  = map[Signal]string{}
-    CabinetSignal = map[Signal]struct{}{
-        SignalCabinetStatus:  {},
-        SignalLng:            {},
-        SignalLat:            {},
-        SignalDeviceID:       {},
-        SignalGSM:            {},
-        SignalCabinetVoltage: {},
-        SignalCabinetCurrent: {},
-        SignalCabinetTemp:    {},
-        SignalEnable:         {},
-        SignalElectricity:    {},
-        SignalCabinetControl: {},
-    }
 )

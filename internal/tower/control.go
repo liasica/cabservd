@@ -3,7 +3,7 @@
 // Created at 2022-11-11
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package kaixin
+package tower
 
 import (
     "fmt"
@@ -46,7 +46,7 @@ func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int) (e
 
     msg := &Request{
         Message: Message{
-            MsgType: MessageTypeControlRequest,
+            MsgType: messageType.ControlRequest,
             TxnNo:   time.Now().UnixMilli(),
             DevID:   serial,
         },
