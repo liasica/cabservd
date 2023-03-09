@@ -3,6 +3,9 @@
     <module name="cabservd" />
     <working_directory value="$PROJECT_DIR$" />
     <go_parameters value="-trimpath -tags=go_json,poll_opt" />
+    <envs>
+      <env name="CONFIG_FILE" value="config/kxcab.config.yaml" />
+    </envs>
     <kind value="DIRECTORY" />
     <package value="cabservd/cmd/kxservd" />
     <directory value="$PROJECT_DIR$/cmd/kxcab" />
