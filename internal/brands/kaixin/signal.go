@@ -23,8 +23,8 @@ const (
     SignalBatterySN          Signal = "02106001" // 柜内电池SN
     SignalBatteryVoltage     Signal = "01111001" // 电池总电压 (V)
     SignalBatteryCurrent     Signal = "01112001" // 电池总电流 (A)
-    SignalSOC                Signal = "02109001" // 电池电量
-    SignalSOH                Signal = "02110001" // 电池健康
+    SignalSOC                Signal = "02109001" // 电池电量 SOC
+    SignalSOH                Signal = "02110001" // 电池健康 SOH
     SignalBatteryCellID      Signal = "01116001" // XX单芯电压串数 (表示电池内电芯总数量值)
     SignalBatteryCellVoltage Signal = "01117001" // XX单芯电压值 (XX如果为01，对应的信号量ID结尾为01)
     SignalPCBTemp            Signal = "01118001" // 功率温度值 (电池内部PCB板表面温度)
@@ -46,8 +46,9 @@ const (
     SignalCabinetTemp    Signal = "02113001" // 柜体温度值 (换电柜温度)
     SignalEnable         Signal = "02119001" // 柜体是否禁用 (0:禁用 1:启用)
     SignalElectricity    Signal = "02120001" // 柜子总用电量 (kwh)
-    SignalCabinetControl Signal = "02301001" // 控制换电柜命令
     SignalPower          Signal = "02019001" // 市电状态 0:正常 1:断电
+
+    SignalCabinetControl Signal = "02301001" // 控制换电柜命令
 )
 
 var (

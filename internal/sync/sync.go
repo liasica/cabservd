@@ -67,7 +67,7 @@ func Start() {
                 Serial:  serial,
                 Ordinal: ordinal,
             }
-            // TODO 记录电池放入取出
+            // 同步记录电池放入取出
             if oldsn != "" {
                 // 取出
                 if b, err := adapter.ParseBatterySN(oldsn); err == nil {
