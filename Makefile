@@ -18,10 +18,18 @@ kxcab:
 kxcab-dev:
 	$(call deploy,kxcab-dev,kxcab)
 
+.PHONY: ydcab
+ydcab:
+	$(call deploy,ydcab,ydcab)
+
 .PHONY: ydcab-dev
 ydcab-dev:
 	$(call deploy,ydcab-dev,ydcab)
 
-.PHONY: ydcab
-ydcab:
-	$(call deploy,ydcab,ydcab)
+.PHONY: tbcab
+tbcab:
+	$(call deploy,tbcab,tbcab)
+
+.PHONY: tbcab-dev
+tbcab-dev:
+	$(call deploy,tbcab-dev,tbcab)

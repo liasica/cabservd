@@ -14,6 +14,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/console"
     "github.com/auroraride/cabservd/internal/g"
+    "github.com/auroraride/cabservd/internal/mem"
     "github.com/auroraride/cabservd/internal/sync"
     "github.com/auroraride/cabservd/internal/types"
     "github.com/google/uuid"
@@ -48,7 +49,6 @@ func (s *binService) QuerySerialOrdinal(serial string, ordinal int) (*ent.Bin, e
 }
 
 // Operate 按步骤操作某个仓位
-// TODO 仓位检测
 func (s *binService) Operate(bo *types.Bin) (err error) {
     if bo.StepCallback == nil {
         return adapter.ErrorBadRequest
@@ -73,6 +73,10 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
     sync.Bin.SetListener(eb, ch)
 
     stepper := make(chan *types.BinResult)
+
+    // 记录操作
+    mem.BinOperate(bo.Serial, bo.Ordinal, bo.MainOperate)
+    defer mem.BinOperationFinished(bo.Serial, bo.Ordinal)
 
     defer func() {
         // 退出时删除监听
@@ -166,6 +170,10 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
                     if !bo.Next() {
                         return
                     }
+
+                    // 将本次仓位信息结果传递到下次
+                    // TODO 取消数据库监听, 使用程序判定每一步的仓位变动
+                    // ch <- x
                 }
             }
         }

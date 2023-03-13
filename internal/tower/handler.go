@@ -15,43 +15,52 @@ import (
 )
 
 var (
-    messageType    *MessageTypeList
     cabinetSignals map[Signal]CabinetSignalFunc
     binSignals     map[Signal]BinSignalFunc
 )
 
 type Handler struct {
     core.Bean
+
+    fakeVoltage float64
+    fakeCurrent float64
+    mtl         *MessageTypeList
+    device      *core.Device
 }
 
-func New(mt *MessageTypeList, params ...any) *Handler {
-    cabinetSignals = make(map[Signal]CabinetSignalFunc)
-    binSignals = make(map[Signal]BinSignalFunc)
+func New(options ...Option) (h *Handler) {
+    h = &Handler{
+        fakeVoltage: 40,
+        fakeCurrent: -1,
+        device:      &core.Device{},
+    }
+    for _, o := range options {
+        o.apply(h)
+    }
 
-    for _, param := range params {
-        switch m := param.(type) {
-        case map[Signal]CabinetSignalFunc:
-            for k, v := range m {
-                CabinetSignalMap[k] = struct{}{}
-                cabinetSignals[k] = v
-            }
-        case map[Signal]BinSignalFunc:
-            for k, v := range m {
-                binSignals[k] = v
-            }
+    if h.mtl == nil {
+        h.mtl = &MessageTypeList{
+            LoginRequest:    100,
+            LoginResponse:   101,
+            ReportRequest:   300,
+            ReportResponse:  301,
+            NoticeRequest:   400,
+            NoticeResponse:  401,
+            ControlRequest:  500,
+            ControlResponse: 501,
         }
     }
 
-    messageType = mt
-
-    return &Handler{}
+    return
 }
 
 // GetEmptyDeviation TODO 后续做在数据库中
-func (h *Handler) GetEmptyDeviation() (voltage, current float64) {
-    voltage = 40
-    current = 1
-    return
+func (h *Handler) GetEmptyDeviation() (float64, float64) {
+    return h.fakeVoltage, h.fakeCurrent
+}
+
+func (h *Handler) Device() *core.Device {
+    return h.device
 }
 
 // OnMessage 解析消息
@@ -70,13 +79,13 @@ func (h *Handler) OnMessage(_ *core.Client, b []byte) (serial string, res core.R
     fields = append(fields, log.Payload(req))
 
     switch req.MsgType {
-    case messageType.LoginRequest:
+    case h.mtl.LoginRequest:
         err = h.LoginHandle(req)
-    case messageType.ReportRequest:
+    case h.mtl.ReportRequest:
         err = h.ReportHandle(req)
-    case messageType.NoticeRequest:
+    case h.mtl.NoticeRequest:
         err = h.NoticeHandle(req)
-    case messageType.ControlResponse:
+    case h.mtl.ControlResponse:
         // TODO 控制成功逻辑
         // 收到成功逻辑处理完成后, 不发送反馈消息
         return
@@ -99,13 +108,6 @@ func (h *Handler) LoginHandle(req *Request) (err error) {
         return adapter.ErrorCabinetSerialRequired
     }
 
-    // // 清除仓位电池信息
-    // // TODO 清除的时候会不会后来的消息先到
-    // err = core.ResetBins(req.DevID)
-    // if err != nil {
-    //     return
-    // }
-
     // 查找或创建电柜
     go core.LoadOrStoreCabinet(context.Background(), req.DevID)
 
@@ -118,7 +120,7 @@ func (h *Handler) ReportHandle(req *Request) (err error) {
     if req.DevID == "" {
         return adapter.ErrorCabinetSerialRequired
     }
-    core.UpdateCabinet(req)
+    core.UpdateCabinet(h, req)
     return
 }
 

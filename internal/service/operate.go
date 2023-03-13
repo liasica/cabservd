@@ -43,14 +43,15 @@ func (s *operateService) Bin(req *cabdef.OperateBinRequest) (results []*cabdef.B
     }
 
     err := NewBin(s.GetUser()).Operate(&types.Bin{
-        Timeout:   120,
-        Serial:    req.Serial,
-        UUID:      uuid.New(),
-        Ordinal:   *req.Ordinal,
-        Business:  adapter.BusinessOperate,
-        Steps:     types.OMOperates[req.Operate],
-        Remark:    req.Remark,
-        BinRemark: binRemark,
+        Timeout:     120,
+        MainOperate: req.Operate,
+        Serial:      req.Serial,
+        UUID:        uuid.New(),
+        Ordinal:     *req.Ordinal,
+        Business:    adapter.BusinessOperate,
+        Steps:       types.OMOperates[req.Operate],
+        Remark:      req.Remark,
+        BinRemark:   binRemark,
         StepCallback: func(result *cabdef.BinOperateResult) {
             results = append(results, result)
         },

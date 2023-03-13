@@ -17,8 +17,6 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldCabinetID holds the string denoting the cabinet_id field in the database.
 	FieldCabinetID = "cabinet_id"
-	// FieldUUID holds the string denoting the uuid field in the database.
-	FieldUUID = "uuid"
 	// FieldSerial holds the string denoting the serial field in the database.
 	FieldSerial = "serial"
 	// FieldName holds the string denoting the name field in the database.
@@ -64,7 +62,6 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldCabinetID,
-	FieldUUID,
 	FieldSerial,
 	FieldName,
 	FieldOrdinal,
@@ -97,8 +94,6 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// UUIDValidator is a validator for the "uuid" field. It is called by the builders before save.
-	UUIDValidator func(string) error
 	// DefaultOpen holds the default value on creation for the "open" field.
 	DefaultOpen bool
 	// DefaultEnable holds the default value on creation for the "enable" field.

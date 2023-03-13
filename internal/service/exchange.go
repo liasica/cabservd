@@ -145,6 +145,7 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
 
         err = NewBin(s.GetUser()).Operate(&types.Bin{
             Timeout:      req.Timeout,
+            MainOperate:  cabdef.OperateDoorOpen,
             Serial:       sc.Serial,
             UUID:         req.UUID,
             Ordinal:      b.Ordinal,

@@ -49,6 +49,13 @@ go run -mod=mod entgo.io/ent/cmd/ent init --target ./internal/ent/schema Cabinet
 - [Postgres Listen / Notify Real-time Notifications in Go](https://ds0nt.com/postgres-streaming-listen-notify-go)
 
 ```postgresql
+SET TIMEZONE = 'Asia/Shanghai';
+CREATE EXTENSION postgis;
+CREATE EXTENSION pg_trgm;
+CREATE EXTENSION btree_gin;
+```
+
+```postgresql
 CREATE OR REPLACE FUNCTION notify_event() RETURNS TRIGGER AS
 $$
 
@@ -109,8 +116,6 @@ BEGIN
                     TG_TABLE_NAME,
                     'id',
                     'id',
-        --                     TG_ARGV[0],
-        --                     TG_ARGV[0],
                     TG_TABLE_NAME));
     RETURN OLD;
 END;

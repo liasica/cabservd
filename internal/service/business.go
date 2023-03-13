@@ -124,6 +124,7 @@ func (s *businessService) Do(req *cabdef.BusinessRequest) (res cabdef.BusinessRe
     // 开始操作
     err := NewBin(s.GetUser()).Operate(&types.Bin{
         Timeout:      req.Timeout,
+        MainOperate:  cabdef.OperateDoorOpen,
         Serial:       req.Serial,
         UUID:         req.UUID,
         Ordinal:      sc.Data.BusinessBin.Ordinal,

@@ -13,17 +13,8 @@ import (
 
 func New() (core.Hook, codec.Codec) {
     return tower.New(
-            &tower.MessageTypeList{
-                LoginRequest:    100,
-                LoginResponse:   101,
-                ReportRequest:   300,
-                ReportResponse:  301,
-                NoticeRequest:   400,
-                NoticeResponse:  401,
-                ControlRequest:  500,
-                ControlResponse: 501,
-            },
-            binSignals,
-        ),
-        &codec.HeaderLength{}
+        tower.WithBinSignals(binSignals),
+        tower.WithAutoResetBattery(false),
+        tower.WithBatteryReign(true),
+    ), &codec.HeaderLength{}
 }

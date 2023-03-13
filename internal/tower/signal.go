@@ -5,14 +5,17 @@
 
 package tower
 
-import "github.com/auroraride/cabservd/internal/ent"
+import (
+    "github.com/auroraride/cabservd/internal/ent"
+    "strings"
+)
 
-type CabinetSignalFunc func(*ent.CabinetPointer, *Attribute, string)
+type CabinetSignalFunc func(cab *ent.CabinetPointer, attr *Attribute, v string)
 
-type BinSignalFunc func(*ent.BinPointer, *Attribute, string)
+type BinSignalFunc func(b *ent.BinPointer, attr *Attribute, v string)
 
 var (
-    CabinetSignalMap = map[Signal]struct{}{
+    cabinetSignalMap = map[Signal]struct{}{
         SignalCabinetStatus:  {},
         SignalLng:            {},
         SignalLat:            {},
@@ -29,6 +32,14 @@ var (
 
 type Signal string
 
+func (s Signal) String() string {
+    return string(s)
+}
+
+func (s Signal) Contains(sub Signal) bool {
+    return strings.Contains(s.String(), sub.String())
+}
+
 // SignalData 信号量结构体
 type SignalData struct {
     ID    Signal `json:"id,omitempty"`    // 信号量ID
@@ -41,7 +52,7 @@ const (
     SignalBinDoorStatus Signal = "02103001" // 仓位柜门状态 0:关 1:开
     SignalBinEnable     Signal = "02118001" // 柜门是否禁用 (0:禁用 1:启用)
 
-    SignalBatteryExists      Signal = "02140001" // 电池在位检测 0:无电池 1:有电池 <凯信>
+    SignalBatteryMonVoltage  Signal = "011170"   // 电芯电压
     SignalBatterySN          Signal = "02106001" // 柜内电池SN
     SignalBatteryVoltage     Signal = "01111001" // 电池总电压 (V)
     SignalBatteryCurrent     Signal = "01112001" // 电池总电流 (A)

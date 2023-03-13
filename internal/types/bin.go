@@ -22,14 +22,14 @@ var (
                 Operate: cabdef.OperateDoorOpen,
                 Door:    cabdef.DetectDoorOpen,
                 Battery: cabdef.DetectBatteryIgnore,
-                Bin:     cabdef.DetectBinUsable,
+                Bin:     cabdef.DetectBinIgnore,
             },
             {
                 Step:    2,
                 Operate: cabdef.OperateDetect,
                 Door:    cabdef.DetectDoorClose,
                 Battery: cabdef.DetectBatteryPutin,
-                Bin:     cabdef.DetectBinUsable,
+                Bin:     cabdef.DetectBinIgnore,
             },
         },
         {
@@ -38,14 +38,14 @@ var (
                 Operate: cabdef.OperateDoorOpen,
                 Door:    cabdef.DetectDoorOpen,
                 Battery: cabdef.DetectBatteryIgnore,
-                Bin:     cabdef.DetectBinUsable,
+                Bin:     cabdef.DetectBinIgnore,
             },
             {
                 Step:    4,
                 Operate: cabdef.OperateDetect,
                 Door:    cabdef.DetectDoorClose,
                 Battery: cabdef.DetectBatteryPutout,
-                Bin:     cabdef.DetectBinUsable,
+                Bin:     cabdef.DetectBinIgnore,
             },
         },
     }
@@ -160,6 +160,7 @@ func (b *BinStep) String() string {
 type Bin struct {
     index int
 
+    MainOperate  cabdef.Operate   // 主要操作
     Timeout      int64            // 超时时间
     Serial       string           // 电柜编号
     UUID         uuid.UUID        // 任务ID
@@ -174,7 +175,11 @@ type Bin struct {
 
 // Current 获取当前步骤
 func (o *Bin) Current() *BinStep {
-    return o.Steps[len(o.Steps)-1]
+    last := len(o.Steps) - 1
+    if o.index >= last {
+        return o.Steps[last]
+    }
+    return o.Steps[o.index]
 }
 
 // Next 标记当前步骤完成, 开始下一个步骤

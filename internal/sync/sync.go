@@ -57,7 +57,10 @@ func Start() {
         }
         // go SendBin(message.Data.Serial, message.Data)
         // 如果旧仓位电池编号和新电池编号不相同
-        oldsn := message.Old.BatterySn
+        var oldsn string
+        if message.Old != nil {
+            oldsn = message.Old.BatterySn
+        }
         newsn := message.Data.BatterySn
         serial := message.Data.Serial
         ordinal := message.Data.Ordinal

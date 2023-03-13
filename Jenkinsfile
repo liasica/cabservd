@@ -31,6 +31,22 @@ node {
             }
         }
     }
+    stage('tbcab') {
+        if (TAG == 'tbcab') {
+            echo '开始部署[tbcab]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
+    stage('tbcab-dev') {
+        if (TAG == 'tbcab-dev') {
+            echo '开始部署[tbcab-dev]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
 }
 
 def deploy(tag) {

@@ -59,7 +59,7 @@ func (Bin) Annotations() []schema.Annotation {
 func (Bin) Fields() []ent.Field {
     return []ent.Field{
         field.Uint64("cabinet_id"),
-        field.String("uuid").Unique().MaxLen(32).Comment("唯一标识"),
+        // field.String("uuid").Unique().MaxLen(32).Comment("唯一标识"),
 
         // 电柜信息
         field.String("serial").Comment("电柜设备序列号"),
@@ -106,7 +106,7 @@ func (Bin) Indexes() []ent.Index {
         index.Fields("cabinet_id"),
         index.Fields("serial", "ordinal").Unique(),
         index.Fields("battery_exists"),
-        index.Fields("ordinal"),
+        // index.Fields("ordinal"),
         index.Fields("battery_sn"),
         index.Fields("soc"),
     }

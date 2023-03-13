@@ -9,6 +9,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/tower"
     "github.com/liasica/go-helpers/silk"
+    "github.com/liasica/go-helpers/tools"
 )
 
 const (
@@ -18,5 +19,13 @@ const (
 var binSignals = map[tower.Signal]tower.BinSignalFunc{
     SignalBatteryExists: func(b *ent.BinPointer, attr *tower.Attribute, v string) {
         b.BatteryExists = silk.Bool(v == "1")
+    },
+    tower.SignalBatteryVoltage: func(b *ent.BinPointer, attr *tower.Attribute, v string) {
+        vf := tools.StrToFloat64(v)
+        b.Voltage = silk.Float64(vf)
+    },
+    tower.SignalBatteryCurrent: func(b *ent.BinPointer, attr *tower.Attribute, v string) {
+        vf := tools.StrToFloat64(v)
+        b.Current = silk.Float64(vf)
     },
 }

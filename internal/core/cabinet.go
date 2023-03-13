@@ -11,9 +11,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
-    "github.com/liasica/go-helpers/tools"
     "go.uber.org/zap"
-    "strconv"
     "time"
 )
 
@@ -23,7 +21,7 @@ type CabinetUpdater interface {
     GetBins() ent.BinPointers
 }
 
-func UpdateCabinet(p CabinetUpdater) {
+func UpdateCabinet(h Hook, p CabinetUpdater) {
     ctx := context.Background()
 
     serial, ok := p.GetSerial()
@@ -31,13 +29,19 @@ func UpdateCabinet(p CabinetUpdater) {
         return
     }
 
-    cab, exists := p.GetCabinet()
-    if exists {
-        SaveCabinet(ctx, serial, cab)
+    cab := LoadOrStoreCabinet(ctx, serial)
+    if cab == nil {
+        zap.L().Error("仓位保存失败: 未找到电柜信息")
+        return
     }
 
-    bins := p.GetBins()
-    SaveBins(ctx, serial, bins)
+    cp, exists := p.GetCabinet()
+    if exists {
+        saveCabinet(h, cab, cp)
+    }
+
+    bp := p.GetBins()
+    saveBins(h, cab, bp)
 }
 
 func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
@@ -54,35 +58,120 @@ func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
     return
 }
 
-func SaveCabinet(ctx context.Context, serial string, item *ent.CabinetPointer) {
-    err := ent.Database.Cabinet.Create().
-        SetSerial(serial).
-        OnConflictColumns(cabinet.FieldSerial).
-        Update(func(u *ent.CabinetUpsert) {
+func saveCabinet(_ Hook, cab *ent.Cabinet, item *ent.CabinetPointer) {
+    ctx := context.Background()
+    u := ent.Database.Cabinet.UpdateOne(cab).SetUpdatedAt(time.Now())
+    // 在线
+    if item.Online != nil {
+        u.SetOnline(*item.Online)
+    }
+
+    // 状态
+    if item.Status != nil {
+        u.SetStatus(*item.Status)
+    }
+
+    // 经度
+    if item.Lng != nil {
+        u.SetLng(*item.Lng)
+    }
+
+    // 纬度
+    if item.Lat != nil {
+        u.SetLat(*item.Lat)
+    }
+
+    // GSM
+    if item.Gsm != nil {
+        u.SetGsm(*item.Gsm)
+    }
+
+    // 电压
+    if item.Voltage != nil {
+        u.SetVoltage(*item.Voltage)
+    }
+
+    // 电流
+    if item.Current != nil {
+        u.SetCurrent(*item.Current)
+    }
+
+    // 温度
+    if item.Temperature != nil {
+        u.SetTemperature(*item.Temperature)
+    }
+
+    // 启用
+    if item.Enable != nil {
+        u.SetEnable(*item.Enable)
+    }
+
+    // 总用电
+    if item.Electricity != nil {
+        u.SetElectricity(*item.Electricity)
+    }
+
+    err := u.Exec(ctx)
+    if err != nil {
+        zap.L().Error("电柜保存失败", zap.Error(err), log.Payload(item))
+    }
+}
+
+func binSaver(cab *ent.Cabinet, ordinal int, setter func(u *ent.BinMutation, b *ent.Bin)) error {
+    ctx := context.Background()
+    b, _ := ent.Database.Bin.Query().Where(bin.Serial(cab.Serial), bin.Ordinal(ordinal)).Only(ctx)
+    var (
+        mu      *ent.BinMutation
+        creator *ent.BinCreate
+        updater *ent.BinUpdateOne
+    )
+    if b == nil {
+        creator = ent.Database.Bin.Create()
+        mu = creator.Mutation()
+    } else {
+        updater = ent.Database.Bin.UpdateOne(b)
+        mu = updater.Mutation()
+    }
+
+    mu.SetSerial(cab.Serial)
+    mu.SetOrdinal(ordinal)
+    mu.SetCabinetID(cab.ID)
+    setter(mu, b)
+
+    if creator != nil {
+        return creator.Exec(ctx)
+    }
+
+    return updater.Exec(ctx)
+}
+
+func saveBins(h Hook, cab *ent.Cabinet, items ent.BinPointers) {
+    if len(items) == 0 {
+        return
+    }
+
+    device := h.Device()
+
+    for _, item := range items {
+        // TODO 删除DEBUG
+        err := binSaver(cab, *item.Ordinal, func(u *ent.BinMutation, old *ent.Bin) {
+            // u, old := binSaver(tx, cab, *item.Ordinal)
+            u.SetName(*item.Name)
             u.SetUpdatedAt(time.Now())
-            // 在线
-            if item.Online != nil {
-                u.SetOnline(*item.Online)
+
+            // 健康状态
+            if item.Health != nil {
+                u.SetHealth(*item.Health)
             }
 
-            // 状态
-            if item.Status != nil {
-                u.SetStatus(*item.Status)
+            // 仓门状态
+            if item.Open != nil {
+                u.SetOpen(*item.Open)
             }
 
-            // 经度
-            if item.Lng != nil {
-                u.SetLng(*item.Lng)
-            }
-
-            // 纬度
-            if item.Lat != nil {
-                u.SetLat(*item.Lat)
-            }
-
-            // GSM
-            if item.Gsm != nil {
-                u.SetGsm(*item.Gsm)
+            // 仓位启用状态
+            if item.Enable != nil {
+                u.SetEnable(*item.Enable)
             }
 
             // 电压
@@ -95,100 +184,50 @@ func SaveCabinet(ctx context.Context, serial string, item *ent.CabinetPointer) {
                 u.SetCurrent(*item.Current)
             }
 
-            // 温度
-            if item.Temperature != nil {
-                u.SetTemperature(*item.Temperature)
+            // 电量
+            if item.Soc != nil {
+                u.SetSoc(*item.Soc)
             }
 
-            // 启用
-            if item.Enable != nil {
-                u.SetEnable(*item.Enable)
+            // 健康
+            if item.Soh != nil {
+                u.SetSoh(*item.Soh)
             }
 
-            // 总用电
-            if item.Electricity != nil {
-                u.SetElectricity(*item.Electricity)
+            // 电池编号
+            if item.BatterySn != nil {
+                u.SetBatterySn(*item.BatterySn)
+                // 如果需要自动清除电池数据
+                if *item.BatterySn == "" && device.AutoResetWithoutBatterySN {
+                    u.ResetBattery()
+                }
+                // 如果无在位检测, 需要处理电池在位标记
+                if !device.BatteryReign {
+                    u.SetBatteryExists(*item.BatterySn != "")
+                }
             }
-        }).
-        Exec(ctx)
-    if err != nil {
-        zap.L().Error("电柜保存失败", zap.Error(err), log.Payload(item))
-    }
-}
 
-func SaveBins(ctx context.Context, serial string, items ent.BinPointers) {
-    if len(items) == 0 {
-        return
-    }
+            // 电池在位
+            if item.BatteryExists != nil {
+                u.SetBatteryExists(*item.BatteryExists)
+            }
 
-    cab := LoadOrStoreCabinet(ctx, serial)
-    if cab == nil {
-        zap.L().Error("仓位保存失败: 未找到电柜信息")
-        return
-    }
-
-    for _, item := range items {
-        uuid := tools.Md5String(serial + "_" + strconv.Itoa(*item.Ordinal))
-        err := ent.Database.Bin.Create().
-            SetUUID(uuid).
-            SetSerial(serial).
-            SetName(*item.Name).
-            SetCabinetID(cab.ID).
-            SetOrdinal(*item.Ordinal).
-            OnConflictColumns(bin.FieldUUID).
-            Update(func(u *ent.BinUpsert) {
-                // 更新时间和电柜ID
-                u.SetUpdatedAt(time.Now()).SetCabinetID(cab.ID)
-                // 健康状态
-                if item.Health != nil {
-                    u.SetHealth(*item.Health)
-                }
-
-                // 仓门状态
-                if item.Open != nil {
-                    u.SetOpen(*item.Open)
-                }
-
-                // 仓位启用状态
-                if item.Enable != nil {
-                    u.SetEnable(*item.Enable)
-                }
-
-                // 电压
-                if item.Voltage != nil {
-                    u.SetVoltage(*item.Voltage)
-                }
-
-                // 电流
-                if item.Current != nil {
-                    u.SetCurrent(*item.Current)
-                }
-
-                // 电量
-                if item.Soc != nil {
-                    u.SetSoc(*item.Soc)
-                }
-
-                // 健康
-                if item.Soh != nil {
-                    u.SetSoh(*item.Soh)
-                }
-
-                // 电池编号
-                if item.BatterySn != nil {
-                    u.SetBatterySn(*item.BatterySn)
-                }
-
-                // 电池在位
-                if item.BatteryExists != nil {
-                    u.SetBatteryExists(*item.BatteryExists)
-                    // TODO 电池不在位是否清除电池信息
-                    // if !*item.BatteryExists {
-                    //     u.ResetBattery()
-                    // }
-                }
-            }).
-            Exec(ctx)
+            // // TODO 需要完善发送锁仓指令
+            // // 当启用中的旧仓位中有电池时, 若非开门操作中电池编号丢失或在位丢失, 直接锁仓
+            // if !mem.BinInOperation(cab.Serial, *item.Ordinal).IsOpen() &&
+            //     old != nil && (old.BatteryExists || old.BatterySn != "") && old.Enable &&
+            //     ((item.BatterySn != nil && *item.BatterySn == "") || (item.BatteryExists != nil && !*item.BatteryExists)) {
+            //     u.SetEnable(false)
+            //     u.SetRemark("未开门状态电池丢失")
+            //     // TODO 如何发送锁仓指令
+            //
+            //     be := "True"
+            //     if !old.BatteryExists {
+            //         be = "False"
+            //     }
+            //     zap.L().Info(cab.Serial + " " + *item.Name + ", 未开门状态电池丢失, 旧电池信息: sn = " + old.BatterySn + ", battery_exists = " + be)
+            // }
+        })
         if err != nil {
             zap.L().Error("仓位保存失败", zap.Error(err), log.Payload(item))
         }

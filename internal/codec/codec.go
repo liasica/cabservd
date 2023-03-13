@@ -6,7 +6,6 @@
 package codec
 
 import (
-    "bufio"
     "bytes"
     "encoding/binary"
     "github.com/auroraride/adapter"
@@ -14,7 +13,8 @@ import (
 )
 
 const (
-    bodySize = 4
+    bodySize           = 4
+    linebreakDelimiter = '\n'
 )
 
 type Codec interface {
@@ -22,18 +22,38 @@ type Codec interface {
     Encode(data []byte) (b []byte)
 }
 
-// Newline 以\n为分割处理
-type Newline struct{}
+type Default struct {
+}
 
-func (codec *Newline) Decode(conn gnet.Conn) (b []byte, err error) {
-    b, err = bufio.NewReader(conn).ReadBytes('\n')
+func (codec *Default) Decode(conn gnet.Conn) (b []byte, err error) {
+    return conn.Next(-1)
+}
+
+func (codec *Default) Encode(message []byte) []byte {
+    return message
+}
+
+// Linebreak 以\n为分割处理
+type Linebreak struct{}
+
+func (codec *Linebreak) Decode(conn gnet.Conn) (b []byte, err error) {
+    b, err = conn.Peek(-1)
     if err != nil {
-        return
+        return nil, err
     }
+
+    n := bytes.IndexByte(b, linebreakDelimiter)
+    if n < 0 {
+        return nil, adapter.ErrorIncompletePacket
+    }
+
+    _, _ = conn.Discard(n)
+
+    b = b[:len(b)-1]
     return
 }
 
-func (codec *Newline) Encode(message []byte) []byte {
+func (codec *Linebreak) Encode(message []byte) []byte {
     return append(message, adapter.Newline...)
 }
 

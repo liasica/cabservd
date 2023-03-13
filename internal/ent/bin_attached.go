@@ -9,14 +9,37 @@ import (
     "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/adapter/defs/cabdef"
+    "github.com/liasica/go-helpers/silk"
     "strings"
 )
 
 // ResetBattery 无电池的时候清除电池信息
-// TODO: 是否有必要?
-func (u *BinUpsert) ResetBattery() *BinUpsert {
-    u.SetCurrent(0).SetVoltage(0).SetSoc(0).SetSoh(0)
-    return u
+func (u *BinMutation) ResetBattery() {
+    u.SetCurrent(0)
+    u.SetVoltage(0)
+    u.SetSoc(0)
+    u.SetSoh(0)
+}
+
+func (b *BinPointer) ResetBattery() {
+    b.BatteryExists = silk.Bool(false)
+    b.BatterySn = silk.String("")
+    b.Voltage = silk.Float64(0)
+    b.Current = silk.Float64(0)
+    b.Soc = silk.Float64(0)
+    b.Soh = silk.Float64(0)
+}
+
+// LostBattery 是否无电池
+func (b *BinPointer) LostBattery() bool {
+    if b.BatterySn != nil && *b.BatterySn == "" {
+        return true
+    }
+    if b.BatteryExists != nil && !*b.BatteryExists {
+        return true
+    }
+
+    return false
 }
 
 // IsLooseHasBattery 宽松检测有电池

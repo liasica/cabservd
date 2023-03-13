@@ -98,10 +98,12 @@ func (h *hub) OnTraffic(conn gnet.Conn) (action gnet.Action) {
         }
 
         // 处理消息
-        go h.handleMessage(c, b)
+        if len(b) > 0 {
+            go h.handleMessage(c, b)
+        }
     }
 
-    return gnet.None
+    return
 }
 
 func (h *hub) handleMessage(c *Client, b []byte) {

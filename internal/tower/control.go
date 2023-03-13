@@ -46,7 +46,7 @@ func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int) (e
 
     msg := &Request{
         Message: Message{
-            MsgType: messageType.ControlRequest,
+            MsgType: h.mtl.ControlRequest,
             TxnNo:   time.Now().UnixMilli(),
             DevID:   serial,
         },

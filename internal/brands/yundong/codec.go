@@ -31,7 +31,7 @@ func (codec *Codec) Decode(conn gnet.Conn) (data []byte, err error) {
     }
 
     if buf[0] != codec.pkgStart[0] || buf[1] != codec.pkgStart[1] {
-        return nil, adapter.ErrIncorrectPacket
+        return nil, adapter.ErrorIncorrectPacket
     }
 
     bodyLen := int(binary.BigEndian.Uint16(buf[4:]))

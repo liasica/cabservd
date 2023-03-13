@@ -189,7 +189,7 @@ func (d *CabinetData) GetBins() (ebs ent.BinPointers) {
     return
 }
 
-func (p *Parser) CabinetData(serial string, b []byte) string {
+func (p *Parser) CabinetData(h *Handler, serial string, b []byte) string {
     data := new(CabinetData)
     index := Parse(data, b, cabinetConfig)
     binBytes := b[index : len(b)-17]
@@ -201,7 +201,7 @@ func (p *Parser) CabinetData(serial string, b []byte) string {
 
     if serial != "" {
         data.Serial = serial
-        core.UpdateCabinet(data)
+        core.UpdateCabinet(h, data)
     }
 
     return data.String()
