@@ -11,6 +11,7 @@ import (
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/bin"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
+    "github.com/auroraride/cabservd/internal/g"
     "go.uber.org/zap"
     "time"
 )
@@ -41,7 +42,7 @@ func UpdateCabinet(h Hook, p CabinetUpdater) {
     }
 
     bp := p.GetBins()
-    saveBins(h, cab, bp)
+    saveBins(cab, bp)
 }
 
 func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
@@ -145,14 +146,13 @@ func binSaver(cab *ent.Cabinet, ordinal int, setter func(u *ent.BinMutation, b *
     return updater.Exec(ctx)
 }
 
-func saveBins(h Hook, cab *ent.Cabinet, items ent.BinPointers) {
+func saveBins(cab *ent.Cabinet, items ent.BinPointers) {
     if len(items) == 0 {
         return
     }
 
-    device := h.Device()
-
     for _, item := range items {
+        // fmt.Println(item.String())
         // TODO 删除DEBUG
         err := binSaver(cab, *item.Ordinal, func(u *ent.BinMutation, old *ent.Bin) {
             // u, old := binSaver(tx, cab, *item.Ordinal)
@@ -198,11 +198,11 @@ func saveBins(h Hook, cab *ent.Cabinet, items ent.BinPointers) {
             if item.BatterySn != nil {
                 u.SetBatterySn(*item.BatterySn)
                 // 如果需要自动清除电池数据
-                if *item.BatterySn == "" && device.AutoResetWithoutBatterySN {
+                if *item.BatterySn == "" && g.AutoResetWithoutBatterySN {
                     u.ResetBattery()
                 }
                 // 如果无在位检测, 需要处理电池在位标记
-                if !device.BatteryReign {
+                if !g.BatteryReign {
                     u.SetBatteryExists(*item.BatterySn != "")
                 }
             }

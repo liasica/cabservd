@@ -27,6 +27,7 @@ func main() {
                         ControlResponse: 501,
                     }),
                     tower.WithAutoResetBattery(true),
+                    tower.WithCalculateMonVoltage(true),
                 ),
                 &codec.Linebreak{}
         },

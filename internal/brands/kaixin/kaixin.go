@@ -18,3 +18,11 @@ func New() (core.Hook, codec.Codec) {
         tower.WithBatteryReign(true),
     ), &codec.HeaderLength{}
 }
+
+func NewNonIntelligent() (core.Hook, codec.Codec) {
+    return tower.New(
+        tower.WithBinSignals(binSignals),
+        tower.WithAutoResetBattery(false),
+        tower.WithBatteryReign(true),
+    ), &codec.HeaderLength{}
+}

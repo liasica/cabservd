@@ -5,6 +5,8 @@
 
 package tower
 
+import "github.com/auroraride/cabservd/internal/g"
+
 type Option interface {
     apply(h *Handler)
 }
@@ -49,13 +51,19 @@ func WithBinSignals(v map[Signal]BinSignalFunc) Option {
 }
 
 func WithAutoResetBattery(v bool) Option {
-    return optionFunc(func(h *Handler) {
-        h.device.AutoResetWithoutBatterySN = v
+    return optionFunc(func(_ *Handler) {
+        g.AutoResetWithoutBatterySN = v
     })
 }
 
 func WithBatteryReign(v bool) Option {
-    return optionFunc(func(h *Handler) {
-        h.device.BatteryReign = v
+    return optionFunc(func(_ *Handler) {
+        g.BatteryReign = v
+    })
+}
+
+func WithCalculateMonVoltage(v bool) Option {
+    return optionFunc(func(_ *Handler) {
+        g.CalculateMonVoltage = v
     })
 }

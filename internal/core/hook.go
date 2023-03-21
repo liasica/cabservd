@@ -26,9 +26,6 @@ type (
         // GetEmptyDeviation 获取空仓最大电压和电流
         // 空仓的时候有可能会有一定的电压和电流
         GetEmptyDeviation() (fakevoltage, fakecurrent float64)
-
-        // Device 电柜配置
-        Device() *Device
     }
 
     Bean struct{}
@@ -48,8 +45,4 @@ func (h *Bean) SendOperate(_ string, _ cabdef.Operate, _ int) (err error) {
 
 func (h *Bean) GetEmptyDeviation() (voltage, current float64) {
     return
-}
-
-func (h *Bean) Device() *Device {
-    return &Device{}
 }

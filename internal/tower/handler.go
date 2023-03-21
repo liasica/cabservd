@@ -25,14 +25,12 @@ type Handler struct {
     fakeVoltage float64
     fakeCurrent float64
     mtl         *MessageTypeList
-    device      *core.Device
 }
 
 func New(options ...Option) (h *Handler) {
     h = &Handler{
         fakeVoltage: 40,
         fakeCurrent: -1,
-        device:      &core.Device{},
     }
     for _, o := range options {
         o.apply(h)
@@ -57,10 +55,6 @@ func New(options ...Option) (h *Handler) {
 // GetEmptyDeviation TODO 后续做在数据库中
 func (h *Handler) GetEmptyDeviation() (float64, float64) {
     return h.fakeVoltage, h.fakeCurrent
-}
-
-func (h *Handler) Device() *core.Device {
-    return h.device
 }
 
 // OnMessage 解析消息

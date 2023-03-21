@@ -22,8 +22,6 @@ func (u *BinMutation) ResetBattery() {
 }
 
 func (b *BinPointer) ResetBattery() {
-    b.BatteryExists = silk.Bool(false)
-    b.BatterySn = silk.String("")
     b.Voltage = silk.Float64(0)
     b.Current = silk.Float64(0)
     b.Soc = silk.Float64(0)

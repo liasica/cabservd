@@ -25,7 +25,7 @@ var binSignals = map[tower.Signal]tower.BinSignalFunc{
         b.Voltage = silk.Float64(vf)
     },
     tower.SignalBatteryCurrent: func(b *ent.BinPointer, attr *tower.Attribute, v string) {
-        vf := tools.StrToFloat64(v)
-        b.Current = silk.Float64(vf)
+        cf := tools.StrToFloat64(v)
+        b.Current = silk.Float64(cf)
     },
 }

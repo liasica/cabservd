@@ -51,10 +51,10 @@ func Boot(hf HookFunc) {
 
     // 初始化日志
     log.New(&log.Config{
-        FormatJson:  true,
-        Stdout:      g.Config.Debug,
-        Application: g.Config.Brand.LoggerName(g.Config.Environment),
-        NoCaller:    true,
+        FormatJson: true,
+        Stdout:     g.Config.Debug,
+        LoggerName: g.Config.LoggerName,
+        NoCaller:   true,
         Writers: []io.Writer{
             log.NewRedisWriter(g.Redis),
         },

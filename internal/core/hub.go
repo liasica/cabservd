@@ -6,11 +6,13 @@
 package core
 
 import (
+    "fmt"
     "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/codec"
     "github.com/panjf2000/gnet/v2"
     "go.uber.org/zap"
     "go.uber.org/zap/zapcore"
+    "os"
     "sync"
 )
 
@@ -87,6 +89,12 @@ func (h *hub) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 
     for {
         b, err = h.codec.Decode(conn)
+
+        if len(b) > 0 {
+            if os.Getenv("LOCAL_DEV") == "true" {
+                fmt.Printf("%d\t%s\n", len(b), b)
+            }
+        }
 
         if err == adapter.ErrorIncompletePacket {
             break

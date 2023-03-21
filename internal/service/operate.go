@@ -27,7 +27,8 @@ func NewOperate(params ...any) *operateService {
 
 // Bin 单仓位控制
 func (s *operateService) Bin(req *cabdef.OperateBinRequest) (results []*cabdef.BinOperateResult) {
-    NewCabinet(s.GetUser()).OperableX(req.Serial)
+    // TODO 是否需要判定仓位状态
+    // NewCabinet(s.GetUser()).OperableX(req.Serial)
 
     if !req.Operate.IsCommand() {
         app.Panic(http.StatusBadRequest, adapter.ErrorOperateCommand)
