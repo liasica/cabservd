@@ -33,3 +33,11 @@ tbcab:
 .PHONY: tbcab-dev
 tbcab-dev:
 	$(call deploy,tbcab-dev,tbcab)
+
+.PHONY: kxnicab
+kxnicab:
+	$(call deploy,kxnicab,kxnicab)
+
+.PHONY: kxnicab-dev
+kxnicab-dev:
+	$(call deploy,kxnicab-dev,kxnicab)

@@ -47,6 +47,22 @@ node {
             }
         }
     }
+    stage('kxnicab') {
+        if (TAG == 'kxnicab') {
+            echo '开始部署[kxnicab]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
+    stage('kxnicab-dev') {
+        if (TAG == 'kxnicab-dev') {
+            echo '开始部署[kxnicab-dev]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
 }
 
 def deploy(tag) {
