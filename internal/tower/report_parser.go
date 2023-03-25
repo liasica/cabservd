@@ -6,6 +6,7 @@
 package tower
 
 import (
+    "github.com/auroraride/adapter"
     "github.com/auroraride/cabservd/internal/ent"
     "github.com/auroraride/cabservd/internal/ent/cabinet"
     "github.com/auroraride/cabservd/internal/g"
@@ -135,7 +136,21 @@ func (r *Request) GetBins() (items ent.BinPointers) {
         case SignalBinEnable:
             b.Enable = silk.Bool(v == "1")
         case SignalBatterySN:
-            b.BatterySn = silk.String(v)
+            vaild := false
+            // 如果需要和电柜通讯
+            if !g.Config.NonBms {
+                // 解析电池编码
+                // 接收到电池编码后, 尝试格式化电池编码, 若可以正常被格式化, 则是有效电池 ---- by: 曹博文, 2023-03-25 23:08
+                bat, _ := adapter.ParseBatterySN(v)
+                if bat.Brand != "" {
+                    vaild = true
+                }
+            }
+
+            if vaild {
+                b.BatterySn = silk.String(v)
+            }
+
             // 删除单芯电压
             // TODO 拓邦更新后删除
             if v == "" && g.CalculateMonVoltage {
