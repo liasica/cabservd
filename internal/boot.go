@@ -98,7 +98,7 @@ func Boot(hf HookFunc) {
         },
         Maintain: g.Config.Maintain,
         DumpSkipper: func(c echo.Context) bool {
-            return c.Path() != "/maintain/clients"
+            return c.Path() == "/maintain/clients"
         },
     })
     go router.Start(e)

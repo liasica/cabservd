@@ -147,7 +147,7 @@ func (r *Request) GetBins() (items ent.BinPointers) {
                 }
             }
 
-            if vaild {
+            if vaild || v == "" {
                 b.BatterySn = silk.String(v)
             }
 
