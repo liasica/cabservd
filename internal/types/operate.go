@@ -6,7 +6,7 @@
 package types
 
 import (
-    "github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/adapter/defs/cabdef"
 )
 
 type StepCallback func(*cabdef.BinOperateResult)

@@ -6,16 +6,16 @@
 package main
 
 import (
-    "github.com/auroraride/cabservd/cmd/ent/internal"
-    "github.com/spf13/cobra"
+	"github.com/auroraride/cabservd/cmd/ent/internal"
+	"github.com/spf13/cobra"
 )
 
 func main() {
-    cmd := &cobra.Command{Use: "ent"}
-    cmd.AddCommand(
-        internal.InitCmd(),
-        internal.GenerateCmd(),
-        internal.CleanCmd(),
-    )
-    _ = cmd.Execute()
+	cmd := &cobra.Command{Use: "ent"}
+	cmd.AddCommand(
+		internal.InitCmd(),
+		internal.GenerateCmd(),
+		internal.CleanCmd(),
+	)
+	_ = cmd.Execute()
 }

@@ -6,33 +6,34 @@
 package mem
 
 import (
-    "github.com/auroraride/adapter/defs/cabdef"
-    "strconv"
-    "sync"
+	"strconv"
+	"sync"
+
+	"github.com/auroraride/adapter/defs/cabdef"
 )
 
 var (
-    // 操作中的仓位 string => cabdef.Operate
-    binOperating sync.Map // operation
+	// 操作中的仓位 string => cabdef.Operate
+	binOperating sync.Map // operation
 )
 
 func binKey(serial string, ordinal int) string {
-    return serial + "-" + strconv.Itoa(ordinal)
+	return serial + "-" + strconv.Itoa(ordinal)
 }
 
 // BinInOperation 获取当前进行中的操作
 func BinInOperation(serial string, ordinal int) cabdef.Operate {
-    v, ok := binOperating.Load(binKey(serial, ordinal))
-    if ok {
-        return v.(cabdef.Operate)
-    }
-    return ""
+	v, ok := binOperating.Load(binKey(serial, ordinal))
+	if ok {
+		return v.(cabdef.Operate)
+	}
+	return ""
 }
 
 func BinOperationFinished(serial string, ordinal int) {
-    binOperating.Delete(binKey(serial, ordinal))
+	binOperating.Delete(binKey(serial, ordinal))
 }
 
 func BinOperate(serial string, ordinal int, o cabdef.Operate) {
-    binOperating.Store(binKey(serial, ordinal), o)
+	binOperating.Store(binKey(serial, ordinal), o)
 }

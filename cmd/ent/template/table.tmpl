@@ -9,19 +9,19 @@ Based on ent by liasica, magicrolan@qq.com.
 
 {{ define "table" }}
 
-{{ template "header" $ }}
+    {{ template "header" $ }}
 
-{{ range $n := $.Nodes }}
+    {{ range $n := $.Nodes }}
 
-{{ if ne $n.Name "Permission" }}
+        {{ if ne $n.Name "Permission" }}
 
-{{ $receiver := $n.Receiver }}
+            {{ $receiver := $n.Receiver }}
 
-// GetTableName returns table name for {{ $n.Name }}.
-func ({{ $receiver }} *{{ $n.Name }}) GetTableName() string {
-    return "{{ $n.Table }}"
-}
+            // GetTableName returns table name for {{ $n.Name }}.
+            func ({{ $receiver }} *{{ $n.Name }}) GetTableName() string {
+            return "{{ $n.Table }}"
+            }
 
-{{ end }}
-{{ end }}
+        {{ end }}
+    {{ end }}
 {{ end }}

@@ -11,29 +11,29 @@ type Parser struct {
 }
 
 type Field struct {
-    Length int
-    Name   string
+	Length int
+	Name   string
 }
 
 type Data interface {
-    SetField(b []byte, name string)
+	SetField(b []byte, name string)
 }
 
 func Parse[T Data](data T, b []byte, fields []Field) (curr int) {
-    curr = 0
-    for _, field := range fields {
-        data.SetField(b[curr:curr+field.Length], field.Name)
-        curr += field.Length
-    }
-    return
+	curr = 0
+	for _, field := range fields {
+		data.SetField(b[curr:curr+field.Length], field.Name)
+		curr += field.Length
+	}
+	return
 }
 
 func (p *Parser) Gsm(b byte) string {
-    // TODO Save
-    return "GSM信号强度=" + strconv.Itoa(int(b))
+	// TODO Save
+	return "GSM信号强度=" + strconv.Itoa(int(b))
 }
 
 func (p *Parser) UpdateNotify(b byte) string {
-    // TODO Save
-    return "http升级结果通知=" + strconv.Itoa(int(b))
+	// TODO Save
+	return "http升级结果通知=" + strconv.Itoa(int(b))
 }

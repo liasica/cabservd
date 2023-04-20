@@ -8,7 +8,7 @@ package g
 import "github.com/go-redis/redis/v9"
 
 var (
-    Redis *redis.Client
+	Redis *redis.Client
 
-    CacheCabinetKey string
+	CacheCabinetKey string
 )

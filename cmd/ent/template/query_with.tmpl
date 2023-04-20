@@ -15,27 +15,27 @@ Based on ent by liasica, magicrolan@qq.com.
 
 {{ define "helper/querywith" }}
 
-{{ $builder := pascal $.Scope.Builder }}
-{{ $receiver := receiver $builder }}
+    {{ $builder := pascal $.Scope.Builder }}
+    {{ $receiver := receiver $builder }}
 
-type {{ $.Name }}QueryWith string
+    type {{ $.Name }}QueryWith string
 
-var (
+    var (
     {{- range $e := $.Edges }}
         {{ $.Name }}QueryWith{{ $e.StructField }} {{ $.Name }}QueryWith = "{{ $e.StructField }}"
     {{- end }}
-)
+    )
 
-func ({{ $receiver }} *{{ $builder }}) With (withEdges ...{{ $.Name }}QueryWith) *{{ $builder }} {
+    func ({{ $receiver }} *{{ $builder }}) With (withEdges ...{{ $.Name }}QueryWith) *{{ $builder }} {
     for _, v := range withEdges {
-        switch v {
-            {{- range $e := $.Edges }}
-            case {{ $.Name }}QueryWith{{ $e.StructField }}:
-                {{ $receiver }}.With{{$e.StructField}}()
-            {{- end }}
-        }
+    switch v {
+    {{- range $e := $.Edges }}
+        case {{ $.Name }}QueryWith{{ $e.StructField }}:
+        {{ $receiver }}.With{{$e.StructField}}()
+    {{- end }}
     }
-	return {{ $receiver }}
-}
+    }
+    return {{ $receiver }}
+    }
 
 {{ end }}

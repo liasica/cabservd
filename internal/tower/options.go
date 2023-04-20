@@ -8,62 +8,62 @@ package tower
 import "github.com/auroraride/cabservd/internal/g"
 
 type Option interface {
-    apply(h *Handler)
+	apply(h *Handler)
 }
 
 type optionFunc func(h *Handler)
 
 func (f optionFunc) apply(h *Handler) {
-    f(h)
+	f(h)
 }
 
 func WithFakeVoltage(v float64) Option {
-    return optionFunc(func(h *Handler) {
-        h.fakeVoltage = v
-    })
+	return optionFunc(func(h *Handler) {
+		h.fakeVoltage = v
+	})
 }
 
 func WithFakeCurrent(v float64) Option {
-    return optionFunc(func(h *Handler) {
-        h.fakeCurrent = v
-    })
+	return optionFunc(func(h *Handler) {
+		h.fakeCurrent = v
+	})
 }
 
 func WithMessageTypeList(v *MessageTypeList) Option {
-    return optionFunc(func(h *Handler) {
-        h.mtl = v
-    })
+	return optionFunc(func(h *Handler) {
+		h.mtl = v
+	})
 }
 
 func WithCabinetSignals(v map[Signal]CabinetSignalFunc) Option {
-    return optionFunc(func(_ *Handler) {
-        cabinetSignals = v
-        for k := range v {
-            cabinetSignalMap[k] = struct{}{}
-        }
-    })
+	return optionFunc(func(_ *Handler) {
+		cabinetSignals = v
+		for k := range v {
+			cabinetSignalMap[k] = struct{}{}
+		}
+	})
 }
 
 func WithBinSignals(v map[Signal]BinSignalFunc) Option {
-    return optionFunc(func(_ *Handler) {
-        binSignals = v
-    })
+	return optionFunc(func(_ *Handler) {
+		binSignals = v
+	})
 }
 
 func WithAutoResetBattery(v bool) Option {
-    return optionFunc(func(_ *Handler) {
-        g.AutoResetWithoutBatterySN = v
-    })
+	return optionFunc(func(_ *Handler) {
+		g.AutoResetWithoutBatterySN = v
+	})
 }
 
 func WithBatteryReign(v bool) Option {
-    return optionFunc(func(_ *Handler) {
-        g.BatteryReign = v
-    })
+	return optionFunc(func(_ *Handler) {
+		g.BatteryReign = v
+	})
 }
 
 func WithCalculateMonVoltage(v bool) Option {
-    return optionFunc(func(_ *Handler) {
-        g.CalculateMonVoltage = v
-    })
+	return optionFunc(func(_ *Handler) {
+		g.CalculateMonVoltage = v
+	})
 }

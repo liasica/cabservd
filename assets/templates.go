@@ -6,55 +6,56 @@
 package assets
 
 import (
-    "embed"
-    "github.com/labstack/echo/v4"
-    "html/template"
-    "io"
-    "io/fs"
-    "strings"
+	"embed"
+	"html/template"
+	"io"
+	"io/fs"
+	"strings"
+
+	"github.com/labstack/echo/v4"
 )
 
 const (
-    templatesDir = "templates"
+	templatesDir = "templates"
 )
 
 var (
-    //go:embed templates/*
-    views embed.FS
+	//go:embed templates/*
+	views embed.FS
 
-    Templates *htmlTemplate
+	Templates *htmlTemplate
 )
 
 type htmlTemplate struct {
-    Templates map[string]*template.Template
+	Templates map[string]*template.Template
 }
 
 func (t *htmlTemplate) Render(w io.Writer, name string, data interface{}, _ echo.Context) error {
-    return t.Templates[name].ExecuteTemplate(w, name, data)
+	return t.Templates[name].ExecuteTemplate(w, name, data)
 }
 
 var (
-    funcMaps = template.FuncMap{
-        "add": func(x, y int) int {
-            return x + y
-        },
-    }
+	funcMaps = template.FuncMap{
+		"add": func(x, y int) int {
+			return x + y
+		},
+	}
 )
 
 func LoadTemplates() {
-    Templates = &htmlTemplate{Templates: make(map[string]*template.Template)}
+	Templates = &htmlTemplate{Templates: make(map[string]*template.Template)}
 
-    _ = fs.WalkDir(views, templatesDir, func(path string, d fs.DirEntry, _ error) (err error) {
-        if d.IsDir() {
-            return
-        }
+	_ = fs.WalkDir(views, templatesDir, func(path string, d fs.DirEntry, _ error) (err error) {
+		if d.IsDir() {
+			return
+		}
 
-        name := strings.Replace(path, templatesDir+"/", "", 1)
-        pt := template.New(name)
-        b, _ := views.ReadFile(path)
-        _, _ = pt.Funcs(funcMaps).Parse(string(b))
+		name := strings.Replace(path, templatesDir+"/", "", 1)
+		pt := template.New(name)
+		b, _ := views.ReadFile(path)
+		_, _ = pt.Funcs(funcMaps).Parse(string(b))
 
-        Templates.Templates[name] = pt
-        return
-    })
+		Templates.Templates[name] = pt
+		return
+	})
 }

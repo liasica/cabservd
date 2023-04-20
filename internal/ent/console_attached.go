@@ -6,34 +6,34 @@
 package ent
 
 import (
-    "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/cabservd/internal/ent/console"
+	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/cabservd/internal/ent/console"
 )
 
 func (c *Console) OperateResult() (res *cabdef.BinOperateResult) {
-    res = &cabdef.BinOperateResult{
-        UUID:     c.UUID.String(),
-        Operate:  c.Operate,
-        Step:     c.Step,
-        Business: c.Business,
-        StartAt:  c.StartAt,
-        StopAt:   c.StopAt,
-        Success:  c.Status == console.StatusSuccess,
-        Before:   c.BeforeBin,
-        After:    c.AfterBin,
-    }
+	res = &cabdef.BinOperateResult{
+		UUID:     c.UUID.String(),
+		Operate:  c.Operate,
+		Step:     c.Step,
+		Business: c.Business,
+		StartAt:  c.StartAt,
+		StopAt:   c.StopAt,
+		Success:  c.Status == console.StatusSuccess,
+		Before:   c.BeforeBin,
+		After:    c.AfterBin,
+	}
 
-    if c.Duration != nil {
-        res.Duration = *c.Duration
-    }
+	if c.Duration != nil {
+		res.Duration = *c.Duration
+	}
 
-    if c.Message != nil {
-        res.Message = *c.Message
-    }
+	if c.Message != nil {
+		res.Message = *c.Message
+	}
 
-    if c.AfterBin != nil {
-        res.BatterySN = c.AfterBin.BatterySN
-    }
+	if c.AfterBin != nil {
+		res.BatterySN = c.AfterBin.BatterySN
+	}
 
-    return
+	return
 }

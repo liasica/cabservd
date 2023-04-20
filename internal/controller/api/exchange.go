@@ -6,13 +6,13 @@
 package api
 
 import (
-    "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/app"
-    "github.com/auroraride/adapter/async"
-    "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/adapter/maintain"
-    "github.com/auroraride/cabservd/internal/service"
-    "github.com/labstack/echo/v4"
+	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/app"
+	"github.com/auroraride/adapter/async"
+	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/adapter/maintain"
+	"github.com/auroraride/cabservd/internal/service"
+	"github.com/labstack/echo/v4"
 )
 
 type exchange struct{}
@@ -20,21 +20,21 @@ type exchange struct{}
 var Exchange = new(exchange)
 
 func (*exchange) Usable(c echo.Context) (err error) {
-    if maintain.Exists() {
-        app.Panic(adapter.ErrorMaintain)
-    }
+	if maintain.Exists() {
+		app.Panic(adapter.ErrorMaintain)
+	}
 
-    ctx, req := app.ContextAndBinding[cabdef.ExchangeUsableRequest](c)
-    return ctx.SendResponse(service.NewExchange(ctx.User).Usable(req))
+	ctx, req := app.ContextAndBinding[cabdef.ExchangeUsableRequest](c)
+	return ctx.SendResponse(service.NewExchange(ctx.User).Usable(req))
 }
 
 func (*exchange) Do(c echo.Context) (err error) {
-    if maintain.Exists() {
-        app.Panic(adapter.ErrorMaintain)
-    }
+	if maintain.Exists() {
+		app.Panic(adapter.ErrorMaintain)
+	}
 
-    return async.WithTaskReturn[error](func() error {
-        ctx, req := app.ContextAndBinding[cabdef.ExchangeRequest](c)
-        return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
-    })
+	return async.WithTaskReturn[error](func() error {
+		ctx, req := app.ContextAndBinding[cabdef.ExchangeRequest](c)
+		return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
+	})
 }

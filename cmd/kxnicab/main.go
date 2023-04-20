@@ -6,10 +6,10 @@
 package main
 
 import (
-    "github.com/auroraride/cabservd/internal"
-    "github.com/auroraride/cabservd/internal/brands/kaixin"
+	"github.com/auroraride/cabservd/internal"
+	"github.com/auroraride/cabservd/internal/brands/kaixin"
 )
 
 func main() {
-    internal.Boot(kaixin.NewNonIntelligent)
+	internal.Boot(kaixin.NewNonIntelligent)
 }

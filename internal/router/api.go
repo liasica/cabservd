@@ -6,32 +6,33 @@
 package router
 
 import (
-    "github.com/auroraride/adapter/app"
-    "github.com/auroraride/cabservd/assets"
-    "github.com/auroraride/cabservd/internal/controller/api"
-    "github.com/auroraride/cabservd/internal/g"
-    "github.com/labstack/echo/v4"
-    "go.uber.org/zap"
-    "net/http"
+	"net/http"
+
+	"github.com/auroraride/adapter/app"
+	"github.com/auroraride/cabservd/assets"
+	"github.com/auroraride/cabservd/internal/controller/api"
+	"github.com/auroraride/cabservd/internal/g"
+	"github.com/labstack/echo/v4"
+	"go.uber.org/zap"
 )
 
 func Start(e *echo.Echo) {
-    e.Renderer = assets.Templates
+	e.Renderer = assets.Templates
 
-    e.GET("/maintain/clients", api.Maintain.Clients)
+	e.GET("/maintain/clients", api.Maintain.Clients)
 
-    // 仓位操作 <管理员权限>
-    e.POST("/operate/bin", api.Operate.Bin, app.UserTypeManagerMiddleware())
+	// 仓位操作 <管理员权限>
+	e.POST("/operate/bin", api.Operate.Bin, app.UserTypeManagerMiddleware())
 
-    e.POST("/business/usable", api.Business.Usable)
-    e.POST("/business/do", api.Business.Do)
+	e.POST("/business/usable", api.Business.Usable)
+	e.POST("/business/do", api.Business.Do)
 
-    e.POST("/exchange/usable", api.Exchange.Usable)
-    e.POST("/exchange/do", api.Exchange.Do)
+	e.POST("/exchange/usable", api.Exchange.Usable)
+	e.POST("/exchange/do", api.Exchange.Do)
 
-    e.POST("/device/bininfo", api.Device.BinInfo)
+	e.POST("/device/bininfo", api.Device.BinInfo)
 
-    if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
-        zap.L().Fatal(err.Error())
-    }
+	if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
+		zap.L().Fatal(err.Error())
+	}
 }

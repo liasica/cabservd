@@ -6,10 +6,10 @@
 package api
 
 import (
-    "github.com/auroraride/adapter/app"
-    "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/cabservd/internal/service"
-    "github.com/labstack/echo/v4"
+	"github.com/auroraride/adapter/app"
+	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/cabservd/internal/service"
+	"github.com/labstack/echo/v4"
 )
 
 type device struct{}
@@ -17,11 +17,11 @@ type device struct{}
 var Device = new(device)
 
 func (*device) BinInfo(c echo.Context) (err error) {
-    ctx, req := app.ContextAndBinding[cabdef.BinInfoRequest](c)
-    var info *cabdef.BinInfo
-    info, err = service.NewBin(ctx.User).BinInfo(req)
-    if err != nil {
-        return
-    }
-    return ctx.SendResponse(info)
+	ctx, req := app.ContextAndBinding[cabdef.BinInfoRequest](c)
+	var info *cabdef.BinInfo
+	info, err = service.NewBin(ctx.User).BinInfo(req)
+	if err != nil {
+		return
+	}
+	return ctx.SendResponse(info)
 }

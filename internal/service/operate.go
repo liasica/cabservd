@@ -6,61 +6,62 @@
 package service
 
 import (
-    "github.com/auroraride/adapter"
-    "github.com/auroraride/adapter/app"
-    "github.com/auroraride/adapter/defs/cabdef"
-    "github.com/auroraride/cabservd/internal/types"
-    "github.com/google/uuid"
-    "github.com/liasica/go-helpers/silk"
-    "net/http"
+	"net/http"
+
+	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/app"
+	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/cabservd/internal/types"
+	"github.com/google/uuid"
+	"github.com/liasica/go-helpers/silk"
 )
 
 type operateService struct {
-    *app.BaseService
+	*app.BaseService
 }
 
 func NewOperate(params ...any) *operateService {
-    return &operateService{
-        BaseService: app.NewService(params...),
-    }
+	return &operateService{
+		BaseService: app.NewService(params...),
+	}
 }
 
 // Bin 单仓位控制
 func (s *operateService) Bin(req *cabdef.OperateBinRequest) (results []*cabdef.BinOperateResult) {
-    // TODO 是否需要判定仓位状态
-    // NewCabinet(s.GetUser()).OperableX(req.Serial)
+	// TODO 是否需要判定仓位状态
+	// NewCabinet(s.GetUser()).OperableX(req.Serial)
 
-    if !req.Operate.IsCommand() {
-        app.Panic(http.StatusBadRequest, adapter.ErrorOperateCommand)
-    }
+	if !req.Operate.IsCommand() {
+		app.Panic(http.StatusBadRequest, adapter.ErrorOperateCommand)
+	}
 
-    var binRemark *string
+	var binRemark *string
 
-    switch req.Operate {
-    case cabdef.OperateBinDisable:
-        binRemark = silk.String(req.Remark)
-    case cabdef.OperateBinEnable:
-        binRemark = silk.String("")
-    }
+	switch req.Operate {
+	case cabdef.OperateBinDisable:
+		binRemark = silk.String(req.Remark)
+	case cabdef.OperateBinEnable:
+		binRemark = silk.String("")
+	}
 
-    err := NewBin(s.GetUser()).Operate(&types.Bin{
-        Timeout:     120,
-        MainOperate: req.Operate,
-        Serial:      req.Serial,
-        UUID:        uuid.New(),
-        Ordinal:     *req.Ordinal,
-        Business:    adapter.BusinessOperate,
-        Steps:       types.OMOperates[req.Operate],
-        Remark:      req.Remark,
-        BinRemark:   binRemark,
-        StepCallback: func(result *cabdef.BinOperateResult) {
-            results = append(results, result)
-        },
-    })
+	err := NewBin(s.GetUser()).Operate(&types.Bin{
+		Timeout:     120,
+		MainOperate: req.Operate,
+		Serial:      req.Serial,
+		UUID:        uuid.New(),
+		Ordinal:     *req.Ordinal,
+		Business:    adapter.BusinessOperate,
+		Steps:       types.OMOperates[req.Operate],
+		Remark:      req.Remark,
+		BinRemark:   binRemark,
+		StepCallback: func(result *cabdef.BinOperateResult) {
+			results = append(results, result)
+		},
+	})
 
-    if err != nil {
-        app.Panic(http.StatusBadRequest, err)
-    }
+	if err != nil {
+		app.Panic(http.StatusBadRequest, err)
+	}
 
-    return
+	return
 }

@@ -6,84 +6,85 @@
 package codec
 
 import (
-    "bytes"
-    "encoding/binary"
-    "github.com/auroraride/adapter"
-    "github.com/panjf2000/gnet/v2"
+	"bytes"
+	"encoding/binary"
+
+	"github.com/auroraride/adapter"
+	"github.com/panjf2000/gnet/v2"
 )
 
 const (
-    bodySize           = 4
-    linebreakDelimiter = '\n'
+	bodySize           = 4
+	linebreakDelimiter = '\n'
 )
 
 type Codec interface {
-    Decode(conn gnet.Conn) (b []byte, err error)
-    Encode(data []byte) (b []byte)
+	Decode(conn gnet.Conn) (b []byte, err error)
+	Encode(data []byte) (b []byte)
 }
 
 type Default struct {
 }
 
 func (codec *Default) Decode(conn gnet.Conn) (b []byte, err error) {
-    return conn.Next(-1)
+	return conn.Next(-1)
 }
 
 func (codec *Default) Encode(message []byte) []byte {
-    return message
+	return message
 }
 
 // Linebreak 以\n为分割处理
 type Linebreak struct{}
 
 func (codec *Linebreak) Decode(conn gnet.Conn) (b []byte, err error) {
-    b, err = conn.Peek(-1)
-    if err != nil {
-        return nil, err
-    }
+	b, err = conn.Peek(-1)
+	if err != nil {
+		return nil, err
+	}
 
-    n := bytes.IndexByte(b, linebreakDelimiter)
-    if n < 0 {
-        return nil, adapter.ErrorIncompletePacket
-    }
+	n := bytes.IndexByte(b, linebreakDelimiter)
+	if n < 0 {
+		return nil, adapter.ErrorIncompletePacket
+	}
 
-    _, _ = conn.Discard(n)
+	_, _ = conn.Discard(n)
 
-    b = b[:len(b)-1]
-    return
+	b = b[:len(b)-1]
+	return
 }
 
 func (codec *Linebreak) Encode(message []byte) []byte {
-    return append(message, adapter.Newline...)
+	return append(message, adapter.Newline...)
 }
 
 // HeaderLength 以头部4字节定义
 type HeaderLength struct{}
 
 func (codec *HeaderLength) Decode(conn gnet.Conn) ([]byte, error) {
-    buf, _ := conn.Peek(bodySize)
-    if len(buf) < bodySize {
-        return nil, adapter.ErrorIncompletePacket
-    }
+	buf, _ := conn.Peek(bodySize)
+	if len(buf) < bodySize {
+		return nil, adapter.ErrorIncompletePacket
+	}
 
-    bodyLen := binary.BigEndian.Uint32(buf[:bodySize])
-    msgLen := bodySize + int(bodyLen)
-    if conn.InboundBuffered() < msgLen {
-        return nil, adapter.ErrorIncompletePacket
-    }
-    buf, _ = conn.Peek(msgLen)
-    _, _ = conn.Discard(msgLen)
+	bodyLen := binary.BigEndian.Uint32(buf[:bodySize])
+	msgLen := bodySize + int(bodyLen)
+	if conn.InboundBuffered() < msgLen {
+		return nil, adapter.ErrorIncompletePacket
+	}
+	buf, _ = conn.Peek(msgLen)
+	_, _ = conn.Discard(msgLen)
 
-    return bytes.TrimSpace(bytes.Replace(buf[bodySize:msgLen], adapter.Newline, nil, -1)), nil
+	return bytes.TrimSpace(bytes.Replace(buf[bodySize:msgLen], adapter.Newline, nil, -1)), nil
 }
 
 func (codec *HeaderLength) Encode(message []byte) []byte {
-    msgLen := bodySize + len(message)
+	msgLen := bodySize + len(message)
 
-    data := make([]byte, msgLen)
+	data := make([]byte, msgLen)
 
-    binary.BigEndian.PutUint32(data[:bodySize], uint32(len(message)))
-    copy(data[bodySize:msgLen], message)
+	binary.BigEndian.PutUint32(data[:bodySize], uint32(len(message)))
+	copy(data[bodySize:msgLen], message)
 
-    return data
+	return data
 }

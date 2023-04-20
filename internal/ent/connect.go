@@ -6,46 +6,47 @@
 package ent
 
 import (
-    "context"
-    "database/sql"
-    "entgo.io/ent/dialect"
-    entsql "entgo.io/ent/dialect/sql"
-    "github.com/auroraride/cabservd/internal/ent/migrate"
-    _ "github.com/auroraride/cabservd/internal/ent/runtime"
-    _ "github.com/jackc/pgx/v4/stdlib"
-    "log"
-    "time"
+	"context"
+	"database/sql"
+	"log"
+	"time"
+
+	"entgo.io/ent/dialect"
+	entsql "entgo.io/ent/dialect/sql"
+	"github.com/auroraride/cabservd/internal/ent/migrate"
+	_ "github.com/auroraride/cabservd/internal/ent/runtime"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 var Database *Client
 
 func OpenDatabase(dsn string, debug bool) *Client {
-    pgx, err := sql.Open("pgx", dsn)
-    if err != nil {
-        log.Fatalf("数据库打开失败: %v", err)
-    }
+	pgx, err := sql.Open("pgx", dsn)
+	if err != nil {
+		log.Fatalf("数据库打开失败: %v", err)
+	}
 
-    pgx.SetMaxIdleConns(10)
-    pgx.SetMaxOpenConns(100)
-    pgx.SetConnMaxLifetime(time.Hour)
+	pgx.SetMaxIdleConns(10)
+	pgx.SetMaxOpenConns(100)
+	pgx.SetConnMaxLifetime(time.Hour)
 
-    // 从db变量中构造一个ent.Driver对象。
-    drv := entsql.OpenDB(dialect.Postgres, pgx)
+	// 从db变量中构造一个ent.Driver对象。
+	drv := entsql.OpenDB(dialect.Postgres, pgx)
 
-    c := NewClient(Driver(drv))
-    if debug {
-        c = c.Debug()
-    }
+	c := NewClient(Driver(drv))
+	if debug {
+		c = c.Debug()
+	}
 
-    autoMigrate(c)
+	autoMigrate(c)
 
-    createFunction(c)
+	createFunction(c)
 
-    return c
+	return c
 }
 
 func createFunction(c *Client) {
-    raw := `CREATE OR REPLACE FUNCTION notify_event() RETURNS TRIGGER AS
+	raw := `CREATE OR REPLACE FUNCTION notify_event() RETURNS TRIGGER AS
 $$
 
 DECLARE
@@ -98,21 +99,21 @@ $$
         END IF;
     END
 $$;`
-    _, err := c.ExecContext(context.Background(), raw)
-    if err != nil {
-        log.Fatal(err)
-    }
+	_, err := c.ExecContext(context.Background(), raw)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func autoMigrate(c *Client) {
-    ctx := context.Background()
+	ctx := context.Background()
 
-    if err := c.Schema.Create(
-        ctx,
-        migrate.WithDropIndex(true),
-        migrate.WithDropColumn(true),
-        migrate.WithForeignKeys(false),
-    ); err != nil {
-        log.Fatalf("数据库迁移失败: %v", err)
-    }
+	if err := c.Schema.Create(
+		ctx,
+		migrate.WithDropIndex(true),
+		migrate.WithDropColumn(true),
+		migrate.WithForeignKeys(false),
+	); err != nil {
+		log.Fatalf("数据库迁移失败: %v", err)
+	}
 }

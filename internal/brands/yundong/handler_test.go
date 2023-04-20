@@ -6,19 +6,20 @@
 package yundong
 
 import (
-    "fmt"
-    "github.com/auroraride/adapter"
-    "testing"
+	"fmt"
+	"testing"
+
+	"github.com/auroraride/adapter"
 )
 
 func TestGetQRCode(t *testing.T) {
-    sn := "NCAWDFA0L751N027"
-    var (
-        sb [16]byte
-        qr [128]byte
-    )
-    copy(sb[:], adapter.ConvertString2Bytes(sn))
-    copy(qr[:], adapter.ConvertString2Bytes(sn))
-    message := append(sb[:], qr[:]...)
-    fmt.Println(message)
+	sn := "NCAWDFA0L751N027"
+	var (
+		sb [16]byte
+		qr [128]byte
+	)
+	copy(sb[:], adapter.ConvertString2Bytes(sn))
+	copy(qr[:], adapter.ConvertString2Bytes(sn))
+	message := append(sb[:], qr[:]...)
+	fmt.Println(message)
 }

@@ -6,26 +6,27 @@
 package internal
 
 import (
-    "bytes"
-    _ "embed"
-    "entgo.io/ent/entc/gen"
-    "fmt"
-    "github.com/liasica/go-helpers/tools"
-    "github.com/spf13/cobra"
-    "log"
-    "os"
-    "path/filepath"
-    "strings"
-    "text/template"
+	"bytes"
+	_ "embed"
+	"fmt"
+	"log"
+	"os"
+	"path/filepath"
+	"strings"
+	"text/template"
+
+	"entgo.io/ent/entc/gen"
+	"github.com/liasica/go-helpers/tools"
+	"github.com/spf13/cobra"
 )
 
 const (
-    defaultSchema = "./internal/ent/schema"
+	defaultSchema = "./internal/ent/schema"
 )
 
 // schema template for the "init" command.
 var tmpl = template.Must(template.New("schema").
-    Parse(`package schema
+	Parse(`package schema
 
 import (
     "entgo.io/ent"
@@ -104,53 +105,53 @@ func ({{ .name }}) Indexes() []ent.Index {
 `))
 
 func InitCmd() *cobra.Command {
-    var target, customtmpl string
-    cmd := &cobra.Command{
-        Use:   "init [flags] [schemas]",
-        Short: "initialize an environment with zero or more schemas",
-        Example: examples(
-            "ent init Example",
-            "ent init --target entv1/schema OperatorName Group",
-            "ent init --target entv1/schema --template tmpl/default.tmpl OperatorName Group",
-        ),
-        Run: func(cmd *cobra.Command, names []string) {
-            if err := initEnv(target, names); err != nil {
-                log.Fatalln(fmt.Errorf("ent/init: %w", err))
-            }
-        },
-    }
-    cmd.Flags().StringVar(&target, "target", defaultSchema, "target directory for schemas")
-    cmd.Flags().StringVar(&customtmpl, "template", "", "target template for schemas")
-    return cmd
+	var target, customtmpl string
+	cmd := &cobra.Command{
+		Use:   "init [flags] [schemas]",
+		Short: "initialize an environment with zero or more schemas",
+		Example: examples(
+			"ent init Example",
+			"ent init --target entv1/schema OperatorName Group",
+			"ent init --target entv1/schema --template tmpl/default.tmpl OperatorName Group",
+		),
+		Run: func(cmd *cobra.Command, names []string) {
+			if err := initEnv(target, names); err != nil {
+				log.Fatalln(fmt.Errorf("ent/init: %w", err))
+			}
+		},
+	}
+	cmd.Flags().StringVar(&target, "target", defaultSchema, "target directory for schemas")
+	cmd.Flags().StringVar(&customtmpl, "template", "", "target template for schemas")
+	return cmd
 }
 
 func initEnv(target string, names []string) error {
-    if err := createDir(target); err != nil {
-        return fmt.Errorf("create dir %s: %w", target, err)
-    }
+	if err := createDir(target); err != nil {
+		return fmt.Errorf("create dir %s: %w", target, err)
+	}
 
-    for _, name := range names {
-        name = tools.StrToFirstUpper(name)
-        if err := gen.ValidSchemaName(name); err != nil {
-            return fmt.Errorf("init schema %s: %w", name, err)
-        }
-        b := bytes.NewBuffer(nil)
-        tableName := strings.ToLower(tools.StrToSnakeCase(name))
-        ts := strings.Split(tableName, "_")
-        relation := ts[len(ts)-1]
-        relationField := relation + "_id"
-        if err := tmpl.Execute(b, map[string]string{
-            "name":          name,
-            "tableName":     tableName,
-            "relation":      relation,
-            "relationField": relationField,
-        }); err != nil {
-            return fmt.Errorf("executing template %s: %w", name, err)
-        }
-        newFileTarget := filepath.Join(target, strings.ToLower(name+".go"))
-        if err := os.WriteFile(newFileTarget, b.Bytes(), 0644); err != nil {
-            return fmt.Errorf("writing file %s: %w", newFileTarget, err)
-        }
-    }
-    return nil
+	for _, name := range names {
+		name = tools.StrToFirstUpper(name)
+		if err := gen.ValidSchemaName(name); err != nil {
+			return fmt.Errorf("init schema %s: %w", name, err)
+		}
+		b := bytes.NewBuffer(nil)
+		tableName := strings.ToLower(tools.StrToSnakeCase(name))
+		ts := strings.Split(tableName, "_")
+		relation := ts[len(ts)-1]
+		relationField := relation + "_id"
+		if err := tmpl.Execute(b, map[string]string{
+			"name":          name,
+			"tableName":     tableName,
+			"relation":      relation,
+			"relationField": relationField,
+		}); err != nil {
+			return fmt.Errorf("executing template %s: %w", name, err)
+		}
+		newFileTarget := filepath.Join(target, strings.ToLower(name+".go"))
+		if err := os.WriteFile(newFileTarget, b.Bytes(), 0644); err != nil {
+			return fmt.Errorf("writing file %s: %w", newFileTarget, err)
+		}
+	}
+	return nil
 }

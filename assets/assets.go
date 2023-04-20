@@ -6,10 +6,10 @@
 package assets
 
 import (
-    _ "embed"
+	_ "embed"
 )
 
 var (
-    //go:embed config/config.yaml
-    DefaultConfig []byte
+	//go:embed config/config.yaml
+	DefaultConfig []byte
 )

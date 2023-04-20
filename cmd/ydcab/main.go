@@ -6,10 +6,10 @@
 package main
 
 import (
-    "github.com/auroraride/cabservd/internal"
-    "github.com/auroraride/cabservd/internal/brands/yundong"
+	"github.com/auroraride/cabservd/internal"
+	"github.com/auroraride/cabservd/internal/brands/yundong"
 )
 
 func main() {
-    internal.Boot(yundong.New)
+	internal.Boot(yundong.New)
 }

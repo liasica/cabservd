@@ -6,44 +6,45 @@
 package service
 
 import (
-    "github.com/auroraride/adapter/app"
-    "github.com/auroraride/cabservd/internal/ent"
-    "github.com/auroraride/cabservd/internal/ent/console"
-    "time"
+	"time"
+
+	"github.com/auroraride/adapter/app"
+	"github.com/auroraride/cabservd/internal/ent"
+	"github.com/auroraride/cabservd/internal/ent/console"
 )
 
 type consoleService struct {
-    *app.BaseService
+	*app.BaseService
 
-    orm *ent.ConsoleClient
+	orm *ent.ConsoleClient
 }
 
 func NewConsole(params ...any) *consoleService {
-    return &consoleService{
-        BaseService: app.NewService(params...),
-        orm:         ent.Database.Console,
-    }
+	return &consoleService{
+		BaseService: app.NewService(params...),
+		orm:         ent.Database.Console,
+	}
 }
 
 // Update 更新记录
 func (s *consoleService) Update(ec *ent.Console, b *ent.Bin, err error) *ent.Console {
-    now := time.Now()
-    cr := ec.Update().SetStopAt(now)
-    if ec.StartAt != nil {
-        cr.SetDuration(now.Sub(*ec.StartAt).Seconds())
-    }
+	now := time.Now()
+	cr := ec.Update().SetStopAt(now)
+	if ec.StartAt != nil {
+		cr.SetDuration(now.Sub(*ec.StartAt).Seconds())
+	}
 
-    // 仓位信息
-    if b != nil {
-        cr.SetAfterBin(b.Info())
-    }
+	// 仓位信息
+	if b != nil {
+		cr.SetAfterBin(b.Info())
+	}
 
-    if err != nil {
-        cr.SetStatus(console.StatusFailed).SetMessage(err.Error())
-    } else {
-        cr.SetStatus(console.StatusSuccess)
-    }
+	if err != nil {
+		cr.SetStatus(console.StatusFailed).SetMessage(err.Error())
+	} else {
+		cr.SetStatus(console.StatusSuccess)
+	}
 
-    ec, _ = cr.Save(s.GetContext())
-    return ec
+	ec, _ = cr.Save(s.GetContext())
+	return ec
 }
