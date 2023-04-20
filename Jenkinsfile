@@ -69,6 +69,7 @@ def deploy(tag) {
     def url = "https://${tag}.auroraride.com/maintain/update/iemANTrAplaSTuRAMetBAHureAVaTertRiUMShrOWpUraNCfaseNtIderIANsGUE"
     def str = """
         docker pull registry-vpc.cn-beijing.aliyuncs.com/liasica/cabservd:$tag
+        sleep 3
         curl $url
         docker stop ${tag}
         docker rm -f ${tag}
