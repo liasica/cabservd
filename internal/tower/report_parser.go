@@ -138,7 +138,7 @@ func (r *Request) GetBins() (items ent.BinPointers) {
 			b.Enable = silk.Bool(v == "1")
 		case SignalBatterySN:
 			// 如果不需要和电柜通讯, 直接保存电池编码
-			vaild := g.Config.NonBms
+			vaild := g.Config.NonBms || v == ""
 			// 如果需要和电柜通讯, 需要解析电池编码
 			if !vaild {
 				// 解析电池编码
@@ -148,6 +148,22 @@ func (r *Request) GetBins() (items ent.BinPointers) {
 					vaild = true
 				}
 			}
+			// // 如果不需要和电柜通讯, 直接保存电池编码
+			// vaild := g.Config.NonBms
+			// // 如果需要和电柜通讯, 需要解析电池编码
+			// // TODO 优化 if else
+			// if !vaild {
+			// 	// 解析电池编码
+			// 	if v != "" {
+			// 		// 接收到电池编码后, 尝试格式化电池编码, 若可以正常被格式化, 则是有效电池 ---- by: 曹博文, 2023-03-25 23:08
+			// 		bat, _ := adapter.ParseBatterySN(v)
+			// 		if bat.Brand != "" {
+			// 			vaild = true
+			// 		}
+			// 	} else {
+			// 		vaild = true
+			// 	}
+			// }
 
 			// 需要保存电池编码
 			if vaild {
