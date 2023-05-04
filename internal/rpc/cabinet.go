@@ -112,6 +112,9 @@ func (s *cabinetServer) Sync(ctx context.Context, req *pb.CabinetSyncRequest) (r
 				OpenStatus: b.Open,
 				DoorHealth: b.Health && b.Enable,
 				Faults:     make([]string, 0), // TODO 需要保存记录仓位故障
+
+				Deactivate:       b.Deactivate,
+				DeactivateReason: b.DeactivateReason,
 			}
 
 			if b.Remark != nil {
