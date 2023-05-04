@@ -68,6 +68,10 @@ func init() {
 	binDescSoh := binFields[12].Descriptor()
 	// bin.DefaultSoh holds the default value on creation for the soh field.
 	bin.DefaultSoh = binDescSoh.Default.(float64)
+	// binDescDeactivate is the schema descriptor for deactivate field.
+	binDescDeactivate := binFields[14].Descriptor()
+	// bin.DefaultDeactivate holds the default value on creation for the deactivate field.
+	bin.DefaultDeactivate = binDescDeactivate.Default.(bool)
 	cabinetMixin := schema.Cabinet{}.Mixin()
 	cabinetMixinFields0 := cabinetMixin[0].Fields()
 	_ = cabinetMixinFields0

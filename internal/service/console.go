@@ -48,3 +48,9 @@ func (s *consoleService) Update(ec *ent.Console, b *ent.Bin, err error) *ent.Con
 	ec, _ = cr.Save(s.GetContext())
 	return ec
 }
+
+// InJob 查询是否有正在执行的任务
+func (s *consoleService) InJob(serial string) bool {
+	exists, _ := s.orm.Query().Where(console.Serial(serial), console.Or(console.StatusIn(console.StatusRunning))).Exist(s.GetContext())
+	return exists
+}

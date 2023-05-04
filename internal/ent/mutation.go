@@ -40,35 +40,37 @@ const (
 // BinMutation represents an operation that mutates the Bin nodes in the graph.
 type BinMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *uint64
-	created_at     *time.Time
-	updated_at     *time.Time
-	serial         *string
-	name           *string
-	ordinal        *int
-	addordinal     *int
-	open           *bool
-	enable         *bool
-	health         *bool
-	battery_exists *bool
-	battery_sn     *string
-	voltage        *float64
-	addvoltage     *float64
-	current        *float64
-	addcurrent     *float64
-	soc            *float64
-	addsoc         *float64
-	soh            *float64
-	addsoh         *float64
-	remark         *string
-	clearedFields  map[string]struct{}
-	cabinet        *uint64
-	clearedcabinet bool
-	done           bool
-	oldValue       func(context.Context) (*Bin, error)
-	predicates     []predicate.Bin
+	op                Op
+	typ               string
+	id                *uint64
+	created_at        *time.Time
+	updated_at        *time.Time
+	serial            *string
+	name              *string
+	ordinal           *int
+	addordinal        *int
+	open              *bool
+	enable            *bool
+	health            *bool
+	battery_exists    *bool
+	battery_sn        *string
+	voltage           *float64
+	addvoltage        *float64
+	current           *float64
+	addcurrent        *float64
+	soc               *float64
+	addsoc            *float64
+	soh               *float64
+	addsoh            *float64
+	remark            *string
+	deactivate        *bool
+	deactivate_reason *string
+	clearedFields     map[string]struct{}
+	cabinet           *uint64
+	clearedcabinet    bool
+	done              bool
+	oldValue          func(context.Context) (*Bin, error)
+	predicates        []predicate.Bin
 }
 
 var _ ent.Mutation = (*BinMutation)(nil)
@@ -858,6 +860,91 @@ func (m *BinMutation) ResetRemark() {
 	delete(m.clearedFields, bin.FieldRemark)
 }
 
+// SetDeactivate sets the "deactivate" field.
+func (m *BinMutation) SetDeactivate(b bool) {
+	m.deactivate = &b
+}
+
+// Deactivate returns the value of the "deactivate" field in the mutation.
+func (m *BinMutation) Deactivate() (r bool, exists bool) {
+	v := m.deactivate
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeactivate returns the old "deactivate" field's value of the Bin entity.
+// If the Bin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BinMutation) OldDeactivate(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeactivate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeactivate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeactivate: %w", err)
+	}
+	return oldValue.Deactivate, nil
+}
+
+// ResetDeactivate resets all changes to the "deactivate" field.
+func (m *BinMutation) ResetDeactivate() {
+	m.deactivate = nil
+}
+
+// SetDeactivateReason sets the "deactivate_reason" field.
+func (m *BinMutation) SetDeactivateReason(s string) {
+	m.deactivate_reason = &s
+}
+
+// DeactivateReason returns the value of the "deactivate_reason" field in the mutation.
+func (m *BinMutation) DeactivateReason() (r string, exists bool) {
+	v := m.deactivate_reason
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeactivateReason returns the old "deactivate_reason" field's value of the Bin entity.
+// If the Bin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *BinMutation) OldDeactivateReason(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeactivateReason is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeactivateReason requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeactivateReason: %w", err)
+	}
+	return oldValue.DeactivateReason, nil
+}
+
+// ClearDeactivateReason clears the value of the "deactivate_reason" field.
+func (m *BinMutation) ClearDeactivateReason() {
+	m.deactivate_reason = nil
+	m.clearedFields[bin.FieldDeactivateReason] = struct{}{}
+}
+
+// DeactivateReasonCleared returns if the "deactivate_reason" field was cleared in this mutation.
+func (m *BinMutation) DeactivateReasonCleared() bool {
+	_, ok := m.clearedFields[bin.FieldDeactivateReason]
+	return ok
+}
+
+// ResetDeactivateReason resets all changes to the "deactivate_reason" field.
+func (m *BinMutation) ResetDeactivateReason() {
+	m.deactivate_reason = nil
+	delete(m.clearedFields, bin.FieldDeactivateReason)
+}
+
 // ClearCabinet clears the "cabinet" edge to the Cabinet entity.
 func (m *BinMutation) ClearCabinet() {
 	m.clearedcabinet = true
@@ -918,7 +1005,7 @@ func (m *BinMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *BinMutation) Fields() []string {
-	fields := make([]string, 0, 16)
+	fields := make([]string, 0, 18)
 	if m.created_at != nil {
 		fields = append(fields, bin.FieldCreatedAt)
 	}
@@ -967,6 +1054,12 @@ func (m *BinMutation) Fields() []string {
 	if m.remark != nil {
 		fields = append(fields, bin.FieldRemark)
 	}
+	if m.deactivate != nil {
+		fields = append(fields, bin.FieldDeactivate)
+	}
+	if m.deactivate_reason != nil {
+		fields = append(fields, bin.FieldDeactivateReason)
+	}
 	return fields
 }
 
@@ -1007,6 +1100,10 @@ func (m *BinMutation) Field(name string) (ent.Value, bool) {
 		return m.Soh()
 	case bin.FieldRemark:
 		return m.Remark()
+	case bin.FieldDeactivate:
+		return m.Deactivate()
+	case bin.FieldDeactivateReason:
+		return m.DeactivateReason()
 	}
 	return nil, false
 }
@@ -1048,6 +1145,10 @@ func (m *BinMutation) OldField(ctx context.Context, name string) (ent.Value, err
 		return m.OldSoh(ctx)
 	case bin.FieldRemark:
 		return m.OldRemark(ctx)
+	case bin.FieldDeactivate:
+		return m.OldDeactivate(ctx)
+	case bin.FieldDeactivateReason:
+		return m.OldDeactivateReason(ctx)
 	}
 	return nil, fmt.Errorf("unknown Bin field %s", name)
 }
@@ -1169,6 +1270,20 @@ func (m *BinMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRemark(v)
 		return nil
+	case bin.FieldDeactivate:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeactivate(v)
+		return nil
+	case bin.FieldDeactivateReason:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeactivateReason(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Bin field %s", name)
 }
@@ -1265,6 +1380,9 @@ func (m *BinMutation) ClearedFields() []string {
 	if m.FieldCleared(bin.FieldRemark) {
 		fields = append(fields, bin.FieldRemark)
 	}
+	if m.FieldCleared(bin.FieldDeactivateReason) {
+		fields = append(fields, bin.FieldDeactivateReason)
+	}
 	return fields
 }
 
@@ -1281,6 +1399,9 @@ func (m *BinMutation) ClearField(name string) error {
 	switch name {
 	case bin.FieldRemark:
 		m.ClearRemark()
+		return nil
+	case bin.FieldDeactivateReason:
+		m.ClearDeactivateReason()
 		return nil
 	}
 	return fmt.Errorf("unknown Bin nullable field %s", name)
@@ -1337,6 +1458,12 @@ func (m *BinMutation) ResetField(name string) error {
 		return nil
 	case bin.FieldRemark:
 		m.ResetRemark()
+		return nil
+	case bin.FieldDeactivate:
+		m.ResetDeactivate()
+		return nil
+	case bin.FieldDeactivateReason:
+		m.ResetDeactivateReason()
 		return nil
 	}
 	return fmt.Errorf("unknown Bin field %s", name)

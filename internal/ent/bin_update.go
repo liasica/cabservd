@@ -241,6 +241,40 @@ func (bu *BinUpdate) ClearRemark() *BinUpdate {
 	return bu
 }
 
+// SetDeactivate sets the "deactivate" field.
+func (bu *BinUpdate) SetDeactivate(b bool) *BinUpdate {
+	bu.mutation.SetDeactivate(b)
+	return bu
+}
+
+// SetNillableDeactivate sets the "deactivate" field if the given value is not nil.
+func (bu *BinUpdate) SetNillableDeactivate(b *bool) *BinUpdate {
+	if b != nil {
+		bu.SetDeactivate(*b)
+	}
+	return bu
+}
+
+// SetDeactivateReason sets the "deactivate_reason" field.
+func (bu *BinUpdate) SetDeactivateReason(s string) *BinUpdate {
+	bu.mutation.SetDeactivateReason(s)
+	return bu
+}
+
+// SetNillableDeactivateReason sets the "deactivate_reason" field if the given value is not nil.
+func (bu *BinUpdate) SetNillableDeactivateReason(s *string) *BinUpdate {
+	if s != nil {
+		bu.SetDeactivateReason(*s)
+	}
+	return bu
+}
+
+// ClearDeactivateReason clears the value of the "deactivate_reason" field.
+func (bu *BinUpdate) ClearDeactivateReason() *BinUpdate {
+	bu.mutation.ClearDeactivateReason()
+	return bu
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (bu *BinUpdate) SetCabinet(c *Cabinet) *BinUpdate {
 	return bu.SetCabinetID(c.ID)
@@ -378,6 +412,15 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if bu.mutation.RemarkCleared() {
 		_spec.ClearField(bin.FieldRemark, field.TypeString)
+	}
+	if value, ok := bu.mutation.Deactivate(); ok {
+		_spec.SetField(bin.FieldDeactivate, field.TypeBool, value)
+	}
+	if value, ok := bu.mutation.DeactivateReason(); ok {
+		_spec.SetField(bin.FieldDeactivateReason, field.TypeString, value)
+	}
+	if bu.mutation.DeactivateReasonCleared() {
+		_spec.ClearField(bin.FieldDeactivateReason, field.TypeString)
 	}
 	if bu.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -647,6 +690,40 @@ func (buo *BinUpdateOne) ClearRemark() *BinUpdateOne {
 	return buo
 }
 
+// SetDeactivate sets the "deactivate" field.
+func (buo *BinUpdateOne) SetDeactivate(b bool) *BinUpdateOne {
+	buo.mutation.SetDeactivate(b)
+	return buo
+}
+
+// SetNillableDeactivate sets the "deactivate" field if the given value is not nil.
+func (buo *BinUpdateOne) SetNillableDeactivate(b *bool) *BinUpdateOne {
+	if b != nil {
+		buo.SetDeactivate(*b)
+	}
+	return buo
+}
+
+// SetDeactivateReason sets the "deactivate_reason" field.
+func (buo *BinUpdateOne) SetDeactivateReason(s string) *BinUpdateOne {
+	buo.mutation.SetDeactivateReason(s)
+	return buo
+}
+
+// SetNillableDeactivateReason sets the "deactivate_reason" field if the given value is not nil.
+func (buo *BinUpdateOne) SetNillableDeactivateReason(s *string) *BinUpdateOne {
+	if s != nil {
+		buo.SetDeactivateReason(*s)
+	}
+	return buo
+}
+
+// ClearDeactivateReason clears the value of the "deactivate_reason" field.
+func (buo *BinUpdateOne) ClearDeactivateReason() *BinUpdateOne {
+	buo.mutation.ClearDeactivateReason()
+	return buo
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (buo *BinUpdateOne) SetCabinet(c *Cabinet) *BinUpdateOne {
 	return buo.SetCabinetID(c.ID)
@@ -814,6 +891,15 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 	}
 	if buo.mutation.RemarkCleared() {
 		_spec.ClearField(bin.FieldRemark, field.TypeString)
+	}
+	if value, ok := buo.mutation.Deactivate(); ok {
+		_spec.SetField(bin.FieldDeactivate, field.TypeBool, value)
+	}
+	if value, ok := buo.mutation.DeactivateReason(); ok {
+		_spec.SetField(bin.FieldDeactivateReason, field.TypeString, value)
+	}
+	if buo.mutation.DeactivateReasonCleared() {
+		_spec.ClearField(bin.FieldDeactivateReason, field.TypeString)
 	}
 	if buo.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{

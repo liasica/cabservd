@@ -17,7 +17,6 @@ import (
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
-	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/g"
 )
 
@@ -96,9 +95,9 @@ func (s *cabinetService) Operable(serial string) (cab *ent.Cabinet, err error) {
 	}
 
 	// 查询是否有正在执行的任务
-	if exists, _ := ent.Database.Console.Query().Where(console.Serial(serial), console.Or(console.StatusIn(console.StatusRunning))).Exist(s.GetContext()); exists {
-		return nil, adapter.ErrorCabinetBusy
-	}
+	// if exists, _ := ent.Database.Console.Query().Where(console.Serial(serial), console.Or(console.StatusIn(console.StatusRunning))).Exist(s.GetContext()); exists {
+	// 	return nil, adapter.ErrorCabinetBusy
+	// }
 
 	return
 }

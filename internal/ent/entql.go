@@ -29,22 +29,24 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Bin",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			bin.FieldCreatedAt:     {Type: field.TypeTime, Column: bin.FieldCreatedAt},
-			bin.FieldUpdatedAt:     {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
-			bin.FieldCabinetID:     {Type: field.TypeUint64, Column: bin.FieldCabinetID},
-			bin.FieldSerial:        {Type: field.TypeString, Column: bin.FieldSerial},
-			bin.FieldName:          {Type: field.TypeString, Column: bin.FieldName},
-			bin.FieldOrdinal:       {Type: field.TypeInt, Column: bin.FieldOrdinal},
-			bin.FieldOpen:          {Type: field.TypeBool, Column: bin.FieldOpen},
-			bin.FieldEnable:        {Type: field.TypeBool, Column: bin.FieldEnable},
-			bin.FieldHealth:        {Type: field.TypeBool, Column: bin.FieldHealth},
-			bin.FieldBatteryExists: {Type: field.TypeBool, Column: bin.FieldBatteryExists},
-			bin.FieldBatterySn:     {Type: field.TypeString, Column: bin.FieldBatterySn},
-			bin.FieldVoltage:       {Type: field.TypeFloat64, Column: bin.FieldVoltage},
-			bin.FieldCurrent:       {Type: field.TypeFloat64, Column: bin.FieldCurrent},
-			bin.FieldSoc:           {Type: field.TypeFloat64, Column: bin.FieldSoc},
-			bin.FieldSoh:           {Type: field.TypeFloat64, Column: bin.FieldSoh},
-			bin.FieldRemark:        {Type: field.TypeString, Column: bin.FieldRemark},
+			bin.FieldCreatedAt:        {Type: field.TypeTime, Column: bin.FieldCreatedAt},
+			bin.FieldUpdatedAt:        {Type: field.TypeTime, Column: bin.FieldUpdatedAt},
+			bin.FieldCabinetID:        {Type: field.TypeUint64, Column: bin.FieldCabinetID},
+			bin.FieldSerial:           {Type: field.TypeString, Column: bin.FieldSerial},
+			bin.FieldName:             {Type: field.TypeString, Column: bin.FieldName},
+			bin.FieldOrdinal:          {Type: field.TypeInt, Column: bin.FieldOrdinal},
+			bin.FieldOpen:             {Type: field.TypeBool, Column: bin.FieldOpen},
+			bin.FieldEnable:           {Type: field.TypeBool, Column: bin.FieldEnable},
+			bin.FieldHealth:           {Type: field.TypeBool, Column: bin.FieldHealth},
+			bin.FieldBatteryExists:    {Type: field.TypeBool, Column: bin.FieldBatteryExists},
+			bin.FieldBatterySn:        {Type: field.TypeString, Column: bin.FieldBatterySn},
+			bin.FieldVoltage:          {Type: field.TypeFloat64, Column: bin.FieldVoltage},
+			bin.FieldCurrent:          {Type: field.TypeFloat64, Column: bin.FieldCurrent},
+			bin.FieldSoc:              {Type: field.TypeFloat64, Column: bin.FieldSoc},
+			bin.FieldSoh:              {Type: field.TypeFloat64, Column: bin.FieldSoh},
+			bin.FieldRemark:           {Type: field.TypeString, Column: bin.FieldRemark},
+			bin.FieldDeactivate:       {Type: field.TypeBool, Column: bin.FieldDeactivate},
+			bin.FieldDeactivateReason: {Type: field.TypeString, Column: bin.FieldDeactivateReason},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
@@ -314,6 +316,16 @@ func (f *BinFilter) WhereSoh(p entql.Float64P) {
 // WhereRemark applies the entql string predicate on the remark field.
 func (f *BinFilter) WhereRemark(p entql.StringP) {
 	f.Where(p.Field(bin.FieldRemark))
+}
+
+// WhereDeactivate applies the entql bool predicate on the deactivate field.
+func (f *BinFilter) WhereDeactivate(p entql.BoolP) {
+	f.Where(p.Field(bin.FieldDeactivate))
+}
+
+// WhereDeactivateReason applies the entql string predicate on the deactivate_reason field.
+func (f *BinFilter) WhereDeactivateReason(p entql.StringP) {
+	f.Where(p.Field(bin.FieldDeactivateReason))
 }
 
 // WhereHasCabinet applies a predicate to check if query has an edge cabinet.

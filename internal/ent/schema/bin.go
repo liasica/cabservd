@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
+
 	"github.com/auroraride/cabservd/internal/ent/internal"
 )
 
@@ -81,6 +82,10 @@ func (Bin) Fields() []ent.Field {
 
 		// 操作信息
 		field.String("remark").Optional().Nillable().Comment("仓位备注"),
+
+		// 平台逻辑
+		field.Bool("deactivate").Default(false).Comment("是否停用"),
+		field.String("deactivate_reason").Optional().Nillable().Comment("停用信息"),
 	}
 }
 

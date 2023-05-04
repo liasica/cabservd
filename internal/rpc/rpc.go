@@ -9,9 +9,10 @@ import (
 	"net"
 
 	"github.com/auroraride/adapter/rpc/pb"
-	"github.com/auroraride/cabservd/internal/g"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+
+	"github.com/auroraride/cabservd/internal/g"
 )
 
 func Run() {

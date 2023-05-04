@@ -12,6 +12,9 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/google/uuid"
+	"go.uber.org/zap"
+
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
@@ -20,8 +23,6 @@ import (
 	"github.com/auroraride/cabservd/internal/mem"
 	"github.com/auroraride/cabservd/internal/sync"
 	"github.com/auroraride/cabservd/internal/types"
-	"github.com/google/uuid"
-	"go.uber.org/zap"
 )
 
 type binService struct {
@@ -268,4 +269,22 @@ func (s *binService) BinInfo(req *cabdef.BinInfoRequest) (info *cabdef.BinInfo, 
 	}
 	info = b.Info()
 	return
+}
+
+// Deactivate 禁用或启用仓位 (逻辑禁用)
+func (s *binService) Deactivate(req *cabdef.BinDeactivateRequest) error {
+	// 查找电柜
+	_, err := NewCabinet().QuerySerial(req.Serial)
+	if err != nil {
+		return adapter.ErrorCabinetNotFound
+	}
+
+	updater := ent.Database.Bin.Update().Where(bin.Serial(req.Serial), bin.Ordinal(req.Ordinal)).SetNillableDeactivate(req.Deactivate)
+	if *req.Deactivate {
+		updater.ClearDeactivateReason()
+	} else {
+		updater.SetNillableDeactivateReason(req.Reason)
+	}
+
+	return updater.Exec(s.GetContext())
 }

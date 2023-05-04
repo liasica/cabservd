@@ -135,6 +135,16 @@ func Remark(v string) predicate.Bin {
 	return predicate.Bin(sql.FieldEQ(FieldRemark, v))
 }
 
+// Deactivate applies equality check predicate on the "deactivate" field. It's identical to DeactivateEQ.
+func Deactivate(v bool) predicate.Bin {
+	return predicate.Bin(sql.FieldEQ(FieldDeactivate, v))
+}
+
+// DeactivateReason applies equality check predicate on the "deactivate_reason" field. It's identical to DeactivateReasonEQ.
+func DeactivateReason(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldEQ(FieldDeactivateReason, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Bin {
 	return predicate.Bin(sql.FieldEQ(FieldCreatedAt, v))
@@ -743,6 +753,91 @@ func RemarkEqualFold(v string) predicate.Bin {
 // RemarkContainsFold applies the ContainsFold predicate on the "remark" field.
 func RemarkContainsFold(v string) predicate.Bin {
 	return predicate.Bin(sql.FieldContainsFold(FieldRemark, v))
+}
+
+// DeactivateEQ applies the EQ predicate on the "deactivate" field.
+func DeactivateEQ(v bool) predicate.Bin {
+	return predicate.Bin(sql.FieldEQ(FieldDeactivate, v))
+}
+
+// DeactivateNEQ applies the NEQ predicate on the "deactivate" field.
+func DeactivateNEQ(v bool) predicate.Bin {
+	return predicate.Bin(sql.FieldNEQ(FieldDeactivate, v))
+}
+
+// DeactivateReasonEQ applies the EQ predicate on the "deactivate_reason" field.
+func DeactivateReasonEQ(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldEQ(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonNEQ applies the NEQ predicate on the "deactivate_reason" field.
+func DeactivateReasonNEQ(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldNEQ(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonIn applies the In predicate on the "deactivate_reason" field.
+func DeactivateReasonIn(vs ...string) predicate.Bin {
+	return predicate.Bin(sql.FieldIn(FieldDeactivateReason, vs...))
+}
+
+// DeactivateReasonNotIn applies the NotIn predicate on the "deactivate_reason" field.
+func DeactivateReasonNotIn(vs ...string) predicate.Bin {
+	return predicate.Bin(sql.FieldNotIn(FieldDeactivateReason, vs...))
+}
+
+// DeactivateReasonGT applies the GT predicate on the "deactivate_reason" field.
+func DeactivateReasonGT(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldGT(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonGTE applies the GTE predicate on the "deactivate_reason" field.
+func DeactivateReasonGTE(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldGTE(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonLT applies the LT predicate on the "deactivate_reason" field.
+func DeactivateReasonLT(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldLT(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonLTE applies the LTE predicate on the "deactivate_reason" field.
+func DeactivateReasonLTE(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldLTE(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonContains applies the Contains predicate on the "deactivate_reason" field.
+func DeactivateReasonContains(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldContains(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonHasPrefix applies the HasPrefix predicate on the "deactivate_reason" field.
+func DeactivateReasonHasPrefix(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldHasPrefix(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonHasSuffix applies the HasSuffix predicate on the "deactivate_reason" field.
+func DeactivateReasonHasSuffix(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldHasSuffix(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonIsNil applies the IsNil predicate on the "deactivate_reason" field.
+func DeactivateReasonIsNil() predicate.Bin {
+	return predicate.Bin(sql.FieldIsNull(FieldDeactivateReason))
+}
+
+// DeactivateReasonNotNil applies the NotNil predicate on the "deactivate_reason" field.
+func DeactivateReasonNotNil() predicate.Bin {
+	return predicate.Bin(sql.FieldNotNull(FieldDeactivateReason))
+}
+
+// DeactivateReasonEqualFold applies the EqualFold predicate on the "deactivate_reason" field.
+func DeactivateReasonEqualFold(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldEqualFold(FieldDeactivateReason, v))
+}
+
+// DeactivateReasonContainsFold applies the ContainsFold predicate on the "deactivate_reason" field.
+func DeactivateReasonContainsFold(v string) predicate.Bin {
+	return predicate.Bin(sql.FieldContainsFold(FieldDeactivateReason, v))
 }
 
 // HasCabinet applies the HasEdge predicate on the "cabinet" edge.

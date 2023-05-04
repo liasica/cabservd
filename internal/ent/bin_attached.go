@@ -79,8 +79,9 @@ func (b *Bin) IsLooseNoBattery(fakevoltage float64) bool {
 }
 
 // IsUsable 检查仓位是否可用
+// 仓位可用: 健康 且 未锁定 且 未逻辑禁用
 func (b *Bin) IsUsable() bool {
-	return b.Health && b.Enable
+	return b.Health && b.Enable && !b.Deactivate
 }
 
 // BusinessPossible 检查仓位是否可操作换电

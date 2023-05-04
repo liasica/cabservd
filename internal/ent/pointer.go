@@ -14,20 +14,22 @@ import (
 
 type BinPointers []*BinPointer
 type BinPointer struct {
-	CabinetID     *uint64  `json:"cabinet_id,omitempty"`
-	Serial        *string  `json:"serial,omitempty"`
-	Name          *string  `json:"name,omitempty"`
-	Ordinal       *int     `json:"ordinal,omitempty"`
-	Open          *bool    `json:"open,omitempty"`
-	Enable        *bool    `json:"enable,omitempty"`
-	Health        *bool    `json:"health,omitempty"`
-	BatteryExists *bool    `json:"battery_exists,omitempty"`
-	BatterySn     *string  `json:"battery_sn,omitempty"`
-	Voltage       *float64 `json:"voltage,omitempty"`
-	Current       *float64 `json:"current,omitempty"`
-	Soc           *float64 `json:"soc,omitempty"`
-	Soh           *float64 `json:"soh,omitempty"`
-	Remark        *string  `json:"remark,omitempty"`
+	CabinetID        *uint64  `json:"cabinet_id,omitempty"`
+	Serial           *string  `json:"serial,omitempty"`
+	Name             *string  `json:"name,omitempty"`
+	Ordinal          *int     `json:"ordinal,omitempty"`
+	Open             *bool    `json:"open,omitempty"`
+	Enable           *bool    `json:"enable,omitempty"`
+	Health           *bool    `json:"health,omitempty"`
+	BatteryExists    *bool    `json:"battery_exists,omitempty"`
+	BatterySn        *string  `json:"battery_sn,omitempty"`
+	Voltage          *float64 `json:"voltage,omitempty"`
+	Current          *float64 `json:"current,omitempty"`
+	Soc              *float64 `json:"soc,omitempty"`
+	Soh              *float64 `json:"soh,omitempty"`
+	Remark           *string  `json:"remark,omitempty"`
+	Deactivate       *bool    `json:"deactivate,omitempty"`
+	DeactivateReason *string  `json:"deactivate_reason,omitempty"`
 }
 
 type CabinetPointers []*CabinetPointer

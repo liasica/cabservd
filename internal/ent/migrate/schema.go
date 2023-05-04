@@ -27,6 +27,8 @@ var (
 		{Name: "soc", Type: field.TypeFloat64, Comment: "电池电量", Default: 0},
 		{Name: "soh", Type: field.TypeFloat64, Comment: "电池健康程度", Default: 0},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Comment: "仓位备注"},
+		{Name: "deactivate", Type: field.TypeBool, Comment: "是否停用", Default: false},
+		{Name: "deactivate_reason", Type: field.TypeString, Nullable: true, Comment: "停用信息"},
 		{Name: "cabinet_id", Type: field.TypeUint64},
 	}
 	// BinTable holds the schema information for the "bin" table.
@@ -37,7 +39,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "bin_cabinet_bins",
-				Columns:    []*schema.Column{BinColumns[16]},
+				Columns:    []*schema.Column{BinColumns[18]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -51,7 +53,7 @@ var (
 			{
 				Name:    "bin_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{BinColumns[16]},
+				Columns: []*schema.Column{BinColumns[18]},
 			},
 			{
 				Name:    "bin_serial_ordinal",

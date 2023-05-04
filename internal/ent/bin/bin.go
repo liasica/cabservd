@@ -43,6 +43,10 @@ const (
 	FieldSoh = "soh"
 	// FieldRemark holds the string denoting the remark field in the database.
 	FieldRemark = "remark"
+	// FieldDeactivate holds the string denoting the deactivate field in the database.
+	FieldDeactivate = "deactivate"
+	// FieldDeactivateReason holds the string denoting the deactivate_reason field in the database.
+	FieldDeactivateReason = "deactivate_reason"
 	// EdgeCabinet holds the string denoting the cabinet edge name in mutations.
 	EdgeCabinet = "cabinet"
 	// Table holds the table name of the bin in the database.
@@ -75,6 +79,8 @@ var Columns = []string{
 	FieldSoc,
 	FieldSoh,
 	FieldRemark,
+	FieldDeactivate,
+	FieldDeactivateReason,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -112,4 +118,6 @@ var (
 	DefaultSoc float64
 	// DefaultSoh holds the default value on creation for the "soh" field.
 	DefaultSoh float64
+	// DefaultDeactivate holds the default value on creation for the "deactivate" field.
+	DefaultDeactivate bool
 )

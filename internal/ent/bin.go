@@ -49,6 +49,10 @@ type Bin struct {
 	Soh float64 `json:"soh,omitempty"`
 	// 仓位备注
 	Remark *string `json:"remark,omitempty"`
+	// 是否停用
+	Deactivate bool `json:"deactivate,omitempty"`
+	// 停用信息
+	DeactivateReason *string `json:"deactivate_reason,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BinQuery when eager-loading is set.
 	Edges BinEdges `json:"edges"`
@@ -81,13 +85,13 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists:
+		case bin.FieldOpen, bin.FieldEnable, bin.FieldHealth, bin.FieldBatteryExists, bin.FieldDeactivate:
 			values[i] = new(sql.NullBool)
 		case bin.FieldVoltage, bin.FieldCurrent, bin.FieldSoc, bin.FieldSoh:
 			values[i] = new(sql.NullFloat64)
 		case bin.FieldID, bin.FieldCabinetID, bin.FieldOrdinal:
 			values[i] = new(sql.NullInt64)
-		case bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark:
+		case bin.FieldSerial, bin.FieldName, bin.FieldBatterySn, bin.FieldRemark, bin.FieldDeactivateReason:
 			values[i] = new(sql.NullString)
 		case bin.FieldCreatedAt, bin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -209,6 +213,19 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				b.Remark = new(string)
 				*b.Remark = value.String
 			}
+		case bin.FieldDeactivate:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field deactivate", values[i])
+			} else if value.Valid {
+				b.Deactivate = value.Bool
+			}
+		case bin.FieldDeactivateReason:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field deactivate_reason", values[i])
+			} else if value.Valid {
+				b.DeactivateReason = new(string)
+				*b.DeactivateReason = value.String
+			}
 		}
 	}
 	return nil
@@ -289,6 +306,14 @@ func (b *Bin) String() string {
 	builder.WriteString(", ")
 	if v := b.Remark; v != nil {
 		builder.WriteString("remark=")
+		builder.WriteString(*v)
+	}
+	builder.WriteString(", ")
+	builder.WriteString("deactivate=")
+	builder.WriteString(fmt.Sprintf("%v", b.Deactivate))
+	builder.WriteString(", ")
+	if v := b.DeactivateReason; v != nil {
+		builder.WriteString("deactivate_reason=")
 		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')

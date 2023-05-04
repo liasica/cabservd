@@ -215,6 +215,34 @@ func (bc *BinCreate) SetNillableRemark(s *string) *BinCreate {
 	return bc
 }
 
+// SetDeactivate sets the "deactivate" field.
+func (bc *BinCreate) SetDeactivate(b bool) *BinCreate {
+	bc.mutation.SetDeactivate(b)
+	return bc
+}
+
+// SetNillableDeactivate sets the "deactivate" field if the given value is not nil.
+func (bc *BinCreate) SetNillableDeactivate(b *bool) *BinCreate {
+	if b != nil {
+		bc.SetDeactivate(*b)
+	}
+	return bc
+}
+
+// SetDeactivateReason sets the "deactivate_reason" field.
+func (bc *BinCreate) SetDeactivateReason(s string) *BinCreate {
+	bc.mutation.SetDeactivateReason(s)
+	return bc
+}
+
+// SetNillableDeactivateReason sets the "deactivate_reason" field if the given value is not nil.
+func (bc *BinCreate) SetNillableDeactivateReason(s *string) *BinCreate {
+	if s != nil {
+		bc.SetDeactivateReason(*s)
+	}
+	return bc
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (bc *BinCreate) SetCabinet(c *Cabinet) *BinCreate {
 	return bc.SetCabinetID(c.ID)
@@ -299,6 +327,10 @@ func (bc *BinCreate) defaults() {
 		v := bin.DefaultSoh
 		bc.mutation.SetSoh(v)
 	}
+	if _, ok := bc.mutation.Deactivate(); !ok {
+		v := bin.DefaultDeactivate
+		bc.mutation.SetDeactivate(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -347,6 +379,9 @@ func (bc *BinCreate) check() error {
 	}
 	if _, ok := bc.mutation.Soh(); !ok {
 		return &ValidationError{Name: "soh", err: errors.New(`ent: missing required field "Bin.soh"`)}
+	}
+	if _, ok := bc.mutation.Deactivate(); !ok {
+		return &ValidationError{Name: "deactivate", err: errors.New(`ent: missing required field "Bin.deactivate"`)}
 	}
 	if _, ok := bc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet", err: errors.New(`ent: missing required edge "Bin.cabinet"`)}
@@ -437,6 +472,14 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 	if value, ok := bc.mutation.Remark(); ok {
 		_spec.SetField(bin.FieldRemark, field.TypeString, value)
 		_node.Remark = &value
+	}
+	if value, ok := bc.mutation.Deactivate(); ok {
+		_spec.SetField(bin.FieldDeactivate, field.TypeBool, value)
+		_node.Deactivate = value
+	}
+	if value, ok := bc.mutation.DeactivateReason(); ok {
+		_spec.SetField(bin.FieldDeactivateReason, field.TypeString, value)
+		_node.DeactivateReason = &value
 	}
 	if nodes := bc.mutation.CabinetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -723,6 +766,36 @@ func (u *BinUpsert) UpdateRemark() *BinUpsert {
 // ClearRemark clears the value of the "remark" field.
 func (u *BinUpsert) ClearRemark() *BinUpsert {
 	u.SetNull(bin.FieldRemark)
+	return u
+}
+
+// SetDeactivate sets the "deactivate" field.
+func (u *BinUpsert) SetDeactivate(v bool) *BinUpsert {
+	u.Set(bin.FieldDeactivate, v)
+	return u
+}
+
+// UpdateDeactivate sets the "deactivate" field to the value that was provided on create.
+func (u *BinUpsert) UpdateDeactivate() *BinUpsert {
+	u.SetExcluded(bin.FieldDeactivate)
+	return u
+}
+
+// SetDeactivateReason sets the "deactivate_reason" field.
+func (u *BinUpsert) SetDeactivateReason(v string) *BinUpsert {
+	u.Set(bin.FieldDeactivateReason, v)
+	return u
+}
+
+// UpdateDeactivateReason sets the "deactivate_reason" field to the value that was provided on create.
+func (u *BinUpsert) UpdateDeactivateReason() *BinUpsert {
+	u.SetExcluded(bin.FieldDeactivateReason)
+	return u
+}
+
+// ClearDeactivateReason clears the value of the "deactivate_reason" field.
+func (u *BinUpsert) ClearDeactivateReason() *BinUpsert {
+	u.SetNull(bin.FieldDeactivateReason)
 	return u
 }
 
@@ -1020,6 +1093,41 @@ func (u *BinUpsertOne) UpdateRemark() *BinUpsertOne {
 func (u *BinUpsertOne) ClearRemark() *BinUpsertOne {
 	return u.Update(func(s *BinUpsert) {
 		s.ClearRemark()
+	})
+}
+
+// SetDeactivate sets the "deactivate" field.
+func (u *BinUpsertOne) SetDeactivate(v bool) *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.SetDeactivate(v)
+	})
+}
+
+// UpdateDeactivate sets the "deactivate" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateDeactivate() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateDeactivate()
+	})
+}
+
+// SetDeactivateReason sets the "deactivate_reason" field.
+func (u *BinUpsertOne) SetDeactivateReason(v string) *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.SetDeactivateReason(v)
+	})
+}
+
+// UpdateDeactivateReason sets the "deactivate_reason" field to the value that was provided on create.
+func (u *BinUpsertOne) UpdateDeactivateReason() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateDeactivateReason()
+	})
+}
+
+// ClearDeactivateReason clears the value of the "deactivate_reason" field.
+func (u *BinUpsertOne) ClearDeactivateReason() *BinUpsertOne {
+	return u.Update(func(s *BinUpsert) {
+		s.ClearDeactivateReason()
 	})
 }
 
@@ -1487,6 +1595,41 @@ func (u *BinUpsertBulk) UpdateRemark() *BinUpsertBulk {
 func (u *BinUpsertBulk) ClearRemark() *BinUpsertBulk {
 	return u.Update(func(s *BinUpsert) {
 		s.ClearRemark()
+	})
+}
+
+// SetDeactivate sets the "deactivate" field.
+func (u *BinUpsertBulk) SetDeactivate(v bool) *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.SetDeactivate(v)
+	})
+}
+
+// UpdateDeactivate sets the "deactivate" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateDeactivate() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateDeactivate()
+	})
+}
+
+// SetDeactivateReason sets the "deactivate_reason" field.
+func (u *BinUpsertBulk) SetDeactivateReason(v string) *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.SetDeactivateReason(v)
+	})
+}
+
+// UpdateDeactivateReason sets the "deactivate_reason" field to the value that was provided on create.
+func (u *BinUpsertBulk) UpdateDeactivateReason() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.UpdateDeactivateReason()
+	})
+}
+
+// ClearDeactivateReason clears the value of the "deactivate_reason" field.
+func (u *BinUpsertBulk) ClearDeactivateReason() *BinUpsertBulk {
+	return u.Update(func(s *BinUpsert) {
+		s.ClearDeactivateReason()
 	})
 }
 

@@ -9,9 +9,11 @@ import (
 	"context"
 
 	"github.com/auroraride/adapter/rpc/pb"
+
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
+	"github.com/auroraride/cabservd/internal/service"
 )
 
 var (
@@ -145,4 +147,10 @@ func (s *cabinetServer) Sync(ctx context.Context, req *pb.CabinetSyncRequest) (r
 	}
 
 	return
+}
+
+// Deactivate 禁用仓位, 待实现
+func (s *cabinetServer) Deactivate(ctx context.Context, req *pb.CabinetDeactivateRequest) (res *pb.CabinetDeactivateResponse, err error) {
+	service.NewCabinet()
+	return nil, nil
 }
