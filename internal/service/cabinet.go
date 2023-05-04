@@ -151,14 +151,13 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
 			// 严格判定是否有电池
 			batteries += 1
 			// 若有电池
-			// 获取满电仓位 (当电量相同时, 以电压从高到低排序) -- 2023年04月23日15:04:41曹博文提出
-			if fully == nil || fully.Soc <= item.Soc {
-				// 跳过逻辑: [该仓位电量小于最小电量] 或 [非智能柜: 已有满仓标定但满仓标定电压大于等于该仓位电压] 或 [智能电池且已有满电标定], 反之则选取该仓位
-				// 智能电池无需额外判定电压 -- 2023年05月04日14:52:22曹博文提出
-				if item.Soc < minsoc || (fully != nil && fully.Voltage >= item.Voltage) || (!g.Config.NonBms && fully != nil) {
-					continue
-				}
-				// 标定满仓
+			// 标定满仓
+			switch {
+			case fully == nil, fully.Soc <= item.Soc:
+				// 如果满电标定为空 或 满电标定电量小于该仓位电量
+				fully = item
+			case fully != nil && g.Config.NonBms && fully.Voltage < item.Voltage:
+				// 非智能柜独有逻辑: 如果满电标定不为空但满电标定电压小于该仓位电压 -- 2023年04月23日15:04:41 /  2023年05月04日14:52:22 曹博文提出
 				fully = item
 			}
 		case item.IsStrictNoBattery(fakevoltage, fakecurrent):
