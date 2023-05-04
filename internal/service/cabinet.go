@@ -153,9 +153,9 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
 			// 若有电池
 			// 获取满电仓位 (当电量相同时, 以电压从高到低排序) -- 2023年04月23日15:04:41曹博文提出
 			if fully == nil || fully.Soc <= item.Soc {
-				// 跳过逻辑: [该仓位电量小于最小电量] 或 [非智能柜: 已有满仓标定但满仓标定电压大于等于该仓位电压] 或 [智能电池], 反之则选取该仓位
+				// 跳过逻辑: [该仓位电量小于最小电量] 或 [非智能柜: 已有满仓标定但满仓标定电压大于等于该仓位电压] 或 [智能电池且已有满电标定], 反之则选取该仓位
 				// 智能电池无需额外判定电压 -- 2023年05月04日14:52:22曹博文提出
-				if item.Soc < minsoc || (fully != nil && fully.Voltage >= item.Voltage) || !g.Config.NonBms {
+				if item.Soc < minsoc || (fully != nil && fully.Voltage >= item.Voltage) || (!g.Config.NonBms && fully != nil) {
 					continue
 				}
 				// 标定满仓
