@@ -20,5 +20,5 @@ var Bin = new(bin)
 // Deactivate 仓位逻辑禁用或启用
 func (*bin) Deactivate(c echo.Context) (err error) {
 	ctx, req := app.ContextAndBinding[cabdef.BinDeactivateRequest](c)
-	return ctx.SendResponse(service.NewBin(ctx.User).Deactivate(req))
+	return ctx.SendResponse(map[string]bool{"status": service.NewBin(ctx.User).Deactivate(req) == nil})
 }

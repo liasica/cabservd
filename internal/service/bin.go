@@ -274,16 +274,16 @@ func (s *binService) BinInfo(req *cabdef.BinInfoRequest) (info *cabdef.BinInfo, 
 // Deactivate 禁用或启用仓位 (逻辑禁用)
 func (s *binService) Deactivate(req *cabdef.BinDeactivateRequest) error {
 	// 查找电柜
-	_, err := NewCabinet().QuerySerial(req.Serial)
+	_, err := NewCabinet(s.GetUser()).QuerySerial(req.Serial)
 	if err != nil {
 		return adapter.ErrorCabinetNotFound
 	}
 
 	updater := ent.Database.Bin.Update().Where(bin.Serial(req.Serial), bin.Ordinal(req.Ordinal)).SetNillableDeactivate(req.Deactivate)
 	if *req.Deactivate {
-		updater.ClearDeactivateReason()
-	} else {
 		updater.SetNillableDeactivateReason(req.Reason)
+	} else {
+		updater.ClearDeactivateReason()
 	}
 
 	return updater.Exec(s.GetContext())
