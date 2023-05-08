@@ -41,3 +41,7 @@ kxnicab:
 .PHONY: kxnicab-dev
 kxnicab-dev:
 	$(call deploy,kxnicab-dev,kxnicab)
+
+.PHONY: all
+all:
+	make kxcab && make kxnicab && make ydcab && make tbcab && make kxcab-dev && make kxnicab-dev && make ydcab-dev && make tbcab-dev
