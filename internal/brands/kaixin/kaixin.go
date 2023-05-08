@@ -24,5 +24,6 @@ func NewNonIntelligent() (core.Hook, codec.Codec) {
 		tower.WithBinSignals(binSignals),
 		tower.WithAutoResetBattery(false),
 		tower.WithBatteryReign(true),
+		tower.WithFakeVoltage(44), // 2023年05月08日20:09:08 曹博文说把虚拟电压调整为44V
 	), &codec.HeaderLength{}
 }
