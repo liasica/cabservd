@@ -8,8 +8,9 @@ package api
 import (
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/defs/cabdef"
-	"github.com/auroraride/cabservd/internal/service"
 	"github.com/labstack/echo/v4"
+
+	"github.com/auroraride/cabservd/internal/service"
 )
 
 type device struct{}
@@ -24,4 +25,9 @@ func (*device) BinInfo(c echo.Context) (err error) {
 		return
 	}
 	return ctx.SendResponse(info)
+}
+
+func (*device) Interrupt(c echo.Context) (err error) {
+	ctx, req := app.ContextAndBinding[cabdef.DeviceInterruptRequest](c)
+	return ctx.SendResponse(service.NewConsole(ctx.User).Interrupt(req))
 }

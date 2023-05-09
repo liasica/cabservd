@@ -15,6 +15,7 @@ import (
 	"github.com/google/uuid"
 	"go.uber.org/zap"
 
+	"github.com/auroraride/cabservd/internal/biz"
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
@@ -77,8 +78,14 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	stepper := make(chan *types.BinResult)
 
 	// 记录操作
+	// TODO 新增中断功能
 	mem.BinOperate(bo.Serial, bo.Ordinal, bo.MainOperate)
 	defer mem.BinOperationFinished(bo.Serial, bo.Ordinal)
+
+	// 设置任务
+	bizkey := uuid.New().String()
+	bizch := biz.Add(bizkey)
+	defer biz.Del(bizkey, bizch)
 
 	defer func() {
 		// 退出时删除监听
@@ -97,6 +104,9 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	go func() {
 		for {
 			select {
+			case <-bizch:
+				// TODO 中断任务
+
 			case <-timeout:
 				err = adapter.ErrorOperateTimeout
 				stepper <- types.NewBinResult(nil, err)

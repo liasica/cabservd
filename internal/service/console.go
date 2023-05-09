@@ -9,6 +9,8 @@ import (
 	"time"
 
 	"github.com/auroraride/adapter/app"
+	"github.com/auroraride/adapter/defs/cabdef"
+
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/console"
 )
@@ -53,4 +55,9 @@ func (s *consoleService) Update(ec *ent.Console, b *ent.Bin, err error) *ent.Con
 func (s *consoleService) InJob(serial string) bool {
 	exists, _ := s.orm.Query().Where(console.Serial(serial), console.Or(console.StatusIn(console.StatusRunning))).Exist(s.GetContext())
 	return exists
+}
+
+// Interrupt 中断所有进行中的业务
+func (s *consoleService) Interrupt(req *cabdef.DeviceInterruptRequest) *app.StatusResponse {
+	return nil
 }
