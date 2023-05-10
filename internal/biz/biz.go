@@ -28,7 +28,7 @@ type Task struct {
 	Interrupter chan string
 }
 
-func Create(serial string, ordinal int, business adapter.Business, operate cabdef.Operate) (t *Task) {
+func Create(serial string, ordinal int, business adapter.Business, operate cabdef.Operate, user *adapter.User) (t *Task) {
 	t = &Task{
 		Key:         uuid.New(),
 		Interrupter: make(chan string),
@@ -40,6 +40,9 @@ func Create(serial string, ordinal int, business adapter.Business, operate cabde
 			Ordinal: int32(ordinal),
 			Desc:    business.Text() + ":" + operate.Text(),
 		},
+	}
+	if user != nil {
+		t.Biz.User = user.String()
 	}
 	tasks.Store(t.Key, t)
 	return

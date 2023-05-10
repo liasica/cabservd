@@ -8,10 +8,15 @@ package core
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/log"
+
 	"github.com/auroraride/cabservd/internal/codec"
+	"github.com/auroraride/cabservd/internal/g"
+
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -128,7 +133,11 @@ func (h *hub) handleMessage(c *Client, b []byte) {
 		fields = append(fields, zap.Error(err))
 	}
 
-	c.Log(lvl, "收到消息 ↑", fields...)
+	if g.LogBinary {
+		fields = append(fields, log.Binary(b))
+	}
+
+	c.Log(lvl, "收到消息 ↑("+strconv.Itoa(len(b))+" bytes)", fields...)
 
 	// 注册电柜客户端
 	if serial != "" {

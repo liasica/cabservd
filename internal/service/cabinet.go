@@ -155,8 +155,9 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
 			case fully == nil, fully.Soc <= item.Soc:
 				// 如果满电标定为空 或 满电标定电量小于该仓位电量
 				fully = item
-			case fully != nil && g.Config.NonBms && fully.Voltage < item.Voltage:
-				// 非智能柜独有逻辑: 如果满电标定不为空但满电标定电压小于该仓位电压 -- 2023年04月23日15:04:41 /  2023年05月04日14:52:22 曹博文提出
+			case fully != nil && g.Config.NonBms && fully.Voltage < item.Voltage && fully.Soc == item.Soc:
+				// 非智能柜独有逻辑: 如果满电标定不为空但满电标定电压小于该仓位电压 -- 2023年04月23日15:04:41 / 2023年05月04日14:52:22 曹博文提出
+				// 增加逻辑: 仅在标定满电电量相等时判定电压大小 -- 2023年05月10日12:47:22
 				fully = item
 			}
 		case item.IsStrictNoBattery(fakevoltage, fakecurrent):

@@ -7,8 +7,10 @@ package core
 
 import (
 	"context"
+	"strconv"
 	"time"
 
+	"github.com/auroraride/adapter/log"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 
@@ -53,13 +55,20 @@ type ResponseMessenger interface {
 // SendMessage 向客户端发送消息
 func (c *Client) SendMessage(messenger ResponseMessenger) (err error) {
 	b, fields := messenger.GetMessage(c.Hub.codec)
-	_, err = c.Write(b)
+	var n int
+	n, err = c.Write(b)
 	lvl := zap.InfoLevel
 	if err != nil {
 		lvl = zap.ErrorLevel
 		fields = append(fields, zap.Error(err))
 	}
-	c.Log(lvl, "发送消息 ↓ ", fields...)
+
+	// 记录原始消息
+	if g.LogBinary {
+		fields = append(fields, log.Binary(b))
+	}
+
+	c.Log(lvl, "发送消息 ↓ ("+strconv.Itoa(n)+" bytes)", fields...)
 
 	return
 }

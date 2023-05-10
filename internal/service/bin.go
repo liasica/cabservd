@@ -79,12 +79,11 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	stepper := make(chan *types.BinResult)
 
 	// 记录操作
-	// TODO 新增中断功能
 	mem.BinOperate(bo.Serial, bo.Ordinal, bo.MainOperate)
 	defer mem.BinOperationFinished(bo.Serial, bo.Ordinal)
 
-	// 创建任务
-	biztask := biz.Create(bo.Serial, bo.Ordinal, bo.Business, bo.MainOperate)
+	// 创建可中断任务
+	biztask := biz.Create(bo.Serial, bo.Ordinal, bo.Business, bo.MainOperate, s.GetUser())
 	defer biztask.Del()
 
 	defer func() {
