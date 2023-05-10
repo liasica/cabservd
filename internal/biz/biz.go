@@ -5,40 +5,80 @@
 
 package biz
 
-import "sync"
+import (
+	"sync"
+
+	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/adapter/rpc/pb"
+	"github.com/google/uuid"
+)
 
 // 业务任务列表
-// 数据格式为 key(string) -> chan string(中断消息)
+// 数据格式为 serial+ordinal -> *Task
 var tasks sync.Map
 
-func Add(key string) (ch chan string) {
-	ch = make(chan string)
-	tasks.Store(key, ch)
-	return
+type Task struct {
+	Biz      *pb.CabinetBiz
+	Business adapter.Business
+	Operate  cabdef.Operate
+
+	Key uuid.UUID
+	// 中断器, 发送中断消息
+	Interrupter chan string
 }
 
-func Get(key string) (ch chan string, ok bool) {
-	var v any
-	v, ok = tasks.Load(key)
-	if !ok {
-		return
-	}
+func Create(serial string, ordinal int, business adapter.Business, operate cabdef.Operate) (t *Task) {
+	t = &Task{
+		Key:         uuid.New(),
+		Interrupter: make(chan string),
+		Business:    business,
+		Operate:     operate,
 
-	ch = v.(chan string)
+		Biz: &pb.CabinetBiz{
+			Serial:  serial,
+			Ordinal: int32(ordinal),
+			Desc:    business.Text() + ":" + operate.Text(),
+		},
+	}
+	tasks.Store(t.Key, t)
 	return
 }
 
 // Del 删除业务任务
 // 一般用在中断或终止任务之后
-func Del(key string, ch chan string) {
-	close(ch)
-	tasks.Delete(key)
+func (t *Task) Del() {
+	close(t.Interrupter)
+	tasks.Delete(t.Key)
 }
 
-// Send 发送消息并中断业务
-func Send(key string, message string) {
-	ch, ok := Get(key)
-	if ok {
-		ch <- message
-	}
+// Interrupt 发送中断消息
+func (t *Task) Interrupt(message string) {
+	t.Interrupter <- message
+}
+
+// Interrupt 发送消息并中断该电柜所有业务
+func Interrupt(serial string, message string) (items []*Task) {
+	// 查询该电柜所有任务并终止
+	tasks.Range(func(_, v any) bool {
+		item := v.(*Task)
+		if item.Biz.Serial == serial {
+			items = append(items, item)
+			item.Interrupter <- message
+		}
+		return true
+	})
+	return
+}
+
+// List 该电柜正在执行的任务列表
+func List(serial string) (items []*Task) {
+	tasks.Range(func(_, v any) bool {
+		item := v.(*Task)
+		if item.Biz.Serial == serial {
+			items = append(items, item)
+		}
+		return true
+	})
+	return
 }

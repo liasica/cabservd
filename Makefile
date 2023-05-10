@@ -45,3 +45,7 @@ kxnicab-dev:
 .PHONY: all
 all:
 	make kxcab && make kxnicab && make ydcab && make tbcab && make kxcab-dev && make kxnicab-dev && make ydcab-dev && make tbcab-dev
+
+.PHONY: dev
+dev:
+	make kxcab-dev && make kxnicab-dev && make ydcab-dev && make tbcab-dev

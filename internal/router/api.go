@@ -37,7 +37,6 @@ func Start(e *echo.Echo) {
 
 	// 电柜信息
 	e.POST("/device/bininfo", api.Device.BinInfo)
-	e.POST("/device/interrupt", api.Device.Interrupt)
 
 	if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
 		zap.L().Fatal(err.Error())

@@ -26,8 +26,3 @@ func (*device) BinInfo(c echo.Context) (err error) {
 	}
 	return ctx.SendResponse(info)
 }
-
-func (*device) Interrupt(c echo.Context) (err error) {
-	ctx, req := app.ContextAndBinding[cabdef.DeviceInterruptRequest](c)
-	return ctx.SendResponse(service.NewConsole(ctx.User).Interrupt(req))
-}

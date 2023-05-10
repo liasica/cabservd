@@ -6,6 +6,7 @@
 package service
 
 import (
+	"errors"
 	"strconv"
 	"time"
 
@@ -82,10 +83,9 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	mem.BinOperate(bo.Serial, bo.Ordinal, bo.MainOperate)
 	defer mem.BinOperationFinished(bo.Serial, bo.Ordinal)
 
-	// 设置任务
-	bizkey := uuid.New().String()
-	bizch := biz.Add(bizkey)
-	defer biz.Del(bizkey, bizch)
+	// 创建任务
+	biztask := biz.Create(bo.Serial, bo.Ordinal, bo.Business, bo.MainOperate)
+	defer biztask.Del()
 
 	defer func() {
 		// 退出时删除监听
@@ -104,9 +104,11 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	go func() {
 		for {
 			select {
-			case <-bizch:
+			case msg := <-biztask.Interrupter:
 				// TODO 中断任务
-
+				err = errors.New("强制中断: " + msg)
+				stepper <- types.NewBinResult(nil, err)
+				return
 			case <-timeout:
 				err = adapter.ErrorOperateTimeout
 				stepper <- types.NewBinResult(nil, err)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/auroraride/adapter/rpc/pb"
 
+	"github.com/auroraride/cabservd/internal/biz"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -152,8 +153,26 @@ func (s *cabinetServer) Sync(ctx context.Context, req *pb.CabinetSyncRequest) (r
 	return
 }
 
-// Deactivate 禁用仓位, 待实现
-func (s *cabinetServer) Deactivate(ctx context.Context, req *pb.CabinetDeactivateRequest) (res *pb.CabinetDeactivateResponse, err error) {
+// Deactivate TODO 禁用仓位, 待gRPC实现
+func (s *cabinetServer) Deactivate(_ context.Context, _ *pb.CabinetDeactivateRequest) (res *pb.CabinetDeactivateResponse, err error) {
 	service.NewCabinet()
 	return nil, nil
+}
+
+// Biz 电柜业务
+func (s *cabinetServer) Biz(_ context.Context, req *pb.CabinetBizRequest) (*pb.CabinetBizResponse, error) {
+	res := &pb.CabinetBizResponse{}
+	for _, task := range biz.List(req.Serial) {
+		res.Items = append(res.Items, task.Biz)
+	}
+	return res, nil
+}
+
+// Interrupt 中断电柜业务
+func (s *cabinetServer) Interrupt(_ context.Context, req *pb.CabinetInterruptRequest) (*pb.CabinetBizResponse, error) {
+	res := &pb.CabinetBizResponse{}
+	for _, task := range biz.Interrupt(req.Serial, req.Message) {
+		res.Items = append(res.Items, task.Biz)
+	}
+	return res, nil
 }

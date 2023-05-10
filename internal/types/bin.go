@@ -10,8 +10,9 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
-	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/google/uuid"
+
+	"github.com/auroraride/cabservd/internal/ent"
 )
 
 var (
