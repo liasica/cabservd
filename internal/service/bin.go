@@ -230,7 +230,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 	buf := adapter.NewBuffer()
 	defer adapter.ReleaseBuffer(buf)
 
-	buf.WriteString("<")
+	buf.WriteString("处理结果: <")
 	buf.WriteString(s.GetUser().String())
 	buf.WriteString("> [电柜: ")
 	buf.WriteString(eb.Serial)
