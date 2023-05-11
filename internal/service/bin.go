@@ -274,10 +274,10 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 		ticker = time.AfterFunc(0, func() {
 			times += 1
 
-			// 「换电第一步」如果超过3次, 终止重复指令
+			// 「换电第一步」如果超过指定次数, 终止重复指令
 			// TODO 这部分代码太丑了, 需要进行优化
-			if s.IsExchangeFirstStep(business, step) && times > g.ExchangeFirstStepRetryTimes ||
-				s.IsExchangeThirdStep(business, step) && times > g.ExchangeThirdStepRetryTimes {
+			if s.IsExchangeFirstStep(business, step) && times >= g.ExchangeFirstStepRetryTimes ||
+				s.IsExchangeThirdStep(business, step) && times >= g.ExchangeThirdStepRetryTimes {
 				ticker.Stop()
 				return
 			}
