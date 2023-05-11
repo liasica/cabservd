@@ -6,8 +6,10 @@
 package g
 
 var (
-	BatteryReign              bool // 是否有电池在位检测
-	AutoResetWithoutBatterySN bool // 当电池编号不存在的时候是否自动清除电池信息 (soc / soh / current / voltage)
-	CalculateMonVoltage       bool // 是否需要计算当前电池电芯单体电压作为仓位电压 (拓邦电柜不上报电柜电压)
-	LogBinary                 bool // 是否记录原始日志
+	BatteryReign                bool // 是否有电池在位检测
+	AutoResetWithoutBatterySN   bool // 当电池编号不存在的时候是否自动清除电池信息 (soc / soh / current / voltage)
+	CalculateMonVoltage         bool // 是否需要计算当前电池电芯单体电压作为仓位电压 (拓邦电柜不上报电柜电压)
+	LogBinary                   bool // 是否记录原始日志
+	ExchangeFirstStepRetryTimes = 1  // 换电第一步是否重复发送开仓指令, 默认为1:不重试
+	ExchangeThirdStepRetryTimes = 1  // 换电第三步是否重复发送开仓指令, 默认为1:不重试
 )

@@ -53,7 +53,7 @@ type ResponseMessenger interface {
 }
 
 // SendMessage 向客户端发送消息
-func (c *Client) SendMessage(messenger ResponseMessenger) (err error) {
+func (c *Client) SendMessage(messenger ResponseMessenger, times int) (err error) {
 	b, fields := messenger.GetMessage(c.Hub.codec)
 	var n int
 	n, err = c.Write(b)
@@ -68,7 +68,14 @@ func (c *Client) SendMessage(messenger ResponseMessenger) (err error) {
 		fields = append(fields, log.Binary(b))
 	}
 
-	c.Log(lvl, "发送消息 ↓ ("+strconv.Itoa(n)+" bytes)", fields...)
+	msg := "发送消息 ↓ (" + strconv.Itoa(n) + " bytes)"
+
+	if times > 1 {
+		// msg = "「第" + strconv.Itoa(times) + "次重试」 " + msg
+		fields = append(fields, zap.Int("retry", times))
+	}
+
+	c.Log(lvl, msg, fields...)
 
 	return
 }

@@ -50,23 +50,24 @@ type CabinetPointer struct {
 
 type ConsolePointers []*ConsolePointer
 type ConsolePointer struct {
-	CabinetID *uint64           `json:"cabinet_id,omitempty"`
-	BinID     *uint64           `json:"bin_id,omitempty"`
-	Operate   *cabdef.Operate   `json:"operate,omitempty"`
-	Serial    *string           `json:"serial,omitempty"`
-	UUID      *uuid.UUID        `json:"uuid,omitempty"`
-	Business  *adapter.Business `json:"business,omitempty"`
-	UserID    *string           `json:"user_id,omitempty"`
-	UserType  *adapter.UserType `json:"user_type,omitempty"`
-	Step      *int              `json:"step,omitempty"`
-	Status    *console.Status   `json:"status,omitempty"`
-	BeforeBin **cabdef.BinInfo  `json:"before_bin,omitempty"`
-	AfterBin  **cabdef.BinInfo  `json:"after_bin,omitempty"`
-	Message   *string           `json:"message,omitempty"`
-	StartAt   *time.Time        `json:"startAt,omitempty"`
-	StopAt    *time.Time        `json:"stopAt,omitempty"`
-	Duration  *float64          `json:"duration,omitempty"`
-	Remark    *string           `json:"remark,omitempty"`
+	CabinetID         *uint64           `json:"cabinet_id,omitempty"`
+	BinID             *uint64           `json:"bin_id,omitempty"`
+	Operate           *cabdef.Operate   `json:"operate,omitempty"`
+	Serial            *string           `json:"serial,omitempty"`
+	UUID              *uuid.UUID        `json:"uuid,omitempty"`
+	Business          *adapter.Business `json:"business,omitempty"`
+	UserID            *string           `json:"user_id,omitempty"`
+	UserType          *adapter.UserType `json:"user_type,omitempty"`
+	Step              *int              `json:"step,omitempty"`
+	Status            *console.Status   `json:"status,omitempty"`
+	BeforeBin         **cabdef.BinInfo  `json:"before_bin,omitempty"`
+	AfterBin          **cabdef.BinInfo  `json:"after_bin,omitempty"`
+	Message           *string           `json:"message,omitempty"`
+	StartAt           *time.Time        `json:"startAt,omitempty"`
+	StopAt            *time.Time        `json:"stopAt,omitempty"`
+	Duration          *float64          `json:"duration,omitempty"`
+	Remark            *string           `json:"remark,omitempty"`
+	CommandRetryTimes *int              `json:"command_retry_times,omitempty"`
 }
 
 type ScanPointers []*ScanPointer

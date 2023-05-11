@@ -105,6 +105,10 @@ func init() {
 	consoleDescStep := consoleFields[6].Descriptor()
 	// console.DefaultStep holds the default value on creation for the step field.
 	console.DefaultStep = consoleDescStep.Default.(int)
+	// consoleDescCommandRetryTimes is the schema descriptor for command_retry_times field.
+	consoleDescCommandRetryTimes := consoleFields[15].Descriptor()
+	// console.DefaultCommandRetryTimes holds the default value on creation for the command_retry_times field.
+	console.DefaultCommandRetryTimes = consoleDescCommandRetryTimes.Default.(int)
 	scanMixin := schema.Scan{}.Mixin()
 	scanMixinFields0 := scanMixin[0].Fields()
 	_ = scanMixinFields0

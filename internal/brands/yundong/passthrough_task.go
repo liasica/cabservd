@@ -12,9 +12,10 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/log"
+	"go.uber.org/zap"
+
 	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
-	"go.uber.org/zap"
 )
 
 var (
@@ -73,7 +74,7 @@ func (t *PassthroughTask) WaitResult() any {
 }
 
 // 发送透传指令
-func sendPassthrough(serial string, param any) (t *PassthroughTask, err error) {
+func sendPassthrough(serial string, param any, times int) (t *PassthroughTask, err error) {
 	var (
 		c    *core.Client
 		cmd  PassthroughCommand
@@ -145,7 +146,7 @@ func sendPassthrough(serial string, param any) (t *PassthroughTask, err error) {
 
 	b := msg.Bytes()
 
-	err = c.SendMessage(wrapPathroughData(CodePassthrough, sn, b))
+	err = c.SendMessage(wrapPathroughData(CodePassthrough, sn, b), times)
 
 	// 如果发送失败, 直接删除任务 (此时任务会返回失败)
 	if err != nil && t != nil {

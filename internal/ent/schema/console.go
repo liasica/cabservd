@@ -84,6 +84,8 @@ func (Console) Fields() []ent.Field {
 		field.Float("duration").Optional().Nillable().Comment("耗时"),
 
 		field.String("remark").Optional().Nillable().Comment("备注信息"),
+
+		field.Int("command_retry_times").Default(1).Comment("指令重试次数"),
 	}
 }
 

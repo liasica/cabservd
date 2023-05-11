@@ -185,6 +185,20 @@ func (cc *ConsoleCreate) SetNillableRemark(s *string) *ConsoleCreate {
 	return cc
 }
 
+// SetCommandRetryTimes sets the "command_retry_times" field.
+func (cc *ConsoleCreate) SetCommandRetryTimes(i int) *ConsoleCreate {
+	cc.mutation.SetCommandRetryTimes(i)
+	return cc
+}
+
+// SetNillableCommandRetryTimes sets the "command_retry_times" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableCommandRetryTimes(i *int) *ConsoleCreate {
+	if i != nil {
+		cc.SetCommandRetryTimes(*i)
+	}
+	return cc
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cc *ConsoleCreate) SetCabinet(c *Cabinet) *ConsoleCreate {
 	return cc.SetCabinetID(c.ID)
@@ -234,6 +248,10 @@ func (cc *ConsoleCreate) defaults() {
 		v := console.DefaultStep
 		cc.mutation.SetStep(v)
 	}
+	if _, ok := cc.mutation.CommandRetryTimes(); !ok {
+		v := console.DefaultCommandRetryTimes
+		cc.mutation.SetCommandRetryTimes(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -274,6 +292,9 @@ func (cc *ConsoleCreate) check() error {
 		if err := console.StatusValidator(v); err != nil {
 			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "Console.status": %w`, err)}
 		}
+	}
+	if _, ok := cc.mutation.CommandRetryTimes(); !ok {
+		return &ValidationError{Name: "command_retry_times", err: errors.New(`ent: missing required field "Console.command_retry_times"`)}
 	}
 	if _, ok := cc.mutation.CabinetID(); !ok {
 		return &ValidationError{Name: "cabinet", err: errors.New(`ent: missing required edge "Console.cabinet"`)}
@@ -364,6 +385,10 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Remark(); ok {
 		_spec.SetField(console.FieldRemark, field.TypeString, value)
 		_node.Remark = &value
+	}
+	if value, ok := cc.mutation.CommandRetryTimes(); ok {
+		_spec.SetField(console.FieldCommandRetryTimes, field.TypeInt, value)
+		_node.CommandRetryTimes = value
 	}
 	if nodes := cc.mutation.CabinetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -709,6 +734,24 @@ func (u *ConsoleUpsert) ClearRemark() *ConsoleUpsert {
 	return u
 }
 
+// SetCommandRetryTimes sets the "command_retry_times" field.
+func (u *ConsoleUpsert) SetCommandRetryTimes(v int) *ConsoleUpsert {
+	u.Set(console.FieldCommandRetryTimes, v)
+	return u
+}
+
+// UpdateCommandRetryTimes sets the "command_retry_times" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateCommandRetryTimes() *ConsoleUpsert {
+	u.SetExcluded(console.FieldCommandRetryTimes)
+	return u
+}
+
+// AddCommandRetryTimes adds v to the "command_retry_times" field.
+func (u *ConsoleUpsert) AddCommandRetryTimes(v int) *ConsoleUpsert {
+	u.Add(console.FieldCommandRetryTimes, v)
+	return u
+}
+
 // UpdateNewValues updates the mutable fields using the new values that were set on create.
 // Using this option is equivalent to using:
 //
@@ -1045,6 +1088,27 @@ func (u *ConsoleUpsertOne) UpdateRemark() *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) ClearRemark() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.ClearRemark()
+	})
+}
+
+// SetCommandRetryTimes sets the "command_retry_times" field.
+func (u *ConsoleUpsertOne) SetCommandRetryTimes(v int) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetCommandRetryTimes(v)
+	})
+}
+
+// AddCommandRetryTimes adds v to the "command_retry_times" field.
+func (u *ConsoleUpsertOne) AddCommandRetryTimes(v int) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.AddCommandRetryTimes(v)
+	})
+}
+
+// UpdateCommandRetryTimes sets the "command_retry_times" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateCommandRetryTimes() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateCommandRetryTimes()
 	})
 }
 
@@ -1554,6 +1618,27 @@ func (u *ConsoleUpsertBulk) UpdateRemark() *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) ClearRemark() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.ClearRemark()
+	})
+}
+
+// SetCommandRetryTimes sets the "command_retry_times" field.
+func (u *ConsoleUpsertBulk) SetCommandRetryTimes(v int) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetCommandRetryTimes(v)
+	})
+}
+
+// AddCommandRetryTimes adds v to the "command_retry_times" field.
+func (u *ConsoleUpsertBulk) AddCommandRetryTimes(v int) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.AddCommandRetryTimes(v)
+	})
+}
+
+// UpdateCommandRetryTimes sets the "command_retry_times" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateCommandRetryTimes() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateCommandRetryTimes()
 	})
 }
 

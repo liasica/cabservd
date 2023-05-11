@@ -16,10 +16,11 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/adapter/log"
+	"go.uber.org/zap"
+
 	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/g"
-	"go.uber.org/zap"
 )
 
 type Handler struct {
@@ -146,17 +147,17 @@ func (h *Handler) OnMessage(c *core.Client, data []byte) (serial string, res cor
 	return
 }
 
-func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int) (err error) {
+func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int, times int) (err error) {
 	index := ordinal - 1
 	switch typ {
 	default:
 		return adapter.ErrorOperateCommand
 	case cabdef.OperateDoorOpen:
-		CommandOpen(serial, index)
+		CommandOpen(serial, index, times)
 	case cabdef.OperateBinDisable:
-		CommandDisable(serial, index)
+		CommandDisable(serial, index, times)
 	case cabdef.OperateBinEnable:
-		CommandEnable(serial, index)
+		CommandEnable(serial, index, times)
 	}
 	return
 }

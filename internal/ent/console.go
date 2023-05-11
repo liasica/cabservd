@@ -56,6 +56,8 @@ type Console struct {
 	Duration *float64 `json:"duration,omitempty"`
 	// 备注信息
 	Remark *string `json:"remark,omitempty"`
+	// 指令重试次数
+	CommandRetryTimes int `json:"command_retry_times,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConsoleQuery when eager-loading is set.
 	Edges ConsoleEdges `json:"edges"`
@@ -113,7 +115,7 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 			values[i] = new(cabdef.Operate)
 		case console.FieldDuration:
 			values[i] = new(sql.NullFloat64)
-		case console.FieldID, console.FieldCabinetID, console.FieldBinID, console.FieldStep:
+		case console.FieldID, console.FieldCabinetID, console.FieldBinID, console.FieldStep, console.FieldCommandRetryTimes:
 			values[i] = new(sql.NullInt64)
 		case console.FieldSerial, console.FieldUserID, console.FieldStatus, console.FieldMessage, console.FieldRemark:
 			values[i] = new(sql.NullString)
@@ -254,6 +256,12 @@ func (c *Console) assignValues(columns []string, values []any) error {
 				c.Remark = new(string)
 				*c.Remark = value.String
 			}
+		case console.FieldCommandRetryTimes:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field command_retry_times", values[i])
+			} else if value.Valid {
+				c.CommandRetryTimes = int(value.Int64)
+			}
 		}
 	}
 	return nil
@@ -354,6 +362,9 @@ func (c *Console) String() string {
 		builder.WriteString("remark=")
 		builder.WriteString(*v)
 	}
+	builder.WriteString(", ")
+	builder.WriteString("command_retry_times=")
+	builder.WriteString(fmt.Sprintf("%v", c.CommandRetryTimes))
 	builder.WriteByte(')')
 	return builder.String()
 }

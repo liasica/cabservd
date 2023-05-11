@@ -28,9 +28,9 @@ func NewConsole(params ...any) *consoleService {
 }
 
 // Update 更新记录
-func (s *consoleService) Update(ec *ent.Console, b *ent.Bin, err error) *ent.Console {
+func (s *consoleService) Update(ec *ent.Console, b *ent.Bin, times int, err error) *ent.Console {
 	now := time.Now()
-	cr := ec.Update().SetStopAt(now)
+	cr := ec.Update().SetStopAt(now).SetCommandRetryTimes(times)
 	if ec.StartAt != nil {
 		cr.SetDuration(now.Sub(*ec.StartAt).Seconds())
 	}

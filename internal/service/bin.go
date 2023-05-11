@@ -204,6 +204,16 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	return
 }
 
+// IsExchangeFirstStep 是否换电第一步
+func (s *binService) IsExchangeFirstStep(business adapter.Business, step *types.BinStep) bool {
+	return business == adapter.BusinessExchange && step.Step == 1
+}
+
+// IsExchangeThirdStep 是否换电第三步
+func (s *binService) IsExchangeThirdStep(business adapter.Business, step *types.BinStep) bool {
+	return business == adapter.BusinessExchange && step.Step == 3
+}
+
 // doOperateStep 按步骤操作
 func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, remark string, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, scb types.StepCallback) (err error) {
 	// 创建记录
@@ -242,8 +252,9 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 	buf.WriteString(step.String())
 	buf.WriteString(" }")
 
+	times := 0
 	defer func() {
-		res := NewConsole(s.GetUser()).Update(co, eb, err).OperateResult()
+		res := NewConsole(s.GetUser()).Update(co, eb, times, err).OperateResult()
 
 		if err != nil {
 			zap.L().Error(buf.String(), zap.Error(err))
@@ -255,20 +266,57 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 		scb(res)
 	}()
 
+	// 电柜控制重试监听器
+	var ticker *time.Timer
 	if step.Operate.IsCommand() {
-		// 电柜控制
-		err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal)
+		// 重复检测器
+		// 初始设置为0立即执行指令
+		ticker = time.AfterFunc(0, func() {
+			times += 1
 
-		// TODO: 开仓失败后是否重复弹开逻辑???
-		// TODO: 详细失败日志???
-		if err != nil {
-			return
-		}
+			// 「换电第一步」如果超过3次, 终止重复指令
+			// TODO 这部分代码太丑了, 需要进行优化
+			if s.IsExchangeFirstStep(business, step) && times > g.ExchangeFirstStepRetryTimes ||
+				s.IsExchangeThirdStep(business, step) && times > g.ExchangeThirdStepRetryTimes {
+				ticker.Stop()
+				return
+			}
+
+			// 电柜控制
+			err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal, times)
+			// 如果电柜控制失败, 直接返回错误
+			if err != nil {
+				stepper <- types.NewBinResult(nil, err)
+				return
+			}
+
+			// 「换电第一步」如果需要重复开仓, 则重置为每隔3s检测一次是否响应, 若指令无响应则重复开仓
+			// TODO 这部分代码太丑了, 需要进行优化
+			if s.IsExchangeFirstStep(business, step) && g.ExchangeFirstStepRetryTimes > 1 ||
+				s.IsExchangeThirdStep(business, step) && g.ExchangeThirdStepRetryTimes > 1 {
+				ticker.Reset(3 * time.Second)
+			}
+		})
+
+		// // 电柜控制
+		// err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal)
+		//
+		// // TODO: 开仓失败后是否重复弹开逻辑???
+		// // TODO: 详细失败日志???
+		// if err != nil {
+		// 	return
+		// }
 	}
 
+	// 监听步骤结果
 	r := <-stepper
-	_, err = r.Result()
 
+	// 终止重复指令
+	if ticker != nil {
+		ticker.Stop()
+	}
+
+	_, err = r.Result()
 	return
 }
 

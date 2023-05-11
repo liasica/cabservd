@@ -87,23 +87,24 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Console",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			console.FieldCabinetID: {Type: field.TypeUint64, Column: console.FieldCabinetID},
-			console.FieldBinID:     {Type: field.TypeUint64, Column: console.FieldBinID},
-			console.FieldOperate:   {Type: field.TypeOther, Column: console.FieldOperate},
-			console.FieldSerial:    {Type: field.TypeString, Column: console.FieldSerial},
-			console.FieldUUID:      {Type: field.TypeUUID, Column: console.FieldUUID},
-			console.FieldBusiness:  {Type: field.TypeEnum, Column: console.FieldBusiness},
-			console.FieldUserID:    {Type: field.TypeString, Column: console.FieldUserID},
-			console.FieldUserType:  {Type: field.TypeOther, Column: console.FieldUserType},
-			console.FieldStep:      {Type: field.TypeInt, Column: console.FieldStep},
-			console.FieldStatus:    {Type: field.TypeEnum, Column: console.FieldStatus},
-			console.FieldBeforeBin: {Type: field.TypeJSON, Column: console.FieldBeforeBin},
-			console.FieldAfterBin:  {Type: field.TypeJSON, Column: console.FieldAfterBin},
-			console.FieldMessage:   {Type: field.TypeString, Column: console.FieldMessage},
-			console.FieldStartAt:   {Type: field.TypeTime, Column: console.FieldStartAt},
-			console.FieldStopAt:    {Type: field.TypeTime, Column: console.FieldStopAt},
-			console.FieldDuration:  {Type: field.TypeFloat64, Column: console.FieldDuration},
-			console.FieldRemark:    {Type: field.TypeString, Column: console.FieldRemark},
+			console.FieldCabinetID:         {Type: field.TypeUint64, Column: console.FieldCabinetID},
+			console.FieldBinID:             {Type: field.TypeUint64, Column: console.FieldBinID},
+			console.FieldOperate:           {Type: field.TypeOther, Column: console.FieldOperate},
+			console.FieldSerial:            {Type: field.TypeString, Column: console.FieldSerial},
+			console.FieldUUID:              {Type: field.TypeUUID, Column: console.FieldUUID},
+			console.FieldBusiness:          {Type: field.TypeEnum, Column: console.FieldBusiness},
+			console.FieldUserID:            {Type: field.TypeString, Column: console.FieldUserID},
+			console.FieldUserType:          {Type: field.TypeOther, Column: console.FieldUserType},
+			console.FieldStep:              {Type: field.TypeInt, Column: console.FieldStep},
+			console.FieldStatus:            {Type: field.TypeEnum, Column: console.FieldStatus},
+			console.FieldBeforeBin:         {Type: field.TypeJSON, Column: console.FieldBeforeBin},
+			console.FieldAfterBin:          {Type: field.TypeJSON, Column: console.FieldAfterBin},
+			console.FieldMessage:           {Type: field.TypeString, Column: console.FieldMessage},
+			console.FieldStartAt:           {Type: field.TypeTime, Column: console.FieldStartAt},
+			console.FieldStopAt:            {Type: field.TypeTime, Column: console.FieldStopAt},
+			console.FieldDuration:          {Type: field.TypeFloat64, Column: console.FieldDuration},
+			console.FieldRemark:            {Type: field.TypeString, Column: console.FieldRemark},
+			console.FieldCommandRetryTimes: {Type: field.TypeInt, Column: console.FieldCommandRetryTimes},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -589,6 +590,11 @@ func (f *ConsoleFilter) WhereDuration(p entql.Float64P) {
 // WhereRemark applies the entql string predicate on the remark field.
 func (f *ConsoleFilter) WhereRemark(p entql.StringP) {
 	f.Where(p.Field(console.FieldRemark))
+}
+
+// WhereCommandRetryTimes applies the entql int predicate on the command_retry_times field.
+func (f *ConsoleFilter) WhereCommandRetryTimes(p entql.IntP) {
+	f.Where(p.Field(console.FieldCommandRetryTimes))
 }
 
 // WhereHasCabinet applies a predicate to check if query has an edge cabinet.

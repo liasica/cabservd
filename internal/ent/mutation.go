@@ -3044,34 +3044,36 @@ func (m *CabinetMutation) ResetEdge(name string) error {
 // ConsoleMutation represents an operation that mutates the Console nodes in the graph.
 type ConsoleMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *uint64
-	operate        *cabdef.Operate
-	serial         *string
-	uuid           *uuid.UUID
-	business       *adapter.Business
-	user_id        *string
-	user_type      *adapter.UserType
-	step           *int
-	addstep        *int
-	status         *console.Status
-	before_bin     **cabdef.BinInfo
-	after_bin      **cabdef.BinInfo
-	message        *string
-	startAt        *time.Time
-	stopAt         *time.Time
-	duration       *float64
-	addduration    *float64
-	remark         *string
-	clearedFields  map[string]struct{}
-	cabinet        *uint64
-	clearedcabinet bool
-	bin            *uint64
-	clearedbin     bool
-	done           bool
-	oldValue       func(context.Context) (*Console, error)
-	predicates     []predicate.Console
+	op                     Op
+	typ                    string
+	id                     *uint64
+	operate                *cabdef.Operate
+	serial                 *string
+	uuid                   *uuid.UUID
+	business               *adapter.Business
+	user_id                *string
+	user_type              *adapter.UserType
+	step                   *int
+	addstep                *int
+	status                 *console.Status
+	before_bin             **cabdef.BinInfo
+	after_bin              **cabdef.BinInfo
+	message                *string
+	startAt                *time.Time
+	stopAt                 *time.Time
+	duration               *float64
+	addduration            *float64
+	remark                 *string
+	command_retry_times    *int
+	addcommand_retry_times *int
+	clearedFields          map[string]struct{}
+	cabinet                *uint64
+	clearedcabinet         bool
+	bin                    *uint64
+	clearedbin             bool
+	done                   bool
+	oldValue               func(context.Context) (*Console, error)
+	predicates             []predicate.Console
 }
 
 var _ ent.Mutation = (*ConsoleMutation)(nil)
@@ -3929,6 +3931,62 @@ func (m *ConsoleMutation) ResetRemark() {
 	delete(m.clearedFields, console.FieldRemark)
 }
 
+// SetCommandRetryTimes sets the "command_retry_times" field.
+func (m *ConsoleMutation) SetCommandRetryTimes(i int) {
+	m.command_retry_times = &i
+	m.addcommand_retry_times = nil
+}
+
+// CommandRetryTimes returns the value of the "command_retry_times" field in the mutation.
+func (m *ConsoleMutation) CommandRetryTimes() (r int, exists bool) {
+	v := m.command_retry_times
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCommandRetryTimes returns the old "command_retry_times" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldCommandRetryTimes(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCommandRetryTimes is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCommandRetryTimes requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCommandRetryTimes: %w", err)
+	}
+	return oldValue.CommandRetryTimes, nil
+}
+
+// AddCommandRetryTimes adds i to the "command_retry_times" field.
+func (m *ConsoleMutation) AddCommandRetryTimes(i int) {
+	if m.addcommand_retry_times != nil {
+		*m.addcommand_retry_times += i
+	} else {
+		m.addcommand_retry_times = &i
+	}
+}
+
+// AddedCommandRetryTimes returns the value that was added to the "command_retry_times" field in this mutation.
+func (m *ConsoleMutation) AddedCommandRetryTimes() (r int, exists bool) {
+	v := m.addcommand_retry_times
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetCommandRetryTimes resets all changes to the "command_retry_times" field.
+func (m *ConsoleMutation) ResetCommandRetryTimes() {
+	m.command_retry_times = nil
+	m.addcommand_retry_times = nil
+}
+
 // ClearCabinet clears the "cabinet" edge to the Cabinet entity.
 func (m *ConsoleMutation) ClearCabinet() {
 	m.clearedcabinet = true
@@ -4015,7 +4073,7 @@ func (m *ConsoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConsoleMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+	fields := make([]string, 0, 18)
 	if m.cabinet != nil {
 		fields = append(fields, console.FieldCabinetID)
 	}
@@ -4067,6 +4125,9 @@ func (m *ConsoleMutation) Fields() []string {
 	if m.remark != nil {
 		fields = append(fields, console.FieldRemark)
 	}
+	if m.command_retry_times != nil {
+		fields = append(fields, console.FieldCommandRetryTimes)
+	}
 	return fields
 }
 
@@ -4109,6 +4170,8 @@ func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
 		return m.Duration()
 	case console.FieldRemark:
 		return m.Remark()
+	case console.FieldCommandRetryTimes:
+		return m.CommandRetryTimes()
 	}
 	return nil, false
 }
@@ -4152,6 +4215,8 @@ func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldDuration(ctx)
 	case console.FieldRemark:
 		return m.OldRemark(ctx)
+	case console.FieldCommandRetryTimes:
+		return m.OldCommandRetryTimes(ctx)
 	}
 	return nil, fmt.Errorf("unknown Console field %s", name)
 }
@@ -4280,6 +4345,13 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRemark(v)
 		return nil
+	case console.FieldCommandRetryTimes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCommandRetryTimes(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Console field %s", name)
 }
@@ -4294,6 +4366,9 @@ func (m *ConsoleMutation) AddedFields() []string {
 	if m.addduration != nil {
 		fields = append(fields, console.FieldDuration)
 	}
+	if m.addcommand_retry_times != nil {
+		fields = append(fields, console.FieldCommandRetryTimes)
+	}
 	return fields
 }
 
@@ -4306,6 +4381,8 @@ func (m *ConsoleMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedStep()
 	case console.FieldDuration:
 		return m.AddedDuration()
+	case console.FieldCommandRetryTimes:
+		return m.AddedCommandRetryTimes()
 	}
 	return nil, false
 }
@@ -4328,6 +4405,13 @@ func (m *ConsoleMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddDuration(v)
+		return nil
+	case console.FieldCommandRetryTimes:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddCommandRetryTimes(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Console numeric field %s", name)
@@ -4457,6 +4541,9 @@ func (m *ConsoleMutation) ResetField(name string) error {
 		return nil
 	case console.FieldRemark:
 		m.ResetRemark()
+		return nil
+	case console.FieldCommandRetryTimes:
+		m.ResetCommandRetryTimes()
 		return nil
 	}
 	return fmt.Errorf("unknown Console field %s", name)

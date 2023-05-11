@@ -8,8 +8,11 @@ package main
 import (
 	"github.com/auroraride/cabservd/internal"
 	"github.com/auroraride/cabservd/internal/brands/kaixin"
+	"github.com/auroraride/cabservd/internal/g"
 )
 
 func main() {
+	g.ExchangeFirstStepRetryTimes = 3
+	g.ExchangeThirdStepRetryTimes = 3
 	internal.Boot(kaixin.NewNonIntelligent)
 }

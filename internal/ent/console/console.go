@@ -47,6 +47,8 @@ const (
 	FieldDuration = "duration"
 	// FieldRemark holds the string denoting the remark field in the database.
 	FieldRemark = "remark"
+	// FieldCommandRetryTimes holds the string denoting the command_retry_times field in the database.
+	FieldCommandRetryTimes = "command_retry_times"
 	// EdgeCabinet holds the string denoting the cabinet edge name in mutations.
 	EdgeCabinet = "cabinet"
 	// EdgeBin holds the string denoting the bin edge name in mutations.
@@ -89,6 +91,7 @@ var Columns = []string{
 	FieldStopAt,
 	FieldDuration,
 	FieldRemark,
+	FieldCommandRetryTimes,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -104,6 +107,8 @@ func ValidColumn(column string) bool {
 var (
 	// DefaultStep holds the default value on creation for the "step" field.
 	DefaultStep int
+	// DefaultCommandRetryTimes holds the default value on creation for the "command_retry_times" field.
+	DefaultCommandRetryTimes int
 )
 
 // BusinessValidator is a validator for the "business" field enum values. It is called by the builders before save.

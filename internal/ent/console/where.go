@@ -123,6 +123,11 @@ func Remark(v string) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldRemark, v))
 }
 
+// CommandRetryTimes applies equality check predicate on the "command_retry_times" field. It's identical to CommandRetryTimesEQ.
+func CommandRetryTimes(v int) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldCommandRetryTimes, v))
+}
+
 // CabinetIDEQ applies the EQ predicate on the "cabinet_id" field.
 func CabinetIDEQ(v uint64) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldCabinetID, v))
@@ -821,6 +826,46 @@ func RemarkEqualFold(v string) predicate.Console {
 // RemarkContainsFold applies the ContainsFold predicate on the "remark" field.
 func RemarkContainsFold(v string) predicate.Console {
 	return predicate.Console(sql.FieldContainsFold(FieldRemark, v))
+}
+
+// CommandRetryTimesEQ applies the EQ predicate on the "command_retry_times" field.
+func CommandRetryTimesEQ(v int) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldCommandRetryTimes, v))
+}
+
+// CommandRetryTimesNEQ applies the NEQ predicate on the "command_retry_times" field.
+func CommandRetryTimesNEQ(v int) predicate.Console {
+	return predicate.Console(sql.FieldNEQ(FieldCommandRetryTimes, v))
+}
+
+// CommandRetryTimesIn applies the In predicate on the "command_retry_times" field.
+func CommandRetryTimesIn(vs ...int) predicate.Console {
+	return predicate.Console(sql.FieldIn(FieldCommandRetryTimes, vs...))
+}
+
+// CommandRetryTimesNotIn applies the NotIn predicate on the "command_retry_times" field.
+func CommandRetryTimesNotIn(vs ...int) predicate.Console {
+	return predicate.Console(sql.FieldNotIn(FieldCommandRetryTimes, vs...))
+}
+
+// CommandRetryTimesGT applies the GT predicate on the "command_retry_times" field.
+func CommandRetryTimesGT(v int) predicate.Console {
+	return predicate.Console(sql.FieldGT(FieldCommandRetryTimes, v))
+}
+
+// CommandRetryTimesGTE applies the GTE predicate on the "command_retry_times" field.
+func CommandRetryTimesGTE(v int) predicate.Console {
+	return predicate.Console(sql.FieldGTE(FieldCommandRetryTimes, v))
+}
+
+// CommandRetryTimesLT applies the LT predicate on the "command_retry_times" field.
+func CommandRetryTimesLT(v int) predicate.Console {
+	return predicate.Console(sql.FieldLT(FieldCommandRetryTimes, v))
+}
+
+// CommandRetryTimesLTE applies the LTE predicate on the "command_retry_times" field.
+func CommandRetryTimesLTE(v int) predicate.Console {
+	return predicate.Console(sql.FieldLTE(FieldCommandRetryTimes, v))
 }
 
 // HasCabinet applies the HasEdge predicate on the "cabinet" edge.

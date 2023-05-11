@@ -137,7 +137,7 @@ func (h *hub) handleMessage(c *Client, b []byte) {
 		fields = append(fields, log.Binary(b))
 	}
 
-	c.Log(lvl, "收到消息 ↑("+strconv.Itoa(len(b))+" bytes)", fields...)
+	c.Log(lvl, "收到消息 ↑ ("+strconv.Itoa(len(b))+" bytes)", fields...)
 
 	// 注册电柜客户端
 	if serial != "" {
@@ -147,7 +147,7 @@ func (h *hub) handleMessage(c *Client, b []byte) {
 
 	// 如果需要发送消息
 	if res != nil {
-		_ = c.SendMessage(res)
+		_ = c.SendMessage(res, 1)
 	}
 }
 

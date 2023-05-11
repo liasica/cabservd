@@ -247,6 +247,27 @@ func (cu *ConsoleUpdate) ClearRemark() *ConsoleUpdate {
 	return cu
 }
 
+// SetCommandRetryTimes sets the "command_retry_times" field.
+func (cu *ConsoleUpdate) SetCommandRetryTimes(i int) *ConsoleUpdate {
+	cu.mutation.ResetCommandRetryTimes()
+	cu.mutation.SetCommandRetryTimes(i)
+	return cu
+}
+
+// SetNillableCommandRetryTimes sets the "command_retry_times" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableCommandRetryTimes(i *int) *ConsoleUpdate {
+	if i != nil {
+		cu.SetCommandRetryTimes(*i)
+	}
+	return cu
+}
+
+// AddCommandRetryTimes adds i to the "command_retry_times" field.
+func (cu *ConsoleUpdate) AddCommandRetryTimes(i int) *ConsoleUpdate {
+	cu.mutation.AddCommandRetryTimes(i)
+	return cu
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cu *ConsoleUpdate) SetCabinet(c *Cabinet) *ConsoleUpdate {
 	return cu.SetCabinetID(c.ID)
@@ -405,6 +426,12 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.RemarkCleared() {
 		_spec.ClearField(console.FieldRemark, field.TypeString)
+	}
+	if value, ok := cu.mutation.CommandRetryTimes(); ok {
+		_spec.SetField(console.FieldCommandRetryTimes, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedCommandRetryTimes(); ok {
+		_spec.AddField(console.FieldCommandRetryTimes, field.TypeInt, value)
 	}
 	if cu.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -712,6 +739,27 @@ func (cuo *ConsoleUpdateOne) ClearRemark() *ConsoleUpdateOne {
 	return cuo
 }
 
+// SetCommandRetryTimes sets the "command_retry_times" field.
+func (cuo *ConsoleUpdateOne) SetCommandRetryTimes(i int) *ConsoleUpdateOne {
+	cuo.mutation.ResetCommandRetryTimes()
+	cuo.mutation.SetCommandRetryTimes(i)
+	return cuo
+}
+
+// SetNillableCommandRetryTimes sets the "command_retry_times" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableCommandRetryTimes(i *int) *ConsoleUpdateOne {
+	if i != nil {
+		cuo.SetCommandRetryTimes(*i)
+	}
+	return cuo
+}
+
+// AddCommandRetryTimes adds i to the "command_retry_times" field.
+func (cuo *ConsoleUpdateOne) AddCommandRetryTimes(i int) *ConsoleUpdateOne {
+	cuo.mutation.AddCommandRetryTimes(i)
+	return cuo
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cuo *ConsoleUpdateOne) SetCabinet(c *Cabinet) *ConsoleUpdateOne {
 	return cuo.SetCabinetID(c.ID)
@@ -900,6 +948,12 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	}
 	if cuo.mutation.RemarkCleared() {
 		_spec.ClearField(console.FieldRemark, field.TypeString)
+	}
+	if value, ok := cuo.mutation.CommandRetryTimes(); ok {
+		_spec.SetField(console.FieldCommandRetryTimes, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedCommandRetryTimes(); ok {
+		_spec.AddField(console.FieldCommandRetryTimes, field.TypeInt, value)
 	}
 	if cuo.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -11,6 +11,7 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
+
 	"github.com/auroraride/cabservd/internal/core"
 )
 
@@ -39,7 +40,7 @@ var (
 	}
 )
 
-func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int) (err error) {
+func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int, times int) (err error) {
 	v, ok := controlValueMap[typ]
 	if !ok {
 		return adapter.ErrorCabinetControlParam
@@ -68,5 +69,5 @@ func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int) (e
 		return
 	}
 
-	return c.SendMessage(msg)
+	return c.SendMessage(msg, times)
 }
