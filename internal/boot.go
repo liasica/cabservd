@@ -8,13 +8,15 @@ package internal
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"time"
 
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/log"
 	"github.com/auroraride/adapter/maintain"
+	"github.com/go-redis/redis/v9"
+	"github.com/labstack/echo/v4"
+
 	"github.com/auroraride/cabservd/assets"
 	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
@@ -26,8 +28,6 @@ import (
 	"github.com/auroraride/cabservd/internal/router"
 	"github.com/auroraride/cabservd/internal/rpc"
 	"github.com/auroraride/cabservd/internal/sync"
-	"github.com/go-redis/redis/v9"
-	"github.com/labstack/echo/v4"
 )
 
 type HookFunc = func() (core.Hook, codec.Codec)
@@ -51,15 +51,18 @@ func Boot(hf HookFunc) {
 	})
 
 	// 初始化日志
-	log.New(&log.Config{
-		FormatJson: true,
-		Stdout:     g.Config.Debug,
+	lc := &log.Config{
+		FormatJson: !g.Config.LoggerDebug,
+		Stdout:     g.Config.LoggerDebug,
 		LoggerName: g.Config.LoggerName,
 		NoCaller:   true,
-		Writers: []io.Writer{
-			log.NewRedisWriter(g.Redis),
-		},
-	})
+	}
+
+	if !g.Config.LoggerDebug {
+		lc.Writers = append(lc.Writers, log.NewRedisWriter(g.Redis))
+	}
+
+	log.New(lc)
 
 	// 加载模板
 	assets.LoadTemplates()

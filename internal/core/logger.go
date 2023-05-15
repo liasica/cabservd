@@ -15,10 +15,10 @@ import (
 func (c *Client) logPrefix() (str string) {
 	defer func() {
 		if v := recover(); v != nil {
-			zap.L().WithOptions(zap.WithCaller(false)).Error("捕获错误", zap.Error(fmt.Errorf("%v", v)))
+			zap.L().WithOptions(zap.WithCaller(false)).Error("捕获错误", zap.Error(fmt.Errorf("%v", v)), zap.Stack("stack"))
 		}
 	}()
-	str = "[" + c.Conn.RemoteAddr().String() + "(" + c.Serial + ")" + "] "
+	str = "[" + c.address.String() + "(" + c.Serial + ")" + "] "
 	return
 }
 

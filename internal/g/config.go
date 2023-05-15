@@ -11,6 +11,7 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/maintain"
+
 	"github.com/auroraride/cabservd/assets"
 )
 
@@ -19,7 +20,7 @@ type config struct {
 
 	Brand        adapter.CabinetBrand
 	Maintain     maintain.Config
-	Debug        bool
+	LoggerDebug  bool
 	DeadDuration int  `koanf:"dead-duration"` // 离线判定时间
 	NonBms       bool `koanf:"non-bms"`       // 是否不包含bms通讯
 	Postgres     struct {

@@ -12,6 +12,8 @@ import (
 
 type (
 	Hook interface {
+		Protocol() Protocol
+
 		// OnConnect 连接接口
 		OnConnect(c *Client)
 
@@ -30,6 +32,10 @@ type (
 
 	Bean struct{}
 )
+
+func (h *Bean) Protocol() Protocol {
+	return ProtocolTcp
+}
 
 func (h *Bean) OnConnect(*Client) {
 	return

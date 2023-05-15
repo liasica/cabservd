@@ -7,6 +7,7 @@ package core
 
 import (
 	"context"
+	"net"
 	"strconv"
 	"time"
 
@@ -31,20 +32,26 @@ type Client struct {
 
 	// 上次接收消息时间
 	dead *time.Timer
+
+	address net.Addr
 }
 
 func NewClient(conn gnet.Conn, h *hub) *Client {
 	c := &Client{
-		Conn: conn,
-		Hub:  h,
+		Conn:    conn,
+		Hub:     h,
+		address: conn.RemoteAddr(),
 	}
-	var dd time.Duration = 20
-	if g.Config.DeadDuration > 0 {
-		dd = time.Duration(g.Config.DeadDuration)
+
+	if h.Bean.Protocol().Tcp() {
+		var dd time.Duration = 20
+		if g.Config.DeadDuration > 0 {
+			dd = time.Duration(g.Config.DeadDuration)
+		}
+		c.dead = time.AfterFunc(dd*time.Minute, func() {
+			_ = c.Conn.Close()
+		})
 	}
-	c.dead = time.AfterFunc(dd*time.Minute, func() {
-		_ = c.Conn.Close()
-	})
 	return c
 }
 
@@ -89,7 +96,7 @@ func (c *Client) Offline() {
 	_ = ent.Database.Cabinet.Update().Where(cabinet.Serial(c.Serial)).SetOnline(false).Exec(context.Background())
 }
 
-// UpdateOnline 更新电柜离线时间
-func (c *Client) UpdateOnline() {
+// UpdateDead 更新电柜离线判定
+func (c *Client) UpdateDead() {
 	c.dead.Reset(20 * time.Minute)
 }

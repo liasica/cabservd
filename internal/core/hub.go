@@ -51,7 +51,10 @@ func (h *hub) OnBoot(_ gnet.Engine) (action gnet.Action) {
 
 func (h *hub) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 	c := NewClient(conn, h)
-	c.Info("新增客户端连接")
+
+	if h.Bean.Protocol().Tcp() {
+		c.Info("新增客户端连接")
+	}
 
 	h.Bean.OnConnect(c)
 
@@ -61,9 +64,14 @@ func (h *hub) OnOpen(conn gnet.Conn) (out []byte, action gnet.Action) {
 }
 
 func (h *hub) OnClose(conn gnet.Conn, err error) (action gnet.Action) {
+	// http服务端直接返回关闭, 无须进行客户端在线维护
+	if h.Bean.Protocol().Http() {
+		return gnet.Close
+	}
+
 	// 获取客户端
 	c, ok := conn.Context().(*Client)
-	// 关闭客户端
+	// 手动关闭客户端并标记离线
 	if ok {
 		c.Info("客户端断开连接", zap.Error(err))
 		// 停止计时
@@ -121,8 +129,10 @@ func (h *hub) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 }
 
 func (h *hub) handleMessage(c *Client, b []byte) {
-	// 更新在线状态
-	go c.UpdateOnline()
+	// TCP需要更新电柜离线判定
+	if h.Bean.Protocol().Tcp() {
+		go c.UpdateDead()
+	}
 
 	// 解析数据
 	serial, res, fields, err := h.Bean.OnMessage(c, b)
@@ -148,6 +158,11 @@ func (h *hub) handleMessage(c *Client, b []byte) {
 	// 如果需要发送消息
 	if res != nil {
 		_ = c.SendMessage(res, 1)
+	}
+
+	// 如果是http链接, 处理完成后需要关闭客户端
+	if h.Bean.Protocol().Http() {
+		_ = c.Conn.Close()
 	}
 }
 
