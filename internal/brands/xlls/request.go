@@ -9,7 +9,6 @@ import (
 	"crypto/hmac"
 	"crypto/sha1"
 	"encoding/base64"
-	"fmt"
 	"strconv"
 	"strings"
 	"time"
@@ -72,10 +71,10 @@ func doRequest[T any](path string, biz any) (result *T, err error) {
 		SetBody(args).
 		SetResult(result).
 		Post(baseURL + path)
-	ti := resp.Request.TraceInfo()
-	fmt.Println("Trace Info:", ti)
 	if err != nil {
-		zap.L().Error("西六楼电柜请求失败", zap.Error(err), zap.String("path", path), zap.ByteString("raw", resp.Body()))
+		zap.L().Error("请求失败", zap.Error(err), zap.String("path", path), zap.ByteString("raw", resp.Body()))
+		return
 	}
+	zap.L().Info("请求成功", zap.String("path", path), zap.ByteString("raw", resp.Body()))
 	return
 }

@@ -33,8 +33,5 @@ func New() (h core.Hook, c codec.Codec) {
 	}
 
 	h = &xlls{}
-
-	// TODO DEMO
-	_, _ = doRequest[Response[[]BusinessAttr]]("/openapi/cabinet/business/attr", map[string][]string{"snList": {"test-shiguangju-001"}})
 	return
 }
