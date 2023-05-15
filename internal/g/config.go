@@ -11,6 +11,7 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/maintain"
+
 	"github.com/auroraride/cabservd/assets"
 )
 

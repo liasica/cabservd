@@ -8,6 +8,7 @@ package yundong
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 
 	"github.com/auroraride/adapter"
 	"github.com/panjf2000/gnet/v2"
@@ -25,7 +26,11 @@ func NewCodec() *Codec {
 	}
 }
 
-func (codec *Codec) Decode(conn gnet.Conn) (data []byte, err error) {
+func (codec *Codec) Decode(input any) (data []byte, err error) {
+	conn, ok := input.(gnet.Conn)
+	if !ok {
+		return nil, errors.New("输入错误")
+	}
 	buf, _ := conn.Peek(codec.headerSize)
 	if len(buf) < codec.headerSize {
 		return nil, adapter.ErrorIncompletePacket
@@ -51,9 +56,10 @@ func (codec *Codec) Decode(conn gnet.Conn) (data []byte, err error) {
 	return
 }
 
-func (codec *Codec) Encode(b []byte) []byte {
+func (codec *Codec) Encode(input any) []byte {
 	// buf := adapter.NewBuffer()
 	// defer adapter.ReleaseBuffer(buf)
+	b := input.([]byte)
 	buf := bytes.Buffer{}
 	buf.Write(codec.pkgStart)
 

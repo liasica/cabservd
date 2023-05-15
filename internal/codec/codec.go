@@ -8,6 +8,7 @@ package codec
 import (
 	"bytes"
 	"encoding/binary"
+	"errors"
 
 	"github.com/auroraride/adapter"
 	"github.com/panjf2000/gnet/v2"
@@ -19,25 +20,30 @@ const (
 )
 
 type Codec interface {
-	Decode(conn gnet.Conn) (b []byte, err error)
-	Encode(data []byte) (b []byte)
+	Decode(input any) (b []byte, err error)
+	Encode(input any) (b []byte)
 }
 
 type Default struct {
 }
 
-func (codec *Default) Decode(conn gnet.Conn) (b []byte, err error) {
-	return conn.Next(-1)
+func (codec *Default) Decode(input any) (b []byte, err error) {
+	return input.(gnet.Conn).Next(-1)
 }
 
-func (codec *Default) Encode(message []byte) []byte {
-	return message
+func (codec *Default) Encode(input any) []byte {
+	b := input.([]byte)
+	return b
 }
 
 // Linebreak 以\n为分割处理
 type Linebreak struct{}
 
-func (codec *Linebreak) Decode(conn gnet.Conn) (b []byte, err error) {
+func (codec *Linebreak) Decode(input any) (b []byte, err error) {
+	conn, ok := input.(gnet.Conn)
+	if !ok {
+		return nil, errors.New("输入错误")
+	}
 	b, err = conn.Peek(-1)
 	if err != nil {
 		return nil, err
@@ -54,14 +60,19 @@ func (codec *Linebreak) Decode(conn gnet.Conn) (b []byte, err error) {
 	return
 }
 
-func (codec *Linebreak) Encode(message []byte) []byte {
-	return append(message, adapter.Newline...)
+func (codec *Linebreak) Encode(input any) []byte {
+	b := input.([]byte)
+	return append(b, adapter.Newline...)
 }
 
 // HeaderLength 以头部4字节定义
 type HeaderLength struct{}
 
-func (codec *HeaderLength) Decode(conn gnet.Conn) ([]byte, error) {
+func (codec *HeaderLength) Decode(input any) ([]byte, error) {
+	conn, ok := input.(gnet.Conn)
+	if !ok {
+		return nil, errors.New("输入错误")
+	}
 	buf, _ := conn.Peek(bodySize)
 	if len(buf) < bodySize {
 		return nil, adapter.ErrorIncompletePacket
@@ -78,13 +89,14 @@ func (codec *HeaderLength) Decode(conn gnet.Conn) ([]byte, error) {
 	return bytes.TrimSpace(bytes.Replace(buf[bodySize:msgLen], adapter.Newline, nil, -1)), nil
 }
 
-func (codec *HeaderLength) Encode(message []byte) []byte {
-	msgLen := bodySize + len(message)
+func (codec *HeaderLength) Encode(input any) []byte {
+	b := input.([]byte)
+	msgLen := bodySize + len(b)
 
 	data := make([]byte, msgLen)
 
-	binary.BigEndian.PutUint32(data[:bodySize], uint32(len(message)))
-	copy(data[bodySize:msgLen], message)
+	binary.BigEndian.PutUint32(data[:bodySize], uint32(len(b)))
+	copy(data[bodySize:msgLen], b)
 
 	return data
 }
