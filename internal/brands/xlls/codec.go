@@ -14,9 +14,7 @@ import (
 )
 
 type signer struct {
-	appID     string
-	appSecret string
-	parser    *wildcat.HTTPParser
+	parser *wildcat.HTTPParser
 }
 
 func (codec *signer) Decode(conn gnet.Conn) (b []byte, err error) {

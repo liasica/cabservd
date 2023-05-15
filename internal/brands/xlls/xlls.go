@@ -13,16 +13,28 @@ import (
 	"github.com/auroraride/cabservd/internal/core"
 )
 
+var (
+	appID     string
+	appSecret []byte
+	baseURL   string
+	version   string
+)
+
 func New() (h core.Hook, c codec.Codec) {
 	conf := adapter.GetKoanf()
+
+	appID = conf.Get("xiliulou.appId").(string)
+	appSecret = []byte(conf.Get("xiliulou.appSecret").(string))
+	baseURL = conf.Get("xiliulou.server").(string)
+	version = conf.Get("xiliulou.version").(string)
+
 	c = &signer{
-		appID:     conf.Get("xiliulou.appId").(string),
-		appSecret: conf.Get("xiliulou.appSecret").(string),
-		parser:    wildcat.NewHTTPParser(),
+		parser: wildcat.NewHTTPParser(),
 	}
-	h = &handler{
-		server:  conf.Get("xiliulou.server").(string),
-		version: conf.Get("xiliulou.version").(string),
-	}
+
+	h = &xlls{}
+
+	// TODO DEMO
+	_, _ = doRequest[Response[[]BusinessAttr]]("/openapi/cabinet/business/attr", map[string][]string{"snList": {"test-shiguangju-001"}})
 	return
 }

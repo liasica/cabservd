@@ -12,27 +12,25 @@ import (
 	"github.com/auroraride/cabservd/internal/core"
 )
 
-type handler struct {
-	server  string
-	version string
+type xlls struct {
 }
 
-func (h *handler) Protocol() core.Protocol {
+func (x *xlls) Protocol() core.Protocol {
 	return core.ProtocolHttp
 }
 
-func (h *handler) OnConnect(c *core.Client) {
+func (x *xlls) OnConnect(c *core.Client) {
 
 }
 
-func (h *handler) OnMessage(_ *core.Client, b []byte) (serial string, _ core.ResponseMessenger, fields []zap.Field, err error) {
+func (x *xlls) OnMessage(_ *core.Client, b []byte) (serial string, _ core.ResponseMessenger, fields []zap.Field, err error) {
 	return
 }
 
-func (h *handler) SendOperate(_ string, _ cabdef.Operate, _ int, _ int) (err error) {
+func (x *xlls) SendOperate(_ string, _ cabdef.Operate, _ int, _ int) (err error) {
 	return
 }
 
-func (h *handler) GetEmptyDeviation() (voltage, current float64) {
+func (x *xlls) GetEmptyDeviation() (voltage, current float64) {
 	return
 }
