@@ -5,20 +5,37 @@
 
 package xlls
 
-// Response 平台响应
-type Response[T any] struct {
-	Code      int    `json:"code,omitempty"`
-	RequestID string `json:"requestID,omitempty"`
+import (
+	jsoniter "github.com/json-iterator/go"
+	"go.uber.org/zap"
+
+	"github.com/auroraride/cabservd/internal/codec"
+)
+
+// ApiResponse 平台响应
+type ApiResponse[T any] struct {
+	Code      int    `json:"code"`
+	RequestID string `json:"requestID"`
 	ErrCode   string `json:"errCode,omitempty"`
 	ErrMsg    string `json:"errMsg,omitempty"`
 	Data      T      `json:"data,omitempty"`
-	SysTime   int64  `json:"sysTime,omitempty"`
+	SysTime   int64  `json:"sysTime"`
 }
 
 // NotifyResponse 回调响应
-type NotifyResponse struct {
-	Code      int    `json:"code,omitempty"`
-	RequestID string `json:"requestID,omitempty"`
+type NotifyResponse[T any] struct {
+	Code      int    `json:"code"`
+	RequestID string `json:"requestID"`
 	ErrorMsg  string `json:"errorMsg,omitempty"`
-	Data      string `json:"data,omitempty"`
+	Data      T      `json:"data,omitempty"`
+}
+
+func (r *NotifyResponse[T]) Bytes() []byte {
+	b, _ := jsoniter.Marshal(r)
+	return b
+}
+
+func (r *NotifyResponse[T]) GetMessage(c codec.Codec) ([]byte, []zap.Field) {
+	b := r.Bytes()
+	return c.Encode(b), []zap.Field{zap.ByteString("data", b)}
 }

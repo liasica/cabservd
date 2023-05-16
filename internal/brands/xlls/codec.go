@@ -6,7 +6,8 @@
 package xlls
 
 import (
-	"fmt"
+	"errors"
+	"net/http"
 
 	"github.com/auroraride/adapter"
 	"github.com/evanphx/wildcat"
@@ -30,6 +31,15 @@ func (codec *signer) Decode(conn gnet.Conn) (b []byte, err error) {
 		return
 	}
 
+	// 是否POST
+	method := adapter.ConvertBytes2String(codec.parser.Method)
+	if method != allowMethod {
+		_, _ = conn.Write(httpResponseRaw(http.StatusMethodNotAllowed, nil))
+		_ = conn.Close()
+		err = errors.New("请求方式未被允许: " + method)
+		return
+	}
+
 	// 获取消息体长度
 	bodyLen := int(codec.parser.ContentLength())
 	// 未获取到消息体长度, 返回继续缓存消息
@@ -45,21 +55,14 @@ func (codec *signer) Decode(conn gnet.Conn) (b []byte, err error) {
 		return nil, adapter.ErrorIncompletePacket
 	}
 
-	path := string(codec.parser.Path)
-	fmt.Println(path)
-
-	b = buf[offset:n]
+	// 消息体前4位存放path信息
+	b = append(codec.parser.Path, buf[offset:n]...)
 
 	_, _ = conn.Discard(n)
 
-	// var res []byte
-	// res = append(res, "HTTP/1.1 200 OK\r\nServer: gnet\r\nContent-Type: text/plain\r\nDate: "...)
-	// res = time.Now().AppendFormat(res, "Mon, 02 Jan 2006 15:04:05 GMT")
-	// res = append(res, "\r\nContent-Length: 12\r\n\r\nHello World!"...)
-	// _, _ = conn.Write(res)
 	return
 }
 
 func (codec *signer) Encode(data []byte) (b []byte) {
-	return
+	return httpResponseRaw(http.StatusOK, data)
 }
