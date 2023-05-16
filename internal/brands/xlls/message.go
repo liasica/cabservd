@@ -9,10 +9,10 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 
-	"github.com/auroraride/cabservd/internal/codec"
+	"github.com/auroraride/cabservd/internal/core"
 )
 
-// ApiResponse 平台响应
+// ApiResponse 接口响应, 西六楼 -> 平台
 type ApiResponse[T any] struct {
 	Code      int    `json:"code"`
 	RequestID string `json:"requestID"`
@@ -22,20 +22,29 @@ type ApiResponse[T any] struct {
 	SysTime   int64  `json:"sysTime"`
 }
 
-// NotifyResponse 回调响应
-type NotifyResponse[T any] struct {
+// NotifyResult 回调响应, 平台 -> 西六楼
+type NotifyResult[T any] struct {
 	Code      int    `json:"code"`
 	RequestID string `json:"requestID"`
 	ErrorMsg  string `json:"errorMsg,omitempty"`
 	Data      T      `json:"data,omitempty"`
 }
 
-func (r *NotifyResponse[T]) Bytes() []byte {
+func (r *NotifyResult[T]) Bytes() []byte {
 	b, _ := jsoniter.Marshal(r)
 	return b
 }
 
-func (r *NotifyResponse[T]) GetMessage(c codec.Codec) ([]byte, []zap.Field) {
+func (r *NotifyResult[T]) GetMessage(c core.Codec) ([]byte, []zap.Field) {
 	b := r.Bytes()
 	return c.Encode(b), []zap.Field{zap.ByteString("data", b)}
+}
+
+// CommandResponse 硬件操作结果, 西六楼 -> 平台
+type CommandResponse[T any] struct {
+	Command   string `json:"command"`        // 指令
+	RequestID string `json:"requestID"`      // 每次调用硬件操作接口使用的requestId
+	Result    int    `json:"result"`         // 0--成功 1--失败
+	Code      string `json:"code,omitempty"` // 错误编号
+	Data      T      `json:"data,omitempty"` // 结果
 }

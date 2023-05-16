@@ -5,9 +5,20 @@
 
 package xlls
 
+import (
+	jsoniter "github.com/json-iterator/go"
+	"go.uber.org/zap/zapcore"
+)
+
 // SnListRequest 批量sn请求
 type SnListRequest struct {
 	SnList []string `json:"snList"`
+}
+
+func (a *SnListRequest) MarshalLogObject(enc zapcore.ObjectEncoder) error {
+	b, _ := jsoniter.Marshal(a)
+	enc.AddByteString("snList", b)
+	return nil
 }
 
 // CabinetModelCreateRequest 批量创建柜机型号

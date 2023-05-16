@@ -6,7 +6,12 @@
 package xlls
 
 import (
+	"fmt"
+
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/auroraride/adapter/log"
+	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 
 	"github.com/auroraride/cabservd/internal/core"
@@ -23,7 +28,42 @@ func (x *xlls) OnConnect(c *core.Client) {
 
 }
 
-func (x *xlls) OnMessage(_ *core.Client, b []byte) (serial string, _ core.ResponseMessenger, fields []zap.Field, err error) {
+func (x *xlls) OnMessage(_ *core.Client, b []byte) (serial string, res core.ResponseMessenger, fields []zap.Field, err error) {
+	defer func() {
+		if v := recover(); v != nil {
+			err = fmt.Errorf("%v", v)
+		}
+	}()
+
+	var payload any
+
+	// 获取path
+	path := adapter.ConvertBytes2String(b[:4])
+
+	// {"cellNo":8,"doorStatus":1,"indicatorLightStatus":0}
+	// {"voltage":234.4,"current":0.9,"fanStatus":0,"cVersion":"1.18"}
+
+	switch path {
+	case pathHardwareOperation:
+	case pathBusinesss:
+	case pathOfflineExchange:
+	case pathCellChange:
+		payload = new(CellAttr)
+	case pathBatteryChange:
+	case pathCabinetChange:
+		payload = new(PhysicsAttr)
+	case pathHardwareFault:
+	case pathSelfServiceOpen:
+	}
+
+	// 获取数据并解析
+	err = jsoniter.Unmarshal(b[4:], payload)
+
+	fields = []zap.Field{
+		zap.String("path", path),
+		log.Payload(payload),
+	}
+
 	return
 }
 
