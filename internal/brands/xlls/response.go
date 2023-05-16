@@ -18,7 +18,7 @@ type Response struct {
 	Data   any
 }
 
-var resNewline = []byte("\n")
+var resNewline = []byte("\r\n")
 
 func httpResponseRaw(code int, data []byte) []byte {
 	buf := adapter.NewBuffer()
@@ -36,8 +36,11 @@ func httpResponseRaw(code int, data []byte) []byte {
 	buf.WriteString("Content-Type: application/json; charset=UTF-8")
 	buf.Write(resNewline)
 
+	buf.WriteString("Connection: close")
+	buf.Write(resNewline)
+
 	buf.WriteString("Date: ")
-	buf.WriteString(time.Now().Format("Mon, 02 Jan 2006 15:04:05 GMT"))
+	buf.WriteString(time.Now().UTC().Format(http.TimeFormat))
 	buf.Write(resNewline)
 
 	buf.WriteString("Content-Length: ")

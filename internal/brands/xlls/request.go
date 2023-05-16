@@ -15,7 +15,6 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/go-resty/resty/v2"
-	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 )
@@ -40,7 +39,7 @@ func newRequest(biz any) (args *Request) {
 	args = &Request{
 		Version:   version,
 		Timestamp: time.Now().UnixMilli(),
-		RequestId: uuid.New().String(),
+		RequestId: generateRequestID(),
 		AppId:     appID,
 	}
 	switch v := biz.(type) {

@@ -161,6 +161,7 @@ func (h *hub) handleMessage(c *Client, b []byte) {
 
 	// 如果是http链接, 处理完成后需要关闭客户端
 	if h.Bean.Protocol().Http() {
+		_ = c.Conn.Flush()
 		_ = c.Conn.Close()
 	}
 }

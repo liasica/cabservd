@@ -6,6 +6,7 @@
 package xlls
 
 import (
+	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
 
@@ -47,4 +48,8 @@ type CommandResponse[T any] struct {
 	Result    int    `json:"result"`         // 0--成功 1--失败
 	Code      string `json:"code,omitempty"` // 错误编号
 	Data      T      `json:"data,omitempty"` // 结果
+}
+
+func generateRequestID() string {
+	return uuid.New().String()
 }
