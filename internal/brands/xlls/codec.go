@@ -11,15 +11,16 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/evanphx/wildcat"
-	"github.com/panjf2000/gnet/v2"
+
+	"github.com/auroraride/cabservd/internal/core"
 )
 
 type signer struct {
 	parser *wildcat.HTTPParser
 }
 
-func (codec *signer) Decode(conn gnet.Conn) (b []byte, err error) {
-	buf, _ := conn.Peek(-1)
+func (codec *signer) Decode(c *core.Client) (b []byte, err error) {
+	buf, _ := c.Peek(-1)
 
 	var offset int
 	offset, err = codec.parser.Parse(buf)
@@ -31,11 +32,19 @@ func (codec *signer) Decode(conn gnet.Conn) (b []byte, err error) {
 		return
 	}
 
+	realIP := codec.parser.FindHeader(headerXRealIP)
+	if realIP == nil {
+		realIP = codec.parser.FindHeader(headerXForwardedFor)
+	}
+	if realIP != nil {
+		c.SetIP(adapter.ConvertBytes2String(realIP))
+	}
+
 	// 是否POST
 	method := adapter.ConvertBytes2String(codec.parser.Method)
 	if method != allowMethod {
-		_, _ = conn.Write(httpResponseRaw(http.StatusMethodNotAllowed, nil))
-		_ = conn.Close()
+		_, _ = c.Write(httpResponseRaw(http.StatusMethodNotAllowed, nil))
+		_ = c.Close()
 		err = errors.New("请求方式未被允许: " + method)
 		return
 	}
@@ -51,14 +60,14 @@ func (codec *signer) Decode(conn gnet.Conn) (b []byte, err error) {
 	n := bodyLen + offset
 
 	// 若已缓存消息长度小于需要长度, 返回错误: 消息未接收完成, 继续缓存消息
-	if conn.InboundBuffered() < n {
+	if c.InboundBuffered() < n {
 		return nil, adapter.ErrorIncompletePacket
 	}
 
 	// 消息体前4位存放path信息
 	b = append(codec.parser.Path, buf[offset:n]...)
 
-	_, _ = conn.Discard(n)
+	_, _ = c.Discard(n)
 
 	return
 }

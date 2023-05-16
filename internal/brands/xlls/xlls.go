@@ -9,7 +9,6 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/evanphx/wildcat"
 
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
 )
 
@@ -20,7 +19,7 @@ var (
 	version   string
 )
 
-func New() (h core.Hook, c codec.Codec) {
+func New() (h core.Hook, c core.Codec) {
 	conf := adapter.GetKoanf()
 
 	appID = conf.Get("xiliulou.appId").(string)

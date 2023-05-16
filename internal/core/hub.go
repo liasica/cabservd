@@ -14,7 +14,6 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/log"
 
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/g"
 
 	"github.com/panjf2000/gnet/v2"
@@ -36,7 +35,7 @@ type hub struct {
 	Bean Hook
 
 	// 编码协议
-	codec codec.Codec
+	codec Codec
 
 	// 在线的客户端
 	// serial => *Client
@@ -102,7 +101,7 @@ func (h *hub) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 	)
 
 	for {
-		b, err = h.codec.Decode(conn)
+		b, err = h.codec.Decode(c)
 
 		if len(b) > 0 {
 			if os.Getenv("LOCAL_DEV") == "true" {

@@ -15,7 +15,6 @@ import (
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/g"
@@ -33,14 +32,14 @@ type Client struct {
 	// 上次接收消息时间
 	dead *time.Timer
 
-	address net.Addr
+	address *net.TCPAddr
 }
 
 func NewClient(conn gnet.Conn, h *hub) *Client {
 	c := &Client{
 		Conn:    conn,
 		Hub:     h,
-		address: conn.RemoteAddr(),
+		address: conn.RemoteAddr().(*net.TCPAddr),
 	}
 
 	if h.Bean.Protocol().Tcp() {
@@ -55,8 +54,15 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
 	return c
 }
 
+func (c *Client) SetIP(ip string) {
+	if ip == "" {
+		return
+	}
+	c.address.IP = net.ParseIP(ip)
+}
+
 type ResponseMessenger interface {
-	GetMessage(c codec.Codec) ([]byte, []zap.Field)
+	GetMessage(c Codec) ([]byte, []zap.Field)
 }
 
 // SendMessage 向客户端发送消息

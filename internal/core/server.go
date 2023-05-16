@@ -8,11 +8,9 @@ package core
 import (
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
-
-	"github.com/auroraride/cabservd/internal/codec"
 )
 
-func Start(addr string, bean Hook, codec codec.Codec, options ...Option) {
+func Start(addr string, bean Hook, codec Codec, options ...Option) {
 	Hub = &hub{
 		addr:  addr,
 		Bean:  bean,

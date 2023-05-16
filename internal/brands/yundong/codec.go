@@ -10,7 +10,8 @@ import (
 	"encoding/binary"
 
 	"github.com/auroraride/adapter"
-	"github.com/panjf2000/gnet/v2"
+
+	"github.com/auroraride/cabservd/internal/core"
 )
 
 type Codec struct {
@@ -25,8 +26,8 @@ func NewCodec() *Codec {
 	}
 }
 
-func (codec *Codec) Decode(conn gnet.Conn) (data []byte, err error) {
-	buf, _ := conn.Peek(codec.headerSize)
+func (codec *Codec) Decode(c *core.Client) (data []byte, err error) {
+	buf, _ := c.Peek(codec.headerSize)
 	if len(buf) < codec.headerSize {
 		return nil, adapter.ErrorIncompletePacket
 	}
@@ -37,11 +38,11 @@ func (codec *Codec) Decode(conn gnet.Conn) (data []byte, err error) {
 
 	bodyLen := int(binary.BigEndian.Uint16(buf[4:]))
 	msgLen := codec.headerSize + bodyLen
-	if conn.InboundBuffered() < msgLen {
+	if c.InboundBuffered() < msgLen {
 		return nil, adapter.ErrorIncompletePacket
 	}
-	buf, _ = conn.Peek(msgLen)
-	_, _ = conn.Discard(msgLen)
+	buf, _ = c.Peek(msgLen)
+	_, _ = c.Discard(msgLen)
 
 	data = make([]byte, 2+bodyLen)
 	data[0] = buf[2]

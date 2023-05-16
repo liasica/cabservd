@@ -18,7 +18,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/auroraride/cabservd/assets"
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/demo"
 	"github.com/auroraride/cabservd/internal/ent"
@@ -30,7 +29,7 @@ import (
 	"github.com/auroraride/cabservd/internal/sync"
 )
 
-type HookFunc = func() (core.Hook, codec.Codec)
+type HookFunc = func() (core.Hook, core.Codec)
 
 func Boot(hf HookFunc) {
 	ctx := context.Background()

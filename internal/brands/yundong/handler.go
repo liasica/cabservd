@@ -18,7 +18,6 @@ import (
 	"github.com/auroraride/adapter/log"
 	"go.uber.org/zap"
 
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/g"
 )
@@ -36,7 +35,7 @@ type Server struct {
 	Address []byte
 }
 
-func New() (core.Hook, codec.Codec) {
+func New() (core.Hook, core.Codec) {
 	ip := net.ParseIP("39.106.77.239")
 	arr := strings.Split(g.Config.Tcp.Bind, ":")
 	port, _ := strconv.ParseUint(arr[1], 10, 64)

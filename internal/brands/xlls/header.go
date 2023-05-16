@@ -5,9 +5,9 @@
 
 package xlls
 
-var allowMethod = "POST" // POST
+const allowMethod = "POST" // POST
 
-var (
+const (
 	pathHardwareOperation = "/hop" // 硬件操作结果通知
 	pathBusinesss         = "/biz" // 业务结果通知
 	pathOfflineExchange   = "/oex" // 离线换电结果通知
@@ -16,4 +16,9 @@ var (
 	pathCabinetChange     = "/cab" // 柜机状态变化通知
 	pathHardwareFault     = "/hfl" // 硬件故障通知
 	pathSelfServiceOpen   = "/sso" // 自助开仓回调通知
+)
+
+var (
+	headerXRealIP       = []byte("X-Real-IP")
+	headerXForwardedFor = []byte("X-Forwarded-For")
 )
