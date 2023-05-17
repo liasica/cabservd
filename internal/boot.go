@@ -15,6 +15,9 @@ import (
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/log"
 	"github.com/auroraride/adapter/maintain"
+	"github.com/go-redis/redis/v9"
+	"github.com/labstack/echo/v4"
+
 	"github.com/auroraride/cabservd/assets"
 	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
@@ -26,8 +29,6 @@ import (
 	"github.com/auroraride/cabservd/internal/router"
 	"github.com/auroraride/cabservd/internal/rpc"
 	"github.com/auroraride/cabservd/internal/sync"
-	"github.com/go-redis/redis/v9"
-	"github.com/labstack/echo/v4"
 )
 
 type HookFunc = func() (core.Hook, codec.Codec)

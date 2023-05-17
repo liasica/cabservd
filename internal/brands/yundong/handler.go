@@ -66,13 +66,6 @@ func New() (core.Hook, codec.Codec) {
 	}, NewCodec()
 }
 
-// GetEmptyDeviation TODO 后续做在数据库中
-func (h *Handler) GetEmptyDeviation() (voltage, current float64) {
-	voltage = 45
-	current = -1
-	return
-}
-
 func (h *Handler) OnMessage(c *core.Client, data []byte) (serial string, res core.ResponseMessenger, fields []zap.Field, err error) {
 	var (
 		decoded string

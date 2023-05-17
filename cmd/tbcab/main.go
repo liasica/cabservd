@@ -9,10 +9,16 @@ import (
 	"github.com/auroraride/cabservd/internal"
 	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
+	"github.com/auroraride/cabservd/internal/g"
 	"github.com/auroraride/cabservd/internal/tower"
 )
 
 func main() {
+	// 设定变量
+	g.Fakevoltage = 40
+	g.AutoResetWithoutBatterySN = true
+	g.CalculateMonVoltage = true
+
 	internal.Boot(
 		func() (core.Hook, codec.Codec) {
 			return tower.New(
@@ -26,8 +32,6 @@ func main() {
 						ControlRequest:  500,
 						ControlResponse: 501,
 					}),
-					tower.WithAutoResetBattery(true),
-					tower.WithCalculateMonVoltage(true),
 				),
 				&codec.Linebreak{}
 		},

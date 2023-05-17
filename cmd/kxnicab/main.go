@@ -14,5 +14,6 @@ import (
 func main() {
 	g.ExchangeFirstStepRetryTimes = 3
 	g.ExchangeThirdStepRetryTimes = 3
+
 	internal.Boot(kaixin.NewNonIntelligent)
 }

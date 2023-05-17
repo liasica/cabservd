@@ -67,8 +67,6 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	// TODO 是否有必要操作之前验证当前状态, 操作值 等于 当前状态时直接返回成功
 	// TODO 其他详细日志
 
-	fakevoltage, _ := core.Hub.Bean.GetEmptyDeviation()
-
 	// 操作超时时间
 	timeout := time.After(time.Duration(bo.Timeout) * time.Second)
 
@@ -143,10 +141,10 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 					batteryOk = true
 				case cabdef.DetectBatteryPutin:
 					// 严格检测电池是否放入
-					batteryOk = x.IsStrictHasBattery(fakevoltage)
+					batteryOk = x.IsStrictHasBattery(g.Fakevoltage)
 				case cabdef.DetectBatteryPutout:
 					// 检测电池是否取出
-					batteryOk = x.IsLooseNoBattery(fakevoltage)
+					batteryOk = x.IsLooseNoBattery(g.Fakevoltage)
 				}
 
 				switch step.Bin {

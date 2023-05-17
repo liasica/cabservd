@@ -13,7 +13,6 @@ import (
 	"github.com/auroraride/adapter/app"
 	"go.uber.org/zap"
 
-	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -115,8 +114,6 @@ func (s *cabinetService) OperableX(serial string) *ent.Cabinet {
 // minfull 指定最小满电仓位
 // minempty 指定最小空仓位
 func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float64, minbattery, minempty int) (fully, empty *ent.Bin, err error) {
-	fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
-
 	var batteries, emptynum int
 
 	for _, item := range cab.Edges.Bins {
@@ -146,7 +143,7 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
 
 		// 判定是否可以满足业务
 		switch true {
-		case item.IsStrictHasBattery(fakevoltage):
+		case item.IsStrictHasBattery(g.Fakevoltage):
 			// 严格判定是否有电池
 			batteries += 1
 			// 若有电池
@@ -160,7 +157,7 @@ func (s *cabinetService) BusinessInfo(bm string, cab *ent.Cabinet, minsoc float6
 				// 增加逻辑: 仅在标定满电电量相等时判定电压大小 -- 2023年05月10日12:47:22
 				fully = item
 			}
-		case item.IsStrictNoBattery(fakevoltage, fakecurrent):
+		case item.IsStrictNoBattery(g.Fakevoltage, g.Fakecurrent):
 			// 严格判定是否无电池
 			emptynum += 1
 			// 若无电池

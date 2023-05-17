@@ -5,6 +5,12 @@
 
 package g
 
+// 获取空仓忽略电压和电流 (空仓的时候有可能会有一定的电压和电流)
+var (
+	Fakevoltage float64 = 40 // 默认为40V虚拟电压
+	Fakecurrent float64 = -1 // 值为-1的时候默认不检测
+)
+
 var (
 	BatteryReign                bool // 是否有电池在位检测
 	AutoResetWithoutBatterySN   bool // 当电池编号不存在的时候是否自动清除电池信息 (soc / soh / current / voltage)

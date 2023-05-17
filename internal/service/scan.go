@@ -12,11 +12,13 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/defs/cabdef"
-	"github.com/auroraride/cabservd/internal/core"
+
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/ent/scan"
+	"github.com/auroraride/cabservd/internal/g"
+
 	"github.com/google/uuid"
 )
 
@@ -86,9 +88,8 @@ func (s *scanService) ExchangeAbleX(sc *ent.Scan, minsoc float64) {
 	}
 
 	// 验证是否可以换电
-	fakevoltage, fakecurrent := core.Hub.Bean.GetEmptyDeviation()
 	for _, b := range bins {
-		if !b.BusinessPossible(b.ID == data.Fully.ID, fakevoltage, fakecurrent, minsoc) {
+		if !b.BusinessPossible(b.ID == data.Fully.ID, g.Fakevoltage, g.Fakecurrent, minsoc) {
 			app.Panic(http.StatusBadRequest, adapter.ErrorExchangeCannot)
 		}
 	}

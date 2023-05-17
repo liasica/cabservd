@@ -23,17 +23,11 @@ var (
 
 type Handler struct {
 	core.Bean
-
-	fakeVoltage float64
-	fakeCurrent float64
-	mtl         *MessageTypeList
+	mtl *MessageTypeList
 }
 
 func New(options ...Option) (h *Handler) {
-	h = &Handler{
-		fakeVoltage: 40,
-		fakeCurrent: -1,
-	}
+	h = &Handler{}
 	for _, o := range options {
 		o.apply(h)
 	}
@@ -52,11 +46,6 @@ func New(options ...Option) (h *Handler) {
 	}
 
 	return
-}
-
-// GetEmptyDeviation TODO 后续做在数据库中
-func (h *Handler) GetEmptyDeviation() (float64, float64) {
-	return h.fakeVoltage, h.fakeCurrent
 }
 
 // OnMessage 解析消息
