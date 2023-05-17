@@ -6,7 +6,7 @@
 package xlls
 
 // FetchBusinessAttr 获取柜机业务属性
-func FetchBusinessAttr(req *SnListRequest) (BusinessAttrs, error) {
+func FetchBusinessAttr(req *BusinessAttrRequest) (BusinessAttrs, error) {
 	return doRequest[BusinessAttrs]("/openapi/cabinet/business/attr", req)
 }
 

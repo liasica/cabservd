@@ -10,6 +10,11 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
+type BusinessAttrRequest struct {
+	NeedCellAttr int      `json:"needCellAttr,omitempty"` // 是否同时获取仓位信息 1:获取
+	SnList       []string `json:"snList"`
+}
+
 // SnListRequest 批量sn请求
 type SnListRequest struct {
 	SnList []string `json:"snList"`

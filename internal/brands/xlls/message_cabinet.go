@@ -9,13 +9,14 @@ type BusinessAttrs []*BusinessAttr
 
 // BusinessAttr 柜机业务属性
 type BusinessAttr struct {
-	Name        *string `json:"name,omitempty"`
-	Sn          *string `json:"sn,omitempty"`
-	Online      *int    `json:"online,omitempty"`      // 柜机是否在线 0--在线 1--不在线
-	OnlineTime  *int64  `json:"onlineTime,omitempty"`  // 柜机最近一次的上线
-	ModelType   *string `json:"modelType,omitempty"`   // 型号类型名称
-	CellNums    *int    `json:"cellNums,omitempty"`    // 格子数量
-	CustomPhone *string `json:"customPhone,omitempty"` // 客服电话（用于柜机显示）
+	Name         *string   `json:"name,omitempty"`
+	Sn           *string   `json:"sn,omitempty"`
+	Online       *int      `json:"online,omitempty"`       // 柜机是否在线 0--在线 1--不在线
+	OnlineTime   *int64    `json:"onlineTime,omitempty"`   // 柜机最近一次的上线
+	ModelType    *string   `json:"modelType,omitempty"`    // 型号类型名称
+	CellNums     *int      `json:"cellNums,omitempty"`     // 格子数量
+	CustomPhone  *string   `json:"customPhone,omitempty"`  // 客服电话（用于柜机显示）
+	CellAttrList CellAttrs `json:"cellAttrList,omitempty"` // 仓位信息
 }
 
 type PhysicsAttrs []*PhysicsAttr
