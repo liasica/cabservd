@@ -19,7 +19,6 @@ import (
 	"github.com/labstack/echo/v4"
 
 	"github.com/auroraride/cabservd/assets"
-	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/demo"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -30,9 +29,7 @@ import (
 	"github.com/auroraride/cabservd/internal/sync"
 )
 
-type HookFunc = func() (core.Hook, core.Codec)
-
-func Boot(hf HookFunc) {
+func Boot(starter func()) {
 	ctx := context.Background()
 
 	// 设置全局时区
@@ -104,13 +101,7 @@ func Boot(hf HookFunc) {
 	})
 	go router.Start(e)
 
-	hook, codecor := hf()
-	// 启动socket hub
-	go core.Start(
-		g.Config.Tcp.Bind,
-		hook,
-		codecor,
-	)
+	go starter()
 
 	// maintain
 	if maintain.Exists() {

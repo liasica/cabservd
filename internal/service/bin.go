@@ -281,7 +281,11 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 			}
 
 			// 电柜控制
-			err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal, times)
+			if g.UseHttp {
+				// TODO 待实现
+			} else {
+				err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal, times)
+			}
 			// 如果电柜控制失败, 直接返回错误
 			if err != nil {
 				stepper <- types.NewBinResult(nil, err)

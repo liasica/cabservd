@@ -8,8 +8,18 @@ package main
 import (
 	"github.com/auroraride/cabservd/internal"
 	"github.com/auroraride/cabservd/internal/brands/kaixin"
+	"github.com/auroraride/cabservd/internal/core"
+	"github.com/auroraride/cabservd/internal/g"
 )
 
 func main() {
-	internal.Boot(kaixin.New)
+	internal.Boot(func() {
+		hook, codecor := kaixin.New()
+		// 启动socket hub
+		go core.Start(
+			g.Config.Tcp.Bind,
+			hook,
+			codecor,
+		)
+	})
 }

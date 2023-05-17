@@ -8,6 +8,7 @@ package main
 import (
 	"github.com/auroraride/cabservd/internal"
 	"github.com/auroraride/cabservd/internal/brands/yundong"
+	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/g"
 )
 
@@ -15,5 +16,13 @@ func main() {
 	// 设定变量
 	g.Fakevoltage = 45
 
-	internal.Boot(yundong.New)
+	internal.Boot(func() {
+		hook, codecor := yundong.New()
+		// 启动socket hub
+		go core.Start(
+			g.Config.Tcp.Bind,
+			hook,
+			codecor,
+		)
+	})
 }

@@ -19,8 +19,11 @@ func main() {
 	g.CalculateMonVoltage = true
 
 	internal.Boot(
-		func() (core.Hook, core.Codec) {
-			return tower.New(
+		func() {
+			// 启动socket hub
+			go core.Start(
+				g.Config.Tcp.Bind,
+				tower.New(
 					tower.WithMessageTypeList(&tower.MessageTypeList{
 						LoginRequest:    110,
 						LoginResponse:   111,
@@ -32,7 +35,8 @@ func main() {
 						ControlResponse: 501,
 					}),
 				),
-				&core.Linebreak{}
+				&core.Linebreak{},
+			)
 		},
 	)
 }

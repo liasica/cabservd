@@ -5,5 +5,8 @@
 
 package main
 
+import "github.com/auroraride/cabservd/internal/g"
+
 func main() {
+	g.UseHttp = true
 }

@@ -8,6 +8,7 @@ package main
 import (
 	"github.com/auroraride/cabservd/internal"
 	"github.com/auroraride/cabservd/internal/brands/kaixin"
+	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/g"
 )
 
@@ -15,5 +16,13 @@ func main() {
 	g.ExchangeFirstStepRetryTimes = 3
 	g.ExchangeThirdStepRetryTimes = 3
 
-	internal.Boot(kaixin.NewNonIntelligent)
+	internal.Boot(func() {
+		hook, codecor := kaixin.NewNonIntelligent()
+		// 启动socket hub
+		go core.Start(
+			g.Config.Tcp.Bind,
+			hook,
+			codecor,
+		)
+	})
 }
