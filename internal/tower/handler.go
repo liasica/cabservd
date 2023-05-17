@@ -14,6 +14,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/auroraride/cabservd/internal/core"
+	"github.com/auroraride/cabservd/internal/ent"
 )
 
 var (
@@ -94,7 +95,7 @@ func (h *Handler) LoginHandle(req *Request) (err error) {
 	}
 
 	// 查找或创建电柜
-	go core.LoadOrStoreCabinet(context.Background(), req.DevID)
+	go ent.LoadOrStoreCabinet(context.Background(), req.DevID)
 
 	// TODO: 保存其他信息
 	return
@@ -105,7 +106,7 @@ func (h *Handler) ReportHandle(req *Request) (err error) {
 	if req.DevID == "" {
 		return adapter.ErrorCabinetSerialRequired
 	}
-	core.UpdateCabinet(h, req)
+	ent.UpdateCabinet(req)
 	return
 }
 

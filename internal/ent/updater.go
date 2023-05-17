@@ -1,29 +1,29 @@
-// Copyright (C) liasica. 2022-present.
+// Copyright (C) liasica. 2022-pres
 //
 // Created at 2022-11-29
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package core
+package ent
 
 import (
 	"context"
 	"time"
 
 	"github.com/auroraride/adapter/log"
-	"github.com/auroraride/cabservd/internal/ent"
+	"go.uber.org/zap"
+
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/g"
-	"go.uber.org/zap"
 )
 
 type CabinetUpdater interface {
 	GetSerial() (string, bool)
-	GetCabinet() (*ent.CabinetPointer, bool)
-	GetBins() ent.BinPointers
+	GetCabinet() (*CabinetPointer, bool)
+	GetBins() BinPointers
 }
 
-func UpdateCabinet(h Hook, p CabinetUpdater) {
+func UpdateCabinet(p CabinetUpdater) {
 	ctx := context.Background()
 
 	serial, ok := p.GetSerial()
@@ -39,15 +39,15 @@ func UpdateCabinet(h Hook, p CabinetUpdater) {
 
 	cp, exists := p.GetCabinet()
 	if exists {
-		saveCabinet(h, cab, cp)
+		saveCabinet(cab, cp)
 	}
 
 	bp := p.GetBins()
 	saveBins(cab, bp)
 }
 
-func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
-	orm := ent.Database.Cabinet
+func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *Cabinet) {
+	orm := Database.Cabinet
 	cab, _ = orm.Query().Where(cabinet.Serial(serial)).First(ctx)
 	if cab != nil {
 		return
@@ -60,9 +60,9 @@ func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *ent.Cabinet) {
 	return
 }
 
-func saveCabinet(_ Hook, cab *ent.Cabinet, item *ent.CabinetPointer) {
+func saveCabinet(cab *Cabinet, item *CabinetPointer) {
 	ctx := context.Background()
-	u := ent.Database.Cabinet.UpdateOne(cab).SetUpdatedAt(time.Now())
+	u := Database.Cabinet.UpdateOne(cab).SetUpdatedAt(time.Now())
 	// 在线
 	if item.Online != nil {
 		u.SetOnline(*item.Online)
@@ -119,19 +119,19 @@ func saveCabinet(_ Hook, cab *ent.Cabinet, item *ent.CabinetPointer) {
 	}
 }
 
-func binSaver(cab *ent.Cabinet, ordinal int, setter func(u *ent.BinMutation, b *ent.Bin)) error {
+func binSaver(cab *Cabinet, ordinal int, setter func(u *BinMutation, b *Bin)) error {
 	ctx := context.Background()
-	b, _ := ent.Database.Bin.Query().Where(bin.Serial(cab.Serial), bin.Ordinal(ordinal)).Only(ctx)
+	b, _ := Database.Bin.Query().Where(bin.Serial(cab.Serial), bin.Ordinal(ordinal)).Only(ctx)
 	var (
-		mu      *ent.BinMutation
-		creator *ent.BinCreate
-		updater *ent.BinUpdateOne
+		mu      *BinMutation
+		creator *BinCreate
+		updater *BinUpdateOne
 	)
 	if b == nil {
-		creator = ent.Database.Bin.Create()
+		creator = Database.Bin.Create()
 		mu = creator.Mutation()
 	} else {
-		updater = ent.Database.Bin.UpdateOne(b)
+		updater = Database.Bin.UpdateOne(b)
 		mu = updater.Mutation()
 	}
 
@@ -147,7 +147,7 @@ func binSaver(cab *ent.Cabinet, ordinal int, setter func(u *ent.BinMutation, b *
 	return updater.Exec(ctx)
 }
 
-func saveBins(cab *ent.Cabinet, items ent.BinPointers) {
+func saveBins(cab *Cabinet, items BinPointers) {
 	if len(items) == 0 {
 		return
 	}
@@ -155,7 +155,7 @@ func saveBins(cab *ent.Cabinet, items ent.BinPointers) {
 	for _, item := range items {
 		// fmt.Println(item.String())
 		// TODO 删除DEBUG
-		err := binSaver(cab, *item.Ordinal, func(u *ent.BinMutation, old *ent.Bin) {
+		err := binSaver(cab, *item.Ordinal, func(u *BinMutation, old *Bin) {
 			// u, old := binSaver(tx, cab, *item.Ordinal)
 			u.SetName(*item.Name)
 			u.SetUpdatedAt(time.Now())
@@ -237,7 +237,7 @@ func saveBins(cab *ent.Cabinet, items ent.BinPointers) {
 
 // ResetBins 重置电柜仓位信息
 func ResetBins(sn string) error {
-	return ent.Database.Bin.Update().
+	return Database.Bin.Update().
 		Where(bin.Serial(sn)).
 		SetBatterySn("").
 		SetSoc(0).

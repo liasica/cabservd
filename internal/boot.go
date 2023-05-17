@@ -39,7 +39,7 @@ func Boot(starter func()) {
 	time.Local = loc
 
 	// 加载配置
-	g.LoadConfig()
+	g.LoadConfig(assets.DefaultConfig)
 
 	// 加载redis
 	g.Redis = redis.NewClient(&redis.Options{

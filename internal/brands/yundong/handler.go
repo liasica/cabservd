@@ -129,7 +129,7 @@ func (h *Handler) OnMessage(c *core.Client, data []byte) (serial string, res cor
 	case CodeUnknown:
 	case CodePeriodMsgV3:
 	case CodePeriodMsgV4:
-		decoded = h.parser.CabinetData(h, c.Serial, b)
+		decoded = h.parser.CabinetData(c.Serial, b)
 	case CodeRequestExchangeV2:
 	case CodeGenerateOrderV2:
 	case CodeDoorEventV2:

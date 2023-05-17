@@ -11,7 +11,6 @@ import (
 
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/maintain"
-	"github.com/auroraride/cabservd/assets"
 )
 
 type config struct {
@@ -38,7 +37,7 @@ var (
 	Config *config
 )
 
-func LoadConfig() {
+func LoadConfig(defaultConfig []byte) {
 	var err error
 	configFile := os.Getenv("CONFIG_FILE")
 	if configFile == "" {
@@ -46,7 +45,7 @@ func LoadConfig() {
 	}
 
 	Config = new(config)
-	err = adapter.LoadConfigure(Config, configFile, assets.DefaultConfig)
+	err = adapter.LoadConfigure(Config, configFile, defaultConfig)
 	if err != nil {
 		log.Fatal(err)
 	}

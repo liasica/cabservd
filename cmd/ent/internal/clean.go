@@ -28,6 +28,7 @@ var (
 	removeNotable = map[string]FileInfoType{
 		"connect.go":          FileInfoTypeFile,
 		"bin_attached.go":     FileInfoTypeFile,
+		"updater.go":          FileInfoTypeFile,
 		"cabinet_attached.go": FileInfoTypeFile,
 		"console_attached.go": FileInfoTypeFile,
 		"internal":            FileInfoTypeDir,
