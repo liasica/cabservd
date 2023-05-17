@@ -17,8 +17,3 @@ const (
 	pathHardwareFault       = "/hfl" // 硬件故障通知
 	pathSelfServiceOpen     = "/sso" // 自助开仓回调通知
 )
-
-var (
-	headerXRealIP       = []byte("X-Real-IP")
-	headerXForwardedFor = []byte("X-Forwarded-For")
-)

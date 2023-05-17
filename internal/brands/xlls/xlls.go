@@ -26,29 +26,40 @@ var (
 func Start() {
 	conf := adapter.GetKoanf()
 
+	// 读取配置
 	appID = conf.Get("xiliulou.appId").(string)
 	appSecret = []byte(conf.Get("xiliulou.appSecret").(string))
 	baseURL = conf.Get("xiliulou.server").(string)
 	version = conf.Get("xiliulou.version").(string)
 
+	// 初始化先于回调调用并保存
+	// TODO 待考虑: 是否使用队列保存回调信息等待初始化完成后统一更新
+	initialize()
+
+	// 创建echo
 	e := echo.New()
+
+	// 覆盖echo打印
 	e.HideBanner = true
 	e.HidePort = true
-
 	colorer := color.New()
 	bind := g.Config.Tcp.Bind
 	colorer.Printf("⇨ 西六楼对接启动于 %s\n", colorer.Green(bind))
 
+	// 创建接收器以便于接收西六楼反馈消息
 	r := new(receiver)
 
+	// 硬件操作结果通知
 	e.POST(pathHardwareOperation, func(c echo.Context) error {
 		return nil
 	})
 
+	// 业务结果通知
 	e.POST(pathBusinesss, func(c echo.Context) error {
 		return nil
 	})
 
+	// 离线换电结果通知
 	e.POST(pathOfflineExchange, func(c echo.Context) error {
 		return nil
 	})
@@ -62,10 +73,12 @@ func Start() {
 	// 柜机状态变化通知
 	e.POST(pathCabinetChange, r.onCab)
 
+	// 硬件故障通知
 	e.POST(pathHardwareFault, func(c echo.Context) error {
 		return nil
 	})
 
+	// 自助开仓回调通知
 	e.POST(pathSelfServiceOpen, func(c echo.Context) error {
 		return nil
 	})
