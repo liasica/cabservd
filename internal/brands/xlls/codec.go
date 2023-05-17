@@ -15,15 +15,14 @@ import (
 	"github.com/auroraride/cabservd/internal/core"
 )
 
-type signer struct {
-	parser *wildcat.HTTPParser
-}
+type signer struct{}
 
 func (codec *signer) Decode(c *core.Client) (b []byte, err error) {
 	buf, _ := c.Peek(-1)
+	parser := wildcat.NewHTTPParser()
 
 	var offset int
-	offset, err = codec.parser.Parse(buf)
+	offset, err = parser.Parse(buf)
 	if err != nil {
 		// 消息未收完继续收取
 		if err == wildcat.ErrMissingData {
@@ -32,16 +31,16 @@ func (codec *signer) Decode(c *core.Client) (b []byte, err error) {
 		return
 	}
 
-	realIP := codec.parser.FindHeader(headerXRealIP)
+	realIP := parser.FindHeader(headerXRealIP)
 	if realIP == nil {
-		realIP = codec.parser.FindHeader(headerXForwardedFor)
+		realIP = parser.FindHeader(headerXForwardedFor)
 	}
 	if realIP != nil {
 		c.SetIP(adapter.ConvertBytes2String(realIP))
 	}
 
 	// 是否POST
-	method := adapter.ConvertBytes2String(codec.parser.Method)
+	method := adapter.ConvertBytes2String(parser.Method)
 	if method != allowMethod {
 		_, _ = c.Write(httpResponseRaw(http.StatusMethodNotAllowed, nil))
 		_ = c.Close()
@@ -50,24 +49,26 @@ func (codec *signer) Decode(c *core.Client) (b []byte, err error) {
 	}
 
 	// 获取消息体长度
-	bodyLen := int(codec.parser.ContentLength())
+	bodyLen := int(parser.ContentLength())
 	// 未获取到消息体长度, 返回继续缓存消息
 	if bodyLen == -1 {
 		return nil, adapter.ErrorIncompletePacket
 	}
 
 	// 获取本次消息体长度
-	n := bodyLen + offset
+	msgLen := bodyLen + offset
 
 	// 若已缓存消息长度小于需要长度, 返回错误: 消息未接收完成, 继续缓存消息
-	if c.InboundBuffered() < n {
+	if c.InboundBuffered() < msgLen {
 		return nil, adapter.ErrorIncompletePacket
 	}
 
-	// 消息体前4位存放path信息
-	b = append(codec.parser.Path, buf[offset:n]...)
+	buf, _ = c.Peek(msgLen)
 
-	_, _ = c.Discard(n)
+	// 消息体前4位存放path信息
+	b = append(parser.Path, buf[offset:msgLen]...)
+
+	_, _ = c.Discard(msgLen)
 
 	return
 }

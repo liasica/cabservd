@@ -29,13 +29,20 @@ func (x *xlls) OnConnect(c *core.Client) {
 }
 
 func (x *xlls) OnMessage(_ *core.Client, b []byte) (serial string, res core.ResponseMessenger, fields []zap.Field, err error) {
+	var payload Notifyer
+
 	defer func() {
 		if v := recover(); v != nil {
 			err = fmt.Errorf("%v", v)
 		}
+		if payload != nil {
+			res = &NotifyResult[any]{
+				Code:      0,
+				RequestID: payload.GetRequestID(),
+				Data:      nil,
+			}
+		}
 	}()
-
-	var payload any
 
 	// 获取path
 	path := adapter.ConvertBytes2String(b[:4])
@@ -44,21 +51,15 @@ func (x *xlls) OnMessage(_ *core.Client, b []byte) (serial string, res core.Resp
 	// {"voltage":234.4,"current":0.9,"fanStatus":0,"cVersion":"1.18"}
 	// /cab {"voltage":228.6,"current":0.87,"temp":28,"fanStatus":0,"lightStatus":0,"power":198.8,"powerFactor":0.15,"activeElectricityEnergy":12.569999694824219,"waterPumpStatus":0,"waterLeachingWarning":0,"humidity":38,"doorStatus":1,"cVersion":"1.18"}
 
-	res = &NotifyResult[any]{
-		Code:      0,
-		RequestID: generateRequestID(),
-		Data:      nil,
-	}
-
 	switch path {
 	case pathHardwareOperation:
 	case pathBusinesss:
 	case pathOfflineExchange:
 	case pathCellChange:
-		payload = new(CellAttr)
+		payload = new(CellNotify)
 	case pathBatteryChange:
 	case pathCabinetChange:
-		payload = new(PhysicsAttr)
+		payload = new(CabinetNotify)
 	case pathHardwareFault:
 	case pathSelfServiceOpen:
 	}

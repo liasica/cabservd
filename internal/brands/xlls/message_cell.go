@@ -22,6 +22,7 @@ type CellAttr struct {
 	Version              *string  `json:"version,omitempty"`              // 硬件版本号
 	BatterySn            *string  `json:"batterySn,omitempty"`            // 电池编号，如果仓内有电池，那么该字段就会有值
 	ForbidStatus         *int     `json:"forbidStatus,omitempty"`         // 格挡的禁用状态 0--解锁 1--加锁
+	ForbidReason         *string  `json:"forbidReason,omitempty"`         // 禁用原因
 	ForbidType           *int     `json:"forbidType,omitempty"`           // 禁用的类型 0--系统禁用 1--人为禁用
 	AerosolStatus        *int     `json:"aerosolStatus,omitempty"`        // 气溶胶的打开状态 0--关闭 1--加锁
 }

@@ -7,7 +7,6 @@ package xlls
 
 import (
 	"github.com/auroraride/adapter"
-	"github.com/evanphx/wildcat"
 
 	"github.com/auroraride/cabservd/internal/core"
 )
@@ -27,10 +26,7 @@ func New() (h core.Hook, c core.Codec) {
 	baseURL = conf.Get("xiliulou.server").(string)
 	version = conf.Get("xiliulou.version").(string)
 
-	c = &signer{
-		parser: wildcat.NewHTTPParser(),
-	}
-
+	c = &signer{}
 	h = &xlls{}
 	return
 }

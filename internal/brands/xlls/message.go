@@ -41,15 +41,6 @@ func (r *NotifyResult[T]) GetMessage(c core.Codec) ([]byte, []zap.Field) {
 	return c.Encode(b), []zap.Field{zap.ByteString("data", b)}
 }
 
-// CommandResponse 硬件操作结果, 西六楼 -> 平台
-type CommandResponse[T any] struct {
-	Command   string `json:"command"`        // 指令
-	RequestID string `json:"requestID"`      // 每次调用硬件操作接口使用的requestId
-	Result    int    `json:"result"`         // 0--成功 1--失败
-	Code      string `json:"code,omitempty"` // 错误编号
-	Data      T      `json:"data,omitempty"` // 结果
-}
-
 func generateRequestID() string {
 	return uuid.New().String()
 }
