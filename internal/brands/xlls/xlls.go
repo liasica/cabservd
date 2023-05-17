@@ -39,6 +39,8 @@ func Start() {
 	// 创建echo
 	e := echo.New()
 
+	// TODO 使用中间件记录回调日志
+
 	// 覆盖echo打印
 	e.HideBanner = true
 	e.HidePort = true
