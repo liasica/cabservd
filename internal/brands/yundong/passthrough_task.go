@@ -14,7 +14,6 @@ import (
 	"github.com/auroraride/adapter/log"
 	"go.uber.org/zap"
 
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
 )
 
@@ -169,7 +168,7 @@ func wrapPathroughData(code, sn byte, message []byte) *PathroughData {
 	}
 }
 
-func (d *PathroughData) GetMessage(c codec.Codec) ([]byte, []zap.Field) {
+func (d *PathroughData) GetMessage(c core.Codec) ([]byte, []zap.Field) {
 	buf := adapter.NewBuffer()
 	defer adapter.ReleaseBuffer(buf)
 

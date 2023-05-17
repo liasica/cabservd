@@ -14,7 +14,6 @@ import (
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/g"
@@ -49,7 +48,7 @@ func NewClient(conn gnet.Conn, h *hub) *Client {
 }
 
 type ResponseMessenger interface {
-	GetMessage(c codec.Codec) ([]byte, []zap.Field)
+	GetMessage(c Codec) ([]byte, []zap.Field)
 }
 
 // SendMessage 向客户端发送消息

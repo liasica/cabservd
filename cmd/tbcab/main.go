@@ -7,7 +7,6 @@ package main
 
 import (
 	"github.com/auroraride/cabservd/internal"
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/g"
 	"github.com/auroraride/cabservd/internal/tower"
@@ -20,7 +19,7 @@ func main() {
 	g.CalculateMonVoltage = true
 
 	internal.Boot(
-		func() (core.Hook, codec.Codec) {
+		func() (core.Hook, core.Codec) {
 			return tower.New(
 					tower.WithMessageTypeList(&tower.MessageTypeList{
 						LoginRequest:    110,
@@ -33,7 +32,7 @@ func main() {
 						ControlResponse: 501,
 					}),
 				),
-				&codec.Linebreak{}
+				&core.Linebreak{}
 		},
 	)
 }

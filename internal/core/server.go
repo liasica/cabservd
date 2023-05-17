@@ -6,12 +6,11 @@
 package core
 
 import (
-	"github.com/auroraride/cabservd/internal/codec"
 	"github.com/panjf2000/gnet/v2"
 	"go.uber.org/zap"
 )
 
-func Start(addr string, bean Hook, codec codec.Codec) {
+func Start(addr string, bean Hook, codec Codec) {
 	Hub = &hub{
 		addr:  addr,
 		Bean:  bean,

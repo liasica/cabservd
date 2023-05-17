@@ -7,10 +7,11 @@ package tower
 
 import (
 	"github.com/auroraride/adapter/log"
-	"github.com/auroraride/cabservd/internal/codec"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/liasica/go-helpers/silk"
 	"go.uber.org/zap"
+
+	"github.com/auroraride/cabservd/internal/core"
 )
 
 // MessageType 消息类型
@@ -129,7 +130,7 @@ const (
 	LoginResultSuccess
 )
 
-func getMessage(c codec.Codec, data any) (message []byte, fields []zap.Field) {
+func getMessage(c core.Codec, data any) (message []byte, fields []zap.Field) {
 	b, _ := jsoniter.Marshal(data)
 	message = c.Encode(b)
 	log.ResponseBody(b)
@@ -145,7 +146,7 @@ type Response struct {
 	Result Result `json:"result"` // 结果
 }
 
-func (r *Response) GetMessage(c codec.Codec) ([]byte, []zap.Field) {
+func (r *Response) GetMessage(c core.Codec) ([]byte, []zap.Field) {
 	return getMessage(c, r)
 }
 
@@ -163,7 +164,7 @@ func (r *Request) String() string {
 	return "TODO"
 }
 
-func (r *Request) GetMessage(c codec.Codec) ([]byte, []zap.Field) {
+func (r *Request) GetMessage(c core.Codec) ([]byte, []zap.Field) {
 	return getMessage(c, r)
 }
 

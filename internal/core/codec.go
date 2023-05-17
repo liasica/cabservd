@@ -3,7 +3,7 @@
 // Created at 2022-11-10
 // Based on cabservd by liasica, magicrolan@qq.com.
 
-package codec
+package core
 
 import (
 	"bytes"
