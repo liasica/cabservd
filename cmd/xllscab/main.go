@@ -5,8 +5,16 @@
 
 package main
 
-import "github.com/auroraride/cabservd/internal/g"
+import (
+	"github.com/auroraride/cabservd/internal"
+	"github.com/auroraride/cabservd/internal/brands/xlls"
+	"github.com/auroraride/cabservd/internal/g"
+)
 
 func main() {
 	g.UseHttp = true
+
+	internal.Boot(func() {
+		xlls.Start()
+	})
 }

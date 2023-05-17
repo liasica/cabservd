@@ -8,14 +8,14 @@ package xlls
 const allowMethod = "POST" // POST
 
 const (
-	pathHardwareOperation = "/hop" // 硬件操作结果通知
-	pathBusinesss         = "/biz" // 业务结果通知
-	pathOfflineExchange   = "/oex" // 离线换电结果通知
-	pathCellChange        = "/bin" // 格挡状态变化通知
-	pathBatteryChange     = "/bat" // 电池盒充电器状态变化通知
-	pathCabinetChange     = "/cab" // 柜机状态变化通知
-	pathHardwareFault     = "/hfl" // 硬件故障通知
-	pathSelfServiceOpen   = "/sso" // 自助开仓回调通知
+	pathHardwareOperation   = "/hop" // 硬件操作结果通知
+	pathBusinesss           = "/biz" // 业务结果通知
+	pathOfflineExchange     = "/oex" // 离线换电结果通知
+	pathCellChange          = "/bin" // 格挡状态变化通知
+	pathBatteryChargeChange = "/bat" // 电池和充电器状态变化通知
+	pathCabinetChange       = "/cab" // 柜机状态变化通知
+	pathHardwareFault       = "/hfl" // 硬件故障通知
+	pathSelfServiceOpen     = "/sso" // 自助开仓回调通知
 )
 
 var (
