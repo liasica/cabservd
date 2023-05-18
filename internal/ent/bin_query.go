@@ -19,7 +19,7 @@ import (
 type BinQuery struct {
 	config
 	ctx         *QueryContext
-	order       []OrderFunc
+	order       []bin.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.Bin
 	withCabinet *CabinetQuery
@@ -55,7 +55,7 @@ func (bq *BinQuery) Unique(unique bool) *BinQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (bq *BinQuery) Order(o ...OrderFunc) *BinQuery {
+func (bq *BinQuery) Order(o ...bin.OrderOption) *BinQuery {
 	bq.order = append(bq.order, o...)
 	return bq
 }
@@ -271,7 +271,7 @@ func (bq *BinQuery) Clone() *BinQuery {
 	return &BinQuery{
 		config:      bq.config,
 		ctx:         bq.ctx.Clone(),
-		order:       append([]OrderFunc{}, bq.order...),
+		order:       append([]bin.OrderOption{}, bq.order...),
 		inters:      append([]Interceptor{}, bq.inters...),
 		predicates:  append([]predicate.Bin{}, bq.predicates...),
 		withCabinet: bq.withCabinet.Clone(),
@@ -461,6 +461,9 @@ func (bq *BinQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != bin.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if bq.withCabinet != nil {
+			_spec.Node.AddColumnOnce(bin.FieldCabinetID)
 		}
 	}
 	if ps := bq.predicates; len(ps) > 0 {

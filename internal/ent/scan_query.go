@@ -19,7 +19,7 @@ import (
 type ScanQuery struct {
 	config
 	ctx         *QueryContext
-	order       []OrderFunc
+	order       []scan.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.Scan
 	withCabinet *CabinetQuery
@@ -55,7 +55,7 @@ func (sq *ScanQuery) Unique(unique bool) *ScanQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (sq *ScanQuery) Order(o ...OrderFunc) *ScanQuery {
+func (sq *ScanQuery) Order(o ...scan.OrderOption) *ScanQuery {
 	sq.order = append(sq.order, o...)
 	return sq
 }
@@ -271,7 +271,7 @@ func (sq *ScanQuery) Clone() *ScanQuery {
 	return &ScanQuery{
 		config:      sq.config,
 		ctx:         sq.ctx.Clone(),
-		order:       append([]OrderFunc{}, sq.order...),
+		order:       append([]scan.OrderOption{}, sq.order...),
 		inters:      append([]Interceptor{}, sq.inters...),
 		predicates:  append([]predicate.Scan{}, sq.predicates...),
 		withCabinet: sq.withCabinet.Clone(),
@@ -461,6 +461,9 @@ func (sq *ScanQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != scan.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if sq.withCabinet != nil {
+			_spec.Node.AddColumnOnce(scan.FieldCabinetID)
 		}
 	}
 	if ps := sq.predicates; len(ps) > 0 {

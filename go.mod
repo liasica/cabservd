@@ -12,7 +12,7 @@ require (
 	github.com/jinzhu/copier v0.3.6-0.20221021060712-6a4be2a76157
 	github.com/json-iterator/go v1.1.13-0.20220915233716-71ac16282d12
 	github.com/labstack/echo/v4 v4.10.2
-	github.com/liasica/go-helpers v0.0.0-20221130010501-6c8b04fa0f35
+	github.com/liasica/go-helpers v0.0.0-20230518013033-afd7268d8f01
 	github.com/panjf2000/gnet/v2 v2.2.7
 	github.com/spf13/cobra v1.7.0
 	go.uber.org/zap v1.24.0

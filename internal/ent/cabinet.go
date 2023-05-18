@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 )
@@ -44,9 +45,12 @@ type Cabinet struct {
 	Temperature *float64 `json:"temperature,omitempty"`
 	// 总用电量
 	Electricity *float64 `json:"electricity,omitempty"`
+	// SIM卡号
+	Sim *string `json:"sim,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CabinetQuery when eager-loading is set.
-	Edges CabinetEdges `json:"edges"`
+	Edges        CabinetEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // CabinetEdges holds the relations/edges for other nodes in the graph.
@@ -78,12 +82,12 @@ func (*Cabinet) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case cabinet.FieldID:
 			values[i] = new(sql.NullInt64)
-		case cabinet.FieldSerial, cabinet.FieldStatus:
+		case cabinet.FieldSerial, cabinet.FieldStatus, cabinet.FieldSim:
 			values[i] = new(sql.NullString)
 		case cabinet.FieldCreatedAt, cabinet.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Cabinet", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -194,9 +198,24 @@ func (c *Cabinet) assignValues(columns []string, values []any) error {
 				c.Electricity = new(float64)
 				*c.Electricity = value.Float64
 			}
+		case cabinet.FieldSim:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field sim", values[i])
+			} else if value.Valid {
+				c.Sim = new(string)
+				*c.Sim = value.String
+			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Cabinet.
+// This includes values selected through modifiers, order, etc.
+func (c *Cabinet) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
 // QueryBins queries the "bins" edge of the Cabinet entity.
@@ -281,6 +300,11 @@ func (c *Cabinet) String() string {
 	if v := c.Electricity; v != nil {
 		builder.WriteString("electricity=")
 		builder.WriteString(fmt.Sprintf("%v", *v))
+	}
+	builder.WriteString(", ")
+	if v := c.Sim; v != nil {
+		builder.WriteString("sim=")
+		builder.WriteString(*v)
 	}
 	builder.WriteByte(')')
 	return builder.String()

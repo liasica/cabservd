@@ -217,7 +217,7 @@ func (cc *ConsoleCreate) Mutation() *ConsoleMutation {
 // Save creates the Console in the database.
 func (cc *ConsoleCreate) Save(ctx context.Context) (*Console, error) {
 	cc.defaults()
-	return withHooks[*Console, ConsoleMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -398,10 +398,7 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 			Columns: []string{console.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -418,10 +415,7 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 			Columns: []string{console.BinColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -1178,8 +1172,8 @@ func (ccb *ConsoleCreateBulk) Save(ctx context.Context) ([]*Console, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {

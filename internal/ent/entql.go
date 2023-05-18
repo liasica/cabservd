@@ -74,6 +74,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			cabinet.FieldCurrent:     {Type: field.TypeFloat64, Column: cabinet.FieldCurrent},
 			cabinet.FieldTemperature: {Type: field.TypeFloat64, Column: cabinet.FieldTemperature},
 			cabinet.FieldElectricity: {Type: field.TypeFloat64, Column: cabinet.FieldElectricity},
+			cabinet.FieldSim:         {Type: field.TypeString, Column: cabinet.FieldSim},
 		},
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
@@ -451,6 +452,11 @@ func (f *CabinetFilter) WhereTemperature(p entql.Float64P) {
 // WhereElectricity applies the entql float64 predicate on the electricity field.
 func (f *CabinetFilter) WhereElectricity(p entql.Float64P) {
 	f.Where(p.Field(cabinet.FieldElectricity))
+}
+
+// WhereSim applies the entql string predicate on the sim field.
+func (f *CabinetFilter) WhereSim(p entql.StringP) {
+	f.Where(p.Field(cabinet.FieldSim))
 }
 
 // WhereHasBins applies a predicate to check if query has an edge bins.

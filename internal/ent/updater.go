@@ -23,6 +23,20 @@ type CabinetUpdater interface {
 	GetBins() BinPointers
 }
 
+func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *Cabinet) {
+	orm := Database.Cabinet
+	cab, _ = orm.Query().Where(cabinet.Serial(serial)).First(ctx)
+	if cab != nil {
+		return
+	}
+	var err error
+	cab, err = orm.Create().SetSerial(serial).Save(ctx)
+	if err != nil {
+		zap.L().Error("电柜保存失败", zap.Error(err))
+	}
+	return
+}
+
 func UpdateCabinet(p CabinetUpdater) {
 	ctx := context.Background()
 
@@ -37,27 +51,17 @@ func UpdateCabinet(p CabinetUpdater) {
 		return
 	}
 
+	// 更新电柜
 	cp, exists := p.GetCabinet()
 	if exists {
 		saveCabinet(cab, cp)
 	}
 
+	// 更新仓位
 	bp := p.GetBins()
-	saveBins(cab, bp)
-}
-
-func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *Cabinet) {
-	orm := Database.Cabinet
-	cab, _ = orm.Query().Where(cabinet.Serial(serial)).First(ctx)
-	if cab != nil {
-		return
+	if len(bp) > 0 {
+		saveBins(cab, bp)
 	}
-	var err error
-	cab, err = orm.Create().SetSerial(serial).Save(ctx)
-	if err != nil {
-		zap.L().Error("电柜保存失败", zap.Error(err))
-	}
-	return
 }
 
 func saveCabinet(cab *Cabinet, item *CabinetPointer) {
@@ -153,8 +157,6 @@ func saveBins(cab *Cabinet, items BinPointers) {
 	}
 
 	for _, item := range items {
-		// fmt.Println(item.String())
-		// TODO 删除DEBUG
 		err := binSaver(cab, *item.Ordinal, func(u *BinMutation, old *Bin) {
 			// u, old := binSaver(tx, cab, *item.Ordinal)
 			u.SetName(*item.Name)
@@ -213,8 +215,9 @@ func saveBins(cab *Cabinet, items BinPointers) {
 				u.SetBatteryExists(*item.BatteryExists)
 			}
 
-			// // TODO 需要完善发送锁仓指令
-			// // 当启用中的旧仓位中有电池时, 若非开门操作中电池编号丢失或在位丢失, 直接锁仓
+			// TODO 需要完善发送锁仓指令
+			// TODO 是否需要自动锁仓
+			// 当启用中的旧仓位中有电池时, 若非开门操作中电池编号丢失或在位丢失, 直接锁仓
 			// if !mem.BinInOperation(cab.Serial, *item.Ordinal).IsOpen() &&
 			//     old != nil && (old.BatteryExists || old.BatterySn != "") && old.Enable &&
 			//     ((item.BatterySn != nil && *item.BatterySn == "") || (item.BatteryExists != nil && !*item.BatteryExists)) {

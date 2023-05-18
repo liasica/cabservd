@@ -25,7 +25,7 @@ type CellCommand string
 
 const (
 	CellOpenDoor            CellCommand = "CELL_OPEN_DOOR"             // 开门
-	CellOpenIndicatorLight  CellCommand = "CELL_OPEN_INDICATOR_LIGHT"  // 开指示灯,颜色有：1--红色 2--绿色 3--黄色 data: CellOpenIndicatorLightData
+	CellOpenIndicatorLight  CellCommand = "CELL_OPEN_INDICATOR_LIGHT"  // 开指示灯,颜色有：1:红色 2:绿色 3:黄色 data: CellOpenIndicatorLightData
 	CellCloseIndicatorLight CellCommand = "CELL_CLOSE_INDICATOR_LIGHT" // 关指示灯
 	CellOpenCellLight       CellCommand = "CELL_OPEN_CELL_LIGHT"       // 开仓内的指示灯
 	CellCloseCellLight      CellCommand = "CELL_CLOSE_CELL_LIGHT"      // 关仓内的指示灯

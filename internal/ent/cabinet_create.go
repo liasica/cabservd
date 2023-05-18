@@ -211,6 +211,20 @@ func (cc *CabinetCreate) SetNillableElectricity(f *float64) *CabinetCreate {
 	return cc
 }
 
+// SetSim sets the "sim" field.
+func (cc *CabinetCreate) SetSim(s string) *CabinetCreate {
+	cc.mutation.SetSim(s)
+	return cc
+}
+
+// SetNillableSim sets the "sim" field if the given value is not nil.
+func (cc *CabinetCreate) SetNillableSim(s *string) *CabinetCreate {
+	if s != nil {
+		cc.SetSim(*s)
+	}
+	return cc
+}
+
 // AddBinIDs adds the "bins" edge to the Bin entity by IDs.
 func (cc *CabinetCreate) AddBinIDs(ids ...uint64) *CabinetCreate {
 	cc.mutation.AddBinIDs(ids...)
@@ -234,7 +248,7 @@ func (cc *CabinetCreate) Mutation() *CabinetMutation {
 // Save creates the Cabinet in the database.
 func (cc *CabinetCreate) Save(ctx context.Context) (*Cabinet, error) {
 	cc.defaults()
-	return withHooks[*Cabinet, CabinetMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -398,6 +412,10 @@ func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 		_spec.SetField(cabinet.FieldElectricity, field.TypeFloat64, value)
 		_node.Electricity = &value
 	}
+	if value, ok := cc.mutation.Sim(); ok {
+		_spec.SetField(cabinet.FieldSim, field.TypeString, value)
+		_node.Sim = &value
+	}
 	if nodes := cc.mutation.BinsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -406,10 +424,7 @@ func (cc *CabinetCreate) createSpec() (*Cabinet, *sqlgraph.CreateSpec) {
 			Columns: []string{cabinet.BinsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -706,6 +721,24 @@ func (u *CabinetUpsert) AddElectricity(v float64) *CabinetUpsert {
 // ClearElectricity clears the value of the "electricity" field.
 func (u *CabinetUpsert) ClearElectricity() *CabinetUpsert {
 	u.SetNull(cabinet.FieldElectricity)
+	return u
+}
+
+// SetSim sets the "sim" field.
+func (u *CabinetUpsert) SetSim(v string) *CabinetUpsert {
+	u.Set(cabinet.FieldSim, v)
+	return u
+}
+
+// UpdateSim sets the "sim" field to the value that was provided on create.
+func (u *CabinetUpsert) UpdateSim() *CabinetUpsert {
+	u.SetExcluded(cabinet.FieldSim)
+	return u
+}
+
+// ClearSim clears the value of the "sim" field.
+func (u *CabinetUpsert) ClearSim() *CabinetUpsert {
+	u.SetNull(cabinet.FieldSim)
 	return u
 }
 
@@ -1034,6 +1067,27 @@ func (u *CabinetUpsertOne) ClearElectricity() *CabinetUpsertOne {
 	})
 }
 
+// SetSim sets the "sim" field.
+func (u *CabinetUpsertOne) SetSim(v string) *CabinetUpsertOne {
+	return u.Update(func(s *CabinetUpsert) {
+		s.SetSim(v)
+	})
+}
+
+// UpdateSim sets the "sim" field to the value that was provided on create.
+func (u *CabinetUpsertOne) UpdateSim() *CabinetUpsertOne {
+	return u.Update(func(s *CabinetUpsert) {
+		s.UpdateSim()
+	})
+}
+
+// ClearSim clears the value of the "sim" field.
+func (u *CabinetUpsertOne) ClearSim() *CabinetUpsertOne {
+	return u.Update(func(s *CabinetUpsert) {
+		s.ClearSim()
+	})
+}
+
 // Exec executes the query.
 func (u *CabinetUpsertOne) Exec(ctx context.Context) error {
 	if len(u.create.conflict) == 0 {
@@ -1100,8 +1154,8 @@ func (ccb *CabinetCreateBulk) Save(ctx context.Context) ([]*Cabinet, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, ccb.builders[i+1].mutation)
 				} else {
@@ -1526,6 +1580,27 @@ func (u *CabinetUpsertBulk) UpdateElectricity() *CabinetUpsertBulk {
 func (u *CabinetUpsertBulk) ClearElectricity() *CabinetUpsertBulk {
 	return u.Update(func(s *CabinetUpsert) {
 		s.ClearElectricity()
+	})
+}
+
+// SetSim sets the "sim" field.
+func (u *CabinetUpsertBulk) SetSim(v string) *CabinetUpsertBulk {
+	return u.Update(func(s *CabinetUpsert) {
+		s.SetSim(v)
+	})
+}
+
+// UpdateSim sets the "sim" field to the value that was provided on create.
+func (u *CabinetUpsertBulk) UpdateSim() *CabinetUpsertBulk {
+	return u.Update(func(s *CabinetUpsert) {
+		s.UpdateSim()
+	})
+}
+
+// ClearSim clears the value of the "sim" field.
+func (u *CabinetUpsertBulk) ClearSim() *CabinetUpsertBulk {
+	return u.Update(func(s *CabinetUpsert) {
+		s.ClearSim()
 	})
 }
 

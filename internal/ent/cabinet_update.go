@@ -287,6 +287,26 @@ func (cu *CabinetUpdate) ClearElectricity() *CabinetUpdate {
 	return cu
 }
 
+// SetSim sets the "sim" field.
+func (cu *CabinetUpdate) SetSim(s string) *CabinetUpdate {
+	cu.mutation.SetSim(s)
+	return cu
+}
+
+// SetNillableSim sets the "sim" field if the given value is not nil.
+func (cu *CabinetUpdate) SetNillableSim(s *string) *CabinetUpdate {
+	if s != nil {
+		cu.SetSim(*s)
+	}
+	return cu
+}
+
+// ClearSim clears the value of the "sim" field.
+func (cu *CabinetUpdate) ClearSim() *CabinetUpdate {
+	cu.mutation.ClearSim()
+	return cu
+}
+
 // AddBinIDs adds the "bins" edge to the Bin entity by IDs.
 func (cu *CabinetUpdate) AddBinIDs(ids ...uint64) *CabinetUpdate {
 	cu.mutation.AddBinIDs(ids...)
@@ -331,7 +351,7 @@ func (cu *CabinetUpdate) RemoveBins(b ...*Bin) *CabinetUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *CabinetUpdate) Save(ctx context.Context) (int, error) {
 	cu.defaults()
-	return withHooks[int, CabinetMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -473,6 +493,12 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.ElectricityCleared() {
 		_spec.ClearField(cabinet.FieldElectricity, field.TypeFloat64)
 	}
+	if value, ok := cu.mutation.Sim(); ok {
+		_spec.SetField(cabinet.FieldSim, field.TypeString, value)
+	}
+	if cu.mutation.SimCleared() {
+		_spec.ClearField(cabinet.FieldSim, field.TypeString)
+	}
 	if cu.mutation.BinsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -481,10 +507,7 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{cabinet.BinsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -497,10 +520,7 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{cabinet.BinsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -516,10 +536,7 @@ func (cu *CabinetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{cabinet.BinsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -806,6 +823,26 @@ func (cuo *CabinetUpdateOne) ClearElectricity() *CabinetUpdateOne {
 	return cuo
 }
 
+// SetSim sets the "sim" field.
+func (cuo *CabinetUpdateOne) SetSim(s string) *CabinetUpdateOne {
+	cuo.mutation.SetSim(s)
+	return cuo
+}
+
+// SetNillableSim sets the "sim" field if the given value is not nil.
+func (cuo *CabinetUpdateOne) SetNillableSim(s *string) *CabinetUpdateOne {
+	if s != nil {
+		cuo.SetSim(*s)
+	}
+	return cuo
+}
+
+// ClearSim clears the value of the "sim" field.
+func (cuo *CabinetUpdateOne) ClearSim() *CabinetUpdateOne {
+	cuo.mutation.ClearSim()
+	return cuo
+}
+
 // AddBinIDs adds the "bins" edge to the Bin entity by IDs.
 func (cuo *CabinetUpdateOne) AddBinIDs(ids ...uint64) *CabinetUpdateOne {
 	cuo.mutation.AddBinIDs(ids...)
@@ -863,7 +900,7 @@ func (cuo *CabinetUpdateOne) Select(field string, fields ...string) *CabinetUpda
 // Save executes the query and returns the updated Cabinet entity.
 func (cuo *CabinetUpdateOne) Save(ctx context.Context) (*Cabinet, error) {
 	cuo.defaults()
-	return withHooks[*Cabinet, CabinetMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -1022,6 +1059,12 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 	if cuo.mutation.ElectricityCleared() {
 		_spec.ClearField(cabinet.FieldElectricity, field.TypeFloat64)
 	}
+	if value, ok := cuo.mutation.Sim(); ok {
+		_spec.SetField(cabinet.FieldSim, field.TypeString, value)
+	}
+	if cuo.mutation.SimCleared() {
+		_spec.ClearField(cabinet.FieldSim, field.TypeString)
+	}
 	if cuo.mutation.BinsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -1030,10 +1073,7 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 			Columns: []string{cabinet.BinsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1046,10 +1086,7 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 			Columns: []string{cabinet.BinsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -1065,10 +1102,7 @@ func (cuo *CabinetUpdateOne) sqlSave(ctx context.Context) (_node *Cabinet, err e
 			Columns: []string{cabinet.BinsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

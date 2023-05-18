@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
+
 	"github.com/auroraride/cabservd/internal/ent/internal"
 )
 
@@ -70,6 +71,7 @@ func (Cabinet) Fields() []ent.Field {
 		field.Float("current").Optional().Nillable().Comment("换电柜总电流 (A)"),
 		field.Float("temperature").Optional().Nillable().Comment("柜体温度值 (换电柜温度)"),
 		field.Float("electricity").Optional().Nillable().Comment("总用电量"),
+		field.String("sim").Optional().Nillable().Comment("SIM卡号"),
 	}
 }
 

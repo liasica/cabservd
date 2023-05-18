@@ -27,7 +27,7 @@ func (bd *BinDelete) Where(ps ...predicate.Bin) *BinDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (bd *BinDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, BinMutation](ctx, bd.sqlExec, bd.mutation, bd.hooks)
+	return withHooks(ctx, bd.sqlExec, bd.mutation, bd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

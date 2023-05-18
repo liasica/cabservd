@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
@@ -43,7 +44,8 @@ type Scan struct {
 	Data *cabdef.CabinetBinUsableResponse `json:"data,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ScanQuery when eager-loading is set.
-	Edges ScanEdges `json:"edges"`
+	Edges        ScanEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ScanEdges holds the relations/edges for other nodes in the graph.
@@ -90,7 +92,7 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 		case scan.FieldUUID:
 			values[i] = new(uuid.UUID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Scan", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -172,9 +174,17 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field data: %w", err)
 				}
 			}
+		default:
+			s.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Scan.
+// This includes values selected through modifiers, order, etc.
+func (s *Scan) Value(name string) (ent.Value, error) {
+	return s.selectValues.Get(name)
 }
 
 // QueryCabinet queries the "cabinet" edge of the Scan entity.

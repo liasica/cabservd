@@ -4,6 +4,9 @@ package bin
 
 import (
 	"time"
+
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -121,3 +124,115 @@ var (
 	// DefaultDeactivate holds the default value on creation for the "deactivate" field.
 	DefaultDeactivate bool
 )
+
+// OrderOption defines the ordering options for the Bin queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByCabinetID orders the results by the cabinet_id field.
+func ByCabinetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCabinetID, opts...).ToFunc()
+}
+
+// BySerial orders the results by the serial field.
+func BySerial(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSerial, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByOrdinal orders the results by the ordinal field.
+func ByOrdinal(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrdinal, opts...).ToFunc()
+}
+
+// ByOpen orders the results by the open field.
+func ByOpen(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOpen, opts...).ToFunc()
+}
+
+// ByEnable orders the results by the enable field.
+func ByEnable(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEnable, opts...).ToFunc()
+}
+
+// ByHealth orders the results by the health field.
+func ByHealth(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldHealth, opts...).ToFunc()
+}
+
+// ByBatteryExists orders the results by the battery_exists field.
+func ByBatteryExists(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBatteryExists, opts...).ToFunc()
+}
+
+// ByBatterySn orders the results by the battery_sn field.
+func ByBatterySn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBatterySn, opts...).ToFunc()
+}
+
+// ByVoltage orders the results by the voltage field.
+func ByVoltage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVoltage, opts...).ToFunc()
+}
+
+// ByCurrent orders the results by the current field.
+func ByCurrent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCurrent, opts...).ToFunc()
+}
+
+// BySoc orders the results by the soc field.
+func BySoc(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSoc, opts...).ToFunc()
+}
+
+// BySoh orders the results by the soh field.
+func BySoh(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSoh, opts...).ToFunc()
+}
+
+// ByRemark orders the results by the remark field.
+func ByRemark(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRemark, opts...).ToFunc()
+}
+
+// ByDeactivate orders the results by the deactivate field.
+func ByDeactivate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeactivate, opts...).ToFunc()
+}
+
+// ByDeactivateReason orders the results by the deactivate_reason field.
+func ByDeactivateReason(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeactivateReason, opts...).ToFunc()
+}
+
+// ByCabinetField orders the results by cabinet field.
+func ByCabinetField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCabinetStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newCabinetStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CabinetInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CabinetTable, CabinetColumn),
+	)
+}

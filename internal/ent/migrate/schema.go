@@ -94,6 +94,7 @@ var (
 		{Name: "current", Type: field.TypeFloat64, Nullable: true, Comment: "换电柜总电流 (A)"},
 		{Name: "temperature", Type: field.TypeFloat64, Nullable: true, Comment: "柜体温度值 (换电柜温度)"},
 		{Name: "electricity", Type: field.TypeFloat64, Nullable: true, Comment: "总用电量"},
+		{Name: "sim", Type: field.TypeString, Nullable: true, Comment: "SIM卡号"},
 	}
 	// CabinetTable holds the schema information for the "cabinet" table.
 	CabinetTable = &schema.Table{

@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"entgo.io/ent"
+	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/cabservd/internal/ent/bin"
@@ -17,9 +19,6 @@ import (
 	"github.com/auroraride/cabservd/internal/ent/predicate"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/google/uuid"
-
-	"entgo.io/ent"
-	"entgo.io/ent/dialect/sql"
 )
 
 const (
@@ -1570,6 +1569,7 @@ type CabinetMutation struct {
 	addtemperature *float64
 	electricity    *float64
 	addelectricity *float64
+	sim            *string
 	clearedFields  map[string]struct{}
 	bins           map[uint64]struct{}
 	removedbins    map[uint64]struct{}
@@ -2419,6 +2419,55 @@ func (m *CabinetMutation) ResetElectricity() {
 	delete(m.clearedFields, cabinet.FieldElectricity)
 }
 
+// SetSim sets the "sim" field.
+func (m *CabinetMutation) SetSim(s string) {
+	m.sim = &s
+}
+
+// Sim returns the value of the "sim" field in the mutation.
+func (m *CabinetMutation) Sim() (r string, exists bool) {
+	v := m.sim
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSim returns the old "sim" field's value of the Cabinet entity.
+// If the Cabinet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CabinetMutation) OldSim(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSim is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSim requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSim: %w", err)
+	}
+	return oldValue.Sim, nil
+}
+
+// ClearSim clears the value of the "sim" field.
+func (m *CabinetMutation) ClearSim() {
+	m.sim = nil
+	m.clearedFields[cabinet.FieldSim] = struct{}{}
+}
+
+// SimCleared returns if the "sim" field was cleared in this mutation.
+func (m *CabinetMutation) SimCleared() bool {
+	_, ok := m.clearedFields[cabinet.FieldSim]
+	return ok
+}
+
+// ResetSim resets all changes to the "sim" field.
+func (m *CabinetMutation) ResetSim() {
+	m.sim = nil
+	delete(m.clearedFields, cabinet.FieldSim)
+}
+
 // AddBinIDs adds the "bins" edge to the Bin entity by ids.
 func (m *CabinetMutation) AddBinIDs(ids ...uint64) {
 	if m.bins == nil {
@@ -2507,7 +2556,7 @@ func (m *CabinetMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CabinetMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, cabinet.FieldCreatedAt)
 	}
@@ -2550,6 +2599,9 @@ func (m *CabinetMutation) Fields() []string {
 	if m.electricity != nil {
 		fields = append(fields, cabinet.FieldElectricity)
 	}
+	if m.sim != nil {
+		fields = append(fields, cabinet.FieldSim)
+	}
 	return fields
 }
 
@@ -2586,6 +2638,8 @@ func (m *CabinetMutation) Field(name string) (ent.Value, bool) {
 		return m.Temperature()
 	case cabinet.FieldElectricity:
 		return m.Electricity()
+	case cabinet.FieldSim:
+		return m.Sim()
 	}
 	return nil, false
 }
@@ -2623,6 +2677,8 @@ func (m *CabinetMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldTemperature(ctx)
 	case cabinet.FieldElectricity:
 		return m.OldElectricity(ctx)
+	case cabinet.FieldSim:
+		return m.OldSim(ctx)
 	}
 	return nil, fmt.Errorf("unknown Cabinet field %s", name)
 }
@@ -2729,6 +2785,13 @@ func (m *CabinetMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetElectricity(v)
+		return nil
+	case cabinet.FieldSim:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSim(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Cabinet field %s", name)
@@ -2868,6 +2931,9 @@ func (m *CabinetMutation) ClearedFields() []string {
 	if m.FieldCleared(cabinet.FieldElectricity) {
 		fields = append(fields, cabinet.FieldElectricity)
 	}
+	if m.FieldCleared(cabinet.FieldSim) {
+		fields = append(fields, cabinet.FieldSim)
+	}
 	return fields
 }
 
@@ -2902,6 +2968,9 @@ func (m *CabinetMutation) ClearField(name string) error {
 		return nil
 	case cabinet.FieldElectricity:
 		m.ClearElectricity()
+		return nil
+	case cabinet.FieldSim:
+		m.ClearSim()
 		return nil
 	}
 	return fmt.Errorf("unknown Cabinet nullable field %s", name)
@@ -2952,6 +3021,9 @@ func (m *CabinetMutation) ResetField(name string) error {
 		return nil
 	case cabinet.FieldElectricity:
 		m.ResetElectricity()
+		return nil
+	case cabinet.FieldSim:
+		m.ResetSim()
 		return nil
 	}
 	return fmt.Errorf("unknown Cabinet field %s", name)

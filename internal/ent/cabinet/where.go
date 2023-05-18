@@ -120,6 +120,11 @@ func Electricity(v float64) predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldEQ(FieldElectricity, v))
 }
 
+// Sim applies equality check predicate on the "sim" field. It's identical to SimEQ.
+func Sim(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldEQ(FieldSim, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldEQ(FieldCreatedAt, v))
@@ -665,6 +670,81 @@ func ElectricityNotNil() predicate.Cabinet {
 	return predicate.Cabinet(sql.FieldNotNull(FieldElectricity))
 }
 
+// SimEQ applies the EQ predicate on the "sim" field.
+func SimEQ(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldEQ(FieldSim, v))
+}
+
+// SimNEQ applies the NEQ predicate on the "sim" field.
+func SimNEQ(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldNEQ(FieldSim, v))
+}
+
+// SimIn applies the In predicate on the "sim" field.
+func SimIn(vs ...string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldIn(FieldSim, vs...))
+}
+
+// SimNotIn applies the NotIn predicate on the "sim" field.
+func SimNotIn(vs ...string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldNotIn(FieldSim, vs...))
+}
+
+// SimGT applies the GT predicate on the "sim" field.
+func SimGT(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldGT(FieldSim, v))
+}
+
+// SimGTE applies the GTE predicate on the "sim" field.
+func SimGTE(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldGTE(FieldSim, v))
+}
+
+// SimLT applies the LT predicate on the "sim" field.
+func SimLT(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldLT(FieldSim, v))
+}
+
+// SimLTE applies the LTE predicate on the "sim" field.
+func SimLTE(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldLTE(FieldSim, v))
+}
+
+// SimContains applies the Contains predicate on the "sim" field.
+func SimContains(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldContains(FieldSim, v))
+}
+
+// SimHasPrefix applies the HasPrefix predicate on the "sim" field.
+func SimHasPrefix(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldHasPrefix(FieldSim, v))
+}
+
+// SimHasSuffix applies the HasSuffix predicate on the "sim" field.
+func SimHasSuffix(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldHasSuffix(FieldSim, v))
+}
+
+// SimIsNil applies the IsNil predicate on the "sim" field.
+func SimIsNil() predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldIsNull(FieldSim))
+}
+
+// SimNotNil applies the NotNil predicate on the "sim" field.
+func SimNotNil() predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldNotNull(FieldSim))
+}
+
+// SimEqualFold applies the EqualFold predicate on the "sim" field.
+func SimEqualFold(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldEqualFold(FieldSim, v))
+}
+
+// SimContainsFold applies the ContainsFold predicate on the "sim" field.
+func SimContainsFold(v string) predicate.Cabinet {
+	return predicate.Cabinet(sql.FieldContainsFold(FieldSim, v))
+}
+
 // HasBins applies the HasEdge predicate on the "bins" edge.
 func HasBins() predicate.Cabinet {
 	return predicate.Cabinet(func(s *sql.Selector) {
@@ -679,11 +759,7 @@ func HasBins() predicate.Cabinet {
 // HasBinsWith applies the HasEdge predicate on the "bins" edge with a given conditions (other predicates).
 func HasBinsWith(preds ...predicate.Bin) predicate.Cabinet {
 	return predicate.Cabinet(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(BinsInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, BinsTable, BinsColumn),
-		)
+		step := newBinsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

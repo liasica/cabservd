@@ -20,7 +20,7 @@ import (
 type CabinetQuery struct {
 	config
 	ctx        *QueryContext
-	order      []OrderFunc
+	order      []cabinet.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Cabinet
 	withBins   *BinQuery
@@ -56,7 +56,7 @@ func (cq *CabinetQuery) Unique(unique bool) *CabinetQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cq *CabinetQuery) Order(o ...OrderFunc) *CabinetQuery {
+func (cq *CabinetQuery) Order(o ...cabinet.OrderOption) *CabinetQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
@@ -272,7 +272,7 @@ func (cq *CabinetQuery) Clone() *CabinetQuery {
 	return &CabinetQuery{
 		config:     cq.config,
 		ctx:        cq.ctx.Clone(),
-		order:      append([]OrderFunc{}, cq.order...),
+		order:      append([]cabinet.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Cabinet{}, cq.predicates...),
 		withBins:   cq.withBins.Clone(),
@@ -416,8 +416,11 @@ func (cq *CabinetQuery) loadBins(ctx context.Context, query *BinQuery, nodes []*
 			init(nodes[i])
 		}
 	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(bin.FieldCabinetID)
+	}
 	query.Where(predicate.Bin(func(s *sql.Selector) {
-		s.Where(sql.InValues(cabinet.BinsColumn, fks...))
+		s.Where(sql.InValues(s.C(cabinet.BinsColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -427,7 +430,7 @@ func (cq *CabinetQuery) loadBins(ctx context.Context, query *BinQuery, nodes []*
 		fk := n.CabinetID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "cabinet_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "cabinet_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

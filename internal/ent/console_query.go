@@ -20,7 +20,7 @@ import (
 type ConsoleQuery struct {
 	config
 	ctx         *QueryContext
-	order       []OrderFunc
+	order       []console.OrderOption
 	inters      []Interceptor
 	predicates  []predicate.Console
 	withCabinet *CabinetQuery
@@ -57,7 +57,7 @@ func (cq *ConsoleQuery) Unique(unique bool) *ConsoleQuery {
 }
 
 // Order specifies how the records should be ordered.
-func (cq *ConsoleQuery) Order(o ...OrderFunc) *ConsoleQuery {
+func (cq *ConsoleQuery) Order(o ...console.OrderOption) *ConsoleQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
@@ -295,7 +295,7 @@ func (cq *ConsoleQuery) Clone() *ConsoleQuery {
 	return &ConsoleQuery{
 		config:      cq.config,
 		ctx:         cq.ctx.Clone(),
-		order:       append([]OrderFunc{}, cq.order...),
+		order:       append([]console.OrderOption{}, cq.order...),
 		inters:      append([]Interceptor{}, cq.inters...),
 		predicates:  append([]predicate.Console{}, cq.predicates...),
 		withCabinet: cq.withCabinet.Clone(),
@@ -536,6 +536,12 @@ func (cq *ConsoleQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != console.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if cq.withCabinet != nil {
+			_spec.Node.AddColumnOnce(console.FieldCabinetID)
+		}
+		if cq.withBin != nil {
+			_spec.Node.AddColumnOnce(console.FieldBinID)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

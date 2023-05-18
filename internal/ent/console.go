@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
@@ -60,7 +61,8 @@ type Console struct {
 	CommandRetryTimes int `json:"command_retry_times,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConsoleQuery when eager-loading is set.
-	Edges ConsoleEdges `json:"edges"`
+	Edges        ConsoleEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ConsoleEdges holds the relations/edges for other nodes in the graph.
@@ -124,7 +126,7 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 		case console.FieldUUID:
 			values[i] = new(uuid.UUID)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Console", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -262,9 +264,17 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.CommandRetryTimes = int(value.Int64)
 			}
+		default:
+			c.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Console.
+// This includes values selected through modifiers, order, etc.
+func (c *Console) Value(name string) (ent.Value, error) {
+	return c.selectValues.Get(name)
 }
 
 // QueryCabinet queries the "cabinet" edge of the Console entity.

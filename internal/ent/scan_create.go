@@ -131,7 +131,7 @@ func (sc *ScanCreate) Mutation() *ScanMutation {
 // Save creates the Scan in the database.
 func (sc *ScanCreate) Save(ctx context.Context) (*Scan, error) {
 	sc.defaults()
-	return withHooks[*Scan, ScanMutation](ctx, sc.sqlSave, sc.mutation, sc.hooks)
+	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -284,10 +284,7 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 			Columns: []string{scan.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -706,8 +703,8 @@ func (scb *ScanCreateBulk) Save(ctx context.Context) ([]*Scan, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, scb.builders[i+1].mutation)
 				} else {

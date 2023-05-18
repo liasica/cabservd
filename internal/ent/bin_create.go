@@ -256,7 +256,7 @@ func (bc *BinCreate) Mutation() *BinMutation {
 // Save creates the Bin in the database.
 func (bc *BinCreate) Save(ctx context.Context) (*Bin, error) {
 	bc.defaults()
-	return withHooks[*Bin, BinMutation](ctx, bc.sqlSave, bc.mutation, bc.hooks)
+	return withHooks(ctx, bc.sqlSave, bc.mutation, bc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -489,10 +489,7 @@ func (bc *BinCreate) createSpec() (*Bin, *sqlgraph.CreateSpec) {
 			Columns: []string{bin.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -1197,8 +1194,8 @@ func (bcb *BinCreateBulk) Save(ctx context.Context) ([]*Bin, error) {
 					return nil, err
 				}
 				builder.mutation = mutation
-				nodes[i], specs[i] = builder.createSpec()
 				var err error
+				nodes[i], specs[i] = builder.createSpec()
 				if i < len(mutators)-1 {
 					_, err = mutators[i+1].Mutate(root, bcb.builders[i+1].mutation)
 				} else {

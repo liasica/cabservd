@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"time"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/auroraride/adapter"
 	"github.com/google/uuid"
 )
@@ -94,4 +96,71 @@ func BusinessValidator(b adapter.Business) error {
 	default:
 		return fmt.Errorf("scan: invalid enum value for business field: %q", b)
 	}
+}
+
+// OrderOption defines the ordering options for the Scan queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByCabinetID orders the results by the cabinet_id field.
+func ByCabinetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCabinetID, opts...).ToFunc()
+}
+
+// ByUUID orders the results by the uuid field.
+func ByUUID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUUID, opts...).ToFunc()
+}
+
+// ByBusiness orders the results by the business field.
+func ByBusiness(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBusiness, opts...).ToFunc()
+}
+
+// ByEfficient orders the results by the efficient field.
+func ByEfficient(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEfficient, opts...).ToFunc()
+}
+
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+}
+
+// ByUserType orders the results by the user_type field.
+func ByUserType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserType, opts...).ToFunc()
+}
+
+// BySerial orders the results by the serial field.
+func BySerial(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSerial, opts...).ToFunc()
+}
+
+// ByCabinetField orders the results by cabinet field.
+func ByCabinetField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCabinetStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newCabinetStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CabinetInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, CabinetTable, CabinetColumn),
+	)
 }

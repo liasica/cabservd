@@ -5,6 +5,9 @@ package cabinet
 import (
 	"fmt"
 	"time"
+
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -40,6 +43,8 @@ const (
 	FieldTemperature = "temperature"
 	// FieldElectricity holds the string denoting the electricity field in the database.
 	FieldElectricity = "electricity"
+	// FieldSim holds the string denoting the sim field in the database.
+	FieldSim = "sim"
 	// EdgeBins holds the string denoting the bins edge name in mutations.
 	EdgeBins = "bins"
 	// Table holds the table name of the cabinet in the database.
@@ -70,6 +75,7 @@ var Columns = []string{
 	FieldCurrent,
 	FieldTemperature,
 	FieldElectricity,
+	FieldSim,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -122,4 +128,108 @@ func StatusValidator(s Status) error {
 	default:
 		return fmt.Errorf("cabinet: invalid enum value for status field: %q", s)
 	}
+}
+
+// OrderOption defines the ordering options for the Cabinet queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the created_at field.
+func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByUpdatedAt orders the results by the updated_at field.
+func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByOnline orders the results by the online field.
+func ByOnline(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOnline, opts...).ToFunc()
+}
+
+// ByPower orders the results by the power field.
+func ByPower(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPower, opts...).ToFunc()
+}
+
+// BySerial orders the results by the serial field.
+func BySerial(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSerial, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByEnable orders the results by the enable field.
+func ByEnable(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEnable, opts...).ToFunc()
+}
+
+// ByLng orders the results by the lng field.
+func ByLng(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLng, opts...).ToFunc()
+}
+
+// ByLat orders the results by the lat field.
+func ByLat(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLat, opts...).ToFunc()
+}
+
+// ByGsm orders the results by the gsm field.
+func ByGsm(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGsm, opts...).ToFunc()
+}
+
+// ByVoltage orders the results by the voltage field.
+func ByVoltage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVoltage, opts...).ToFunc()
+}
+
+// ByCurrent orders the results by the current field.
+func ByCurrent(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCurrent, opts...).ToFunc()
+}
+
+// ByTemperature orders the results by the temperature field.
+func ByTemperature(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldTemperature, opts...).ToFunc()
+}
+
+// ByElectricity orders the results by the electricity field.
+func ByElectricity(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldElectricity, opts...).ToFunc()
+}
+
+// BySim orders the results by the sim field.
+func BySim(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSim, opts...).ToFunc()
+}
+
+// ByBinsCount orders the results by bins count.
+func ByBinsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newBinsStep(), opts...)
+	}
+}
+
+// ByBins orders the results by bins terms.
+func ByBins(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBinsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newBinsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BinsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, BinsTable, BinsColumn),
+	)
 }

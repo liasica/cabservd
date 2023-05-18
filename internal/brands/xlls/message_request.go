@@ -68,20 +68,20 @@ type CellCommandRequest struct {
 // BatteryCreateRequest 批量创建电池请求
 type BatteryCreateRequest struct {
 	BatteryList             []BatterySnData `json:"batteryList"`                       // 电池的创建所需属性，最大50个
-	NeedSyncBatteryPlatform int             `json:"needSyncBatteryPlatform,omitempty"` // 是否同步到电池BMS平台，1--同步，不传或者其他值为不同步
+	NeedSyncBatteryPlatform int             `json:"needSyncBatteryPlatform,omitempty"` // 是否同步到电池BMS平台，1:同步，不传或者其他值为不同步
 }
 
 // BatteryDeleteRequest 批量删除电池请求
 type BatteryDeleteRequest struct {
 	BatterySnList           []string `json:"batterySnList"`                     // 电池SN列表
-	NeedSyncBatteryPlatform int      `json:"needSyncBatteryPlatform,omitempty"` // 是否同步到电池BMS平台，1--同步，不传或者其他值为不同步
+	NeedSyncBatteryPlatform int      `json:"needSyncBatteryPlatform,omitempty"` // 是否同步到电池BMS平台，1:同步，不传或者其他值为不同步
 }
 
 // BatteryModifySnRequest 修改电池编号
 type BatteryModifySnRequest struct {
 	OldBatterySn            string `json:"oldBatterySn"`                      // 旧编号
 	NewBatterySn            string `json:"newBatterySn"`                      // 新编号
-	NeedSyncBatteryPlatform int    `json:"needSyncBatteryPlatform,omitempty"` // 是否同步到电池BMS平台，1--同步，不传或者其他值为不同步
+	NeedSyncBatteryPlatform int    `json:"needSyncBatteryPlatform,omitempty"` // 是否同步到电池BMS平台，1:同步，不传或者其他值为不同步
 }
 
 // BatteryAttrRequest 获取电池属性

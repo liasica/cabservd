@@ -294,7 +294,7 @@ func (bu *BinUpdate) ClearCabinet() *BinUpdate {
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (bu *BinUpdate) Save(ctx context.Context) (int, error) {
 	bu.defaults()
-	return withHooks[int, BinMutation](ctx, bu.sqlSave, bu.mutation, bu.hooks)
+	return withHooks(ctx, bu.sqlSave, bu.mutation, bu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -430,10 +430,7 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{bin.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -446,10 +443,7 @@ func (bu *BinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{bin.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -756,7 +750,7 @@ func (buo *BinUpdateOne) Select(field string, fields ...string) *BinUpdateOne {
 // Save executes the query and returns the updated Bin entity.
 func (buo *BinUpdateOne) Save(ctx context.Context) (*Bin, error) {
 	buo.defaults()
-	return withHooks[*Bin, BinMutation](ctx, buo.sqlSave, buo.mutation, buo.hooks)
+	return withHooks(ctx, buo.sqlSave, buo.mutation, buo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -909,10 +903,7 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 			Columns: []string{bin.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -925,10 +916,7 @@ func (buo *BinUpdateOne) sqlSave(ctx context.Context) (_node *Bin, err error) {
 			Columns: []string{bin.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

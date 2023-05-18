@@ -8,14 +8,16 @@ package ent
 import (
 	"context"
 	"database/sql"
+	"fmt"
 	"log"
 	"time"
 
 	"entgo.io/ent/dialect"
 	entsql "entgo.io/ent/dialect/sql"
+	_ "github.com/jackc/pgx/v4/stdlib"
+
 	"github.com/auroraride/cabservd/internal/ent/migrate"
 	_ "github.com/auroraride/cabservd/internal/ent/runtime"
-	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
 var Database *Client
@@ -116,4 +118,29 @@ func autoMigrate(c *Client) {
 	); err != nil {
 		log.Fatalf("数据库迁移失败: %v", err)
 	}
+}
+
+type TxFunc func(tx *Tx) (err error)
+
+func WithTx(ctx context.Context, fn TxFunc) error {
+	tx, err := Database.Tx(ctx)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if v := recover(); v != nil {
+			_ = tx.Rollback()
+			panic(v)
+		}
+	}()
+	if err = fn(tx); err != nil {
+		if txErr := tx.Rollback(); txErr != nil {
+			err = fmt.Errorf("rolling back transaction: %w", txErr)
+		}
+		return err
+	}
+	if err = tx.Commit(); err != nil {
+		return fmt.Errorf("committing transaction: %w", err)
+	}
+	return nil
 }

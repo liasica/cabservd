@@ -7,6 +7,7 @@ import (
 	"strings"
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/auroraride/cabservd/internal/ent/bin"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
@@ -55,7 +56,8 @@ type Bin struct {
 	DeactivateReason *string `json:"deactivate_reason,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the BinQuery when eager-loading is set.
-	Edges BinEdges `json:"edges"`
+	Edges        BinEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // BinEdges holds the relations/edges for other nodes in the graph.
@@ -96,7 +98,7 @@ func (*Bin) scanValues(columns []string) ([]any, error) {
 		case bin.FieldCreatedAt, bin.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
 		default:
-			return nil, fmt.Errorf("unexpected column %q for type Bin", columns[i])
+			values[i] = new(sql.UnknownType)
 		}
 	}
 	return values, nil
@@ -226,9 +228,17 @@ func (b *Bin) assignValues(columns []string, values []any) error {
 				b.DeactivateReason = new(string)
 				*b.DeactivateReason = value.String
 			}
+		default:
+			b.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
+}
+
+// Value returns the ent.Value that was dynamically selected and assigned to the Bin.
+// This includes values selected through modifiers, order, etc.
+func (b *Bin) Value(name string) (ent.Value, error) {
+	return b.selectValues.Get(name)
 }
 
 // QueryCabinet queries the "cabinet" edge of the Bin entity.

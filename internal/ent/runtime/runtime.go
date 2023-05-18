@@ -5,6 +5,6 @@ package runtime
 // The schema-stitching logic is generated in github.com/auroraride/cabservd/internal/ent/runtime.go
 
 const (
-	Version = "v0.11.9-0.20230219143902-44327541440b"           // Version of ent codegen.
-	Sum     = "h1:NVyFbH1Gt76nQ+M4ZnsI8R94VzuA2hskUybIcyWBJgQ=" // Sum of ent codegen.
+	Version = "v0.12.3"                                         // Version of ent codegen.
+	Sum     = "h1:N5lO2EOrHpCH5HYfiMOCHYbo+oh5M8GjT0/cx5x6xkk=" // Sum of ent codegen.
 )

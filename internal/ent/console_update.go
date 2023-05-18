@@ -297,7 +297,7 @@ func (cu *ConsoleUpdate) ClearBin() *ConsoleUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *ConsoleUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ConsoleMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -441,10 +441,7 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{console.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -457,10 +454,7 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{console.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -476,10 +470,7 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{console.BinColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -492,10 +483,7 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{console.BinColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -802,7 +790,7 @@ func (cuo *ConsoleUpdateOne) Select(field string, fields ...string) *ConsoleUpda
 
 // Save executes the query and returns the updated Console entity.
 func (cuo *ConsoleUpdateOne) Save(ctx context.Context) (*Console, error) {
-	return withHooks[*Console, ConsoleMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -963,10 +951,7 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 			Columns: []string{console.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -979,10 +964,7 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 			Columns: []string{console.CabinetColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: cabinet.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(cabinet.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {
@@ -998,10 +980,7 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 			Columns: []string{console.BinColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -1014,10 +993,7 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 			Columns: []string{console.BinColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUint64,
-					Column: bin.FieldID,
-				},
+				IDSpec: sqlgraph.NewFieldSpec(bin.FieldID, field.TypeUint64),
 			},
 		}
 		for _, k := range nodes {

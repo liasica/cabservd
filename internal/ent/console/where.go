@@ -882,11 +882,7 @@ func HasCabinet() predicate.Console {
 // HasCabinetWith applies the HasEdge predicate on the "cabinet" edge with a given conditions (other predicates).
 func HasCabinetWith(preds ...predicate.Cabinet) predicate.Console {
 	return predicate.Console(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(CabinetInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, CabinetTable, CabinetColumn),
-		)
+		step := newCabinetStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -909,11 +905,7 @@ func HasBin() predicate.Console {
 // HasBinWith applies the HasEdge predicate on the "bin" edge with a given conditions (other predicates).
 func HasBinWith(preds ...predicate.Bin) predicate.Console {
 	return predicate.Console(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(BinInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, BinTable, BinColumn),
-		)
+		step := newBinStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

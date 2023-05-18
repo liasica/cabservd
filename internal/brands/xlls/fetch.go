@@ -6,13 +6,13 @@
 package xlls
 
 // FetchBusinessAttr 获取柜机业务属性
-func FetchBusinessAttr(req *BusinessAttrRequest) (BusinessAttrs, error) {
-	return doRequest[BusinessAttrs]("/openapi/cabinet/business/attr", req)
+func FetchBusinessAttr(req *BusinessAttrRequest) (CabAttrs, error) {
+	return doRequest[CabAttrs]("/openapi/cabinet/business/attr", req)
 }
 
 // FetchPhysicsAttr 获取柜机物理属性
-func FetchPhysicsAttr(req *SnListRequest) (PhysicsAttrs, error) {
-	return doRequest[PhysicsAttrs]("/openapi/cabinet/physics/attr", req)
+func FetchPhysicsAttr(req *SnListRequest) (CabAttrs, error) {
+	return doRequest[CabAttrs]("/openapi/cabinet/physics/attr", req)
 }
 
 // FetchAppAttr 获取柜机APP设置属性
@@ -46,8 +46,8 @@ func FetchCabinetModelDelete(req string) (data any, err error) {
 }
 
 // FetchCellAttr 获取格挡属性
-func FetchCellAttr(req *CellAttrRequest) (CellAttrs, error) {
-	return doRequest[CellAttrs]("/openapi/cell/attr", req)
+func FetchCellAttr(req *CellAttrRequest) (BinAttrs, error) {
+	return doRequest[BinAttrs]("/openapi/cell/attr", req)
 }
 
 // FetchBatteryCreate 批量创建电池

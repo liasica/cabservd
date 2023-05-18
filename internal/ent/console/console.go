@@ -5,6 +5,8 @@ package console
 import (
 	"fmt"
 
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/auroraride/adapter"
 )
 
@@ -145,4 +147,120 @@ func StatusValidator(s Status) error {
 	default:
 		return fmt.Errorf("console: invalid enum value for status field: %q", s)
 	}
+}
+
+// OrderOption defines the ordering options for the Console queries.
+type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByCabinetID orders the results by the cabinet_id field.
+func ByCabinetID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCabinetID, opts...).ToFunc()
+}
+
+// ByBinID orders the results by the bin_id field.
+func ByBinID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBinID, opts...).ToFunc()
+}
+
+// ByOperate orders the results by the operate field.
+func ByOperate(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOperate, opts...).ToFunc()
+}
+
+// BySerial orders the results by the serial field.
+func BySerial(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSerial, opts...).ToFunc()
+}
+
+// ByUUID orders the results by the uuid field.
+func ByUUID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUUID, opts...).ToFunc()
+}
+
+// ByBusiness orders the results by the business field.
+func ByBusiness(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldBusiness, opts...).ToFunc()
+}
+
+// ByUserID orders the results by the user_id field.
+func ByUserID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+}
+
+// ByUserType orders the results by the user_type field.
+func ByUserType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserType, opts...).ToFunc()
+}
+
+// ByStep orders the results by the step field.
+func ByStep(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStep, opts...).ToFunc()
+}
+
+// ByStatus orders the results by the status field.
+func ByStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStatus, opts...).ToFunc()
+}
+
+// ByMessage orders the results by the message field.
+func ByMessage(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMessage, opts...).ToFunc()
+}
+
+// ByStartAt orders the results by the startAt field.
+func ByStartAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStartAt, opts...).ToFunc()
+}
+
+// ByStopAt orders the results by the stopAt field.
+func ByStopAt(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldStopAt, opts...).ToFunc()
+}
+
+// ByDuration orders the results by the duration field.
+func ByDuration(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDuration, opts...).ToFunc()
+}
+
+// ByRemark orders the results by the remark field.
+func ByRemark(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRemark, opts...).ToFunc()
+}
+
+// ByCommandRetryTimes orders the results by the command_retry_times field.
+func ByCommandRetryTimes(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCommandRetryTimes, opts...).ToFunc()
+}
+
+// ByCabinetField orders the results by cabinet field.
+func ByCabinetField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCabinetStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByBinField orders the results by bin field.
+func ByBinField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newBinStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newCabinetStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CabinetInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, CabinetTable, CabinetColumn),
+	)
+}
+func newBinStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(BinInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, BinTable, BinColumn),
+	)
 }

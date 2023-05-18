@@ -46,6 +46,7 @@ type CabinetPointer struct {
 	Current     *float64        `json:"current,omitempty"`
 	Temperature *float64        `json:"temperature,omitempty"`
 	Electricity *float64        `json:"electricity,omitempty"`
+	Sim         *string         `json:"sim,omitempty"`
 }
 
 type ConsolePointers []*ConsolePointer
