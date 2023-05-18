@@ -77,12 +77,12 @@ func doRequest[T any](path string, biz any) (data T, err error) {
 		SetResult(result).
 		Post(baseURL + path)
 	if err != nil {
-		zap.L().Error("[api] 请求失败", zap.Error(err), zap.String("path", path), zap.ByteString("response", resp.Body()))
+		zap.L().Error("[api] 请求失败", zap.Error(err), zap.String("path", path), zap.ByteString("body", resp.Body()))
 		return
 	}
 
 	// TODO 日志记录增加elk索引
-	zap.L().Info("[api] 请求成功", zap.String("path", path), zap.ByteString("response", resp.Body()))
+	zap.L().Info("[api] 请求成功", zap.String("path", path), zap.ByteString("body", resp.Body()))
 	data = result.Data
 	return
 }
