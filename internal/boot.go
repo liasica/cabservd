@@ -49,8 +49,8 @@ func Boot(starter func()) {
 
 	// 初始化日志
 	log.New(&log.Config{
-		FormatJson: true,
-		Stdout:     g.Config.Debug,
+		FormatJson: !g.Config.LoggerDebug,
+		Stdout:     g.Config.LoggerDebug,
 		LoggerName: g.Config.LoggerName,
 		NoCaller:   true,
 		Writers: []io.Writer{

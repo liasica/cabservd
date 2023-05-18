@@ -8,15 +8,12 @@ package xlls
 import (
 	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
-	"go.uber.org/zap"
-
-	"github.com/auroraride/cabservd/internal/core"
 )
 
 // ApiResponse 接口响应, 西六楼 -> 平台
 type ApiResponse[T any] struct {
 	Code      int    `json:"code"`
-	RequestID string `json:"requestID"`
+	RequestID string `json:"requestId"`
 	ErrCode   string `json:"errCode,omitempty"`
 	ErrMsg    string `json:"errMsg,omitempty"`
 	Data      T      `json:"data,omitempty"`
@@ -26,7 +23,7 @@ type ApiResponse[T any] struct {
 // NotifyResult 回调响应, 平台 -> 西六楼
 type NotifyResult[T any] struct {
 	Code      int    `json:"code"`
-	RequestID string `json:"requestID"`
+	RequestID string `json:"requestId"`
 	ErrorMsg  string `json:"errorMsg,omitempty"`
 	Data      T      `json:"data,omitempty"`
 }
@@ -34,11 +31,6 @@ type NotifyResult[T any] struct {
 func (r *NotifyResult[T]) Bytes() []byte {
 	b, _ := jsoniter.Marshal(r)
 	return b
-}
-
-func (r *NotifyResult[T]) GetMessage(c core.Codec) ([]byte, []zap.Field) {
-	b := r.Bytes()
-	return c.Encode(b), []zap.Field{zap.ByteString("data", b)}
 }
 
 func generateRequestID() string {

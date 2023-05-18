@@ -18,6 +18,7 @@ type config struct {
 
 	Brand        adapter.CabinetBrand
 	Maintain     maintain.Config
+	LoggerDebug  bool
 	Debug        bool
 	DeadDuration int  `koanf:"dead-duration"` // 离线判定时间
 	NonBms       bool `koanf:"non-bms"`       // 是否不包含bms通讯

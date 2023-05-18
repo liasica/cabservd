@@ -38,6 +38,10 @@ func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *Cabinet) {
 }
 
 func UpdateCabinet(p CabinetUpdater) {
+	if p == nil {
+		return
+	}
+
 	ctx := context.Background()
 
 	serial, ok := p.GetSerial()

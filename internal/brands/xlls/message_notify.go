@@ -10,7 +10,7 @@ type Notifyer interface {
 }
 
 type Notify struct {
-	RequestID string `json:"requestID"`
+	RequestID string `json:"requestId"`
 }
 
 func (n Notify) GetRequestID() string {
@@ -52,7 +52,7 @@ type BinNotify struct {
 	BinAttr
 }
 
-type CabinetNotify struct {
+type CabNotify struct {
 	Notify
 	CabAttr
 	ReportTime int64  `json:"reportTime"`

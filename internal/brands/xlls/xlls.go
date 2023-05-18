@@ -39,7 +39,14 @@ func Start() {
 	// 创建echo
 	e := echo.New()
 
-	// TODO 使用中间件记录回调日志
+	// 默认json序列化工具
+	e.JSONSerializer = &adapter.DefaultJSONSerializer{}
+
+	// 获取远程IP
+	e.IPExtractor = echo.ExtractIPFromXFFHeader()
+
+	// 使用中间件记录回调日志
+	e.Use(dump())
 
 	// 覆盖echo打印
 	e.HideBanner = true
@@ -68,9 +75,6 @@ func Start() {
 
 	// 格挡状态变化通知
 	e.POST(pathCellChange, r.onBin)
-
-	// 电池和充电器状态变化通知
-	e.POST(pathBatteryChargeChange, r.onBat)
 
 	// 柜机状态变化通知
 	e.POST(pathCabinetChange, r.onCab)
