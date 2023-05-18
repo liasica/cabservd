@@ -45,7 +45,6 @@ func (r *receiver) onBin(c echo.Context) (err error) {
 }
 
 func (r *receiver) onCab(c echo.Context) (err error) {
-	zap.L().Info("test message")
 	n := new(CabNotify)
 	err = c.Bind(n)
 	if err != nil {

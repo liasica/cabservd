@@ -8,7 +8,6 @@ package internal
 import (
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"time"
 
@@ -48,15 +47,16 @@ func Boot(starter func()) {
 	})
 
 	// 初始化日志
-	log.New(&log.Config{
+	logcfg := &log.Config{
 		FormatJson: !g.Config.LoggerDebug,
 		Stdout:     g.Config.LoggerDebug,
 		LoggerName: g.Config.LoggerName,
 		NoCaller:   true,
-		Writers: []io.Writer{
-			log.NewRedisWriter(g.Redis),
-		},
-	})
+	}
+	if !g.Config.LoggerDebug {
+		logcfg.Writers = append(logcfg.Writers, log.NewRedisWriter(g.Redis))
+	}
+	log.New(logcfg)
 
 	// 加载模板
 	assets.LoadTemplates()

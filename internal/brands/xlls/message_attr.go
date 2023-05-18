@@ -61,7 +61,7 @@ func (attr *CabAttr) GetCabinet() (cab *ent.CabinetPointer, exist bool) {
 		return nil, false
 	}
 
-	exist = attr.Online != nil || attr.Voltage != nil || attr.Current != nil || attr.Iccid != nil || attr.Temp != nil
+	exist = attr.Online != nil || attr.Voltage != nil || attr.Current != nil || attr.Iccid != nil || attr.Temp != nil || attr.PowerConsumption != nil
 	if !exist {
 		return
 	}
@@ -95,6 +95,11 @@ func (attr *CabAttr) GetCabinet() (cab *ent.CabinetPointer, exist bool) {
 	// SIM卡
 	if attr.Iccid != nil {
 		cab.Sim = attr.Iccid
+	}
+
+	// 耗电量
+	if attr.PowerConsumption != nil {
+		cab.Electricity = attr.PowerConsumption
 	}
 
 	return cab, true
