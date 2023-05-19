@@ -121,6 +121,11 @@ func saveCabinet(cab *Cabinet, item *CabinetPointer) {
 		u.SetElectricity(*item.Electricity)
 	}
 
+	// SIM卡号
+	if item.Sim != nil {
+		u.SetSim(*item.Sim)
+	}
+
 	err := u.Exec(ctx)
 	if err != nil {
 		zap.L().Error("电柜保存失败", zap.Error(err), log.Payload(item))
