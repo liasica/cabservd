@@ -20,11 +20,11 @@ import (
 var (
 	cabinetSignals map[Signal]CabinetSignalFunc
 	binSignals     map[Signal]BinSignalFunc
+	typeList       *MessageTypeList
 )
 
 type Handler struct {
 	core.Bean
-	mtl *MessageTypeList
 }
 
 func New(options ...Option) (h *Handler) {
@@ -33,8 +33,8 @@ func New(options ...Option) (h *Handler) {
 		o.apply(h)
 	}
 
-	if h.mtl == nil {
-		h.mtl = &MessageTypeList{
+	if typeList == nil {
+		typeList = &MessageTypeList{
 			LoginRequest:    100,
 			LoginResponse:   101,
 			ReportRequest:   300,
@@ -65,13 +65,13 @@ func (h *Handler) OnMessage(_ *core.Client, b []byte) (serial string, res core.R
 	fields = append(fields, log.Payload(req))
 
 	switch req.MsgType {
-	case h.mtl.LoginRequest:
+	case typeList.LoginRequest:
 		err = h.LoginHandle(req)
-	case h.mtl.ReportRequest:
+	case typeList.ReportRequest:
 		err = h.ReportHandle(req)
-	case h.mtl.NoticeRequest:
+	case typeList.NoticeRequest:
 		err = h.NoticeHandle(req)
-	case h.mtl.ControlResponse:
+	case typeList.ControlResponse:
 		// TODO 控制成功逻辑
 		// 收到成功逻辑处理完成后, 不发送反馈消息
 		return

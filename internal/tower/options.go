@@ -17,7 +17,7 @@ func (f optionFunc) apply(h *Handler) {
 
 func WithMessageTypeList(v *MessageTypeList) Option {
 	return optionFunc(func(h *Handler) {
-		h.mtl = v
+		typeList = v
 	})
 }
 
