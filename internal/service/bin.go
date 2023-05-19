@@ -13,7 +13,6 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/defs/cabdef"
-	"github.com/google/uuid"
 	"go.uber.org/zap"
 
 	"github.com/auroraride/cabservd/internal/biz"
@@ -191,7 +190,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	}()
 
 	for _, step := range bo.Steps {
-		err = s.doOperateStep(bo.UUID, bo.Business, bo.Remark, eb, step, stepper, bo.StepCallback)
+		err = s.doOperateStep(bo, eb, step, stepper, ch)
 
 		// 遇到错误, 直接返回
 		if err != nil {
@@ -213,7 +212,7 @@ func (s *binService) IsExchangeThirdStep(business adapter.Business, step *types.
 }
 
 // doOperateStep 按步骤操作
-func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, remark string, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, scb types.StepCallback) (err error) {
+func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, bc chan *ent.Bin) (err error) {
 	// 创建记录
 	var co *ent.Console
 	co, err = ent.Database.Console.Create().
@@ -227,9 +226,9 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 		SetStartAt(time.Now()).
 		SetBeforeBin(eb.Info()).
 		SetStep(step.Step).
-		SetBusiness(business).
-		SetUUID(uid).
-		SetRemark(remark).
+		SetBusiness(bo.Business).
+		SetUUID(bo.UUID).
+		SetRemark(bo.Remark).
 		Save(s.GetContext())
 	if err != nil {
 		return
@@ -245,7 +244,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 	buf.WriteString(", 仓门:")
 	buf.WriteString(strconv.Itoa(eb.Ordinal))
 	buf.WriteString("] { ")
-	buf.WriteString(business.Text())
+	buf.WriteString(bo.Business.Text())
 	buf.WriteString("业务")
 	buf.WriteString(step.String())
 	buf.WriteString(" }")
@@ -261,7 +260,7 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 		}
 
 		// 同步回调结果
-		scb(res)
+		bo.StepCallback(res)
 	}()
 
 	// 电柜控制重试监听器
@@ -274,8 +273,8 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 
 			// 「换电第一步」如果超过指定次数, 终止重复指令
 			// TODO 这部分代码太丑了, 需要进行优化
-			if s.IsExchangeFirstStep(business, step) && times >= g.ExchangeFirstStepRetryTimes ||
-				s.IsExchangeThirdStep(business, step) && times >= g.ExchangeThirdStepRetryTimes {
+			if s.IsExchangeFirstStep(bo.Business, step) && times >= g.ExchangeFirstStepRetryTimes ||
+				s.IsExchangeThirdStep(bo.Business, step) && times >= g.ExchangeThirdStepRetryTimes {
 				ticker.Stop()
 				return
 			}
@@ -294,8 +293,8 @@ func (s *binService) doOperateStep(uid uuid.UUID, business adapter.Business, rem
 
 			// 「换电第一步」如果需要重复开仓, 则重置为每隔3s检测一次是否响应, 若指令无响应则重复开仓
 			// TODO 这部分代码太丑了, 需要进行优化
-			if s.IsExchangeFirstStep(business, step) && g.ExchangeFirstStepRetryTimes > 1 ||
-				s.IsExchangeThirdStep(business, step) && g.ExchangeThirdStepRetryTimes > 1 {
+			if s.IsExchangeFirstStep(bo.Business, step) && g.ExchangeFirstStepRetryTimes > 1 ||
+				s.IsExchangeThirdStep(bo.Business, step) && g.ExchangeThirdStepRetryTimes > 1 {
 				ticker.Reset(3 * time.Second)
 			}
 		})
