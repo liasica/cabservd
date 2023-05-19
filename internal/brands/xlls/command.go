@@ -35,6 +35,6 @@ const (
 	CellCloseCharge         CellCommand = "CELL_CLOSE_CHARGE"          // 关闭充电器
 	CellForbid              CellCommand = "CELL_FORBID"                // 禁用格挡
 	CellUnForbid            CellCommand = "CELL_UN_FORBID"             // 开启格挡
-	CellOpenFan             CellCommand = "CELL_OPEN_FAN"              // br>|打开格挡风扇
-	CellCloseFan            CellCommand = "CELL_CLOSE_FAN"             // br>|关闭格挡风扇
+	CellOpenFan             CellCommand = "CELL_OPEN_FAN"              // 打开格挡风扇
+	CellCloseFan            CellCommand = "CELL_CLOSE_FAN"             // 关闭格挡风扇
 )
