@@ -16,6 +16,7 @@ import (
 	"go.uber.org/zap"
 
 	"github.com/auroraride/cabservd/internal/biz"
+	"github.com/auroraride/cabservd/internal/brands/xlls"
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
@@ -212,7 +213,7 @@ func (s *binService) IsExchangeThirdStep(business adapter.Business, step *types.
 }
 
 // doOperateStep 按步骤操作
-func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, bc chan *ent.Bin) (err error) {
+func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, notifier chan *ent.Bin) (err error) {
 	// 创建记录
 	var co *ent.Console
 	co, err = ent.Database.Console.Create().
@@ -280,11 +281,15 @@ func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinSt
 			}
 
 			// 电柜控制
-			if g.UseHttp {
-				// TODO 待实现
-			} else {
+			// TODO: 抽离接口
+			switch g.Config.Brand {
+			default:
 				err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal, times)
+			case adapter.CabinetBrandXiliulouServer:
+				// TODO 待实现
+				err = xlls.BinTransfer(eb.Serial, eb.Ordinal, bo.Business, step.Operate, notifier, times)
 			}
+
 			// 如果电柜控制失败, 直接返回错误
 			if err != nil {
 				stepper <- types.NewBinResult(nil, err)
