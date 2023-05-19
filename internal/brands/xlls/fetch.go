@@ -69,3 +69,12 @@ func FetchBatteryModify(req *BatteryModifySnRequest) (data any, err error) {
 func FetchBatteryAttr(req *BatteryAttrRequest) (*BatteryAttr, error) {
 	return doRequest[*BatteryAttr]("/openapi/battery/attr", req)
 }
+
+// FetchCellCommand 仓位控制
+func FetchCellCommand(req *CellCommandRequest) (string, error) {
+	result, err := request[any]("/openapi/cell/command", req)
+	if err != nil {
+		return "", err
+	}
+	return result.RequestID, nil
+}

@@ -40,8 +40,8 @@ var (
 	}
 )
 
-func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int, times int) (err error) {
-	v, ok := controlValueMap[typ]
+func (h *Handler) SendOperate(serial string, operate cabdef.Operate, ordinal int, times int) (err error) {
+	v, ok := controlValueMap[operate]
 	if !ok {
 		return adapter.ErrorCabinetControlParam
 	}

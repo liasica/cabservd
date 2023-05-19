@@ -21,7 +21,7 @@ type (
 		OnMessage(c *Client, b []byte) (serial string, res ResponseMessenger, fields []zap.Field, err error)
 
 		// SendOperate 发送主要控制
-		SendOperate(serial string, typ cabdef.Operate, ordinal int, times int) error
+		SendOperate(serial string, operate cabdef.Operate, ordinal int, times int) error
 	}
 
 	Bean struct{}

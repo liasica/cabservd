@@ -12,6 +12,22 @@ import (
 	"github.com/auroraride/cabservd/internal/ent"
 )
 
-func BinTransfer(serial string, ordinal int, business adapter.Business, typ cabdef.Operate, notifier chan *ent.Bin, times int) (err error) {
+var binCommand = map[cabdef.Operate]CellCommand{
+	cabdef.OperateDoorOpen:   CellOpenDoor,
+	cabdef.OperateBinDisable: CellForbid,
+	cabdef.OperateBinEnable:  CellUnForbid,
+}
+
+func BinTransfer(serial string, ordinal int, business adapter.Business, operate cabdef.Operate, notifier chan *ent.Bin, times int) (err error) {
+	switch business {
+	case adapter.BusinessOperate:
+		// 运维操作
+		_, err = FetchCellCommand(&CellCommandRequest{
+			Sn:      serial,
+			CellNos: []int{ordinal},
+			Command: binCommand[operate],
+		})
+		return
+	}
 	return
 }

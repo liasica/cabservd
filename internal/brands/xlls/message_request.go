@@ -51,15 +51,15 @@ type CabinetCommandRequest[T any] struct {
 
 // CellAttrRequest 获取格挡相关属性请求
 type CellAttrRequest struct {
-	Sn      string   `json:"sn"`
-	CellNos []string `json:"cellNos,omitempty"` // 柜机的格挡号，可以为多个，如果传入不存在的，那么最终只会返回存在的格挡，不会报错
-	IsAll   int      `json:"isAll,omitempty"`   // 和cellNos必须二选一，如果两个参数都传了，系统默认取isAll,如果这个值不为空(任意的int数值)，那么就会返回所有的格挡相关属性
+	Sn      string `json:"sn"`
+	CellNos []int  `json:"cellNos,omitempty"` // 柜机的格挡号，可以为多个，如果传入不存在的，那么最终只会返回存在的格挡，不会报错
+	IsAll   int    `json:"isAll,omitempty"`   // 和cellNos必须二选一，如果两个参数都传了，系统默认取isAll,如果这个值不为空(任意的int数值)，那么就会返回所有的格挡相关属性
 }
 
 // CellCommandRequest 「ASYNC」发送柜机格挡硬件控制指令
 type CellCommandRequest struct {
 	Sn      string      `json:"sn"`
-	CellNos []string    `json:"cellNos,omitempty"` // 柜机的格挡号，可以为多个，如果传入不存在的，那么最终只会返回存在的格挡，不会报错
+	CellNos []int       `json:"cellNos,omitempty"` // 柜机的格挡号，可以为多个，如果传入不存在的，那么最终只会返回存在的格挡，不会报错
 	IsAll   int         `json:"isAll,omitempty"`   // 和cellNos必须二选一，如果两个参数都传了，系统默认取isAll,如果这个值不为空(任意的int数值)，那么就会返回所有的格挡相关属性
 	Command CellCommand `json:"command"`           // 格挡控制指令
 	Data    any         `json:"data,omitempty"`    // 如果是开指示灯，那么必须传入指示灯的颜色

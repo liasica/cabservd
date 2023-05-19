@@ -139,9 +139,9 @@ func (h *Handler) OnMessage(c *core.Client, data []byte) (serial string, res cor
 	return
 }
 
-func (h *Handler) SendOperate(serial string, typ cabdef.Operate, ordinal int, times int) (err error) {
+func (h *Handler) SendOperate(serial string, operate cabdef.Operate, ordinal int, times int) (err error) {
 	index := ordinal - 1
-	switch typ {
+	switch operate {
 	default:
 		return adapter.ErrorOperateCommand
 	case cabdef.OperateDoorOpen:

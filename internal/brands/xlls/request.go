@@ -67,14 +67,20 @@ func newRequest(biz any) (args *Request) {
 }
 
 func doRequest[T any](path string, biz any) (data T, err error) {
-	result := new(ApiResponse[T])
+	var result ApiResponse[T]
+	result, err = request[T](path, biz)
+	data = result.Data
+	return
+}
+
+func request[T any](path string, biz any) (result ApiResponse[T], err error) {
 	args := newRequest(biz)
 	client := resty.New()
 	var resp *resty.Response
 	resp, err = client.R().
 		EnableTrace().
 		SetBody(args).
-		SetResult(result).
+		SetResult(&result).
 		Post(baseURL + path)
 	if err != nil {
 		zap.L().Error("[api] 请求失败", zap.Error(err), zap.String("path", path), zap.ByteString("body", resp.Body()))
@@ -83,6 +89,5 @@ func doRequest[T any](path string, biz any) (data T, err error) {
 
 	// TODO 日志记录增加elk索引
 	zap.L().Info("[api] 请求成功", zap.String("path", path), zap.ByteString("body", resp.Body()))
-	data = result.Data
 	return
 }
