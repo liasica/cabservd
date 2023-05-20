@@ -20,7 +20,7 @@ var binCommand = map[cabdef.Operate]CellCommand{
 	cabdef.OperateBinEnable:  CellUnForbid,
 }
 
-func BinTransfer(serial string, ordinal int, bo *types.Bin, step *types.BinStep) (err error) {
+func BinTransfer(bo *types.Bin, step *types.BinStep) (err error) {
 	if step.Step != 1 {
 		return
 	}
@@ -29,23 +29,19 @@ func BinTransfer(serial string, ordinal int, bo *types.Bin, step *types.BinStep)
 	case adapter.BusinessOperate:
 		// 运维操作
 		_, err = fetchCellCommand(&CellCommandRequest{
-			Sn:      serial,
-			CellNos: []int{ordinal},
+			Sn:      bo.Serial,
+			CellNos: []int{bo.Ordinal},
 			Command: binCommand[step.Operate],
 		})
 		return
 	case adapter.BusinessExchange:
 		_, err = fetchExchange(&BusinessExchangeRequest{
-			Sn:               serial,
+			Sn:               bo.Serial,
 			OrderNo:          strconv.FormatUint(bo.Scan.ID, 10),
 			EmptyCellNo:      bo.Scan.Data.Empty.Ordinal,
 			BatteryCellNo:    bo.Scan.Data.Fully.Ordinal,
 			BindingBatterySn: bo.Battery,
 		})
 	}
-	return
-}
-
-func doExchange() (err error) {
 	return
 }

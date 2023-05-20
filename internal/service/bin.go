@@ -313,7 +313,7 @@ func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinSt
 			// }
 		}
 	case adapter.CabinetBrandXiliulouServer:
-		err = xlls.BinTransfer(eb.Serial, eb.Ordinal, bo, step)
+		err = xlls.BinTransfer(bo, step)
 	}
 
 	// 监听步骤结果
