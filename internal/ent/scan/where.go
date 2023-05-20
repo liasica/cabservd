@@ -77,6 +77,11 @@ func UUID(v uuid.UUID) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldUUID, v))
 }
 
+// OrderNo applies equality check predicate on the "order_no" field. It's identical to OrderNoEQ.
+func OrderNo(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldOrderNo, v))
+}
+
 // Efficient applies equality check predicate on the "efficient" field. It's identical to EfficientEQ.
 func Efficient(v bool) predicate.Scan {
 	return predicate.Scan(sql.FieldEQ(FieldEfficient, v))
@@ -235,6 +240,81 @@ func UUIDLT(v uuid.UUID) predicate.Scan {
 // UUIDLTE applies the LTE predicate on the "uuid" field.
 func UUIDLTE(v uuid.UUID) predicate.Scan {
 	return predicate.Scan(sql.FieldLTE(FieldUUID, v))
+}
+
+// OrderNoEQ applies the EQ predicate on the "order_no" field.
+func OrderNoEQ(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldEQ(FieldOrderNo, v))
+}
+
+// OrderNoNEQ applies the NEQ predicate on the "order_no" field.
+func OrderNoNEQ(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldNEQ(FieldOrderNo, v))
+}
+
+// OrderNoIn applies the In predicate on the "order_no" field.
+func OrderNoIn(vs ...string) predicate.Scan {
+	return predicate.Scan(sql.FieldIn(FieldOrderNo, vs...))
+}
+
+// OrderNoNotIn applies the NotIn predicate on the "order_no" field.
+func OrderNoNotIn(vs ...string) predicate.Scan {
+	return predicate.Scan(sql.FieldNotIn(FieldOrderNo, vs...))
+}
+
+// OrderNoGT applies the GT predicate on the "order_no" field.
+func OrderNoGT(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldGT(FieldOrderNo, v))
+}
+
+// OrderNoGTE applies the GTE predicate on the "order_no" field.
+func OrderNoGTE(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldGTE(FieldOrderNo, v))
+}
+
+// OrderNoLT applies the LT predicate on the "order_no" field.
+func OrderNoLT(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldLT(FieldOrderNo, v))
+}
+
+// OrderNoLTE applies the LTE predicate on the "order_no" field.
+func OrderNoLTE(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldLTE(FieldOrderNo, v))
+}
+
+// OrderNoContains applies the Contains predicate on the "order_no" field.
+func OrderNoContains(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldContains(FieldOrderNo, v))
+}
+
+// OrderNoHasPrefix applies the HasPrefix predicate on the "order_no" field.
+func OrderNoHasPrefix(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldHasPrefix(FieldOrderNo, v))
+}
+
+// OrderNoHasSuffix applies the HasSuffix predicate on the "order_no" field.
+func OrderNoHasSuffix(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldHasSuffix(FieldOrderNo, v))
+}
+
+// OrderNoIsNil applies the IsNil predicate on the "order_no" field.
+func OrderNoIsNil() predicate.Scan {
+	return predicate.Scan(sql.FieldIsNull(FieldOrderNo))
+}
+
+// OrderNoNotNil applies the NotNil predicate on the "order_no" field.
+func OrderNoNotNil() predicate.Scan {
+	return predicate.Scan(sql.FieldNotNull(FieldOrderNo))
+}
+
+// OrderNoEqualFold applies the EqualFold predicate on the "order_no" field.
+func OrderNoEqualFold(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldEqualFold(FieldOrderNo, v))
+}
+
+// OrderNoContainsFold applies the ContainsFold predicate on the "order_no" field.
+func OrderNoContainsFold(v string) predicate.Scan {
+	return predicate.Scan(sql.FieldContainsFold(FieldOrderNo, v))
 }
 
 // BusinessEQ applies the EQ predicate on the "business" field.

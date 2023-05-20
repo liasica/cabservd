@@ -219,6 +219,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "uuid", Type: field.TypeUUID, Unique: true},
+		{Name: "order_no", Type: field.TypeString, Nullable: true, Comment: "订单编号"},
 		{Name: "business", Type: field.TypeEnum, Comment: "业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订", Enums: []string{"operate", "exchange", "active", "pause", "continue", "unsubscribe"}},
 		{Name: "efficient", Type: field.TypeBool, Comment: "是否有效", Default: true},
 		{Name: "user_id", Type: field.TypeString, Comment: "用户ID"},
@@ -235,7 +236,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "scan_cabinet_cabinet",
-				Columns:    []*schema.Column{ScanColumns[10]},
+				Columns:    []*schema.Column{ScanColumns[11]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -249,22 +250,22 @@ var (
 			{
 				Name:    "scan_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[10]},
+				Columns: []*schema.Column{ScanColumns[11]},
 			},
 			{
 				Name:    "scan_user_id",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[6]},
+				Columns: []*schema.Column{ScanColumns[7]},
 			},
 			{
 				Name:    "scan_user_type",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[7]},
+				Columns: []*schema.Column{ScanColumns[8]},
 			},
 			{
 				Name:    "scan_serial",
 				Unique:  false,
-				Columns: []*schema.Column{ScanColumns[8]},
+				Columns: []*schema.Column{ScanColumns[9]},
 			},
 		},
 	}

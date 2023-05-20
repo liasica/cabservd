@@ -198,6 +198,9 @@ func (su *ScanUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.UUID(); ok {
 		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
 	}
+	if su.mutation.OrderNoCleared() {
+		_spec.ClearField(scan.FieldOrderNo, field.TypeString)
+	}
 	if value, ok := su.mutation.Business(); ok {
 		_spec.SetField(scan.FieldBusiness, field.TypeEnum, value)
 	}
@@ -464,6 +467,9 @@ func (suo *ScanUpdateOne) sqlSave(ctx context.Context) (_node *Scan, err error) 
 	}
 	if value, ok := suo.mutation.UUID(); ok {
 		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
+	}
+	if suo.mutation.OrderNoCleared() {
+		_spec.ClearField(scan.FieldOrderNo, field.TypeString)
 	}
 	if value, ok := suo.mutation.Business(); ok {
 		_spec.SetField(scan.FieldBusiness, field.TypeEnum, value)

@@ -30,6 +30,8 @@ type Scan struct {
 	CabinetID uint64 `json:"cabinet_id,omitempty"`
 	// UUID holds the value of the "uuid" field.
 	UUID uuid.UUID `json:"uuid,omitempty"`
+	// 订单编号
+	OrderNo *string `json:"order_no,omitempty"`
 	// 业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订
 	Business adapter.Business `json:"business,omitempty"`
 	// 是否有效
@@ -85,7 +87,7 @@ func (*Scan) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case scan.FieldID, scan.FieldCabinetID:
 			values[i] = new(sql.NullInt64)
-		case scan.FieldUserID, scan.FieldSerial:
+		case scan.FieldOrderNo, scan.FieldUserID, scan.FieldSerial:
 			values[i] = new(sql.NullString)
 		case scan.FieldCreatedAt, scan.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -135,6 +137,13 @@ func (s *Scan) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field uuid", values[i])
 			} else if value != nil {
 				s.UUID = *value
+			}
+		case scan.FieldOrderNo:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field order_no", values[i])
+			} else if value.Valid {
+				s.OrderNo = new(string)
+				*s.OrderNo = value.String
 			}
 		case scan.FieldBusiness:
 			if value, ok := values[i].(*adapter.Business); !ok {
@@ -226,6 +235,11 @@ func (s *Scan) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("uuid=")
 	builder.WriteString(fmt.Sprintf("%v", s.UUID))
+	builder.WriteString(", ")
+	if v := s.OrderNo; v != nil {
+		builder.WriteString("order_no=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("business=")
 	builder.WriteString(fmt.Sprintf("%v", s.Business))

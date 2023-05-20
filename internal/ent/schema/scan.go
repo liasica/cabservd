@@ -12,8 +12,9 @@ import (
 	"entgo.io/ent/schema/mixin"
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
-	"github.com/auroraride/cabservd/internal/ent/internal"
 	"github.com/google/uuid"
+
+	"github.com/auroraride/cabservd/internal/ent/internal"
 )
 
 type ScanMixin struct {
@@ -64,6 +65,7 @@ func (Scan) Annotations() []schema.Annotation {
 func (Scan) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("uuid", uuid.UUID{}).Unique().Default(uuid.New),
+		field.String("order_no").Optional().Nillable().Immutable().Comment("订单编号"),
 		field.Enum("business").GoType(adapter.Business("")).Comment("业务 operate:运维操作 exchange:换电 active:激活 pause:寄存 continue:结束寄存 unsubscribe:退订"),
 		field.Bool("efficient").Default(true).Comment("是否有效"),
 		field.String("user_id").Comment("用户ID"),

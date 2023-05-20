@@ -75,6 +75,7 @@ type ScanPointers []*ScanPointer
 type ScanPointer struct {
 	CabinetID *uint64                           `json:"cabinet_id,omitempty"`
 	UUID      *uuid.UUID                        `json:"uuid,omitempty"`
+	OrderNo   *string                           `json:"order_no,omitempty"`
 	Business  *adapter.Business                 `json:"business,omitempty"`
 	Efficient *bool                             `json:"efficient,omitempty"`
 	UserID    *string                           `json:"user_id,omitempty"`

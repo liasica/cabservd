@@ -12,6 +12,7 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/oklog/ulid/v2"
 
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
@@ -37,7 +38,15 @@ func NewScan(params ...any) *scanService {
 
 // Create 新增扫码记录
 func (s *scanService) Create(ab adapter.Business, serial string, cab *ent.Cabinet, data *cabdef.CabinetBinUsableResponse) *ent.Scan {
-	sm, _ := ent.Database.Scan.Create().SetSerial(serial).SetUserID(s.GetUser().ID).SetData(data).SetUserType(s.GetUser().Type).SetCabinet(cab).SetBusiness(ab).Save(s.GetContext())
+	sm, _ := ent.Database.Scan.Create().
+		SetSerial(serial).
+		SetUserID(s.GetUser().ID).
+		SetData(data).
+		SetUserType(s.GetUser().Type).
+		SetCabinet(cab).
+		SetBusiness(ab).
+		SetOrderNo(ulid.Make().String()).
+		Save(s.GetContext())
 	return sm
 }
 

@@ -74,6 +74,20 @@ func (sc *ScanCreate) SetNillableUUID(u *uuid.UUID) *ScanCreate {
 	return sc
 }
 
+// SetOrderNo sets the "order_no" field.
+func (sc *ScanCreate) SetOrderNo(s string) *ScanCreate {
+	sc.mutation.SetOrderNo(s)
+	return sc
+}
+
+// SetNillableOrderNo sets the "order_no" field if the given value is not nil.
+func (sc *ScanCreate) SetNillableOrderNo(s *string) *ScanCreate {
+	if s != nil {
+		sc.SetOrderNo(*s)
+	}
+	return sc
+}
+
 // SetBusiness sets the "business" field.
 func (sc *ScanCreate) SetBusiness(a adapter.Business) *ScanCreate {
 	sc.mutation.SetBusiness(a)
@@ -251,6 +265,10 @@ func (sc *ScanCreate) createSpec() (*Scan, *sqlgraph.CreateSpec) {
 	if value, ok := sc.mutation.UUID(); ok {
 		_spec.SetField(scan.FieldUUID, field.TypeUUID, value)
 		_node.UUID = value
+	}
+	if value, ok := sc.mutation.OrderNo(); ok {
+		_spec.SetField(scan.FieldOrderNo, field.TypeString, value)
+		_node.OrderNo = &value
 	}
 	if value, ok := sc.mutation.Business(); ok {
 		_spec.SetField(scan.FieldBusiness, field.TypeEnum, value)
@@ -472,6 +490,9 @@ func (u *ScanUpsertOne) UpdateNewValues() *ScanUpsertOne {
 	u.create.conflict = append(u.create.conflict, sql.ResolveWith(func(s *sql.UpdateSet) {
 		if _, exists := u.create.mutation.CreatedAt(); exists {
 			s.SetIgnore(scan.FieldCreatedAt)
+		}
+		if _, exists := u.create.mutation.OrderNo(); exists {
+			s.SetIgnore(scan.FieldOrderNo)
 		}
 	}))
 	return u
@@ -819,6 +840,9 @@ func (u *ScanUpsertBulk) UpdateNewValues() *ScanUpsertBulk {
 		for _, b := range u.create.builders {
 			if _, exists := b.mutation.CreatedAt(); exists {
 				s.SetIgnore(scan.FieldCreatedAt)
+			}
+			if _, exists := b.mutation.OrderNo(); exists {
+				s.SetIgnore(scan.FieldOrderNo)
 			}
 		}
 	}))

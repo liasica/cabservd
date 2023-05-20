@@ -4722,6 +4722,7 @@ type ScanMutation struct {
 	created_at     *time.Time
 	updated_at     *time.Time
 	uuid           *uuid.UUID
+	order_no       *string
 	business       *adapter.Business
 	efficient      *bool
 	user_id        *string
@@ -4976,6 +4977,55 @@ func (m *ScanMutation) OldUUID(ctx context.Context) (v uuid.UUID, err error) {
 // ResetUUID resets all changes to the "uuid" field.
 func (m *ScanMutation) ResetUUID() {
 	m.uuid = nil
+}
+
+// SetOrderNo sets the "order_no" field.
+func (m *ScanMutation) SetOrderNo(s string) {
+	m.order_no = &s
+}
+
+// OrderNo returns the value of the "order_no" field in the mutation.
+func (m *ScanMutation) OrderNo() (r string, exists bool) {
+	v := m.order_no
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOrderNo returns the old "order_no" field's value of the Scan entity.
+// If the Scan object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ScanMutation) OldOrderNo(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOrderNo is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOrderNo requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOrderNo: %w", err)
+	}
+	return oldValue.OrderNo, nil
+}
+
+// ClearOrderNo clears the value of the "order_no" field.
+func (m *ScanMutation) ClearOrderNo() {
+	m.order_no = nil
+	m.clearedFields[scan.FieldOrderNo] = struct{}{}
+}
+
+// OrderNoCleared returns if the "order_no" field was cleared in this mutation.
+func (m *ScanMutation) OrderNoCleared() bool {
+	_, ok := m.clearedFields[scan.FieldOrderNo]
+	return ok
+}
+
+// ResetOrderNo resets all changes to the "order_no" field.
+func (m *ScanMutation) ResetOrderNo() {
+	m.order_no = nil
+	delete(m.clearedFields, scan.FieldOrderNo)
 }
 
 // SetBusiness sets the "business" field.
@@ -5267,7 +5317,7 @@ func (m *ScanMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ScanMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, scan.FieldCreatedAt)
 	}
@@ -5279,6 +5329,9 @@ func (m *ScanMutation) Fields() []string {
 	}
 	if m.uuid != nil {
 		fields = append(fields, scan.FieldUUID)
+	}
+	if m.order_no != nil {
+		fields = append(fields, scan.FieldOrderNo)
 	}
 	if m.business != nil {
 		fields = append(fields, scan.FieldBusiness)
@@ -5314,6 +5367,8 @@ func (m *ScanMutation) Field(name string) (ent.Value, bool) {
 		return m.CabinetID()
 	case scan.FieldUUID:
 		return m.UUID()
+	case scan.FieldOrderNo:
+		return m.OrderNo()
 	case scan.FieldBusiness:
 		return m.Business()
 	case scan.FieldEfficient:
@@ -5343,6 +5398,8 @@ func (m *ScanMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCabinetID(ctx)
 	case scan.FieldUUID:
 		return m.OldUUID(ctx)
+	case scan.FieldOrderNo:
+		return m.OldOrderNo(ctx)
 	case scan.FieldBusiness:
 		return m.OldBusiness(ctx)
 	case scan.FieldEfficient:
@@ -5391,6 +5448,13 @@ func (m *ScanMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUUID(v)
+		return nil
+	case scan.FieldOrderNo:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOrderNo(v)
 		return nil
 	case scan.FieldBusiness:
 		v, ok := value.(adapter.Business)
@@ -5467,6 +5531,9 @@ func (m *ScanMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *ScanMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(scan.FieldOrderNo) {
+		fields = append(fields, scan.FieldOrderNo)
+	}
 	if m.FieldCleared(scan.FieldData) {
 		fields = append(fields, scan.FieldData)
 	}
@@ -5484,6 +5551,9 @@ func (m *ScanMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *ScanMutation) ClearField(name string) error {
 	switch name {
+	case scan.FieldOrderNo:
+		m.ClearOrderNo()
+		return nil
 	case scan.FieldData:
 		m.ClearData()
 		return nil
@@ -5506,6 +5576,9 @@ func (m *ScanMutation) ResetField(name string) error {
 		return nil
 	case scan.FieldUUID:
 		m.ResetUUID()
+		return nil
+	case scan.FieldOrderNo:
+		m.ResetOrderNo()
 		return nil
 	case scan.FieldBusiness:
 		m.ResetBusiness()

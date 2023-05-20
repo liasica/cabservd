@@ -25,6 +25,8 @@ const (
 	FieldCabinetID = "cabinet_id"
 	// FieldUUID holds the string denoting the uuid field in the database.
 	FieldUUID = "uuid"
+	// FieldOrderNo holds the string denoting the order_no field in the database.
+	FieldOrderNo = "order_no"
 	// FieldBusiness holds the string denoting the business field in the database.
 	FieldBusiness = "business"
 	// FieldEfficient holds the string denoting the efficient field in the database.
@@ -57,6 +59,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldCabinetID,
 	FieldUUID,
+	FieldOrderNo,
 	FieldBusiness,
 	FieldEfficient,
 	FieldUserID,
@@ -124,6 +127,11 @@ func ByCabinetID(opts ...sql.OrderTermOption) OrderOption {
 // ByUUID orders the results by the uuid field.
 func ByUUID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUUID, opts...).ToFunc()
+}
+
+// ByOrderNo orders the results by the order_no field.
+func ByOrderNo(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrderNo, opts...).ToFunc()
 }
 
 // ByBusiness orders the results by the business field.

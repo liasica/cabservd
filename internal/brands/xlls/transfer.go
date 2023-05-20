@@ -6,8 +6,6 @@
 package xlls
 
 import (
-	"strconv"
-
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/defs/cabdef"
 
@@ -37,7 +35,7 @@ func BinTransfer(bo *types.Bin, step *types.BinStep) (err error) {
 	case adapter.BusinessExchange:
 		_, err = fetchExchange(&BusinessExchangeRequest{
 			Sn:               bo.Serial,
-			OrderNo:          strconv.FormatUint(bo.Scan.ID, 10),
+			OrderNo:          *bo.Scan.OrderNo,
 			EmptyCellNo:      bo.Scan.Data.Empty.Ordinal,
 			BatteryCellNo:    bo.Scan.Data.Fully.Ordinal,
 			BindingBatterySn: bo.Battery,
