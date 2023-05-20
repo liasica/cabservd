@@ -20,7 +20,6 @@ import (
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
-	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/g"
 	"github.com/auroraride/cabservd/internal/mem"
 	"github.com/auroraride/cabservd/internal/sync"
@@ -217,21 +216,7 @@ func (s *binService) IsExchangeThirdStep(business adapter.Business, step *types.
 func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult) (err error) {
 	// 创建记录
 	var co *ent.Console
-	co, err = ent.Database.Console.Create().
-		SetOperate(step.Operate).
-		SetCabinetID(eb.CabinetID).
-		SetBinID(eb.ID).
-		SetSerial(eb.Serial).
-		SetUserID(s.GetUser().ID).
-		SetUserType(s.GetUser().Type).
-		SetStatus(console.StatusRunning).
-		SetStartAt(time.Now()).
-		SetBeforeBin(eb.Info()).
-		SetStep(step.Step).
-		SetBusiness(bo.Business).
-		SetUUID(bo.UUID).
-		SetRemark(bo.Remark).
-		Save(s.GetContext())
+	co, err = NewConsole(s.GetUser()).Create(bo, step, eb)
 	if err != nil {
 		return
 	}
