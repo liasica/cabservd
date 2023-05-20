@@ -6,8 +6,8 @@
 package xlls
 
 import (
-	"github.com/google/uuid"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/oklog/ulid/v2"
 )
 
 // ApiResponse 接口响应, 西六楼 -> 平台
@@ -34,5 +34,5 @@ func (r *NotifyResult[T]) Bytes() []byte {
 }
 
 func generateRequestID() string {
-	return uuid.New().String()
+	return ulid.Make().String()
 }

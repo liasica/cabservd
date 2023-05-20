@@ -144,32 +144,32 @@ func (attr *CabAttr) GetBins() (items ent.BinPointers) {
 			a = c.BatteryA
 		}
 
-		var batExists *bool
+		p := &ent.BinPointer{
+			Serial:    attr.Sn,
+			Name:      silk.String(strconv.Itoa(*c.CellNo) + "号仓"),
+			Ordinal:   c.CellNo,
+			Open:      silk.PointerConditionBool(c.DoorStatus, 1),
+			Enable:    silk.PointerConditionBool(c.ForbidStatus, 0),
+			Health:    health,
+			BatterySn: c.BatterySn,
+			Voltage:   v,
+			Current:   a,
+			Soc:       soc,
+			Remark:    c.ForbidReason,
+		}
 
-		// silk.Bool((c.BatterySn != nil && *c.BatterySn != "") || (c.ExistsBattery != nil && *c.ExistsBattery == 1))
 		if c.BatterySn != nil {
-			batExists = silk.Bool(*c.BatterySn != "")
+			p.BatteryExists = silk.Bool(*c.BatterySn != "")
+			if *c.BatterySn == "" {
+				p.Soc = silk.Float64(0)
+				p.Soh = silk.Float64(0)
+			}
 		}
 
 		// 暂时不使用ExistsBattery
 		// if c.ExistsBattery != nil {
 		// 	batExists = silk.Bool(*c.ExistsBattery == 1)
 		// }
-
-		p := &ent.BinPointer{
-			Serial:        attr.Sn,
-			Name:          silk.String(strconv.Itoa(*c.CellNo) + "号仓"),
-			Ordinal:       c.CellNo,
-			Open:          silk.PointerConditionBool(c.DoorStatus, 1),
-			Enable:        silk.PointerConditionBool(c.ForbidStatus, 0),
-			Health:        health,
-			BatteryExists: batExists,
-			BatterySn:     c.BatterySn,
-			Voltage:       v,
-			Current:       a,
-			Soc:           soc,
-			Remark:        c.ForbidReason,
-		}
 
 		// 清除备注
 		if p.Enable != nil && *p.Enable {
