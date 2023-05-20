@@ -10,50 +10,60 @@ import "errors"
 type ExchangeStatus float64
 
 const (
-	ExchangeStatusUnknown            ExchangeStatus = 0   // 未知状态
-	ExchangeStatusInit               ExchangeStatus = 1.0 // SELF_INIT_ORDER                     初始化订单
-	ExchangeStatusInitFail           ExchangeStatus = 1.1 // SELF_INIT_CHECK_PARAMS_FAIL         设备检查下发的参数失败
-	ExchangeStatusNoBattery          ExchangeStatus = 1.2 // SELF_INIT_CHECK_BATTERY_NOT_EXISTS  指定格挡不存在电池
-	ExchangeStatusBatteryTypeMismach ExchangeStatus = 1.3 // SELF_BATTERY_TYPE_MISMATCH          电池名称不匹配
-	ExchangeStatusDoorOpenSuccess    ExchangeStatus = 2.0 // SELF_OPEN_DOOR_SUCCESS              开门成功
-	ExchangeStatusDoorOpenFail       ExchangeStatus = 2.1 // SELF_OPEN_DOOR_ERROR                开门失败 (最终步骤, 中断流程)
-	ExchangeStatusBatteryTimeout     ExchangeStatus = 3.0 // SELF_TAKE_BATTERY_TIMEOUT           电池超时未取走
-	ExchangeStatusBatteryTook        ExchangeStatus = 3.1 // SELF_TAKE_BATTERY_SUCCESS           电池取走成功
-	ExchangeStatusCloseTimeout       ExchangeStatus = 4.0 // SELF_CLOSE_DOOR_TIMEOUT             关门超时 (最终步骤)
-	ExchangeStatusCloseSuccess       ExchangeStatus = 4.1 // SELF_CLOSE_DOOR_SUCCESS             关门成功 (最终步骤)
+	ExchangeStatusUnknown             ExchangeStatus = 0   // 未知状态
+	ExchangeInitOrder                 ExchangeStatus = 1.0 // 初始化订单
+	ExchangeInitCheckParamsFail       ExchangeStatus = 1.1 // 设备检查下发的参数失败 (中断流程)
+	ExchangeInitCheckBatteryNotExists ExchangeStatus = 1.2 // 指定格挡不存在电池 (中断流程)
+	ExchangeInitCheckCellNotEmpty     ExchangeStatus = 1.3 // 指定的格挡不是空仓 (中断流程)
+	ExchangePlaceOpenSuccess          ExchangeStatus = 2.0 // 开门成功
+	ExchangePlaceOpenFail             ExchangeStatus = 2.1 // 开门失败 (中断流程)
+	ExchangePlaceBatteryCheckSuccess  ExchangeStatus = 3.0 // 放入电池检测成功
+	ExchangePlaceBatteryCheckFail     ExchangeStatus = 3.1 // 检测电池直接失败 (中断流程) 例如: 放入的电池不是上一次的换电取走的电池 、放入的电池不属于第三方平台、因为开了strictMode模式, 网络不佳, 一直请求不到服务器, 导致检测电池失败
+	ExchangePlaceBatteryCheckTimeout  ExchangeStatus = 3.2 // 检测电池超时 (中断流程) 默认两分钟
+	ExchangeTakeOpenSuccess           ExchangeStatus = 4.0 // 取电池开门成功
+	ExchangeTakeOpenFail              ExchangeStatus = 4.1 // 开门失败 (中断流程)
+	ExchangeTakeBatterySuccess        ExchangeStatus = 5.0 // 电池取走成功 (流程结束)
+	ExchangeTakeBatteryTimeout        ExchangeStatus = 5.1 // 电池取走超时 (中断流程并且流程结束)
 )
 
 func (s ExchangeStatus) String() string {
 	switch s {
 	default:
 		return "未知状态"
-	case ExchangeStatusInit:
+	case ExchangeInitOrder:
 		return "初始化订单"
-	case ExchangeStatusInitFail:
+	case ExchangeInitCheckParamsFail:
 		return "设备检查下发的参数失败"
-	case ExchangeStatusNoBattery:
+	case ExchangeInitCheckBatteryNotExists:
 		return "指定格挡不存在电池"
-	case ExchangeStatusBatteryTypeMismach:
-		return "电池名称不匹配"
-	case ExchangeStatusDoorOpenSuccess:
+	case ExchangeInitCheckCellNotEmpty:
+		return "指定的格挡不是空仓"
+	case ExchangePlaceOpenSuccess:
 		return "开门成功"
-	case ExchangeStatusDoorOpenFail:
+	case ExchangePlaceOpenFail:
 		return "开门失败"
-	case ExchangeStatusBatteryTimeout:
-		return "电池超时未取走"
-	case ExchangeStatusBatteryTook:
+	case ExchangePlaceBatteryCheckSuccess:
+		return "放入电池检测成功"
+	case ExchangePlaceBatteryCheckFail:
+		return "检测电池直接失败"
+	case ExchangePlaceBatteryCheckTimeout:
+		return "检测电池超时"
+	case ExchangeTakeOpenSuccess:
+		return "取电池开门成功"
+	case ExchangeTakeOpenFail:
+		return "开门失败"
+	case ExchangeTakeBatterySuccess:
 		return "电池取走成功"
-	case ExchangeStatusCloseTimeout:
-		return "关门超时"
-	case ExchangeStatusCloseSuccess:
-		return "关门成功"
+	case ExchangeTakeBatteryTimeout:
+		return "电池取走超时"
 	}
 }
 
 // 判定是否失败并返回失败消息
 func (s ExchangeStatus) error() error {
 	switch s {
-	case ExchangeStatusInit, ExchangeStatusDoorOpenSuccess, ExchangeStatusBatteryTook, ExchangeStatusCloseSuccess:
+	case ExchangeInitCheckParamsFail, ExchangeInitCheckBatteryNotExists, ExchangeInitCheckCellNotEmpty, ExchangePlaceOpenFail,
+		ExchangePlaceBatteryCheckFail, ExchangePlaceBatteryCheckTimeout, ExchangeTakeOpenFail, ExchangeTakeBatteryTimeout:
 		return nil
 	}
 	return errors.New(s.String())
