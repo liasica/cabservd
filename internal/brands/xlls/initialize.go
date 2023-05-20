@@ -27,7 +27,7 @@ func initialize() {
 		if i == max-1 {
 			to = total
 		}
-		attrs, _ := FetchBusinessAttr(&BusinessAttrRequest{
+		attrs, _ := fetchBusinessAttr(&BusinessAttrRequest{
 			NeedCellAttr: 1,
 			SnList:       items[from:to],
 		})

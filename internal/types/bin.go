@@ -173,6 +173,7 @@ type Bin struct {
 	StepCallback StepCallback     // 每一步的回调
 	Remark       string           // 操作备注
 	BinRemark    *string          // 仓位备注
+	Scan         *ent.Scan        // 扫码信息
 }
 
 // Current 获取当前步骤

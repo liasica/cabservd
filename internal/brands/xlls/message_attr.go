@@ -144,6 +144,18 @@ func (attr *CabAttr) GetBins() (items ent.BinPointers) {
 			a = c.BatteryA
 		}
 
+		var batExists *bool
+
+		// silk.Bool((c.BatterySn != nil && *c.BatterySn != "") || (c.ExistsBattery != nil && *c.ExistsBattery == 1))
+		if c.BatterySn != nil {
+			batExists = silk.Bool(*c.BatterySn != "")
+		}
+
+		// 暂时不使用ExistsBattery
+		// if c.ExistsBattery != nil {
+		// 	batExists = silk.Bool(*c.ExistsBattery == 1)
+		// }
+
 		p := &ent.BinPointer{
 			Serial:        attr.Sn,
 			Name:          silk.String(strconv.Itoa(*c.CellNo) + "号仓"),
@@ -151,7 +163,7 @@ func (attr *CabAttr) GetBins() (items ent.BinPointers) {
 			Open:          silk.PointerConditionBool(c.DoorStatus, 1),
 			Enable:        silk.PointerConditionBool(c.ForbidStatus, 0),
 			Health:        health,
-			BatteryExists: silk.Bool(c.BatterySn != nil && *c.BatterySn != ""),
+			BatteryExists: batExists,
 			BatterySn:     c.BatterySn,
 			Voltage:       v,
 			Current:       a,

@@ -57,7 +57,7 @@ func dump() echo.MiddlewareFunc {
 
 			// 记录
 			zap.L().Info(
-				"收发消息",
+				"收到消息↑↓",
 				zap.String("path", c.Path()),
 				log.Payload(c.Get("payload")),
 				zap.ByteString("body", reqBody),

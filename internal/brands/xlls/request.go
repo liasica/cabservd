@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/auroraride/adapter"
+	"github.com/auroraride/adapter/log"
 	"github.com/go-resty/resty/v2"
 	jsoniter "github.com/json-iterator/go"
 	"go.uber.org/zap"
@@ -68,26 +69,29 @@ func newRequest(biz any) (args *Request) {
 
 func doRequest[T any](path string, biz any) (data T, err error) {
 	var result ApiResponse[T]
-	result, err = request[T](path, biz)
+	result, err = request[ApiResponse[T]](path, biz)
 	data = result.Data
 	return
 }
 
-func request[T any](path string, biz any) (result ApiResponse[T], err error) {
+func request[T any](path string, biz any) (result T, err error) {
 	args := newRequest(biz)
+	b, _ := jsoniter.Marshal(args)
+
 	client := resty.New()
 	var resp *resty.Response
 	resp, err = client.R().
 		EnableTrace().
-		SetBody(args).
+		SetHeader("Content-Type", "application/json; charset=utf-8").
+		SetBody(b).
 		SetResult(&result).
 		Post(baseURL + path)
 	if err != nil {
-		zap.L().Error("[api] 请求失败", zap.Error(err), zap.String("path", path), zap.ByteString("body", resp.Body()))
+		zap.L().Error("[api] 请求失败", zap.Error(err), zap.String("path", path), log.ResponseBody(resp.Body()), zap.ByteString("body", b))
 		return
 	}
 
 	// TODO 日志记录增加elk索引
-	zap.L().Info("[api] 请求成功", zap.String("path", path), zap.ByteString("body", resp.Body()))
+	zap.L().Info("[api] 请求成功", zap.String("path", path), log.ResponseBody(resp.Body()), zap.ByteString("body", b))
 	return
 }

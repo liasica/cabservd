@@ -12,13 +12,14 @@ import (
 	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/defs/cabdef"
+	"github.com/jinzhu/copier"
+	"github.com/liasica/go-helpers/silk"
+
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/auroraride/cabservd/internal/g"
 	"github.com/auroraride/cabservd/internal/sync"
 	"github.com/auroraride/cabservd/internal/types"
-	"github.com/jinzhu/copier"
-	"github.com/liasica/go-helpers/silk"
 )
 
 type exchangeService struct {
@@ -154,6 +155,7 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
 			Steps:        conf,
 			Battery:      req.Battery,
 			StepCallback: cb,
+			Scan:         sc,
 		})
 
 		if err != nil {

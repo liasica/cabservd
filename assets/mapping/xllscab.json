@@ -1,0 +1,109 @@
+{
+  "template": {
+    "mappings": {
+      "_source": {
+        "excludes": [],
+        "includes": [],
+        "enabled": true
+      },
+      "_routing": {
+        "required": false
+      },
+      "dynamic": true,
+      "numeric_detection": false,
+      "date_detection": true,
+      "dynamic_date_formats": [
+        "strict_date_optional_time",
+        "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z"
+      ],
+      "dynamic_templates": [],
+      "properties": {
+        "payload": {
+          "type": "object",
+          "properties": {
+            "activeElectricityEnergy": {
+              "type": "double"
+            },
+            "batteryA": {
+              "type": "double"
+            },
+            "batteryHealth": {
+              "type": "text",
+              "index": true,
+              "eager_global_ordinals": false,
+              "index_phrases": false,
+              "norms": true,
+              "fielddata": false,
+              "store": false,
+              "index_options": "positions"
+            },
+            "batteryV": {
+              "type": "double"
+            },
+            "boardTemp": {
+              "type": "double"
+            },
+            "capacity": {
+              "type": "double"
+            },
+            "chargeA": {
+              "type": "double"
+            },
+            "chargeV": {
+              "type": "double"
+            },
+            "coreTemp": {
+              "type": "double"
+            },
+            "coreV": {
+              "eager_global_ordinals": false,
+              "index_phrases": false,
+              "fielddata": false,
+              "norms": true,
+              "index": true,
+              "store": false,
+              "type": "text",
+              "index_options": "positions"
+            },
+            "current": {
+              "type": "double"
+            },
+            "envTemp": {
+              "type": "double"
+            },
+            "humidity": {
+              "type": "double"
+            },
+            "operateStep": {
+              "type": "double"
+            },
+            "power": {
+              "type": "double"
+            },
+            "powerConsumption": {
+              "type": "double"
+            },
+            "powerFactor": {
+              "type": "double"
+            },
+            "temp": {
+              "type": "double"
+            },
+            "voltage": {
+              "type": "double"
+            }
+          }
+        }
+      }
+    }
+  },
+  "index_patterns": [
+    "cabinet-xlls-*",
+    "development-cabinet-xlls-*"
+  ],
+  "data_stream": {
+    "hidden": false,
+    "allow_custom_routing": false
+  },
+  "composed_of": []
+}

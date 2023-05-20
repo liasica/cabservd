@@ -74,6 +74,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	ch := make(chan *ent.Bin)
 	sync.Bin.SetListener(eb, ch)
 
+	// 步骤结果监听器
 	stepper := make(chan *types.BinResult)
 
 	// 记录操作
@@ -191,7 +192,7 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 	}()
 
 	for _, step := range bo.Steps {
-		err = s.doOperateStep(bo, eb, step, stepper, ch)
+		err = s.doOperateStep(bo, eb, step, stepper)
 
 		// 遇到错误, 直接返回
 		if err != nil {
@@ -212,8 +213,8 @@ func (s *binService) IsExchangeThirdStep(business adapter.Business, step *types.
 	return business == adapter.BusinessExchange && step.Step == 3
 }
 
-// doOperateStep 按步骤操作
-func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult, notifier chan *ent.Bin) (err error) {
+// 按步骤操作
+func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult) (err error) {
 	// 创建记录
 	var co *ent.Console
 	co, err = ent.Database.Console.Create().
@@ -266,52 +267,53 @@ func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinSt
 
 	// 电柜控制重试监听器
 	var ticker *time.Timer
-	if step.Operate.IsCommand() {
-		// 重复检测器
-		// 初始设置为0立即执行指令
-		ticker = time.AfterFunc(0, func() {
-			times += 1
 
-			// 「换电第一步」如果超过指定次数, 终止重复指令
-			// TODO 这部分代码太丑了, 需要进行优化
-			if s.IsExchangeFirstStep(bo.Business, step) && times >= g.ExchangeFirstStepRetryTimes ||
-				s.IsExchangeThirdStep(bo.Business, step) && times >= g.ExchangeThirdStepRetryTimes {
-				ticker.Stop()
-				return
-			}
+	// 电柜控制
+	// TODO: 抽离接口
+	switch g.Config.Brand {
+	default:
+		if step.Operate.IsCommand() {
+			// 重复检测器
+			// 初始设置为0立即执行指令
+			ticker = time.AfterFunc(0, func() {
+				// 「换电第一步」如果超过指定次数, 终止重复指令
+				// TODO 这部分代码太丑了, 需要进行优化
+				if s.IsExchangeFirstStep(bo.Business, step) && times >= g.ExchangeFirstStepRetryTimes ||
+					s.IsExchangeThirdStep(bo.Business, step) && times >= g.ExchangeThirdStepRetryTimes {
+					ticker.Stop()
+					return
+				}
+				// 次数+1
+				times += 1
 
-			// 电柜控制
-			// TODO: 抽离接口
-			switch g.Config.Brand {
-			default:
+				// 电柜控制
 				err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal, times)
-			case adapter.CabinetBrandXiliulouServer:
-				// TODO 待实现
-				err = xlls.BinTransfer(eb.Serial, eb.Ordinal, bo.Business, step.Operate, notifier, times)
-			}
 
-			// 如果电柜控制失败, 直接返回错误
-			if err != nil {
-				stepper <- types.NewBinResult(nil, err)
-				return
-			}
+				// 如果电柜控制失败, 直接返回错误
+				if err != nil {
+					stepper <- types.NewBinResult(nil, err)
+					return
+				}
 
-			// 「换电第一步」如果需要重复开仓, 则重置为每隔3s检测一次是否响应, 若指令无响应则重复开仓
-			// TODO 这部分代码太丑了, 需要进行优化
-			if s.IsExchangeFirstStep(bo.Business, step) && g.ExchangeFirstStepRetryTimes > 1 ||
-				s.IsExchangeThirdStep(bo.Business, step) && g.ExchangeThirdStepRetryTimes > 1 {
-				ticker.Reset(3 * time.Second)
-			}
-		})
+				// 「换电第一步」如果需要重复开仓, 则重置为每隔3s检测一次是否响应, 若指令无响应则重复开仓
+				// TODO 这部分代码太丑了, 需要进行优化
+				if s.IsExchangeFirstStep(bo.Business, step) && g.ExchangeFirstStepRetryTimes > 1 ||
+					s.IsExchangeThirdStep(bo.Business, step) && g.ExchangeThirdStepRetryTimes > 1 {
+					ticker.Reset(3 * time.Second)
+				}
+			})
 
-		// // 电柜控制
-		// err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal)
-		//
-		// // TODO: 开仓失败后是否重复弹开逻辑???
-		// // TODO: 详细失败日志???
-		// if err != nil {
-		// 	return
-		// }
+			// // 电柜控制
+			// err = core.Hub.Bean.SendOperate(eb.Serial, step.Operate, eb.Ordinal)
+			//
+			// // TODO: 开仓失败后是否重复弹开逻辑???
+			// // TODO: 详细失败日志???
+			// if err != nil {
+			// 	return
+			// }
+		}
+	case adapter.CabinetBrandXiliulouServer:
+		err = xlls.BinTransfer(eb.Serial, eb.Ordinal, bo, step)
 	}
 
 	// 监听步骤结果
