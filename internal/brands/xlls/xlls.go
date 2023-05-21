@@ -64,9 +64,7 @@ func Start() {
 	})
 
 	// 业务结果通知
-	e.POST(pathBusinesss, func(c echo.Context) error {
-		return nil
-	})
+	e.POST(pathBusinesss, r.onBusinuess)
 
 	// 离线换电结果通知
 	e.POST(pathOfflineExchange, func(c echo.Context) error {

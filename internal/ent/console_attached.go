@@ -7,13 +7,13 @@ package ent
 
 import (
 	"github.com/auroraride/adapter/defs/cabdef"
+
 	"github.com/auroraride/cabservd/internal/ent/console"
 )
 
 func (c *Console) OperateResult() (res *cabdef.BinOperateResult) {
 	res = &cabdef.BinOperateResult{
 		UUID:     c.UUID.String(),
-		Operate:  c.Operate,
 		Step:     c.Step,
 		Business: c.Business,
 		StartAt:  c.StartAt,
@@ -29,10 +29,6 @@ func (c *Console) OperateResult() (res *cabdef.BinOperateResult) {
 
 	if c.Message != nil {
 		res.Message = *c.Message
-	}
-
-	if c.AfterBin != nil {
-		res.BatterySN = c.AfterBin.BatterySN
 	}
 
 	return

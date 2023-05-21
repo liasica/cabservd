@@ -12,7 +12,6 @@ import (
 
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/console"
-	"github.com/auroraride/cabservd/internal/types"
 )
 
 type consoleService struct {
@@ -26,25 +25,6 @@ func NewConsole(params ...any) *consoleService {
 		BaseService: app.NewService(params...),
 		orm:         ent.Database.Console,
 	}
-}
-
-// Create 创建操作记录
-func (s *consoleService) Create(bo *types.Bin, step *types.BinStep, eb *ent.Bin) (*ent.Console, error) {
-	return ent.Database.Console.Create().
-		SetOperate(step.Operate).
-		SetCabinetID(eb.CabinetID).
-		SetBinID(eb.ID).
-		SetSerial(eb.Serial).
-		SetUserID(s.GetUser().ID).
-		SetUserType(s.GetUser().Type).
-		SetStatus(console.StatusRunning).
-		SetStartAt(time.Now()).
-		SetBeforeBin(eb.Info()).
-		SetStep(step.Step).
-		SetBusiness(bo.Business).
-		SetUUID(bo.UUID).
-		SetRemark(bo.Remark).
-		Save(s.GetContext())
 }
 
 // Update 更新记录

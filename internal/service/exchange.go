@@ -15,6 +15,7 @@ import (
 	"github.com/jinzhu/copier"
 	"github.com/liasica/go-helpers/silk"
 
+	"github.com/auroraride/cabservd/internal/brands/xlls"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/scan"
 	"github.com/auroraride/cabservd/internal/g"
@@ -110,8 +111,8 @@ func (s *exchangeService) Do(req *cabdef.ExchangeRequest) (res *cabdef.ExchangeR
 		}
 
 		// 放入的电池, 第二步成功且有电池视为放入电池
-		if result.Step <= 2 && result.BatterySN != "" {
-			res.PutinBattery = result.BatterySN
+		if result.Step <= 2 && result.After != nil && result.After.BatterySN != "" {
+			res.PutinBattery = result.After.BatterySN
 		}
 	}
 
@@ -142,26 +143,30 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
 		go sync.SendMessage(data)
 	}
 
-	for i, conf := range types.ExchangeConfigure {
-		b := bins[i]
+	// 西六楼电柜
+	if g.Config.Brand == adapter.CabinetBrandXiliulouServer {
+		err = xlls.BinBusiness(s.GetUser(), sc, req.Battery, cb)
+	} else {
+		for i, conf := range types.ExchangeConfigure {
+			b := bins[i]
 
-		err = NewBin(s.GetUser()).Operate(&types.Bin{
-			Timeout:      req.Timeout,
-			MainOperate:  cabdef.OperateDoorOpen,
-			Serial:       sc.Serial,
-			UUID:         req.UUID,
-			Ordinal:      b.Ordinal,
-			Business:     adapter.BusinessExchange,
-			Steps:        conf,
-			Battery:      req.Battery,
-			StepCallback: cb,
-			Scan:         sc,
-		})
+			err = NewBin(s.GetUser()).Operate(&types.Bin{
+				Timeout:      req.Timeout,
+				MainOperate:  cabdef.OperateDoorOpen,
+				Serial:       sc.Serial,
+				UUID:         req.UUID,
+				Ordinal:      b.Ordinal,
+				Business:     adapter.BusinessExchange,
+				Steps:        conf,
+				Battery:      req.Battery,
+				StepCallback: cb,
+				Scan:         sc,
+			})
 
-		if err != nil {
-			return
+			if err != nil {
+				return
+			}
 		}
-
 	}
 
 	return

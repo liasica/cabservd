@@ -7,7 +7,7 @@ package xlls
 
 import (
 	jsoniter "github.com/json-iterator/go"
-	"github.com/oklog/ulid/v2"
+	"github.com/teris-io/shortid"
 )
 
 // ApiResponse 接口响应, 西六楼 -> 平台
@@ -34,5 +34,6 @@ func (r *NotifyResult[T]) Bytes() []byte {
 }
 
 func generateRequestID() string {
-	return ulid.Make().String()
+	s, _ := shortid.Generate()
+	return s
 }

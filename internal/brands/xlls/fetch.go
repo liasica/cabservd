@@ -79,11 +79,16 @@ func fetchCellCommand(req *CellCommandRequest) (string, error) {
 	return result.RequestID, nil
 }
 
-func fetchExchange(req *BusinessExchangeRequest) (ExchangeStatus, error) {
-	result, err := doRequest[BusinessResponse]("/openapi/business/exchange/order", req)
+// 换电请求
+func fetchExchange(req *bizExchangeRequest) (exchangeStatus, error) {
+	result, err := doRequest[bizResponse]("/openapi/business/exchange/order", req)
 	if err != nil {
-		return ExchangeStatusUnknown, err
+		return exchangeStatusUnknown, err
 	}
-	status := ExchangeStatus(result.Status)
+	status := exchangeStatus(result.Status)
 	return status, status.error()
+}
+
+func fetchBizQuery(req *bizQueryRequest) (*bizQueryResult, error) {
+	return doRequest[*bizQueryResult]("/openapi/business/order/query", req)
 }

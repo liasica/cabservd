@@ -20,8 +20,8 @@ import (
 	"github.com/auroraride/cabservd/internal/core"
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/bin"
+	"github.com/auroraride/cabservd/internal/ent/console"
 	"github.com/auroraride/cabservd/internal/g"
-	"github.com/auroraride/cabservd/internal/mem"
 	"github.com/auroraride/cabservd/internal/sync"
 	"github.com/auroraride/cabservd/internal/types"
 )
@@ -75,10 +75,6 @@ func (s *binService) Operate(bo *types.Bin) (err error) {
 
 	// 步骤结果监听器
 	stepper := make(chan *types.BinResult)
-
-	// 记录操作
-	mem.BinOperate(bo.Serial, bo.Ordinal, bo.MainOperate)
-	defer mem.BinOperationFinished(bo.Serial, bo.Ordinal)
 
 	// 创建可中断任务
 	biztask := biz.Create(bo.Serial, bo.Ordinal, bo.Business, bo.MainOperate, s.GetUser())
@@ -216,7 +212,21 @@ func (s *binService) IsExchangeThirdStep(business adapter.Business, step *types.
 func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinStep, stepper chan *types.BinResult) (err error) {
 	// 创建记录
 	var co *ent.Console
-	co, err = NewConsole(s.GetUser()).Create(bo, step, eb)
+	co, err = ent.Database.Console.Create().
+		SetOperate(step.Operate).
+		SetCabinetID(eb.CabinetID).
+		SetBinID(eb.ID).
+		SetSerial(eb.Serial).
+		SetUserID(s.GetUser().ID).
+		SetUserType(s.GetUser().Type).
+		SetStatus(console.StatusRunning).
+		SetStartAt(time.Now()).
+		SetBeforeBin(eb.Info()).
+		SetStep(step.Step).
+		SetBusiness(bo.Business).
+		SetUUID(bo.UUID).
+		SetRemark(bo.Remark).
+		Save(s.GetContext())
 	if err != nil {
 		return
 	}
@@ -298,7 +308,7 @@ func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinSt
 			// }
 		}
 	case adapter.CabinetBrandXiliulouServer:
-		err = xlls.BinTransfer(bo, step)
+		err = xlls.BinOperate(bo, step)
 	}
 
 	// 监听步骤结果
