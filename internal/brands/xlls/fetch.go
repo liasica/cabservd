@@ -92,3 +92,7 @@ func fetchExchange(req *bizExchangeRequest) (exchangeStatus, error) {
 func fetchBizQuery(req *bizQueryRequest) (*bizQueryResult, error) {
 	return doRequest[*bizQueryResult]("/openapi/business/order/query", req)
 }
+
+func fetchCoreCommand[T any](req *CabinetCommandRequest[T]) (any, error) {
+	return doRequest[any]("/openapi/cabinet/core/command", req)
+}

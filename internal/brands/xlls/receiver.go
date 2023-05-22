@@ -88,7 +88,18 @@ func (r *receiver) onCab(c echo.Context) error {
 		return err
 	}
 
-	ent.UpdateCabinet(data)
+	// 若新增电柜, 下发二维码
+	if ent.UpdateCabinet(data) {
+		go func() {
+			_, _ = fetchCoreCommand[AppAttr](&CabinetCommandRequest[AppAttr]{
+				Sn:      *data.Sn,
+				Command: SettingApp,
+				Data: AppAttr{
+					QrAddress: data.Sn,
+				},
+			})
+		}()
+	}
 
 	return r.send(c, data)
 }

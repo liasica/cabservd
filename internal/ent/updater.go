@@ -23,7 +23,9 @@ type CabinetUpdater interface {
 	GetBins() BinPointers
 }
 
-func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *Cabinet) {
+// LoadOrStoreCabinet 查找并创建电柜
+// create 是否新增
+func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *Cabinet, created bool) {
 	orm := Database.Cabinet
 	cab, _ = orm.Query().Where(cabinet.Serial(serial)).First(ctx)
 	if cab != nil {
@@ -34,10 +36,11 @@ func LoadOrStoreCabinet(ctx context.Context, serial string) (cab *Cabinet) {
 	if err != nil {
 		zap.L().Error("电柜保存失败", zap.Error(err))
 	}
+	created = true
 	return
 }
 
-func UpdateCabinet(p CabinetUpdater) {
+func UpdateCabinet(p CabinetUpdater) (created bool) {
 	if p == nil {
 		return
 	}
@@ -49,7 +52,8 @@ func UpdateCabinet(p CabinetUpdater) {
 		return
 	}
 
-	cab := LoadOrStoreCabinet(ctx, serial)
+	var cab *Cabinet
+	cab, created = LoadOrStoreCabinet(ctx, serial)
 	if cab == nil {
 		zap.L().Error("仓位保存失败: 未找到电柜信息")
 		return
@@ -66,6 +70,8 @@ func UpdateCabinet(p CabinetUpdater) {
 	if len(bp) > 0 {
 		saveBins(cab, bp)
 	}
+
+	return
 }
 
 func saveCabinet(cab *Cabinet, item *CabinetPointer) {
