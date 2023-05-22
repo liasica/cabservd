@@ -89,7 +89,7 @@ func Boot(starter func()) {
 	userSkipper := map[string]bool{
 		"/maintain/update/:token": true,
 		"/maintain/clients":       true,
-		"/xllscab/battery":        true,
+		"/battery":                true,
 	}
 	e := app.NewEcho(&app.EchoConfig{
 		AuthSkipper: func(c echo.Context) bool {

@@ -41,7 +41,7 @@ func Start(e *echo.Echo, brand adapter.CabinetBrand) {
 
 	// 西六楼电柜
 	if brand == adapter.CabinetBrandXiliulouServer {
-		e.Any("/xllscab/battery", api.Xllscab.Battery)
+		e.Any("/battery", api.Xllscab.Battery)
 	}
 
 	if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
