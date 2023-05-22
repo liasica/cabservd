@@ -42,10 +42,18 @@ kxnicab:
 kxnicab-dev:
 	$(call deploy,kxnicab-dev,kxnicab)
 
+.PHONY: xllscab
+xllscab:
+	$(call deploy,xllscab,xllscab)
+
+.PHONY: xllscab-dev
+xllscab-dev:
+	$(call deploy,xllscab-dev,xllscab)
+
 .PHONY: all
 all:
-	make kxcab && make kxnicab && make ydcab && make tbcab && make kxcab-dev && make kxnicab-dev && make ydcab-dev && make tbcab-dev
+	make kxcab && make kxnicab && make ydcab && make tbcab && make xllscab && make kxcab-dev && make kxnicab-dev && make ydcab-dev && make tbcab-dev && make xllscab-dev
 
 .PHONY: dev
 dev:
-	make kxcab-dev && make kxnicab-dev && make ydcab-dev && make tbcab-dev
+	make kxcab-dev && make kxnicab-dev && make ydcab-dev && make tbcab-dev && make xllscab-dev

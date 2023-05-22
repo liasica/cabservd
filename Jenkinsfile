@@ -63,6 +63,22 @@ node {
             }
         }
     }
+    stage('xllscab') {
+        if (TAG == 'xllscab') {
+            echo '开始部署[xllscab]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
+    stage('xllscab-dev') {
+        if (TAG == 'xllscab-dev') {
+            echo '开始部署[xllscab-dev]'
+            sshagent (credentials: ['Jenkins']) {
+                sh "ssh -o StrictHostKeyChecking=no root@39.106.77.239 '${deploy(TAG)}'"
+            }
+        }
+    }
 }
 
 def deploy(tag) {
