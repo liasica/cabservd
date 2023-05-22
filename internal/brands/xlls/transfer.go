@@ -68,12 +68,18 @@ func BinBusiness(user *adapter.User, sc *ent.Scan, batterySN string, cb types.St
 		for {
 			select {
 			case data := <-notifier:
+				if data == nil {
+					continue
+				}
+
 				var stop bool
 				var result *cabdef.BinOperateResult
 				stop, result, err = bizStep(user, sc, data)
 
-				// 回调结果
-				go cb(result)
+				if result != nil {
+					// 回调结果
+					go cb(result)
+				}
 
 				// 如果是最终步骤或者发生错误
 				if stop {
@@ -133,6 +139,12 @@ func bizStep(user *adapter.User, sc *ent.Scan, data *BusinessNotify) (stop bool,
 	// 如果是最后一步 或者 发生错误
 	stop = status.last() || err != nil
 	step := status.step()
+
+	// 有可能步骤为0
+	if step == 0 {
+		return
+	}
+
 	bs := status.binStep()
 
 	ctx := context.Background()

@@ -11,8 +11,10 @@ import (
 	"github.com/auroraride/adapter/async"
 	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/auroraride/adapter/maintain"
-	"github.com/auroraride/cabservd/internal/service"
+	"github.com/auroraride/adapter/snag"
 	"github.com/labstack/echo/v4"
+
+	"github.com/auroraride/cabservd/internal/service"
 )
 
 type exchange struct{}
@@ -34,7 +36,9 @@ func (*exchange) Do(c echo.Context) (err error) {
 	}
 
 	return async.WithTaskReturn[error](func() error {
-		ctx, req := app.ContextAndBinding[cabdef.ExchangeRequest](c)
-		return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
+		return snag.WithRecoverError(func() error {
+			ctx, req := app.ContextAndBinding[cabdef.ExchangeRequest](c)
+			return ctx.SendResponse(service.NewExchange(ctx.User).Do(req))
+		})
 	})
 }
