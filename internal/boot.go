@@ -89,6 +89,7 @@ func Boot(starter func()) {
 	userSkipper := map[string]bool{
 		"/maintain/update/:token": true,
 		"/maintain/clients":       true,
+		"/xllscab/battery":        true,
 	}
 	e := app.NewEcho(&app.EchoConfig{
 		AuthSkipper: func(c echo.Context) bool {
@@ -99,7 +100,7 @@ func Boot(starter func()) {
 			return c.Path() == "/maintain/clients"
 		},
 	})
-	go router.Start(e)
+	go router.Start(e, g.Config.Brand)
 
 	go starter()
 

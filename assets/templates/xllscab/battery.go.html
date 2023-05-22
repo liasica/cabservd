@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>西六楼API版电池列表</title>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/bulma/0.9.4/css/bulma.css">
+    <style>
+        textarea {
+            font-family: monospace
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="section">
+    <div class="container is-fluid">
+        <div class="notification is-primary is-light hidden">
+            <button class="delete"></button>
+            <span>后台提交中, 请稍后刷新页面验证</span>
+        </div>
+
+        <section>
+            <label class="control">
+                <textarea class="textarea has-fixed-size is-primary" placeholder="输入需要添加的电池编码, 每行一个"></textarea>
+            </label>
+            <button class="button is-primary mt-2 submit">提交</button>
+        </section>
+
+        <section class="mt-6">
+            <pre>{{.items}}</pre>
+        </section>
+
+    </div>
+</section>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+            const $notification = $delete.parentNode
+
+            $delete.addEventListener('click', () => {
+                $notification.parentNode.removeChild($notification)
+            })
+        })
+    })
+
+    document.querySelector('.submit').addEventListener('click', () => {
+        const $textarea = document.querySelector('textarea')
+        const $notification = document.querySelector('.notification')
+
+        fetch(location.href, {
+            method: 'POST',
+            body: $textarea.value
+        }).then(res => {
+            console.info(res, res.text())
+            $notification.classList.remove('hidden')
+        })
+
+    })
+</script>
+</body>
+</html>

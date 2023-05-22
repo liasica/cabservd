@@ -50,8 +50,8 @@ func fetchCellAttr(req *CellAttrRequest) (BinAttrs, error) {
 	return doRequest[BinAttrs]("/openapi/cell/attr", req)
 }
 
-// 批量创建电池
-func fetchBatteryCreate(req *BatteryCreateRequest) (data any, err error) {
+// FetchBatteryCreate 批量创建电池
+func FetchBatteryCreate(req *BatteryCreateRequest) (data any, err error) {
 	return doRequest[any]("/openapi/battery/create", req)
 }
 

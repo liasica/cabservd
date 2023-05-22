@@ -8,6 +8,7 @@ package router
 import (
 	"net/http"
 
+	"github.com/auroraride/adapter"
 	"github.com/auroraride/adapter/app"
 	"github.com/labstack/echo/v4"
 	"go.uber.org/zap"
@@ -18,7 +19,7 @@ import (
 	"github.com/auroraride/cabservd/internal/middleware"
 )
 
-func Start(e *echo.Echo) {
+func Start(e *echo.Echo, brand adapter.CabinetBrand) {
 	e.Renderer = assets.Templates
 
 	e.GET("/maintain/clients", api.Maintain.Clients)
@@ -37,6 +38,11 @@ func Start(e *echo.Echo) {
 
 	// 电柜信息
 	e.POST("/device/bininfo", api.Device.BinInfo)
+
+	// 西六楼电柜
+	if brand == adapter.CabinetBrandXiliulouServer {
+		e.Any("/xllscab/battery", api.Xllscab.Battery)
+	}
 
 	if err := e.Start(g.Config.Api.Bind); err != nil && err != http.ErrServerClosed {
 		zap.L().Fatal(err.Error())
