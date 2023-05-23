@@ -13,6 +13,9 @@ import (
 )
 
 func main() {
+	g.ExchangeFirstStepRetryTimes = 3
+	g.ExchangeThirdStepRetryTimes = 3
+
 	internal.Boot(func() {
 		hook, codecor := kaixin.New()
 		// 启动socket hub
