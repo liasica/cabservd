@@ -9,12 +9,13 @@ import (
 	"strconv"
 
 	"github.com/auroraride/adapter"
+	"github.com/liasica/go-helpers/silk"
+	"github.com/liasica/go-helpers/tools"
+
 	"github.com/auroraride/cabservd/internal/ent"
 	"github.com/auroraride/cabservd/internal/ent/cabinet"
 	"github.com/auroraride/cabservd/internal/g"
 	"github.com/auroraride/cabservd/internal/mem"
-	"github.com/liasica/go-helpers/silk"
-	"github.com/liasica/go-helpers/tools"
 )
 
 // GetSerial 获取电柜编码
@@ -120,12 +121,14 @@ func (r *Request) GetBins() (items ent.BinPointers) {
 		}
 
 		// 计算电芯单体电压
+		// TODO 拓邦改造更新后删除
 		if attr.ID.Contains(SignalBatteryMonVoltage) {
-			// 更新单芯电压
-			// TODO 拓邦更新后删除
-			mv := tools.StrToFloat64(v) / 1000.0
-			index, _ := strconv.Atoi(attr.ID.String()[6:])
-			mem.VoltageMonUpdate(r.DevID, ordinal, index, mv)
+			if g.Config.Brand == adapter.CabinetBrandTuobang {
+				// 更新单芯电压
+				mv := tools.StrToFloat64(v) / 1000.0
+				index, _ := strconv.Atoi(attr.ID.String()[6:])
+				mem.VoltageMonUpdate(r.DevID, ordinal, index, mv)
+			}
 			continue
 		}
 
@@ -171,7 +174,7 @@ func (r *Request) GetBins() (items ent.BinPointers) {
 			}
 
 			// 删除单芯电压
-			// TODO 拓邦更新后删除
+			// TODO 拓邦改造更新后删除
 			if v == "" && g.CalculateMonVoltage {
 				mem.VoltageClear(r.DevID, ordinal)
 			}
@@ -191,6 +194,7 @@ func (r *Request) GetBins() (items ent.BinPointers) {
 	}
 
 	for _, p := range m {
+		// TODO 拓邦改造更新后删除
 		if g.CalculateMonVoltage {
 			p.Voltage = silk.Pointer(mem.VoltageGet(r.DevID, *p.Ordinal))
 		}

@@ -7,6 +7,7 @@ package mem
 
 import (
 	"math"
+	"strconv"
 	"sync"
 )
 
@@ -19,8 +20,10 @@ var (
 )
 
 type MonVoltage struct {
-	Total    float64
-	Monomers map[int]float64
+	Total float64
+	// 单芯电压
+	// 数据结构为: index => float64
+	Monomers sync.Map
 }
 
 func VoltageClear(serial string, ordinal int) {
@@ -32,18 +35,20 @@ func VoltageMonUpdate(serial string, ordinal int, index int, voltage float64) {
 	v, ok := batteryVoltage.Load(key)
 	if !ok {
 		v = &MonVoltage{
-			Total:    0,
-			Monomers: make(map[int]float64),
+			Total: 0,
 		}
 	}
 
 	t := v.(*MonVoltage)
-	t.Monomers[index] = voltage
-	t.Total = 0
 
-	for k := range t.Monomers {
-		t.Total += t.Monomers[k]
-	}
+	t.Monomers.Store(strconv.Itoa(index), voltage)
+
+	// 重新计算总电压
+	t.Total = 0
+	t.Monomers.Range(func(_, value any) bool {
+		t.Total += value.(float64)
+		return true
+	})
 
 	batteryVoltage.Store(key, v)
 }

@@ -294,7 +294,9 @@ func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinSt
 				// TODO 这部分代码太丑了, 需要进行优化
 				if s.IsExchangeFirstStep(bo.Business, step) && g.ExchangeFirstStepRetryTimes > 1 ||
 					s.IsExchangeThirdStep(bo.Business, step) && g.ExchangeThirdStepRetryTimes > 1 {
-					ticker.Reset(3 * time.Second)
+					if ticker != nil {
+						ticker.Reset(3 * time.Second)
+					}
 				}
 			})
 
