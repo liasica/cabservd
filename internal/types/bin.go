@@ -88,6 +88,24 @@ var (
 		},
 	}
 
+	// OpenWaitCloseConfigure 开仓并等待关仓
+	OpenWaitCloseConfigure = BinSteps{
+		{
+			Step:    1,
+			Operate: cabdef.OperateDoorOpen,
+			Door:    cabdef.DetectDoorOpen,
+			Battery: cabdef.DetectBatteryIgnore,
+			Bin:     cabdef.DetectBinUsable,
+		},
+		{
+			Step:    2,
+			Operate: cabdef.OperateDetect,
+			Door:    cabdef.DetectDoorClose,
+			Battery: cabdef.DetectBatteryIgnore,
+			Bin:     cabdef.DetectBinIgnore,
+		},
+	}
+
 	// OMOpenConfigure 运维开仓
 	OMOpenConfigure = BinSteps{
 		{
