@@ -28,6 +28,9 @@ func Start(e *echo.Echo, brand adapter.CabinetBrand) {
 	e.POST("/operate/bin", api.Operate.Bin, app.UserTypeManagerMiddleware(), middleware.BinOperateExclusive())
 	e.POST("/bin/deactivate", api.Bin.Deactivate, app.UserTypeManagerMiddleware(), middleware.BinOperateExclusive())
 
+	// 代理操作
+	e.POST("/agent/operate/bin", api.Operate.Bin, app.UserTypeAgentMiddleware(), middleware.BinOperateExclusive())
+
 	// 业务
 	e.POST("/business/usable", api.Business.Usable)
 	e.POST("/business/do", api.Business.Do, middleware.BinOperateExclusive())
