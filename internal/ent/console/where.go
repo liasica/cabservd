@@ -128,6 +128,11 @@ func CommandRetryTimes(v int) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldCommandRetryTimes, v))
 }
 
+// OrderSn applies equality check predicate on the "order_sn" field. It's identical to OrderSnEQ.
+func OrderSn(v string) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldOrderSn, v))
+}
+
 // CabinetIDEQ applies the EQ predicate on the "cabinet_id" field.
 func CabinetIDEQ(v uint64) predicate.Console {
 	return predicate.Console(sql.FieldEQ(FieldCabinetID, v))
@@ -866,6 +871,81 @@ func CommandRetryTimesLT(v int) predicate.Console {
 // CommandRetryTimesLTE applies the LTE predicate on the "command_retry_times" field.
 func CommandRetryTimesLTE(v int) predicate.Console {
 	return predicate.Console(sql.FieldLTE(FieldCommandRetryTimes, v))
+}
+
+// OrderSnEQ applies the EQ predicate on the "order_sn" field.
+func OrderSnEQ(v string) predicate.Console {
+	return predicate.Console(sql.FieldEQ(FieldOrderSn, v))
+}
+
+// OrderSnNEQ applies the NEQ predicate on the "order_sn" field.
+func OrderSnNEQ(v string) predicate.Console {
+	return predicate.Console(sql.FieldNEQ(FieldOrderSn, v))
+}
+
+// OrderSnIn applies the In predicate on the "order_sn" field.
+func OrderSnIn(vs ...string) predicate.Console {
+	return predicate.Console(sql.FieldIn(FieldOrderSn, vs...))
+}
+
+// OrderSnNotIn applies the NotIn predicate on the "order_sn" field.
+func OrderSnNotIn(vs ...string) predicate.Console {
+	return predicate.Console(sql.FieldNotIn(FieldOrderSn, vs...))
+}
+
+// OrderSnGT applies the GT predicate on the "order_sn" field.
+func OrderSnGT(v string) predicate.Console {
+	return predicate.Console(sql.FieldGT(FieldOrderSn, v))
+}
+
+// OrderSnGTE applies the GTE predicate on the "order_sn" field.
+func OrderSnGTE(v string) predicate.Console {
+	return predicate.Console(sql.FieldGTE(FieldOrderSn, v))
+}
+
+// OrderSnLT applies the LT predicate on the "order_sn" field.
+func OrderSnLT(v string) predicate.Console {
+	return predicate.Console(sql.FieldLT(FieldOrderSn, v))
+}
+
+// OrderSnLTE applies the LTE predicate on the "order_sn" field.
+func OrderSnLTE(v string) predicate.Console {
+	return predicate.Console(sql.FieldLTE(FieldOrderSn, v))
+}
+
+// OrderSnContains applies the Contains predicate on the "order_sn" field.
+func OrderSnContains(v string) predicate.Console {
+	return predicate.Console(sql.FieldContains(FieldOrderSn, v))
+}
+
+// OrderSnHasPrefix applies the HasPrefix predicate on the "order_sn" field.
+func OrderSnHasPrefix(v string) predicate.Console {
+	return predicate.Console(sql.FieldHasPrefix(FieldOrderSn, v))
+}
+
+// OrderSnHasSuffix applies the HasSuffix predicate on the "order_sn" field.
+func OrderSnHasSuffix(v string) predicate.Console {
+	return predicate.Console(sql.FieldHasSuffix(FieldOrderSn, v))
+}
+
+// OrderSnIsNil applies the IsNil predicate on the "order_sn" field.
+func OrderSnIsNil() predicate.Console {
+	return predicate.Console(sql.FieldIsNull(FieldOrderSn))
+}
+
+// OrderSnNotNil applies the NotNil predicate on the "order_sn" field.
+func OrderSnNotNil() predicate.Console {
+	return predicate.Console(sql.FieldNotNull(FieldOrderSn))
+}
+
+// OrderSnEqualFold applies the EqualFold predicate on the "order_sn" field.
+func OrderSnEqualFold(v string) predicate.Console {
+	return predicate.Console(sql.FieldEqualFold(FieldOrderSn, v))
+}
+
+// OrderSnContainsFold applies the ContainsFold predicate on the "order_sn" field.
+func OrderSnContainsFold(v string) predicate.Console {
+	return predicate.Console(sql.FieldContainsFold(FieldOrderSn, v))
 }
 
 // HasCabinet applies the HasEdge predicate on the "cabinet" edge.

@@ -14,6 +14,7 @@ import (
 	"github.com/auroraride/adapter/defs/cabdef"
 	"github.com/jinzhu/copier"
 	"github.com/liasica/go-helpers/silk"
+	"golang.org/x/exp/slices"
 
 	"github.com/auroraride/cabservd/internal/brands/xlls"
 	"github.com/auroraride/cabservd/internal/ent"
@@ -139,6 +140,10 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
 	cb := func(r *cabdef.BinOperateResult) {
 		data := silk.Pointer(cabdef.ExchangeStepMessage(*r))
 		res = append(res, data)
+		// 结果排序
+		slices.SortFunc(res, func(a, b *cabdef.ExchangeStepMessage) bool {
+			return a.Step < b.Step
+		})
 		// 异步发送结果
 		go sync.SendMessage(data)
 	}

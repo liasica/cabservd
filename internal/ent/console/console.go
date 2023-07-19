@@ -51,6 +51,8 @@ const (
 	FieldRemark = "remark"
 	// FieldCommandRetryTimes holds the string denoting the command_retry_times field in the database.
 	FieldCommandRetryTimes = "command_retry_times"
+	// FieldOrderSn holds the string denoting the order_sn field in the database.
+	FieldOrderSn = "order_sn"
 	// EdgeCabinet holds the string denoting the cabinet edge name in mutations.
 	EdgeCabinet = "cabinet"
 	// EdgeBin holds the string denoting the bin edge name in mutations.
@@ -94,6 +96,7 @@ var Columns = []string{
 	FieldDuration,
 	FieldRemark,
 	FieldCommandRetryTimes,
+	FieldOrderSn,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -235,6 +238,11 @@ func ByRemark(opts ...sql.OrderTermOption) OrderOption {
 // ByCommandRetryTimes orders the results by the command_retry_times field.
 func ByCommandRetryTimes(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCommandRetryTimes, opts...).ToFunc()
+}
+
+// ByOrderSn orders the results by the order_sn field.
+func ByOrderSn(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOrderSn, opts...).ToFunc()
 }
 
 // ByCabinetField orders the results by cabinet field.

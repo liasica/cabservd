@@ -3138,6 +3138,7 @@ type ConsoleMutation struct {
 	remark                 *string
 	command_retry_times    *int
 	addcommand_retry_times *int
+	order_sn               *string
 	clearedFields          map[string]struct{}
 	cabinet                *uint64
 	clearedcabinet         bool
@@ -4059,6 +4060,55 @@ func (m *ConsoleMutation) ResetCommandRetryTimes() {
 	m.addcommand_retry_times = nil
 }
 
+// SetOrderSn sets the "order_sn" field.
+func (m *ConsoleMutation) SetOrderSn(s string) {
+	m.order_sn = &s
+}
+
+// OrderSn returns the value of the "order_sn" field in the mutation.
+func (m *ConsoleMutation) OrderSn() (r string, exists bool) {
+	v := m.order_sn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldOrderSn returns the old "order_sn" field's value of the Console entity.
+// If the Console object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ConsoleMutation) OldOrderSn(ctx context.Context) (v *string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldOrderSn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldOrderSn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldOrderSn: %w", err)
+	}
+	return oldValue.OrderSn, nil
+}
+
+// ClearOrderSn clears the value of the "order_sn" field.
+func (m *ConsoleMutation) ClearOrderSn() {
+	m.order_sn = nil
+	m.clearedFields[console.FieldOrderSn] = struct{}{}
+}
+
+// OrderSnCleared returns if the "order_sn" field was cleared in this mutation.
+func (m *ConsoleMutation) OrderSnCleared() bool {
+	_, ok := m.clearedFields[console.FieldOrderSn]
+	return ok
+}
+
+// ResetOrderSn resets all changes to the "order_sn" field.
+func (m *ConsoleMutation) ResetOrderSn() {
+	m.order_sn = nil
+	delete(m.clearedFields, console.FieldOrderSn)
+}
+
 // ClearCabinet clears the "cabinet" edge to the Cabinet entity.
 func (m *ConsoleMutation) ClearCabinet() {
 	m.clearedcabinet = true
@@ -4145,7 +4195,7 @@ func (m *ConsoleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ConsoleMutation) Fields() []string {
-	fields := make([]string, 0, 18)
+	fields := make([]string, 0, 19)
 	if m.cabinet != nil {
 		fields = append(fields, console.FieldCabinetID)
 	}
@@ -4200,6 +4250,9 @@ func (m *ConsoleMutation) Fields() []string {
 	if m.command_retry_times != nil {
 		fields = append(fields, console.FieldCommandRetryTimes)
 	}
+	if m.order_sn != nil {
+		fields = append(fields, console.FieldOrderSn)
+	}
 	return fields
 }
 
@@ -4244,6 +4297,8 @@ func (m *ConsoleMutation) Field(name string) (ent.Value, bool) {
 		return m.Remark()
 	case console.FieldCommandRetryTimes:
 		return m.CommandRetryTimes()
+	case console.FieldOrderSn:
+		return m.OrderSn()
 	}
 	return nil, false
 }
@@ -4289,6 +4344,8 @@ func (m *ConsoleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldRemark(ctx)
 	case console.FieldCommandRetryTimes:
 		return m.OldCommandRetryTimes(ctx)
+	case console.FieldOrderSn:
+		return m.OldOrderSn(ctx)
 	}
 	return nil, fmt.Errorf("unknown Console field %s", name)
 }
@@ -4424,6 +4481,13 @@ func (m *ConsoleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCommandRetryTimes(v)
 		return nil
+	case console.FieldOrderSn:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetOrderSn(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Console field %s", name)
 }
@@ -4517,6 +4581,9 @@ func (m *ConsoleMutation) ClearedFields() []string {
 	if m.FieldCleared(console.FieldRemark) {
 		fields = append(fields, console.FieldRemark)
 	}
+	if m.FieldCleared(console.FieldOrderSn) {
+		fields = append(fields, console.FieldOrderSn)
+	}
 	return fields
 }
 
@@ -4554,6 +4621,9 @@ func (m *ConsoleMutation) ClearField(name string) error {
 		return nil
 	case console.FieldRemark:
 		m.ClearRemark()
+		return nil
+	case console.FieldOrderSn:
+		m.ClearOrderSn()
 		return nil
 	}
 	return fmt.Errorf("unknown Console nullable field %s", name)
@@ -4616,6 +4686,9 @@ func (m *ConsoleMutation) ResetField(name string) error {
 		return nil
 	case console.FieldCommandRetryTimes:
 		m.ResetCommandRetryTimes()
+		return nil
+	case console.FieldOrderSn:
+		m.ResetOrderSn()
 		return nil
 	}
 	return fmt.Errorf("unknown Console field %s", name)

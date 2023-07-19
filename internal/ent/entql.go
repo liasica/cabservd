@@ -106,6 +106,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			console.FieldDuration:          {Type: field.TypeFloat64, Column: console.FieldDuration},
 			console.FieldRemark:            {Type: field.TypeString, Column: console.FieldRemark},
 			console.FieldCommandRetryTimes: {Type: field.TypeInt, Column: console.FieldCommandRetryTimes},
+			console.FieldOrderSn:           {Type: field.TypeString, Column: console.FieldOrderSn},
 		},
 	}
 	graph.Nodes[3] = &sqlgraph.Node{
@@ -602,6 +603,11 @@ func (f *ConsoleFilter) WhereRemark(p entql.StringP) {
 // WhereCommandRetryTimes applies the entql int predicate on the command_retry_times field.
 func (f *ConsoleFilter) WhereCommandRetryTimes(p entql.IntP) {
 	f.Where(p.Field(console.FieldCommandRetryTimes))
+}
+
+// WhereOrderSn applies the entql string predicate on the order_sn field.
+func (f *ConsoleFilter) WhereOrderSn(p entql.StringP) {
+	f.Where(p.Field(console.FieldOrderSn))
 }
 
 // WhereHasCabinet applies a predicate to check if query has an edge cabinet.

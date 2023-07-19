@@ -268,6 +268,26 @@ func (cu *ConsoleUpdate) AddCommandRetryTimes(i int) *ConsoleUpdate {
 	return cu
 }
 
+// SetOrderSn sets the "order_sn" field.
+func (cu *ConsoleUpdate) SetOrderSn(s string) *ConsoleUpdate {
+	cu.mutation.SetOrderSn(s)
+	return cu
+}
+
+// SetNillableOrderSn sets the "order_sn" field if the given value is not nil.
+func (cu *ConsoleUpdate) SetNillableOrderSn(s *string) *ConsoleUpdate {
+	if s != nil {
+		cu.SetOrderSn(*s)
+	}
+	return cu
+}
+
+// ClearOrderSn clears the value of the "order_sn" field.
+func (cu *ConsoleUpdate) ClearOrderSn() *ConsoleUpdate {
+	cu.mutation.ClearOrderSn()
+	return cu
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cu *ConsoleUpdate) SetCabinet(c *Cabinet) *ConsoleUpdate {
 	return cu.SetCabinetID(c.ID)
@@ -432,6 +452,12 @@ func (cu *ConsoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.AddedCommandRetryTimes(); ok {
 		_spec.AddField(console.FieldCommandRetryTimes, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.OrderSn(); ok {
+		_spec.SetField(console.FieldOrderSn, field.TypeString, value)
+	}
+	if cu.mutation.OrderSnCleared() {
+		_spec.ClearField(console.FieldOrderSn, field.TypeString)
 	}
 	if cu.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -748,6 +774,26 @@ func (cuo *ConsoleUpdateOne) AddCommandRetryTimes(i int) *ConsoleUpdateOne {
 	return cuo
 }
 
+// SetOrderSn sets the "order_sn" field.
+func (cuo *ConsoleUpdateOne) SetOrderSn(s string) *ConsoleUpdateOne {
+	cuo.mutation.SetOrderSn(s)
+	return cuo
+}
+
+// SetNillableOrderSn sets the "order_sn" field if the given value is not nil.
+func (cuo *ConsoleUpdateOne) SetNillableOrderSn(s *string) *ConsoleUpdateOne {
+	if s != nil {
+		cuo.SetOrderSn(*s)
+	}
+	return cuo
+}
+
+// ClearOrderSn clears the value of the "order_sn" field.
+func (cuo *ConsoleUpdateOne) ClearOrderSn() *ConsoleUpdateOne {
+	cuo.mutation.ClearOrderSn()
+	return cuo
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cuo *ConsoleUpdateOne) SetCabinet(c *Cabinet) *ConsoleUpdateOne {
 	return cuo.SetCabinetID(c.ID)
@@ -942,6 +988,12 @@ func (cuo *ConsoleUpdateOne) sqlSave(ctx context.Context) (_node *Console, err e
 	}
 	if value, ok := cuo.mutation.AddedCommandRetryTimes(); ok {
 		_spec.AddField(console.FieldCommandRetryTimes, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.OrderSn(); ok {
+		_spec.SetField(console.FieldOrderSn, field.TypeString, value)
+	}
+	if cuo.mutation.OrderSnCleared() {
+		_spec.ClearField(console.FieldOrderSn, field.TypeString)
 	}
 	if cuo.mutation.CabinetCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -148,6 +148,7 @@ var (
 		{Name: "duration", Type: field.TypeFloat64, Nullable: true, Comment: "耗时"},
 		{Name: "remark", Type: field.TypeString, Nullable: true, Comment: "备注信息"},
 		{Name: "command_retry_times", Type: field.TypeInt, Comment: "指令重试次数", Default: 1},
+		{Name: "order_sn", Type: field.TypeString, Nullable: true, Comment: "第三方平台订单号"},
 		{Name: "cabinet_id", Type: field.TypeUint64},
 		{Name: "bin_id", Type: field.TypeUint64, Nullable: true},
 	}
@@ -159,13 +160,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "console_cabinet_cabinet",
-				Columns:    []*schema.Column{ConsoleColumns[17]},
+				Columns:    []*schema.Column{ConsoleColumns[18]},
 				RefColumns: []*schema.Column{CabinetColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "console_bin_bin",
-				Columns:    []*schema.Column{ConsoleColumns[18]},
+				Columns:    []*schema.Column{ConsoleColumns[19]},
 				RefColumns: []*schema.Column{BinColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -174,12 +175,12 @@ var (
 			{
 				Name:    "console_cabinet_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[17]},
+				Columns: []*schema.Column{ConsoleColumns[18]},
 			},
 			{
 				Name:    "console_bin_id",
 				Unique:  false,
-				Columns: []*schema.Column{ConsoleColumns[18]},
+				Columns: []*schema.Column{ConsoleColumns[19]},
 			},
 			{
 				Name:    "console_serial",
@@ -210,6 +211,11 @@ var (
 				Name:    "console_stop_at",
 				Unique:  false,
 				Columns: []*schema.Column{ConsoleColumns[13]},
+			},
+			{
+				Name:    "console_order_sn",
+				Unique:  false,
+				Columns: []*schema.Column{ConsoleColumns[17]},
 			},
 		},
 	}

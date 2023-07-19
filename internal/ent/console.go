@@ -59,6 +59,8 @@ type Console struct {
 	Remark *string `json:"remark,omitempty"`
 	// 指令重试次数
 	CommandRetryTimes int `json:"command_retry_times,omitempty"`
+	// 第三方平台订单号
+	OrderSn *string `json:"order_sn,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ConsoleQuery when eager-loading is set.
 	Edges        ConsoleEdges `json:"edges"`
@@ -119,7 +121,7 @@ func (*Console) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case console.FieldID, console.FieldCabinetID, console.FieldBinID, console.FieldStep, console.FieldCommandRetryTimes:
 			values[i] = new(sql.NullInt64)
-		case console.FieldSerial, console.FieldUserID, console.FieldStatus, console.FieldMessage, console.FieldRemark:
+		case console.FieldSerial, console.FieldUserID, console.FieldStatus, console.FieldMessage, console.FieldRemark, console.FieldOrderSn:
 			values[i] = new(sql.NullString)
 		case console.FieldStartAt, console.FieldStopAt:
 			values[i] = new(sql.NullTime)
@@ -264,6 +266,13 @@ func (c *Console) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.CommandRetryTimes = int(value.Int64)
 			}
+		case console.FieldOrderSn:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field order_sn", values[i])
+			} else if value.Valid {
+				c.OrderSn = new(string)
+				*c.OrderSn = value.String
+			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
 		}
@@ -375,6 +384,11 @@ func (c *Console) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("command_retry_times=")
 	builder.WriteString(fmt.Sprintf("%v", c.CommandRetryTimes))
+	builder.WriteString(", ")
+	if v := c.OrderSn; v != nil {
+		builder.WriteString("order_sn=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -86,6 +86,7 @@ func (Console) Fields() []ent.Field {
 		field.String("remark").Optional().Nillable().Comment("备注信息"),
 
 		field.Int("command_retry_times").Default(1).Comment("指令重试次数"),
+		field.String("order_sn").Optional().Nillable().Comment("第三方平台订单号"),
 	}
 }
 
@@ -109,5 +110,6 @@ func (Console) Indexes() []ent.Index {
 		index.Fields("user_type"),
 		index.Fields("startAt"),
 		index.Fields("stopAt"),
+		index.Fields("order_sn"),
 	}
 }

@@ -199,6 +199,20 @@ func (cc *ConsoleCreate) SetNillableCommandRetryTimes(i *int) *ConsoleCreate {
 	return cc
 }
 
+// SetOrderSn sets the "order_sn" field.
+func (cc *ConsoleCreate) SetOrderSn(s string) *ConsoleCreate {
+	cc.mutation.SetOrderSn(s)
+	return cc
+}
+
+// SetNillableOrderSn sets the "order_sn" field if the given value is not nil.
+func (cc *ConsoleCreate) SetNillableOrderSn(s *string) *ConsoleCreate {
+	if s != nil {
+		cc.SetOrderSn(*s)
+	}
+	return cc
+}
+
 // SetCabinet sets the "cabinet" edge to the Cabinet entity.
 func (cc *ConsoleCreate) SetCabinet(c *Cabinet) *ConsoleCreate {
 	return cc.SetCabinetID(c.ID)
@@ -389,6 +403,10 @@ func (cc *ConsoleCreate) createSpec() (*Console, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.CommandRetryTimes(); ok {
 		_spec.SetField(console.FieldCommandRetryTimes, field.TypeInt, value)
 		_node.CommandRetryTimes = value
+	}
+	if value, ok := cc.mutation.OrderSn(); ok {
+		_spec.SetField(console.FieldOrderSn, field.TypeString, value)
+		_node.OrderSn = &value
 	}
 	if nodes := cc.mutation.CabinetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -743,6 +761,24 @@ func (u *ConsoleUpsert) UpdateCommandRetryTimes() *ConsoleUpsert {
 // AddCommandRetryTimes adds v to the "command_retry_times" field.
 func (u *ConsoleUpsert) AddCommandRetryTimes(v int) *ConsoleUpsert {
 	u.Add(console.FieldCommandRetryTimes, v)
+	return u
+}
+
+// SetOrderSn sets the "order_sn" field.
+func (u *ConsoleUpsert) SetOrderSn(v string) *ConsoleUpsert {
+	u.Set(console.FieldOrderSn, v)
+	return u
+}
+
+// UpdateOrderSn sets the "order_sn" field to the value that was provided on create.
+func (u *ConsoleUpsert) UpdateOrderSn() *ConsoleUpsert {
+	u.SetExcluded(console.FieldOrderSn)
+	return u
+}
+
+// ClearOrderSn clears the value of the "order_sn" field.
+func (u *ConsoleUpsert) ClearOrderSn() *ConsoleUpsert {
+	u.SetNull(console.FieldOrderSn)
 	return u
 }
 
@@ -1103,6 +1139,27 @@ func (u *ConsoleUpsertOne) AddCommandRetryTimes(v int) *ConsoleUpsertOne {
 func (u *ConsoleUpsertOne) UpdateCommandRetryTimes() *ConsoleUpsertOne {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateCommandRetryTimes()
+	})
+}
+
+// SetOrderSn sets the "order_sn" field.
+func (u *ConsoleUpsertOne) SetOrderSn(v string) *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetOrderSn(v)
+	})
+}
+
+// UpdateOrderSn sets the "order_sn" field to the value that was provided on create.
+func (u *ConsoleUpsertOne) UpdateOrderSn() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateOrderSn()
+	})
+}
+
+// ClearOrderSn clears the value of the "order_sn" field.
+func (u *ConsoleUpsertOne) ClearOrderSn() *ConsoleUpsertOne {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearOrderSn()
 	})
 }
 
@@ -1633,6 +1690,27 @@ func (u *ConsoleUpsertBulk) AddCommandRetryTimes(v int) *ConsoleUpsertBulk {
 func (u *ConsoleUpsertBulk) UpdateCommandRetryTimes() *ConsoleUpsertBulk {
 	return u.Update(func(s *ConsoleUpsert) {
 		s.UpdateCommandRetryTimes()
+	})
+}
+
+// SetOrderSn sets the "order_sn" field.
+func (u *ConsoleUpsertBulk) SetOrderSn(v string) *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.SetOrderSn(v)
+	})
+}
+
+// UpdateOrderSn sets the "order_sn" field to the value that was provided on create.
+func (u *ConsoleUpsertBulk) UpdateOrderSn() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.UpdateOrderSn()
+	})
+}
+
+// ClearOrderSn clears the value of the "order_sn" field.
+func (u *ConsoleUpsertBulk) ClearOrderSn() *ConsoleUpsertBulk {
+	return u.Update(func(s *ConsoleUpsert) {
+		s.ClearOrderSn()
 	})
 }
 

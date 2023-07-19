@@ -124,7 +124,7 @@ func bizStep(user *adapter.User, sc *ent.Scan, data *BusinessNotify) (stop bool,
 	switch sc.Business {
 	case adapter.BusinessExchange:
 		status = exchangeStatus(data.OperateStep)
-		if status.step() < 2 {
+		if status.step() <= 2 {
 			before = sc.Data.Empty
 		} else {
 			before = sc.Data.Fully
@@ -182,6 +182,7 @@ func bizStep(user *adapter.User, sc *ent.Scan, data *BusinessNotify) (stop bool,
 			SetBeforeBin(before.Info()).
 			SetStep(step).
 			SetBusiness(sc.Business).
+			SetAfterBin(after.Info()).
 			SetUUID(sc.UUID).
 			SetDuration(d).
 			SetStopAt(now)
