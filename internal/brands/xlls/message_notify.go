@@ -17,8 +17,8 @@ func (n Notify) GetRequestID() string {
 	return n.RequestID
 }
 
-// CommandNotify 硬件操作结果通知, 西六楼 -> 平台
-type CommandNotify[T any] struct {
+// HardwareOperation 硬件操作结果通知, 西六楼 -> 平台
+type HardwareOperation[T any] struct {
 	Notify
 	Command string `json:"command"`        // 指令
 	Result  int    `json:"result"`         // 0:成功 1:失败

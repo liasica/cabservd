@@ -59,17 +59,13 @@ func Start() {
 	r := new(receiver)
 
 	// 硬件操作结果通知
-	e.POST(pathHardwareOperation, func(c echo.Context) error {
-		return nil
-	})
+	e.POST(pathHardwareOperation, r.onImperfectMessage)
 
 	// 业务结果通知
 	e.POST(pathBusinesss, r.onBusinuess)
 
 	// 离线换电结果通知
-	e.POST(pathOfflineExchange, func(c echo.Context) error {
-		return nil
-	})
+	e.POST(pathOfflineExchange, r.onImperfectMessage)
 
 	// 格挡状态变化通知
 	e.POST(pathCellChange, r.onBin)
@@ -78,14 +74,10 @@ func Start() {
 	e.POST(pathCabinetChange, r.onCab)
 
 	// 硬件故障通知
-	e.POST(pathHardwareFault, func(c echo.Context) error {
-		return nil
-	})
+	e.POST(pathHardwareFault, r.onImperfectMessage)
 
 	// 自助开仓回调通知
-	e.POST(pathSelfServiceOpen, func(c echo.Context) error {
-		return nil
-	})
+	e.POST(pathSelfServiceOpen, r.onImperfectMessage)
 
 	if err := e.Start(bind); err != nil && err != http.ErrServerClosed {
 		zap.L().Fatal(err.Error())

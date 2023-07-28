@@ -119,3 +119,16 @@ func (r *receiver) onBusinuess(c echo.Context) error {
 
 	return r.send(c, data)
 }
+
+// TODO 未完善消息
+// 硬件操作结果通知
+// 离线换电结果通知
+// 硬件故障通知
+// 自助开仓回调通知
+func (r *receiver) onImperfectMessage(c echo.Context) error {
+	data, err := getReceiverData[Notify](c)
+	if err != nil {
+		return err
+	}
+	return r.send(c, data)
+}
