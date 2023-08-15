@@ -25,8 +25,8 @@ func Start(e *echo.Echo, brand adapter.CabinetBrand) {
 	e.GET("/maintain/clients", api.Maintain.Clients)
 
 	// 仓位操作 <管理员权限>
-	e.POST("/operate/bin", api.Operate.Bin, app.UserTypeManagerMiddleware(), middleware.BinOperateExclusive())
-	e.POST("/bin/deactivate", api.Bin.Deactivate, app.UserTypeManagerMiddleware(), middleware.BinOperateExclusive())
+	e.POST("/operate/bin", api.Operate.Bin, app.UserTypeManagerOrMaintainerMiddleware(), middleware.BinOperateExclusive())
+	e.POST("/bin/deactivate", api.Bin.Deactivate, app.UserTypeManagerOrMaintainerMiddleware(), middleware.BinOperateExclusive())
 
 	// 代理操作
 	e.POST("/agent/operate/bin/open", api.Operate.BinOpenAndClose, app.UserTypeAgentMiddleware(), middleware.BinOperateExclusive())
