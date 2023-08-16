@@ -112,9 +112,9 @@ func BinBusiness(user *adapter.User, sc *ent.Scan, batterySN string, cb types.St
 
 func bizStep(user *adapter.User, sc *ent.Scan, data *BusinessNotify) (stop bool, result *cabdef.BinOperateResult, err error) {
 	// 时间
-	now := time.Now()
-	start := time.UnixMilli(data.OperateTime)
-	d := now.Sub(start).Seconds()
+	start := time.UnixMilli(data.ExchangeStartTime)
+	end := time.UnixMilli(data.ExchangeEndTime)
+	d := end.Sub(start).Seconds()
 
 	// 执行前后仓位状态
 	var before *cabdef.Bin
@@ -158,7 +158,7 @@ func bizStep(user *adapter.User, sc *ent.Scan, data *BusinessNotify) (stop bool,
 		Step:     status.step(),
 		Business: sc.Business,
 		StartAt:  silk.Pointer(start),
-		StopAt:   silk.Pointer(now),
+		StopAt:   silk.Pointer(end),
 		Success:  err == nil,
 		Before:   before.Info(),
 		After:    after.Info(),
@@ -185,7 +185,7 @@ func bizStep(user *adapter.User, sc *ent.Scan, data *BusinessNotify) (stop bool,
 			SetAfterBin(after.Info()).
 			SetUUID(sc.UUID).
 			SetDuration(d).
-			SetStopAt(now)
+			SetStopAt(end)
 		if err != nil {
 			creator.SetStatus(console.StatusFailed).SetMessage(err.Error())
 		} else {
