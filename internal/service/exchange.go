@@ -141,8 +141,11 @@ func (s *exchangeService) start(req *cabdef.ExchangeRequest, sc *ent.Scan) (res 
 		data := silk.Pointer(cabdef.ExchangeStepMessage(*r))
 		res = append(res, data)
 		// 结果排序
-		slices.SortFunc(res, func(a, b *cabdef.ExchangeStepMessage) bool {
-			return a.Step < b.Step
+		slices.SortStableFunc(res, func(a, b *cabdef.ExchangeStepMessage) int {
+			if a.Step > b.Step {
+				return 1
+			}
+			return -1
 		})
 		// 异步发送结果
 		go sync.SendMessage(data)
