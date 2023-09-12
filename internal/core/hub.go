@@ -6,6 +6,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -101,7 +102,7 @@ func (h *hub) OnTraffic(conn gnet.Conn) (action gnet.Action) {
 			}
 		}
 
-		if err == adapter.ErrorIncompletePacket {
+		if errors.Is(err, adapter.ErrorIncompletePacket) {
 			break
 		}
 

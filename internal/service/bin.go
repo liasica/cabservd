@@ -292,10 +292,9 @@ func (s *binService) doOperateStep(bo *types.Bin, eb *ent.Bin, step *types.BinSt
 
 				// 「换电第一步」如果需要重复开仓, 则重置为每隔3s检测一次是否响应, 若指令无响应则重复开仓
 				// TODO 这部分代码太丑了, 需要进行优化
-				if s.IsExchangeFirstStep(bo.Business, step) && g.ExchangeFirstStepRetryTimes > 1 ||
-					s.IsExchangeThirdStep(bo.Business, step) && g.ExchangeThirdStepRetryTimes > 1 {
+				if g.ExchangeThirdStepRetryTimes > 1 && (s.IsExchangeFirstStep(bo.Business, step) || s.IsExchangeThirdStep(bo.Business, step)) {
 					if ticker != nil {
-						ticker.Reset(3 * time.Second)
+						ticker.Reset(4 * time.Second)
 					}
 				}
 			})
