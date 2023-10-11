@@ -14,8 +14,8 @@ import (
 	"github.com/auroraride/adapter/app"
 	"github.com/auroraride/adapter/log"
 	"github.com/auroraride/adapter/maintain"
-	"github.com/go-redis/redis/v9"
 	"github.com/labstack/echo/v4"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/auroraride/cabservd/assets"
 	"github.com/auroraride/cabservd/internal/demo"
